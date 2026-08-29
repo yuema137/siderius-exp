@@ -25,13 +25,24 @@ Proven on the `ligroup` development server:
 - one cold-start LLM-driven Trial completed training, inference, and validation
   AUPRC scoring on `cpdb` (`0.18473163467815523`); its subsequent two-network
   Formal attempt was killed by the generic setup-only watchdog defect tracked
-  in SIDERIUS issue `#388` before validation completed.
+  in SIDERIUS issue `#388` before validation completed;
+- a second cold-start Trial scored `ltg` validation AUPRC at
+  `0.20331661762333703`;
+- a second cold-start run completed Formal training after disabling the broken
+  watchdog, then exposed the variable-shape generic inference batching defect
+  tracked in SIDERIUS issue `#389` (`inference_batch=64` attempted to stack the
+  complete `cpdb` and `ltg` graph tensors);
+- a phase-only replay of that exact Formal checkpoint with inference batch 1
+  completed task-owned inference and scoring: `cpdb=0.3519765294390681`,
+  `ltg=0.18345607540350573`, and unweighted mean validation
+  AUPRC `0.2677163024212869`.
 
 Not yet proven:
 
 - acquisition and identity verification of the eight real NatureBench HDF5
   files on TestPod;
-- complete two-network Formal inference and mean AUPRC scoring;
+- complete two-network Formal inference and mean AUPRC scoring inside an
+  uninterrupted discovery chain;
 - HealthGate behavior or campaign resume;
 - a complete LLM-driven discovery iteration;
 - reproduction or improvement of AI-Build-AI's artifact mean AUPRC
