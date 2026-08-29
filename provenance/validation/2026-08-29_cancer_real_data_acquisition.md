@@ -82,3 +82,10 @@ training because the execution environment did not provide `OPENAI_API_KEY`.
 The run correctly persisted a failed manifest and produced no authoritative
 result. This is a credential availability boundary, not a GPU or task-data
 failure.
+
+After explicitly loading the repository credential environment, a fresh
+production-chain attempt reached all three proposal attempts. Each received a
+valid LLM response and then failed before implementation because the generic
+proposer converted the non-applicable legacy static-estimator factor from
+`None` with `float(...)`. The reproducible generic defect is SIDERIUS #387;
+framework repair `52e3e8e0` records a named preflight skip and continues.

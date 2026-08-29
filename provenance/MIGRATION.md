@@ -36,6 +36,7 @@
 | SIDERIUS #384 | task-valid semantic targets in VRAM admission probes | repaired and externally witnessed at `8be2874d` |
 | SIDERIUS #385 | task-valid context in generic deliverable writing | repaired and externally witnessed at `8be2874d` |
 | SIDERIUS #386 | TIDMAD configuration resolution during generic workflow import | repaired and externally witnessed at `8be2874d` |
+| SIDERIUS #387 | non-applicable proposal preflight converted null factor with `float(None)` | reproduced by Cancer qualification and repaired at `52e3e8e0` |
 
 ## Portability changes
 
