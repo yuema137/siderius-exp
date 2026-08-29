@@ -1,0 +1,46 @@
+# GOLD CAMPAIGN task-owned PROPOSER guidance — v0.1.4.
+#
+# A COPY of configs/task_proposal/tidmad.yaml with the classification-bearing
+# prose made regression-consistent. TWO keys differ; every other key is
+# byte-verbatim, including the whole evidence-reading and per-file strategy
+# science, which is about READING EVIDENCE and is representation-neutral.
+#
+#   class_axis_note            OMITTED. It read
+#                                "256 denoising bins per time step is contract-fixed, not a hyperparameter"
+#                              The framework renders a generic
+#                              "the declared output dimension is contract-fixed,
+#                              not a hyperparameter" when the key is absent, so
+#                              omission yields an honest sentence rather than an
+#                              invented class count.
+#
+#   output_contract_guidance   REPLACED. It offered BOTH representations
+#                              ("Regression predicts ...; classification
+#                              predicts a distribution over 256 amplitude bins
+#                              per timestep."), which under a regression-locked
+#                              task is an invitation to propose the refused one.
+#
+# `input_semantics` is UNCHANGED: the INPUT is still integer-coded ADC samples.
+# Only the OUTPUT representation is locked.
+#
+# configs/task_proposal/tidmad.yaml is UNCHANGED; this is bound campaign-locally
+# through the composition manifest's `proposal_blocks:` section.
+architect_role: deep learning for signal denoising
+continuous_output_meaning: the denoised waveform directly
+evidence_citation_clause: ', and the
+
+  `Impact_Score` / `Linear_Weight` columns of the per-file score table'
+evidence_rationale_clause: ' and per-file lever distribution from the Impact_Score column'
+evidence_reading: "   - Read each model's per-file score table by `Impact_Score` descending — that is\n\
+  \     the per-iter opportunity ranking. Cite `Linear_Weight` as context, not as a\n     ranking metric\
+  \ on its own. Identify whether the largest remaining\n     `Impact_Score` levers concentrate on a small\
+  \ subset of files or are\n     distributed broadly, and whether the same files dominate across models\
+  \ —\n     those are the cross-model opportunities the new architecture should target.\n     Do not assert\
+  \ that any file is universally weak from `headroom_vs_gt` alone\n     or from a fixed file-index label."
+input_semantics: per-timestep ADC class indices
+output_contract_guidance: 'This task predicts the denoised waveform directly: one continuous value per
+  timestep. Do not propose per-class logits, a class axis, or an argmax decode.'
+per_file_strategy_guidance: 'Whether to use snapshot/target/anchors strategy based on the Impact_Score
+  distribution
+
+  Which files (by Impact_Score ranking, not by fixed indices) to focus on if using target strategy'
+target_strategy_selector_clause: " (concentrate on the\n       highest-Impact_Score files)"

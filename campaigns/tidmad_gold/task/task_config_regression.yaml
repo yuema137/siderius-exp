@@ -1,0 +1,87 @@
+# sdsc_submission_scripts/gold_task/task_config_regression.yaml
+# ---------------------------------------------------------------------------
+# GOLD CAMPAIGN task configuration — v0.1.4, operator ruling (regression-only).
+#
+# This is a CAMPAIGN-SCOPED variant of configs/task_config.yaml, bound through
+# the existing `--task_config` mechanism that run_gold_campaign.sh already
+# emits. SIDERIUS's generic classification support is UNTOUCHED; only the Gold
+# campaign's task definition changes.
+#
+# WHY THIS FILE EXISTS. The v0.1.3 Gold campaign produced 119 scored candidates
+# that were overwhelmingly classifiers, with repeated CE mode collapse and a
+# near-single-class artifact. That was not a proposer preference — the task
+# definition itself instructed it. The shipped config declares
+# `task_type: classification`, a fixed 256-class output axis, "per-timestep
+# logits over 256 denoising classes", and an output-head note telling the model
+# to end in `Conv1d(channels, num_classes, 1)`. Advice alone cannot fix that:
+# the proposer would receive two contradicting authorities, advice saying
+# regression and the task definition saying 256-class classification.
+#
+# The historical FCNet reference this campaign is measured against is a
+# CONTINUOUS WAVEFORM REGRESSOR (`output_kind: regressor` in the adopted score
+# artifact; SmoothL1 in the paper implementation). Comparing a classifier search
+# against a regression baseline was never apples-to-apples.
+#
+# THE SHAPES BELOW ARE NOT INVENTED. They are the shapes SIDERIUS's already
+# working regression path consumes: `inference_single.py` decodes a regression
+# model with `output_seq = output.detach().cpu().numpy()` on a
+# "Regression task: Output is already [Batch, Time]" branch, versus
+# `output.argmax(dim=1)` for a classifier. Input is unchanged.
+# ---------------------------------------------------------------------------
+
+# Plain-English description of the research task.
+# Injected into the {TASK_DESCRIPTION} placeholder in all agent system prompts.
+# Keep this concise — it appears in every LLM call.
+task_description: |
+  full-spectrum 1-D time-series denoising of SQUID dark-matter
+  detector data: map a noisy [B, T] integer signal to a clean
+  [B, T] continuous waveform, trained across the whole frequency
+  spectrum at once (not split into per-band models). This is a
+  continuous regression task — the model predicts waveform values
+  directly, not a distribution over discrete levels.
+
+# Forward contract for the model plugin interface.
+# Injected into the {FORWARD_CONTRACT} placeholder in implementor and proposer
+# system prompts. Must describe the exact PyTorch tensor shapes and types
+# expected by the training engine and validator.
+forward_contract:
+  # `preset` is authoring convenience only. It is read once, during
+  # resolution, and never reaches a runtime consumer.
+  preset: sequence
+  model_io:
+    input:
+      # UNCHANGED from the shipped contract. The input is still the raw
+      # integer-coded signal; only the OUTPUT representation changes.
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {role: temporal, dimension: {symbolic: "T"}}
+      dtype: {admissible: ["int64", "int32"]}
+    output:
+      # Continuous waveform: [B, T] float32. NO class axis — that axis is
+      # exactly what made every candidate a classifier.
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {role: temporal, dimension: {symbolic: "T"}}
+      dtype: {admissible: ["float32"]}
+  input_description: "raw signal, integer-coded samples 0-255"
+  output_description: "continuous denoised waveform value per timestep"
+  embedding_note: >
+    Input values are integer-coded samples — nn.Embedding(256, embed_dim) to
+    convert [B, T] int64 → [B, T, embed_dim], then transpose to
+    [B, embed_dim, T] for Conv1d layers, remains a valid and common input
+    stem. The input representation is unchanged; only the output is
+    continuous.
+  output_head_note: >
+    Output must be exactly [output_shape] — a continuous value per timestep,
+    e.g. a final Conv1d(channels, 1, 1) followed by squeeze, or any head that
+    emits [B, T] float32. Do NOT emit per-class logits and do NOT argmax:
+    this task predicts waveform values directly. Residual formulations are
+    natural here — predicting a correction to the input, or predicting the
+    noise and subtracting it, preserves amplitude and low-frequency structure
+    instead of regenerating the waveform from scratch.
+  task_type: "regression"
+  task_note: >
+    Offline denoising — output at position t may depend on all positions.
+    Causal constraints are not required. The objective is a continuous
+    regression loss; robust choices such as SmoothL1/Huber are strong
+    task-grounded starting points, and the loss itself remains searchable.

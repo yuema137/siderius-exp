@@ -21,4 +21,13 @@
 
 | Batch | Source | Destination | Source revision | Status | Evidence |
 |---|---|---|---|---|---|
-| Bootstrap | repository boundary and dependency pin | repository root | `98610b8ded2277598749cc05ab567e1b92902bde` | prepared | pending initial commit |
+| Bootstrap | repository boundary and dependency pin | repository root | `98610b8ded2277598749cc05ab567e1b92902bde` | complete | commit `108dea0` |
+| Gold source import | Gold protocol, task overlay, launchers, and evidence | `campaigns/tidmad_gold` | `624e1a93942fbc745b4559848048c578d5dd3074` | imported, not yet portable | byte equality plus `tidmad_gold_import_sha256.txt` |
+
+## Framework blockers discovered during separation
+
+| Issue | Boundary | Status |
+|---|---|---|
+| SIDERIUS #383 | composed Health binding through round evaluation | open |
+| SIDERIUS #384 | task-valid semantic targets in VRAM admission probes | open |
+| SIDERIUS #385 | task-valid context in generic deliverable writing | open |
