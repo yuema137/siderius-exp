@@ -1,0 +1,46 @@
+task_data_path:
+  file: ../../plugins/_cancer_gene_task.py
+  symbol: CancerGeneTaskDataPath
+  id: naturebench_cancer_gene
+  config:
+    instances: [cpdb, ltg]
+    evaluation_split: val
+
+dataset_profile:
+  config: ../../declared/dataset_profile.json
+
+metric:
+  declaration: ../../declared/metric_mean_auprc.json
+  implementation:
+    file: ../../plugins/_cancer_gene_metrics.py
+    symbol: CancerGeneMeanAuprcMetric
+
+secondary_metrics:
+  - declaration: ../../declared/metric_mean_auroc.json
+    implementation:
+      file: ../../plugins/_cancer_gene_metrics.py
+      symbol: CancerGeneMeanAurocMetric
+
+task_health:
+  none: true
+
+interpretation_blocks:
+  none: true
+proposal_blocks:
+  config: ../../declared/proposal_blocks.yaml
+implementor_blocks:
+  config: ../../declared/implementor_blocks.yaml
+
+task_config:
+  config: ../../declared/task_config.yaml
+
+model_plugins:
+  dir: ../../plugins
+  require: [cancer_gene_reference_gnn]
+
+loss_plugins:
+  dir: ../../plugins
+objective:
+  implementation:
+    file: ../../plugins/cancer_gene_masked_bce.py
+    symbol: PLUGIN_LOSS_TYPE

@@ -26,15 +26,16 @@
 | Real task import | TIDMAD, Oxford-IIIT Pet, and DAVIS packages | `tasks/**` | `624e1a93942fbc745b4559848048c578d5dd3074` | imported, not yet portable | byte equality plus `real_task_import_sha256.txt` |
 | Cancer Gene import | Cancer Gene Identification package | `tasks/cancer_gene_identification` | `41c030721` | imported, not yet portable | byte equality plus `real_task_import_sha256.txt` |
 | Composition portability | four real task manifests | imported task packages | current migration head | composition-only validation passed | `validation/2026-08-29_external_composition.md` |
+| Cancer real-data checkpoint | complete NatureBench task plus bounded workflow | external data root and `tasks/cancer_gene_identification/workflows/**` | NatureBench `9e6a69f10865dd56f4991b49d1c974e2006b6b18`; SIDERIUS `8be2874d536a30e20a202e7d36568b596439e392` | 5090 data identity and materialization passed; GPU chain pending | `validation/2026-08-29_cancer_real_data_acquisition.md` |
 
 ## Framework blockers discovered during separation
 
 | Issue | Boundary | Status |
 |---|---|---|
-| SIDERIUS #383 | composed Health binding through round evaluation | open |
-| SIDERIUS #384 | task-valid semantic targets in VRAM admission probes | open |
-| SIDERIUS #385 | task-valid context in generic deliverable writing | open |
-| SIDERIUS #386 | TIDMAD configuration resolution during generic workflow import | open |
+| SIDERIUS #383 | composed Health binding through round evaluation | repaired and externally witnessed at `8be2874d` |
+| SIDERIUS #384 | task-valid semantic targets in VRAM admission probes | repaired and externally witnessed at `8be2874d` |
+| SIDERIUS #385 | task-valid context in generic deliverable writing | repaired and externally witnessed at `8be2874d` |
+| SIDERIUS #386 | TIDMAD configuration resolution during generic workflow import | repaired and externally witnessed at `8be2874d` |
 
 ## Portability changes
 
@@ -43,3 +44,5 @@
 | 2026-08-29 | four task `composition.yaml` files | replace former in-repository `examples/**` references with package-local references; load real task data paths through `file:` rather than built-in module imports | none; ownership and path resolution only |
 | 2026-08-29 | `tasks/tidmad/framework_configs/**` | assign collision-free responsibility names to four source files formerly named `tidmad.yaml` in separate directories | none; file contents remain byte-identical |
 | 2026-08-29 | `tasks/tidmad/declared/task_config.yaml` | import the task declaration previously resolved from the SIDERIUS repository default | none; makes task ownership explicit |
+| 2026-08-29 | `tasks/cancer_gene_identification/workflows/**` | separate bounded two-network qualification from the complete eight-network formal campaign | qualification scope is intentionally smaller; formal task scope is unchanged |
+| 2026-08-29 | `tasks/cancer_gene_identification/quickstart.sh` | require an explicit SIDERIUS checkout and select an explicit workflow | removes repository-co-location dependence; scientific behavior remains owned by the selected workflow |

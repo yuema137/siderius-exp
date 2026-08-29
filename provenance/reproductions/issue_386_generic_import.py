@@ -16,11 +16,13 @@ def main() -> None:
             Path(__file__).resolve().parents[2]
             / "tasks"
             / "cancer_gene_identification"
+            / "workflows"
+            / "formal"
             / "composition.yaml"
         ),
     )
     args = parser.parse_args()
-    plugin_dir = str(Path(args.manifest).resolve().parent / "plugins")
+    plugin_dir = str(Path(args.manifest).resolve().parents[2] / "plugins")
     os.environ["SIDERIUS_PLUGIN_DIRS"] = plugin_dir
     os.environ["SIDERIUS_LOSS_DIRS"] = plugin_dir
 

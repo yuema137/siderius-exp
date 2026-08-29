@@ -5,9 +5,9 @@ adding task branches to framework code. It is a transductive binary
 node-classification task over eight biological networks. The primary metric is
 the unweighted mean of per-network AUPRC values; higher is better.
 
-Pack governance follows `docs/design/siderius_generic_framework_upgrade.md`
-§22.23. This exploratory fourth task is not one of the three persistent §22.9a
-tracks and makes no cross-task-generalization claim before a real-data witness.
+This package is an external consumer of a pinned SIDERIUS checkout. Its real
+task declarations and workflows remain in `siderius-exp`; they are not
+framework defaults or examples.
 
 ## Data
 
@@ -44,12 +44,22 @@ The AI-Build-AI repository reports a headline mean AUPRC of `0.774`; its
 committed per-network `score.json` values average to `0.7725415502369475`.
 Reports must keep the published claim and reproducible artifact value separate.
 
+## Workflows
+
+- `workflows/qualification/composition.yaml` selects the complete `cpdb` and
+  `ltg` networks for bounded compatibility checks. Its score is not comparable
+  with the eight-network benchmark result.
+- `workflows/formal/composition.yaml` selects all eight complete networks for
+  the scientific campaign and AI-Build-AI comparison.
+
 ## Dry run
 
 ```bash
-bash examples/cancer_gene_identification/quickstart.sh \
+bash tasks/cancer_gene_identification/quickstart.sh \
+  --siderius-checkout /path/to/pinned/SIDERIUS \
   --workspace /tmp/cancer-gene-dry-run \
   --data_dir /path/to/NatureBench/tasks/s41551-024-01312-5/problem/data \
+  --workflow qualification \
   --dry-run
 ```
 
@@ -66,7 +76,8 @@ arguments are passed through and later values override the bounded defaults.
 - `plugins/cancer_gene_masked_bce.py`: task-authoritative masked objective.
 - `plugins/cancer_gene_reference_gnn.py`: small known-good message-passing
   reference plugin for qualification.
-- `../../configs/task_composition/cancer_gene.yaml`: the composition pointer.
+- `workflows/qualification/`: bounded two-network compatibility workflow.
+- `workflows/formal/`: complete eight-network campaign composition.
 
 Sources:
 
