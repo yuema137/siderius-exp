@@ -1,0 +1,9 @@
+{
+  "aggregation": "unweighted_mean_of_per_network_roc_auc",
+  "direction": "higher",
+  "id": "mean_auroc",
+  "references": ["https://huggingface.co/datasets/FrontisAI/NatureBench/tree/main/tasks/s41551-024-01312-5"],
+  "scoreability": {"contract_id": "deliverable_presence"},
+  "transform": null,
+  "transform_params": {}
+}

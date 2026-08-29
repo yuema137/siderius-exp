@@ -1,0 +1,18 @@
+architect_role: graph neural networks for transductive cancer-gene identification
+output_contract_guidance: >-
+  The continuous output carries task metadata in its first two channels and a
+  raw binary cancer-gene logit in its third channel for every packed record.
+evidence_reading: >-
+  Read per-network AUPRC values before the unweighted mean. Improvements that
+  come from one network while degrading most others are not broad evidence.
+input_semantics: >-
+  complete biological networks packed as node records followed by directed
+  edge records, with 64 multi-omics features on node rows
+continuous_output_meaning: >-
+  node and active-split markers plus raw cancer-gene logits
+per_file_strategy_guidance: |-
+  Use snapshot to compare all eight networks.
+  Use target only for a named network-level diagnostic, never as the final aggregate.
+target_strategy_selector_clause: " (concentrate on explicitly named biological networks)"
+evidence_rationale_clause: " and the distribution of per-network AUPRC"
+evidence_citation_clause: ", and the per-network AUPRC values"

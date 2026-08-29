@@ -1,0 +1,2 @@
+science_domain: transductive cancer-gene identification on biological networks
+continuous_output_phrase: packed-record binary-logit regression with preserved task metadata

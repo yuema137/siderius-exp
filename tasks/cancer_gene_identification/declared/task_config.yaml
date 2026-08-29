@@ -1,0 +1,38 @@
+task_description: |
+  Transductive binary node classification across eight biological networks.
+  Every network provides a dense adjacency matrix, 64-dimensional multi-omics
+  node features, and fixed disjoint train, validation, and test masks. Models
+  may use the complete graph and every node feature, but only labels from the
+  active supervised split. The scientific metric is the unweighted mean of
+  per-network AUPRC values and HIGHER is better. Test labels remain outside
+  this package and are scored only by the untouched NatureBench evaluator.
+
+forward_contract:
+  model_io:
+    input:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {dimension: {symbolic: "R"}}
+        - {dimension: {fixed: 68}}
+      dtype: {admissible: ["float32"]}
+    output:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {dimension: {symbolic: "R"}}
+        - {dimension: {fixed: 3}}
+      dtype: {admissible: ["float32"]}
+  input_description: >-
+    packed graph records [B, R, 68]: node records first, then directed edge
+    records; columns encode node marker, source, destination, active split
+    marker, and 64 multi-omics features
+  output_description: >-
+    [B, R, 3] carrying the node marker, active split marker, and one raw
+    cancer-gene logit for each record
+  task_type: "regression"
+  output_head_note: >-
+    Preserve input columns 0 and 3 as output columns 0 and 1. Put raw logits
+    in output column 2. Do not apply sigmoid inside the model.
+  task_note: >-
+    One dataset item is one complete biological network. Batch size must be
+    exactly 1 because networks have different record counts. Treating nodes
+    as independent samples violates the transductive graph contract.

@@ -1,0 +1,46 @@
+task_data_path:
+  file: ../../examples/cancer_gene_identification/plugins/_cancer_gene_task.py
+  symbol: CancerGeneTaskDataPath
+  id: naturebench_cancer_gene
+  config:
+    instances: [cpdb, stringdb, pcnet, iref_v15, iref_v9, multinet, mtg, ltg]
+    evaluation_split: val
+
+dataset_profile:
+  config: ../../examples/cancer_gene_identification/declared/dataset_profile.json
+
+metric:
+  declaration: ../../examples/cancer_gene_identification/declared/metric_mean_auprc.json
+  implementation:
+    file: ../../examples/cancer_gene_identification/plugins/_cancer_gene_metrics.py
+    symbol: CancerGeneMeanAuprcMetric
+
+secondary_metrics:
+  - declaration: ../../examples/cancer_gene_identification/declared/metric_mean_auroc.json
+    implementation:
+      file: ../../examples/cancer_gene_identification/plugins/_cancer_gene_metrics.py
+      symbol: CancerGeneMeanAurocMetric
+
+task_health:
+  none: true
+
+interpretation_blocks:
+  none: true
+proposal_blocks:
+  config: ../../examples/cancer_gene_identification/declared/proposal_blocks.yaml
+implementor_blocks:
+  config: ../../examples/cancer_gene_identification/declared/implementor_blocks.yaml
+
+task_config:
+  config: ../../examples/cancer_gene_identification/declared/task_config.yaml
+
+model_plugins:
+  dir: ../../examples/cancer_gene_identification/plugins
+  require: [cancer_gene_reference_gnn]
+
+loss_plugins:
+  dir: ../../examples/cancer_gene_identification/plugins
+objective:
+  implementation:
+    file: ../../examples/cancer_gene_identification/plugins/cancer_gene_masked_bce.py
+    symbol: PLUGIN_LOSS_TYPE

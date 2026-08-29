@@ -1,0 +1,14 @@
+{
+  "partition_count": 8,
+  "topology": {
+    "modality": "transductive_biological_graph",
+    "partition_unit": "network",
+    "instances": ["cpdb", "stringdb", "pcnet", "iref_v15", "iref_v9", "multinet", "mtg", "ltg"],
+    "node_features": 64,
+    "packed_record_width": 68,
+    "target": "binary_cancer_gene_probability",
+    "split_authority": "mask_train/mask_val/mask_test in each data.h5"
+  },
+  "anchor_selection_files": [0],
+  "health_peek_files": [0]
+}
