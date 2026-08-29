@@ -87,9 +87,12 @@ done
 LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
 COMPOSITION="${PACK_DIR}/workflows/${WORKFLOW}/composition.yaml"
 LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
+GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
 [ -f "$LAUNCHER" ] || fail "production launcher not found at '$LAUNCHER'"
 [ -f "$COMPOSITION" ] || fail "task composition not found at '$COMPOSITION'"
 [ -f "$LLM_CONFIG" ] || fail "LLM config not found at '$LLM_CONFIG'"
+
+export SIDERIUS_GENERATED_LIBRARY_DIR="$GENERATED_LIBRARY_DIR"
 
 exec bash "$LAUNCHER" \
     --mode lilab \
@@ -100,7 +103,7 @@ exec bash "$LAUNCHER" \
     --llm_config "$LLM_CONFIG" \
     --start_iter 1 \
     --num_iterations 1 \
-    --max_rounds 1 \
+    --max_rounds 2 \
     --max_epochs 1 \
     --min_formal_batch_size 1 \
     --trial_portion 0.25 \

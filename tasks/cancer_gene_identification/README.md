@@ -65,6 +65,10 @@ bash tasks/cancer_gene_identification/quickstart.sh \
 
 The script is a thin adapter over the production chain launcher. Extra
 arguments are passed through and later values override the bounded defaults.
+The bounded default runs one trial round followed by one forced formal round,
+so the trial-only scope overrides are exercised before formal validation AUPRC
+is computed. Generated capabilities are isolated under the supplied workspace
+to prevent candidates from an earlier qualification run entering a cold start.
 
 ## Package contents
 
