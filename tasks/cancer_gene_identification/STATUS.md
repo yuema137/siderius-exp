@@ -22,15 +22,18 @@ Proven on the `ligroup` development server:
 - one real `cpdb` epoch completed on an RTX 5090 through the task-owned data
   path, custom model, custom objective, validation, checkpoint, and result
   persistence surfaces.
+- one cold-start LLM-driven Trial completed training, inference, and validation
+  AUPRC scoring on `cpdb` (`0.18473163467815523`); its subsequent two-network
+  Formal attempt was killed by the generic setup-only watchdog defect tracked
+  in SIDERIUS issue `#388` before validation completed.
 
 Not yet proven:
 
 - acquisition and identity verification of the eight real NatureBench HDF5
   files on TestPod;
-- real inference, AUPRC scoring, HealthGate behavior, or campaign resume;
-- a complete LLM-driven discovery iteration; the first 5090 attempt stopped
-  before proposal because `OPENAI_API_KEY` was unavailable in that execution
-  environment;
+- complete two-network Formal inference and mean AUPRC scoring;
+- HealthGate behavior or campaign resume;
+- a complete LLM-driven discovery iteration;
 - reproduction or improvement of AI-Build-AI's artifact mean AUPRC
   `0.7725415502369475`;
 - final train-plus-validation refit and hidden-test evaluation.

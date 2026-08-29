@@ -109,4 +109,5 @@ exec bash "$LAUNCHER" \
     --trial_portion 0.25 \
     --eval_portion 0.25 \
     --formal_portion 1.0 \
+    --no-runtime_watchdog \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

@@ -69,6 +69,8 @@ The bounded default runs one trial round followed by one forced formal round,
 so the trial-only scope overrides are exercised before formal validation AUPRC
 is computed. Generated capabilities are isolated under the supplied workspace
 to prevent candidates from an earlier qualification run entering a cold start.
+The bounded default disables the shared runtime watchdog until SIDERIUS issue
+`#388` is repaired; explicit Trial and Formal operator budgets remain declared.
 
 ## Package contents
 
