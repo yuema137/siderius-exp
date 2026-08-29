@@ -57,3 +57,28 @@ train, validation, and test masks before composition.
 - Qualification scores must not be compared with AI-Build-AI's eight-network
   mean AUPRC.
 - Hidden test labels remain outside model development and candidate selection.
+
+## RTX 5090 training qualification
+
+The committed external witness at `siderius-exp` revision `7d776db` executed
+one real `cpdb` training epoch against SIDERIUS `8be2874d` on the `ligroup`
+NVIDIA GeForce RTX 5090. The task-owned data path, custom reference GNN, masked
+BCE objective, CUDA training, validation, checkpoint writing, and experiment
+result writing completed successfully.
+
+- optimizer steps: 1
+- epoch wall time reported by the training loop: 25.62 seconds
+- training loss: 0.702394
+- validation loss: 0.702044
+- observed process GPU memory during execution: 1,226 MiB
+
+The observed GPU memory value is a point observation, not a measured peak.
+This qualification does not claim inference, AUPRC scoring, or scientific
+performance.
+
+A separate one-iteration production-chain attempt reached source-authority,
+composition, hardware, and runtime self-tests, then failed before proposal or
+training because the execution environment did not provide `OPENAI_API_KEY`.
+The run correctly persisted a failed manifest and produced no authoritative
+result. This is a credential availability boundary, not a GPU or task-data
+failure.

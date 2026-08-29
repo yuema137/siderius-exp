@@ -1,6 +1,6 @@
 # STATUS — NatureBench cancer-gene identification
 
-## Maturity: **L2 — real-data composition and materialization proven; no real GPU chain witness**
+## Maturity: **L2 — real-data GPU training proven; no complete discovery-chain witness**
 
 The maturity vocabulary and pack-governance authority are
 `docs/design/siderius_generic_framework_upgrade.md` §22.23. This pack is an
@@ -19,13 +19,18 @@ Proven on the `ligroup` development server:
 - the bounded `cpdb` and `ltg` qualification workflow materializes real graph
   records while preserving node counts and train masks;
 - the source-provided train, validation, and test masks are mutually disjoint.
+- one real `cpdb` epoch completed on an RTX 5090 through the task-owned data
+  path, custom model, custom objective, validation, checkpoint, and result
+  persistence surfaces.
 
 Not yet proven:
 
 - acquisition and identity verification of the eight real NatureBench HDF5
   files on TestPod;
-- real GPU training, inference, scoring, HealthGate behavior, or campaign
-  resume;
+- real inference, AUPRC scoring, HealthGate behavior, or campaign resume;
+- a complete LLM-driven discovery iteration; the first 5090 attempt stopped
+  before proposal because `OPENAI_API_KEY` was unavailable in that execution
+  environment;
 - reproduction or improvement of AI-Build-AI's artifact mean AUPRC
   `0.7725415502369475`;
 - final train-plus-validation refit and hidden-test evaluation.
