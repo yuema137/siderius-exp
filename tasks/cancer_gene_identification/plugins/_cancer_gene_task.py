@@ -154,6 +154,10 @@ class CancerGeneTaskDataPath:
             instances=self._select(request), evaluation_split=self._evaluation_split
         )
 
+    def max_inference_batch_size(self) -> int:
+        """Whole-network records have variable lengths and cannot be stacked."""
+        return 1
+
     def serialize_scope(self, scope: object) -> str:
         checked = self._scope(scope)
         return json.dumps(
