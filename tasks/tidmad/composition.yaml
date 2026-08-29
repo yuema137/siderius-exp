@@ -23,24 +23,24 @@
 # renders zero bytes (P2b §4.7).
 
 task_data_path:
-  module: execute_tools.tidmad_data_path
+  file: runtime/tidmad_data_path.py
   symbol: TidmadTaskDataPath
   id: tidmad
 
 dataset_profile:
-  config: ../../examples/tidmad/resolved/dataset_profile.json
+  config: resolved/dataset_profile.json
 
 metric:
-  declaration: ../../examples/tidmad/resolved/metric_spec.json
+  declaration: resolved/metric_spec.json
   implementation:
     module: execute_tools.evaluation_metric
     symbol: TidmadDenoisingMetric
 
 task_health:
-  config: ../task_health/tidmad.yaml
+  config: framework_configs/health.yaml
 
 interpretation_blocks:
-  config: ../task_interpretation/tidmad.yaml
+  config: framework_configs/interpretation.yaml
 
 # Step 12 / PR-12a C7. The proposer and the implementor used to read TIDMAD's
 # science out of their own hardcoded prompts, so a COMPOSED run of any task got
@@ -48,13 +48,13 @@ interpretation_blocks:
 # meaning composing TIDMAD still needs zero special-casing, and a task that
 # declares neither section gets no science rather than TIDMAD's.
 proposal_blocks:
-  config: ../task_proposal/tidmad.yaml
+  config: framework_configs/proposal.yaml
 
 implementor_blocks:
-  config: ../task_implementor/tidmad.yaml
+  config: framework_configs/implementor.yaml
 
 task_config:
-  config: ../task_config.yaml
+  config: declared/task_config.yaml
 
 # arXiv #268 — the anchor task now DECLARES its indexed naming like any other
 # task (these are the previously-implicit shipped defaults, stated). The
