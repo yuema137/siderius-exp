@@ -22,6 +22,11 @@ def _parse_args() -> argparse.Namespace:
         help="Comma-separated complete NatureBench networks to qualify.",
     )
     parser.add_argument(
+        "--execute-training",
+        action="store_true",
+        help="Run one real GPU training epoch instead of stopping at argv capture.",
+    )
+    parser.add_argument(
         "--manifest",
         default=str(
             Path(__file__).resolve().parents[2]
@@ -168,6 +173,7 @@ def main() -> None:
                 data_evidence[instance]["packed_records"] = int(model_input.shape[0])
 
             captured: dict[str, list[str]] = {}
+            training_status = "not_requested"
 
             def _capture(command, **_kwargs):
                 captured["command"] = command
@@ -179,53 +185,59 @@ def main() -> None:
                 workspace=str(root / "workspace"),
                 file_index=0,
             )
-            with patch.object(
-                sandbox_executor, "_run_observed_subprocess", side_effect=_capture
-            ):
-                try:
-                    sandbox.execute_training(
-                        exp_id="external_checkpoint_001",
-                        run_name="external_checkpoint",
-                        model_type="cancer_gene_reference_gnn",
-                        m_cfg={
-                            "model_type": "cancer_gene_reference_gnn",
-                            "segmentation_size": 64,
-                            "hidden_dim": 64,
-                            "message_steps": 2,
-                        },
-                        t_cfg={
-                            "epochs": 1,
-                            "batch_size": 1,
-                            "lr": 1e-4,
-                            "optimizer_type": "adamw",
-                            "device": "cpu",
-                        },
-                        l_cfg={
-                            "loss_type": "custom",
-                            "loss_name": "cancer_gene_masked_bce",
-                        },
-                        sample_set=None,
-                        task_scopes=scopes,
-                    )
-                except SystemExit as exc:
-                    if str(exc) != "argv captured":
-                        raise
+            training_kwargs = {
+                "exp_id": "external_checkpoint_001",
+                "run_name": "external_checkpoint",
+                "model_type": "cancer_gene_reference_gnn",
+                "m_cfg": {
+                    "model_type": "cancer_gene_reference_gnn",
+                    "segmentation_size": 64,
+                    "hidden_dim": 64,
+                    "message_steps": 2,
+                },
+                "t_cfg": {
+                    "epochs": 1,
+                    "batch_size": 1,
+                    "lr": 1e-4,
+                    "optimizer_type": "adamw",
+                    "device": "cuda" if args.execute_training else "cpu",
+                },
+                "l_cfg": {
+                    "loss_type": "custom",
+                    "loss_name": "cancer_gene_masked_bce",
+                },
+                "sample_set": None,
+                "task_scopes": scopes,
+            }
+            if args.execute_training:
+                sandbox.execute_training(**training_kwargs)
+                training_status = "completed"
+            else:
+                with patch.object(
+                    sandbox_executor, "_run_observed_subprocess", side_effect=_capture
+                ):
+                    try:
+                        sandbox.execute_training(**training_kwargs)
+                    except SystemExit as exc:
+                        if str(exc) != "argv captured":
+                            raise
 
-        command = captured.get("command", [])
-        required = {
-            "--task_scope_ref",
-            "--task_eval_scope_ref",
-            "--validation_requested_rows",
-        }
-        missing = sorted(required - set(command))
-        if missing:
-            raise RuntimeError(
-                f"training child argv omitted composed scope fields: {missing}"
-            )
-        if "--sample_set_json" in command:
-            raise RuntimeError(
-                "external composed task unexpectedly emitted a legacy SampleSet"
-            )
+        if not args.execute_training:
+            command = captured.get("command", [])
+            required = {
+                "--task_scope_ref",
+                "--task_eval_scope_ref",
+                "--validation_requested_rows",
+            }
+            missing = sorted(required - set(command))
+            if missing:
+                raise RuntimeError(
+                    f"training child argv omitted composed scope fields: {missing}"
+                )
+            if "--sample_set_json" in command:
+                raise RuntimeError(
+                    "external composed task unexpectedly emitted a legacy SampleSet"
+                )
 
         print(
             json.dumps(
@@ -238,6 +250,7 @@ def main() -> None:
                     "lit_review_task_config": "accepted_and_pinned",
                     "shipped_lit_review_config": "refused",
                     "training_scope_transport": "present_without_legacy_sample_set",
+                    "training": training_status,
                     "real_data": data_evidence,
                 },
                 sort_keys=True,
