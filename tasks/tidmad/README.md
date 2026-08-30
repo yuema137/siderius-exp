@@ -138,7 +138,7 @@ tasks/tidmad/quickstart.sh --help` prints the contract.
 | `--start_iter 1` | **not cosmetic — see below** |
 | `--num_iterations 1` · `--max_rounds 1` · `--max_epochs 1` | one shallow pass |
 | `--min_formal_batch_size 1` | preserves Trial/Formal batch parity in this qualification workflow |
-| `--trial_portion 0.02` · `--formal_portion 0.02` | see below |
+| `--trial_portion 0.02` · `--formal_portion 0.02` · `--formal_eval_portion 0.02` | see below |
 | `--trial_time_budget_minutes 20` · `--formal_time_budget_minutes 60` | **TIDMAD-priced — see below** |
 
 **Why `--start_iter 1`.** Auto-resume is on by default, and on an *existing*
@@ -151,10 +151,13 @@ number actually walked — and exits `0`. A published command must not be able
 to do nothing and report success, so this one pins iteration 1. To resume
 deliberately, pass `--start_iter N` yourself; it overrides this default.
 
-**Why the portions deviate from the chain's `0.1` default.** TIDMAD's sampling
-unit is a 10 000 000-sample PSD segment, and each of its 20 files holds 200 of
-segments; at `0.02` it reads ~80. This bounds the run through the same
-task-agnostic knob any other task would use, rather than by dropping files.
+**Why the portions deviate from the chain's defaults.** TIDMAD's sampling unit
+is a 10 000 000-sample PSD segment, and each of its 20 files holds 200
+segments; at `0.02` each full-scope phase reads approximately 80. Formal
+evaluation is pinned separately because the production launcher's default is
+the complete evaluation scope. Leaving that default in a bounded quickstart
+would make its advertised data and time bounds inconsistent. These ordinary
+task-agnostic knobs bound the run without silently dropping files.
 
 **Why the time budgets are here.** Passing a time budget switches on the
 wall-time pre-flight, which prices the training workload through **TIDMAD's

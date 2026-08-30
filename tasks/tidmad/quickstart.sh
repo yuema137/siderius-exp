@@ -17,7 +17,7 @@ Required:
 Bounded defaults:
   one iteration, one tuner round, one epoch
   Trial/Formal batch parity (minimum Formal batch 1)
-  trial/formal portion 0.02
+  trial/formal training and evaluation portion 0.02
   trial/formal time budget 20/60 minutes
 
 Common extras:
@@ -99,6 +99,7 @@ exec bash "$LAUNCHER" \
     --min_formal_batch_size 1 \
     --trial_portion 0.02 \
     --formal_portion 0.02 \
+    --formal_eval_portion 0.02 \
     --trial_time_budget_minutes 20 \
     --formal_time_budget_minutes 60 \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

@@ -95,6 +95,16 @@ test rather than being harmless.
   #393 tracks the generic schema mismatch; `7476bf44` provides its focused
   repair. The operator stopped the unchanged automatic retry, so this run is
   diagnostic evidence rather than a completed iteration.
+- Fresh workspace `358ba13_7476bf44_5090_chain` accepted the #393 repair:
+  training, streamed inference, scoring, Health, and attempt persistence all
+  completed; the timing sidecar was the declared empty list and the attempt
+  persisted as `failed_mode_collapse`. Formal admission then priced the
+  launcher's inherited complete evaluation scope at more than 30 minutes. The
+  repeated attempts were stopped because reducing model capacity could not
+  change that scope. The package quickstart now pins
+  `--formal_eval_portion 0.02` alongside its other bounded portions; its
+  production dry-run resolves that exact value. A fresh complete iteration
+  remains pending.
 
 ## Maturity pins carried by this pack at PR0 (design §3.5)
 
