@@ -36,6 +36,7 @@ from typing import Any, ClassVar, Literal, cast
 
 import h5py
 import numpy as np
+import torch
 from pydantic import BaseModel, ConfigDict, Field
 from torch.utils.data import Dataset
 
@@ -523,38 +524,144 @@ class TidmadTaskDataPath:
 
     def write_deliverable(
         self,
-        outputs: Iterable[tuple[int, np.ndarray, np.ndarray]],
+        outputs: Iterable[Any],
         request: DeliverableWriteRequest,
     ) -> None:
-        """Persist ``(file_index, denoised, injected)`` items as ABRA files.
+        """Persist legacy tuples or streamed composed predictions as ABRA files.
 
-        Byte-identical delegation to the two pre-relocation writer sites
-        (``inference_single.py:824,983``): name from the naming authority,
-        remove a stale file first, flatten + storage-dtype cast, and
-        ``create_abra_file(..., indexed=False, storage=spec.storage)``.
+        The legacy caller supplies processed ``(file_index, denoised,
+        injected)`` tuples. The composed caller supplies raw predictions in
+        validation-dataset order together with the task scope and physical
+        source context. Predictions are decoded and persisted one file at a
+        time so full classification logits never accumulate in host memory.
         """
+        if request.task_scope is not None or request.source_context is not None:
+            self._write_streamed_predictions(outputs, request)
+            return
+
         profile = resolve_dataset_profile()
         spec = derive_tidmad_deliverable_spec(profile)
-        storage_np = np.dtype(spec.storage.storage_dtype)
         for file_index, denoised, injected in outputs:
-            out_name = os.path.join(
-                request.output_dir,
-                spec.naming.name(
-                    model_type=request.model_type,
-                    run_name=request.run_name,
-                    exp_id=request.exp_id,
-                    input_identity=file_index,
-                ),
+            self._persist_file(
+                file_index=int(file_index),
+                denoised=np.asarray(denoised),
+                injected=np.asarray(injected),
+                request=request,
+                spec=spec,
             )
-            if os.path.exists(out_name):
-                os.remove(out_name)
-            create_abra_file(
-                out_name,
-                denoised.flatten().astype(storage_np),
-                injected.flatten().astype(storage_np),
-                indexed=False,
-                storage=spec.storage,
+
+    def _write_streamed_predictions(
+        self,
+        outputs: Iterable[Any],
+        request: DeliverableWriteRequest,
+    ) -> None:
+        scope = self._scope(request.task_scope)
+        context = request.source_context
+        if context is None:
+            raise ValueError("composed TIDMAD persistence requires source_context")
+
+        dataset = self.validation_dataset(
+            scope,
+            EvalMaterializationParams(data_dir=context.data_dir),
+        )
+        if len(dataset) != context.sample_count:
+            raise ValueError(
+                f"TIDMAD deliverable source materialized {len(dataset)} samples, "
+                f"but inference declared {context.sample_count}"
             )
+
+        profile = scope.profile or resolve_dataset_profile()
+        topology = tidmad_topology(profile)
+        encoding = topology.encoding
+        spec = derive_tidmad_deliverable_spec(profile)
+        storage_np = np.dtype(spec.storage.storage_dtype)
+        predictions = iter(outputs)
+        consumed = 0
+
+        for file_index, (start, end) in dataset.file_row_ranges.items():
+            rows = end - start
+            denoised = np.empty((rows, scope.seg_size), dtype=storage_np)
+            for local_row in range(rows):
+                try:
+                    prediction = next(predictions)
+                except StopIteration as exc:
+                    raise ValueError(
+                        f"TIDMAD inference produced {consumed} predictions, "
+                        f"but {len(dataset)} were declared"
+                    ) from exc
+                if isinstance(prediction, torch.Tensor):
+                    prediction_array = prediction.detach().cpu().numpy()
+                else:
+                    prediction_array = np.asarray(prediction)
+                if (
+                    prediction_array.ndim == 2
+                    and prediction_array.shape[0] == encoding.num_classes
+                ):
+                    decoded = prediction_array.argmax(axis=0)
+                elif prediction_array.ndim == 2 and prediction_array.shape[0] == 1:
+                    decoded = prediction_array[0]
+                elif prediction_array.ndim == 1:
+                    decoded = prediction_array
+                else:
+                    raise ValueError(
+                        "TIDMAD prediction must have shape [classes, time], "
+                        f"[1, time], or [time]; got {prediction_array.shape}"
+                    )
+                if decoded.shape != (scope.seg_size,):
+                    raise ValueError(
+                        f"TIDMAD prediction has decoded shape {decoded.shape}; "
+                        f"expected {(scope.seg_size,)}"
+                    )
+                denoised[local_row] = (decoded - encoding.value_offset).astype(storage_np)
+                consumed += 1
+
+            self._persist_file(
+                file_index=file_index,
+                denoised=denoised,
+                injected=dataset.targets[start:end],
+                request=request,
+                spec=spec,
+            )
+
+        sentinel = object()
+        if next(predictions, sentinel) is not sentinel:
+            raise ValueError(
+                f"TIDMAD inference produced more than the declared {len(dataset)} predictions"
+            )
+        if consumed != len(dataset):
+            raise ValueError(
+                f"TIDMAD inference produced {consumed} predictions, "
+                f"but {len(dataset)} were declared"
+            )
+
+    @staticmethod
+    def _persist_file(
+        *,
+        file_index: int,
+        denoised: np.ndarray,
+        injected: np.ndarray,
+        request: DeliverableWriteRequest,
+        spec: Any,
+    ) -> None:
+        storage_np = np.dtype(spec.storage.storage_dtype)
+        out_name = os.path.join(
+            request.output_dir,
+            spec.naming.name(
+                model_type=request.model_type,
+                run_name=request.run_name,
+                exp_id=request.exp_id,
+                input_identity=file_index,
+            ),
+        )
+        if os.path.exists(out_name):
+            os.remove(out_name)
+        create_abra_file(
+            out_name,
+            denoised.flatten().astype(storage_np),
+            injected.flatten().astype(storage_np),
+            indexed=False,
+            storage=spec.storage,
+        )
 
     def read_evaluation_payload(self, request: EvaluationReadRequest) -> object:
         """Resolve this run/experiment's persisted deliverables.

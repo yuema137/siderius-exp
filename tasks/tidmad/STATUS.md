@@ -19,7 +19,7 @@ not be presented as tests executed from this repository.
 | task description / forward contract | REFERENCE to `configs/task_config.yaml` | README cites the owning path |
 | health policy | REFERENCE to `configs/health_checks.yaml` | README cites the owning path |
 | data root | REFERENCE to the `tidmad_data_config.yaml` mechanism | `data/README.md` |
-| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `5ccecd4f` |
+| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `a4e63655` |
 
 **Nothing under `examples/tidmad/` is an authoring surface: the runtime does
 not read these snapshots as a task authority.** They are generated
@@ -45,7 +45,7 @@ test rather than being harmless.
 
 ## Separation qualification
 
-- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `5ccecd4f`
+- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `a4e63655`
   with task-data-path id `tidmad`, primary metric
   `tidmad_denoising_score`, and semantic fingerprint
   `1d7aecac3a8af8dc53935be8ff6f0ba49d122a31b2991613e4f4c36c5fd9a364`.
@@ -68,8 +68,21 @@ test rather than being harmless.
   retries and remains unscored diagnostic evidence.
 - SIDERIUS `5ccecd4f` removes import-time real-task registration and retains an
   explicit legacy TIDMAD bootstrap. A fresh child-process witness resolved this
-  package's transported `TidmadTaskDataPath` with the parent-pinned identity;
-  the next separation step is a bounded end-to-end qualification run.
+  package's transported `TidmadTaskDataPath` with the parent-pinned identity.
+- Qualification workspace `ee67858_5ccecd4f_5090_chain` completed 2,500
+  training steps in 158 seconds and wrote a valid checkpoint. The original
+  generic inference path then retained raw `[256, 16000]` predictions for the
+  complete 5,000-sample evaluation scope and was killed before persistence.
+  SIDERIUS issue #391 records the generic eager-materialization defect.
+- Against SIDERIUS `a4e63655`, an inference-only delta witness streamed the
+  same checkpoint and scope at batch 32: 5,000 samples, 157 batches, four
+  task-owned HDF5 deliverables, and 74.99 seconds. The frozen
+  anchor-normalized metric then returned a finite score of
+  `-10.509863893769241`. This proves execution closure for the repair; it is
+  not a scientific-performance result and does not make the stopped chain an
+  authoritative completed iteration.
+- The independent time-warmup scope-identity coupling is tracked in SIDERIUS
+  issue #392. A fresh uninterrupted end-to-end qualification remains pending.
 
 ## Maturity pins carried by this pack at PR0 (design §3.5)
 
