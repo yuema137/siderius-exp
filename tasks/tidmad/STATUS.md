@@ -52,8 +52,18 @@ test rather than being harmless.
 - Literature review resolves from the task-owned
   `framework_configs/lit_review.yaml`; a composed run does not consume the
   framework checkout's task-specific default.
-- A fresh small-scale real-data GPU iteration on the separated entrypoint is
-  not yet complete.
+- A fresh small-scale real-data RTX 5090 run completed task-owned literature
+  review (2 findings, 3 search rounds, 19 papers), cold-start proposal,
+  implementation, all seven model-validation checks, and resource admission.
+  Training then refused before model execution because the child had already
+  registered SIDERIUS's built-in `tidmad` implementation while the parent had
+  pinned this package's byte-identical implementation. Their source SHA-256
+  values are both
+  `bd92af5ac9cfc19e4e8df2921db18ced40b9384c6d46b75884cbf454618e21b9`,
+  but their module identities differ. The run was stopped before redundant
+  retries and remains unscored diagnostic evidence.
+- The next separation step is removal of built-in real-task bootstrap imports
+  from SIDERIUS while preserving the identity refusal and legacy TIDMAD parity.
 
 ## Maturity pins carried by this pack at PR0 (design §3.5)
 
