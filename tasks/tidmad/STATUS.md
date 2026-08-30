@@ -3,6 +3,10 @@
 This file records the external package's current qualification state. Framework
 capability remains owned by the pinned SIDERIUS revision.
 
+The projection checks named below are pre-separation evidence from the SIDERIUS
+checkout. Equivalent package-local ownership is still pending in M4; they must
+not be presented as tests executed from this repository.
+
 ## Maturity: **production-backed task package; separated qualification pending**
 
 | projected in this pack (PR0) | how | verified by |
@@ -15,7 +19,7 @@ capability remains owned by the pinned SIDERIUS revision.
 | task description / forward contract | REFERENCE to `configs/task_config.yaml` | README cites the owning path |
 | health policy | REFERENCE to `configs/health_checks.yaml` | README cites the owning path |
 | data root | REFERENCE to the `tidmad_data_config.yaml` mechanism | `data/README.md` |
-| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `384cc9e8` |
+| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `5ccecd4f` |
 
 **Nothing under `examples/tidmad/` is an authoring surface: the runtime does
 not read these snapshots as a task authority.** They are generated
@@ -41,7 +45,7 @@ test rather than being harmless.
 
 ## Separation qualification
 
-- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `384cc9e8`
+- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `5ccecd4f`
   with task-data-path id `tidmad`, primary metric
   `tidmad_denoising_score`, and semantic fingerprint
   `1d7aecac3a8af8dc53935be8ff6f0ba49d122a31b2991613e4f4c36c5fd9a364`.
@@ -62,8 +66,10 @@ test rather than being harmless.
   `bd92af5ac9cfc19e4e8df2921db18ced40b9384c6d46b75884cbf454618e21b9`,
   but their module identities differ. The run was stopped before redundant
   retries and remains unscored diagnostic evidence.
-- The next separation step is removal of built-in real-task bootstrap imports
-  from SIDERIUS while preserving the identity refusal and legacy TIDMAD parity.
+- SIDERIUS `5ccecd4f` removes import-time real-task registration and retains an
+  explicit legacy TIDMAD bootstrap. A fresh child-process witness resolved this
+  package's transported `TidmadTaskDataPath` with the parent-pinned identity;
+  the next separation step is a bounded end-to-end qualification run.
 
 ## Maturity pins carried by this pack at PR0 (design §3.5)
 
