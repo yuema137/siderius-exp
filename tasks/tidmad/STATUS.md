@@ -1,9 +1,9 @@
-# STATUS — `tidmad` (honest maturity; MIRROR of roadmap §15.1 / §22.12)
+# STATUS — TIDMAD experiment package
 
-The roadmap (`docs/design/siderius_generic_framework_upgrade.md`) is the ONE
-status authority; this file mirrors it for a reader of the pack.
+This file records the external package's current qualification state. Framework
+capability remains owned by the pinned SIDERIUS revision.
 
-## Maturity: **production-backed resolved projection** (Track A is executed by production at L4 through the existing operator surface; this PACK projects L0/L1 read-only)
+## Maturity: **production-backed task package; separated qualification pending**
 
 | projected in this pack (PR0) | how | verified by |
 |---|---|---|
@@ -15,13 +15,13 @@ status authority; this file mirrors it for a reader of the pack.
 | task description / forward contract | REFERENCE to `configs/task_config.yaml` | README cites the owning path |
 | health policy | REFERENCE to `configs/health_checks.yaml` | README cites the owning path |
 | data root | REFERENCE to the `tidmad_data_config.yaml` mechanism | `data/README.md` |
-| run entrypoint (Step 12 / PR-12e) | `quickstart.sh` — a thin adapter that supplies `configs/task_composition/tidmad.yaml` plus a bounded posture and then executes `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | `tests/unit/examples/test_step12_pr12e_tidmad_quickstart.py` |
+| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `d53893d1` |
 
 **Nothing under `examples/tidmad/` is an authoring surface: the runtime does
 not read these snapshots as a task authority.** They are generated
 projections, and editing one changes nothing you want changed (design §3.6).
-The one nuance: the shipped composition manifest
-`configs/task_composition/tidmad.yaml` binds `resolved/dataset_profile.json`
+The one nuance: this package's composition manifest
+`composition.yaml` binds `resolved/dataset_profile.json`
 and `resolved/metric_spec.json` as declaration references, so a composed run
 does load those two — which is exactly why a hand edit is caught as a red
 test rather than being harmless.
@@ -38,6 +38,19 @@ test rather than being harmless.
 | measurement / verification data feeding | not yet landed | Step 07c |
 | generic health applicability declaration | `configs/health_checks.yaml` referenced only | Step 08 |
 | interpretation evidence | — | Step 09 |
+
+## Separation qualification
+
+- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `d53893d1`
+  with task-data-path id `tidmad`, primary metric
+  `tidmad_denoising_score`, and semantic fingerprint
+  `1d7aecac3a8af8dc53935be8ff6f0ba49d122a31b2991613e4f4c36c5fd9a364`.
+- `quickstart.sh --dry-run` imports framework source exclusively from the
+  explicit SIDERIUS checkout, uses this package's composition, and emits
+  `--min_formal_batch_size 1` so the qualification does not reintroduce the
+  invalidated Formal-only batch guard.
+- A fresh small-scale real-data GPU iteration on the separated entrypoint is
+  not yet complete.
 
 ## Maturity pins carried by this pack at PR0 (design §3.5)
 

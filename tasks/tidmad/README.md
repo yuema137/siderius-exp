@@ -30,7 +30,7 @@ data is, and none ever will be.
 
 | shipped asset | path | what it is |
 |---|---|---|
-| task composition manifest | `configs/task_composition/tidmad.yaml` | the single declaration that binds this task for a run |
+| task composition manifest | `composition.yaml` | the single declaration that binds this task for a run |
 | resolved declarations | `resolved/*.json` | dataset profile, model I/O contract, deliverable spec, metric spec, file identity |
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |
 | reference artifacts | `reference_data/raw_baseline/`, `reference_data/ground_truth/`, `reference_data/official_paper_result/` | metric floor, metric ceiling, paper-comparable scores |
@@ -89,7 +89,8 @@ executing anything. Do this first.
 
 <!-- QUICKSTART-PREVIEW-COMMAND -->
 ```bash
-bash examples/tidmad/quickstart.sh \
+bash tasks/tidmad/quickstart.sh \
+    --siderius-checkout /path/to/SIDERIUS \
     --workspace /path/to/your/workspace \
     --data_dir /path/to/tidmad/data \
     --dry-run
@@ -99,22 +100,24 @@ bash examples/tidmad/quickstart.sh \
 
 <!-- QUICKSTART-RUN-COMMAND -->
 ```bash
-bash examples/tidmad/quickstart.sh \
+bash tasks/tidmad/quickstart.sh \
+    --siderius-checkout /path/to/SIDERIUS \
     --workspace /path/to/your/workspace \
     --data_dir /path/to/tidmad/data
 ```
 
-`--workspace` and `--data_dir` are **required and have no defaults**: a
-published quickstart must not depend on a directory that exists on one
-machine.
+`--siderius-checkout`, `--workspace`, and `--data_dir` are **required and have
+no defaults**. The task package names its framework checkout, output location,
+and dataset explicitly instead of depending on repository co-location or a
+directory that happens to exist on one machine.
 
-`quickstart.sh` is a thin adapter. It resolves the repository root from its own
-location, refuses by name when a required input is missing, and then executes
-the normal production launcher:
+`quickstart.sh` is a thin adapter. It resolves this task package from its own
+location, validates the explicitly selected framework checkout and inputs, and
+then executes that checkout's normal production launcher:
 
 ```text
-examples/tidmad/quickstart.sh
-  → sdsc_submission_scripts/run_chain.sh --task_composition configs/task_composition/tidmad.yaml
+tasks/tidmad/quickstart.sh
+  → <siderius-checkout>/sdsc_submission_scripts/run_chain.sh --task_composition <siderius-exp>/tasks/tidmad/composition.yaml
   → sdsc_submission_scripts/run_one_iteration.py
   → the same workflow, declarations and plugins that CI and the Gates exercise
 ```
@@ -122,16 +125,17 @@ examples/tidmad/quickstart.sh
 It applies one bounded posture so a first run is cheap. Every value is an
 ordinary launcher flag; passing the same flag yourself overrides it, and every
 other launcher argument is forwarded verbatim. `bash
-examples/tidmad/quickstart.sh --help` prints the contract.
+tasks/tidmad/quickstart.sh --help` prints the contract.
 
 | default applied | why |
 |---|---|
 | `--mode lilab` | foreground subprocess |
-| `--task_composition <repo>/configs/task_composition/tidmad.yaml` | binds this task — omitting it is the legacy un-composed run |
+| `--task_composition <siderius-exp>/tasks/tidmad/composition.yaml` | binds this external task package |
 | `--run_name tidmad_quickstart` | pins the run id |
 | `--llm_config <repo>/llm_configs/openai_tiered_pro.json` | per-node model routing. Without it the run falls back to a single default model with no routing. Override with `--llm_config llm_configs/deepseek_tiered_pro.json` or your own file |
 | `--start_iter 1` | **not cosmetic — see below** |
 | `--num_iterations 1` · `--max_rounds 1` · `--max_epochs 1` | one shallow pass |
+| `--min_formal_batch_size 1` | preserves Trial/Formal batch parity in this qualification workflow |
 | `--trial_portion 0.02` · `--formal_portion 0.02` | see below |
 | `--trial_time_budget_minutes 20` · `--formal_time_budget_minutes 60` | **TIDMAD-priced — see below** |
 
@@ -147,7 +151,6 @@ deliberately, pass `--start_iter N` yourself; it overrides this default.
 
 **Why the portions deviate from the chain's `0.1` default.** TIDMAD's sampling
 unit is a 10 000 000-sample PSD segment, and each of its 20 files holds 200 of
-them (`resolved/dataset_profile.json`). At `0.1` a round still reads ~400 such
 segments; at `0.02` it reads ~80. This bounds the run through the same
 task-agnostic knob any other task would use, rather than by dropping files.
 
@@ -162,8 +165,8 @@ the pre-flight is skipped with a stated reason and the run continues, rather
 than failing before training. So the other packs simply have no use for these
 two flags, not a hazard from them.
 
-You also need at least one LLM API key in `.env`
-([installation](../../docs/getting-started/installation.md)) and a CUDA GPU.
+You also need at least one LLM API key in the selected SIDERIUS checkout's
+`.env` and a CUDA GPU.
 
 **Bounding it further, TIDMAD-specifically.** `--data_scope 4-9` (paired with
 `--health_gate_files`, which must be a subset of the scope) restricts the run
