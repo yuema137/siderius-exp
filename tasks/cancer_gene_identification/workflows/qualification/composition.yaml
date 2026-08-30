@@ -44,3 +44,7 @@ objective:
   implementation:
     file: ../../plugins/cancer_gene_masked_bce.py
     symbol: PLUGIN_LOSS_TYPE
+
+parameter_rules:
+  train_config.batch_size:
+    exact: 1
