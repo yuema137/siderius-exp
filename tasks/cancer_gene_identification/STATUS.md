@@ -36,13 +36,24 @@ Proven on the `ligroup` development server:
   completed task-owned inference and scoring: `cpdb=0.3519765294390681`,
   `ltg=0.18345607540350573`, and unweighted mean validation
   AUPRC `0.2677163024212869`.
+- SIDERIUS `60fffb1e` makes that batch limit task-owned and transports it
+  through admission and execution. A real two-network checkpoint witness on
+  the RTX 5090 selected batch 1, emitted two inference batches, and reproduced
+  the same per-network and mean AUPRC values exactly.
+- a fresh cold-start chain against `siderius-exp` `84bfdb0` and SIDERIUS
+  `60fffb1e` reached proposal, implementation, correction, validation, and
+  tuner preflight. Its generated `sparse_residual_appnp_gcn` candidate did not
+  reach training: four completed configurations exhausted the bounded
+  180-second training probe, and a fifth was operator-stopped after the same
+  failure class was isolated. The artifacts remain diagnostic evidence and
+  are not a scored result.
 
 Not yet proven:
 
 - acquisition and identity verification of the eight real NatureBench HDF5
   files on TestPod;
 - complete two-network Formal inference and mean AUPRC scoring inside an
-  uninterrupted discovery chain;
+  uninterrupted discovery chain on the repaired batching revision;
 - HealthGate behavior or campaign resume;
 - a complete LLM-driven discovery iteration;
 - reproduction or improvement of AI-Build-AI's artifact mean AUPRC
