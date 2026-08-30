@@ -87,6 +87,7 @@ exec bash "$LAUNCHER" \
     --max_epochs 1 \
     --min_formal_batch_size 1 \
     --trial_portion 1.0 \
+    --train_portion 1.0 \
     --formal_portion 1.0 \
     --formal_train_portion 1.0 \
     --formal_eval_portion 1.0 \

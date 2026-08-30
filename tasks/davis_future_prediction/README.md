@@ -53,6 +53,13 @@ metric goes the other way. `mse` is **lower**-is-better, so "best" is the
 Six steps, in the order the boundary actually works: what ships in git, what
 does not, how to get it, how to run, where the output lands, how to look at it.
 
+The qualification workflow fixes `train_portion=1.0`. DAVIS sampling units are
+whole temporal windows grouped by sequence; the task does not assign generic
+row-fraction semantics to an epoch and therefore refuses fractional training
+instead of silently sampling frames. Its exact-L1 objective remains a
+task-owned plugin, demonstrating the custom sibling of the framework-provided
+objective config used by Pets.
+
 ### 1. What ships in this repository
 
 Everything needed to **understand and bind** this task — and no data.

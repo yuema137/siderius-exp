@@ -67,6 +67,15 @@ metric:
     file: plugins/_pets_metrics.py
     symbol: PetsAccuracyMetric
 
+# Pets uses the framework-provided categorical cross-entropy objective. This
+# is task-owned scientific selection expressed through the generic built-in
+# config seam; a task needing a new objective would use
+# `objective.implementation` and provide a plugin instead.
+objective:
+  config:
+    loss_type: ce
+    reduction: mean
+
 # §22.9a's frozen OPTIONAL TERMINAL metrics, both observational. They are
 # bound by an out-of-tree `file:` ref to the pack's own implementations, so
 # each one's CONTENT digest joins this composition's semantic fingerprint —

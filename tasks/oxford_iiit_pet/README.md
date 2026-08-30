@@ -95,6 +95,13 @@ run two iterations, one Trial plus one Formal round per iteration, and one
 epoch over the complete 370/74 qualification manifests. Every flag it passes
 is an ordinary production flag.
 
+The workflow fixes `train_portion=1.0` because this task does not define a
+fractional-epoch sampling rule; it refuses rather than inventing one. It also
+declares the framework-provided `ce` objective through `objective.config`, so
+the planner cannot substitute a temporal focal loss that is incompatible with
+the declared `[B, 37]` output. Neither choice is hardcoded in SIDERIUS: they are
+task/workflow declarations at this external boundary.
+
 Both arguments are required and have no default — a workspace and a data root
 are machine-local, and guessing either is how a published command becomes
 unrunnable on every machine but one. Omitting one refuses immediately, by

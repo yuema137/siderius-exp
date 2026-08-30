@@ -22,9 +22,11 @@ EXP_ROOT = Path(__file__).resolve().parents[1]
 TASK_MANIFESTS = {
     "tidmad": EXP_ROOT / "tasks/tidmad/workflows/qualification/composition.yaml",
     "oxford_iiit_pet": EXP_ROOT / "tasks/oxford_iiit_pet/composition.yaml",
-    "davis_future_prediction": EXP_ROOT / "tasks/davis_future_prediction/composition.yaml",
+    "davis_future_prediction": EXP_ROOT
+    / "tasks/davis_future_prediction/composition.yaml",
     "cancer_gene_identification": (
-        EXP_ROOT / "tasks/cancer_gene_identification/workflows/qualification/composition.yaml"
+        EXP_ROOT
+        / "tasks/cancer_gene_identification/workflows/qualification/composition.yaml"
     ),
 }
 
@@ -83,6 +85,11 @@ CHILD = textwrap.dedent(
                 "partition_count": partition_count,
                 "resolved_scope_count": len(invariants.resolved_data_scope),
                 "effective_health_config": effective_path,
+                "objective_loss_type": (
+                    composition.objective.loss_type
+                    if composition.objective is not None
+                    else None
+                ),
                 "source_checkout": str(checkout),
             },
             sort_keys=True,
@@ -95,7 +102,9 @@ CHILD = textwrap.dedent(
 def _siderius_checkout() -> Path:
     configured = os.environ.get("SIDERIUS_CHECKOUT")
     if not configured:
-        pytest.fail("SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test")
+        pytest.fail(
+            "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
+        )
     checkout = Path(configured).resolve()
     if not (checkout / "core/run_invariants.py").is_file():
         pytest.fail(f"SIDERIUS_CHECKOUT is not a SIDERIUS checkout: {checkout}")
@@ -103,7 +112,9 @@ def _siderius_checkout() -> Path:
 
 
 @pytest.mark.parametrize("task_id", TASK_MANIFESTS)
-def test_real_task_cold_start_reaches_the_llm_gpu_boundary(task_id: str, tmp_path: Path) -> None:
+def test_real_task_cold_start_reaches_the_llm_gpu_boundary(
+    task_id: str, tmp_path: Path
+) -> None:
     """Fail when startup reselects legacy Health or dataset authority.
 
     Removing this test would leave two observed failures uncovered: formal
@@ -132,3 +143,5 @@ def test_real_task_cold_start_reaches_the_llm_gpu_boundary(task_id: str, tmp_pat
     assert receipt["partition_count"] == receipt["resolved_scope_count"]
     assert Path(receipt["effective_health_config"]).is_file()
     assert Path(receipt["source_checkout"]) == checkout
+    if task_id == "oxford_iiit_pet":
+        assert receipt["objective_loss_type"] == "ce"
