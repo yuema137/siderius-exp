@@ -86,6 +86,7 @@ exec bash "$LAUNCHER" \
     --num_iterations 2 \
     --max_rounds 2 \
     --max_epochs 1 \
+    --allowed_output_types classifier \
     --min_formal_batch_size 1 \
     --trial_portion 1.0 \
     --eval_portion 1.0 \
