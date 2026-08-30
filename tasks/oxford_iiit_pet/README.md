@@ -82,17 +82,18 @@ is deliberately not bound by any composition, so no run can contaminate it.
 ### 5. Run it
 
 ```bash
-bash examples/oxford_iiit_pet/quickstart.sh \
+bash tasks/oxford_iiit_pet/quickstart.sh \
+    --siderius-checkout /path/to/pinned/SIDERIUS \
     --workspace /path/to/pets-quickstart-workspace \
     --data_dir /path/to/oxford-iiit-pet/images
 ```
 
-That is the entire command. `quickstart.sh` is a thin adapter with no logic of
-its own: it resolves the repository from its own location and execs the normal
-production launcher, `sdsc_submission_scripts/run_chain.sh`, with
-`--task_composition configs/task_composition/pets.yaml` and a set of small
-bounded defaults (1 iteration, 1 round, 1 epoch, full portions over the 370/74
-gate subsets). Every flag it passes is an ordinary production flag.
+That is the entire command. `quickstart.sh` is a thin adapter with no execution
+logic of its own. It invokes the selected SIDERIUS checkout's normal production
+launcher with this external package's `composition.yaml`. The bounded defaults
+run two iterations, one Trial plus one Formal round per iteration, and one
+epoch over the complete 370/74 qualification manifests. Every flag it passes
+is an ordinary production flag.
 
 Both arguments are required and have no default — a workspace and a data root
 are machine-local, and guessing either is how a published command becomes
@@ -104,14 +105,14 @@ the chain's parser is last-wins, overrides the corresponding default:
 
 ```text
 --dry-run                      print the exact child command; run nothing
---num_iterations 2             go deeper
+--num_iterations 3             go deeper
 --max_rounds 3                 more tuning rounds per iteration
 --trial_portion 0.5            use half the bound training rows
 --validation_max_samples 20    hard ceiling on the evaluation leg
 --healthgate_mode observe_only record health verdicts without invalidating
 --force_fresh                  reuse a non-empty workspace
 --start_iter N                 resume at iteration N
-bash examples/oxford_iiit_pet/quickstart.sh --help
+bash tasks/oxford_iiit_pet/quickstart.sh --help
 ```
 
 Those portion and ceiling flags are the task-agnostic way to bound a composed

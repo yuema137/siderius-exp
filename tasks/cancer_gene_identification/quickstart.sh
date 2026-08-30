@@ -102,12 +102,16 @@ exec bash "$LAUNCHER" \
     --run_name cancer_gene_quickstart \
     --llm_config "$LLM_CONFIG" \
     --start_iter 1 \
-    --num_iterations 1 \
+    --num_iterations 2 \
     --max_rounds 2 \
     --max_epochs 1 \
     --min_formal_batch_size 1 \
     --trial_portion 0.25 \
     --eval_portion 0.25 \
     --formal_portion 1.0 \
+    --formal_train_portion 0.25 \
+    --formal_eval_portion 0.25 \
+    --trial_vram_budget_gb 10 \
+    --formal_vram_budget_gb 16 \
     --no-runtime_watchdog \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

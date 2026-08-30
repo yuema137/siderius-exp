@@ -138,7 +138,8 @@ refused by name for a task that does not declare TIDMAD's file topology.
 
 <!-- quickstart-command -->
 ```bash
-bash examples/davis_future_prediction/quickstart.sh \
+bash tasks/davis_future_prediction/quickstart.sh \
+    --siderius-checkout /path/to/pinned/SIDERIUS \
     --workspace /path/to/your/workspace \
     --data_dir /path/to/DAVIS_2017
 ```
@@ -151,8 +152,8 @@ resolves the repository root from its own location, then invokes the normal
 production launcher with this pack's manifest:
 
 ```text
-examples/davis_future_prediction/quickstart.sh
-  → sdsc_submission_scripts/run_chain.sh --task_composition configs/task_composition/davis.yaml
+tasks/davis_future_prediction/quickstart.sh
+  → <siderius-checkout>/sdsc_submission_scripts/run_chain.sh --task_composition <siderius-exp>/tasks/davis_future_prediction/composition.yaml
   → sdsc_submission_scripts/run_one_iteration.py
   → the same workflow, declarations and plugins that CI and the Gates exercise
 ```
@@ -161,31 +162,25 @@ That manifest is an **entrypoint POINTER** (Q-12d-1): it carries refs into this
 pack and no second copy of any task semantics. Move the pack and the refs move
 with it; change a threshold and you change it in exactly one place.
 
-**Required, with no default on purpose.** `--workspace` (where the run writes)
-and `--data_dir` (the root from step 3) are refused by name when missing. A
-published quickstart must never require a path that exists on one machine.
+**Required, with no default on purpose.** `--siderius-checkout`, `--workspace`
+and `--data_dir` are refused by name when missing. A published quickstart must
+name the framework revision it executes and must never require a machine-local
+path that exists on only one machine.
 
 **Bounded by default, and every bound is an ordinary chain flag.** The script
-supplies `--mode lilab --num_iterations 1 --max_rounds 1 --max_epochs 1
---trial_portion 0.1 --formal_portion 0.1 --validation_max_samples 8`. Anything
+supplies `--mode lilab --num_iterations 2 --max_rounds 2 --max_epochs 1
+--trial_portion 1.0 --formal_portion 1.0 --validation_max_samples 15`. The
+committed qualification manifests already bound the run to 60 training clips
+and 15 validation clips. Anything
 you append is passed straight through and wins, because the launcher's parser
 is last-wins:
 
-*Why 0.1 for this pack.* The manifest already narrows the run to the committed
-Gate subsets — 60 training clips and 15 evaluation clips — so `0.1` leaves ~6
-training clips, and `--validation_max_samples 8` caps the evaluation leg at 8.
-That is enough because this task's primary metric is a **global pixel mean**
-over clips × C × T × H × W: eight clips is already ~2.75 M sampled values, so a
-10% subset still yields a stable, comparable number. The cost per clip, on the
-other hand, is high — twelve decoded RGB frames in and a dense
-`[3, 4, 128, 224]` regression target out — which is what makes a small portion
-the right default here. Packs bound themselves differently for their own
-reasons; a classification pack, for instance, may pin `1.0` because a fraction
-of a small image set leaves too few examples per class to mean anything. Raise
-it when you want a real run, not a first run.
+The complete qualification manifests remain small enough to exercise the real
+lower-is-better Formal path without sampling away sequence coverage.
 
 ```bash
-bash examples/davis_future_prediction/quickstart.sh \
+bash tasks/davis_future_prediction/quickstart.sh \
+    --siderius-checkout /path/to/pinned/SIDERIUS \
     --workspace /path/to/your/workspace \
     --data_dir /path/to/DAVIS_2017 \
     --num_iterations 3 --max_rounds 2
@@ -217,7 +212,7 @@ alternative; append `--llm_config <path>` to use it or your own.
 data root from step 3. For the full argument list:
 
 ```bash
-bash examples/davis_future_prediction/quickstart.sh --help
+bash tasks/davis_future_prediction/quickstart.sh --help
 ```
 
 ### 5. Where the output lands

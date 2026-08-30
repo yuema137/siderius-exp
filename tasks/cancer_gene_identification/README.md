@@ -65,10 +65,13 @@ bash tasks/cancer_gene_identification/quickstart.sh \
 
 The script is a thin adapter over the production chain launcher. Extra
 arguments are passed through and later values override the bounded defaults.
-The bounded default runs one trial round followed by one forced formal round,
-so the trial-only scope overrides are exercised before formal validation AUPRC
-is computed. Generated capabilities are isolated under the supplied workspace
-to prevent candidates from an earlier qualification run entering a cold start.
+The bounded default runs two chain iterations. Each iteration has one Trial
+round followed by one forced Formal round, so iteration-state continuity and
+the Trial-to-Formal transition are both exercised before validation AUPRC is
+computed. Formal training and evaluation exposure are externally fixed at
+`0.25`; the agent cannot expand them. Generated capabilities are isolated under
+the supplied workspace to prevent candidates from an earlier qualification
+run entering a cold start.
 The bounded default disables the shared runtime watchdog until SIDERIUS issue
 `#388` is repaired; explicit Trial and Formal operator budgets remain declared.
 
