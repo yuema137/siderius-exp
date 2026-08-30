@@ -29,6 +29,25 @@ TASK_MANIFESTS = {
         / "tasks/cancer_gene_identification/workflows/qualification/composition.yaml"
     ),
 }
+EXPECTED_OBJECTIVES = {
+    "tidmad": None,
+    "oxford_iiit_pet": ("ce", None),
+    "davis_future_prediction": ("custom", "davis_exact_l1"),
+    "cancer_gene_identification": ("custom", "cancer_gene_masked_bce"),
+}
+EXPECTED_HEALTH_GATES = {
+    "tidmad": {
+        "amplitude_collapse_blocking",
+        "output_diversity_blocking",
+        "output_std_blocking",
+    },
+    "oxford_iiit_pet": {
+        "pets_distinct_symbols_blocking",
+        "pets_dominant_fraction_blocking",
+    },
+    "davis_future_prediction": {"davis_dispersion_blocking"},
+    "cancer_gene_identification": set(),
+}
 
 CHILD = textwrap.dedent(
     """
@@ -43,8 +62,9 @@ CHILD = textwrap.dedent(
     sys.path.insert(0, str(checkout))
     os.chdir(checkout)
 
-    from core.run_invariants import build_run_invariants
+    from core.run_invariants import RunHealthMaterialization, build_run_invariants
     from execute_tools.dataset_config import DataScope
+    from execute_tools.health_checks.candidate_eligibility import resolve_run_scientific_gate_ids
     from execute_tools.health_checks.launch_policy import validate_formal_launch
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -75,9 +95,11 @@ CHILD = textwrap.dedent(
         health_checks_config=None,
         workspace=str(workspace),
         include_runtime_identities=False,
-        task_health_binding=composition.task_health_binding,
+        health_materialization=RunHealthMaterialization(
+            task_health_binding=composition.task_health_binding,
+            dataset_partition_count=partition_count,
+        ),
         task_composition_fingerprint=composition.semantic_fingerprint,
-        dataset_partition_count=partition_count,
     )
     print(
         json.dumps(
@@ -89,6 +111,15 @@ CHILD = textwrap.dedent(
                     composition.objective.loss_type
                     if composition.objective is not None
                     else None
+                ),
+                "objective_loss_name": (
+                    composition.objective.loss_name
+                    if composition.objective is not None
+                    else None
+                ),
+                "health_gate_ids": sorted(
+                    resolve_run_scientific_gate_ids(composition.task_health_binding)
+                    or []
                 ),
                 "source_checkout": str(checkout),
             },
@@ -143,5 +174,13 @@ def test_real_task_cold_start_reaches_the_llm_gpu_boundary(
     assert receipt["partition_count"] == receipt["resolved_scope_count"]
     assert Path(receipt["effective_health_config"]).is_file()
     assert Path(receipt["source_checkout"]) == checkout
-    if task_id == "oxford_iiit_pet":
-        assert receipt["objective_loss_type"] == "ce"
+    expected_objective = EXPECTED_OBJECTIVES[task_id]
+    actual_objective = (
+        receipt["objective_loss_type"],
+        receipt["objective_loss_name"],
+    )
+    if expected_objective is None:
+        assert actual_objective == (None, None)
+    else:
+        assert actual_objective == expected_objective
+    assert set(receipt["health_gate_ids"]) == EXPECTED_HEALTH_GATES[task_id]
