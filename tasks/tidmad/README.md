@@ -30,7 +30,8 @@ data is, and none ever will be.
 
 | shipped asset | path | what it is |
 |---|---|---|
-| task composition manifest | `composition.yaml` | the single declaration that binds this task for a run |
+| qualification composition | `workflows/qualification/composition.yaml` | the bounded external-consumer workflow used by `quickstart.sh` |
+| Gold workflow assets | `workflows/gold_stage1/`, `workflows/gold_stage2/` | campaign-owned treatment kept separate from qualification; Stage 2 is not executable or authorized |
 | literature-review config | `framework_configs/lit_review.yaml` | TIDMAD root paper, search posture, and confidence rubric used when literature review is enabled |
 | resolved declarations | `resolved/*.json` | dataset profile, model I/O contract, deliverable spec, metric spec, file identity |
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |
@@ -118,7 +119,7 @@ then executes that checkout's normal production launcher:
 
 ```text
 tasks/tidmad/quickstart.sh
-  → <siderius-checkout>/sdsc_submission_scripts/run_chain.sh --task_composition <siderius-exp>/tasks/tidmad/composition.yaml
+  → <siderius-checkout>/sdsc_submission_scripts/run_chain.sh --task_composition <siderius-exp>/tasks/tidmad/workflows/qualification/composition.yaml
   → sdsc_submission_scripts/run_one_iteration.py
   → the same workflow, declarations and plugins that CI and the Gates exercise
 ```
@@ -131,12 +132,12 @@ tasks/tidmad/quickstart.sh --help` prints the contract.
 | default applied | why |
 |---|---|
 | `--mode lilab` | foreground subprocess |
-| `--task_composition <siderius-exp>/tasks/tidmad/composition.yaml` | binds this external task package |
+| `--task_composition <siderius-exp>/tasks/tidmad/workflows/qualification/composition.yaml` | binds the bounded external-consumer workflow, not a Gold campaign |
 | `--run_name tidmad_quickstart` | pins the run id |
 | `--llm_config <repo>/llm_configs/openai_tiered_pro.json` | per-node model routing. Without it the run falls back to a single default model with no routing. Override with `--llm_config llm_configs/deepseek_tiered_pro.json` or your own file |
 | `--ml_lit_review_config <siderius-exp>/tasks/tidmad/framework_configs/lit_review.yaml` | keeps TIDMAD-specific literature framing in the experiment repository even when the CLI enables or disables the advisor |
 | `--start_iter 1` | **not cosmetic — see below** |
-| `--num_iterations 1` · `--max_rounds 1` · `--max_epochs 1` | one shallow pass |
+| `--num_iterations 2` · `--max_rounds 2` · `--max_epochs 1` | proves iteration-state continuity and executes one Trial plus one Formal round per iteration |
 | `--min_formal_batch_size 1` | preserves Trial/Formal batch parity in this qualification workflow |
 | `--trial_portion 0.02` · `--formal_portion 0.02` · `--formal_eval_portion 0.02` | see below |
 | `--trial_time_budget_minutes 20` · `--formal_time_budget_minutes 60` | **TIDMAD-priced — see below** |

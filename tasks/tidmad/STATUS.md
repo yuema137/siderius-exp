@@ -19,13 +19,13 @@ not be presented as tests executed from this repository.
 | task description / forward contract | REFERENCE to `configs/task_config.yaml` | README cites the owning path |
 | health policy | REFERENCE to `configs/health_checks.yaml` | README cites the owning path |
 | data root | REFERENCE to the `tidmad_data_config.yaml` mechanism | `data/README.md` |
-| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `7476bf44` |
+| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies `workflows/qualification/composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | two-iteration separated dry-run against SIDERIUS `7476bf44` |
 
 **Nothing under `examples/tidmad/` is an authoring surface: the runtime does
 not read these snapshots as a task authority.** They are generated
 projections, and editing one changes nothing you want changed (design §3.6).
 The one nuance: this package's composition manifest
-`composition.yaml` binds `resolved/dataset_profile.json`
+`workflows/qualification/composition.yaml` binds `resolved/dataset_profile.json`
 and `resolved/metric_spec.json` as declaration references, so a composed run
 does load those two — which is exactly why a hand edit is caught as a red
 test rather than being harmless.
@@ -45,10 +45,15 @@ test rather than being harmless.
 
 ## Separation qualification
 
-- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `7476bf44`
-  with task-data-path id `tidmad`, primary metric
+- `workflows/qualification/composition.yaml` resolves from `siderius-exp`
+  against SIDERIUS `7476bf44` with task-data-path id `tidmad`, primary metric
   `tidmad_denoising_score`, and semantic fingerprint
-  `1d7aecac3a8af8dc53935be8ff6f0ba49d122a31b2991613e4f4c36c5fd9a364`.
+  `1bfbd291921ce56063420fa8d9c973c9f3d7abf4e8b1a5b76cd604c0a07d4252`
+- the qualification dry-run resolves two iterations and two tuner rounds, with
+  Formal scope and evaluation fixed at `0.02`
+- Gold Stage 1 Health treatment is stored separately with
+  `amplitude_collapse` as its sole blocking gate; Gold Stage 2 remains
+  non-executable and unauthorized
 - `quickstart.sh --dry-run` imports framework source exclusively from the
   explicit SIDERIUS checkout, uses this package's composition, and emits
   `--min_formal_batch_size 1` so the qualification does not reintroduce the

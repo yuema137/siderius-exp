@@ -1,0 +1,96 @@
+health_gates:
+- after_round: every
+  checks:
+  - config:
+      min_unique_int8_values: 25
+      peek_file_indices: [3, 10, 17]
+      peek_samples: 100000
+    name: output_diversity
+  gate_role: observational
+  id: output_diversity_blocking
+  on_fail: {action: continue}
+  on_pass: {action: continue}
+  reason: >-
+    Record-only for Gold under operator ruling D-HEALTH-1 (2026-08-27).
+    Production-semantics evaluation of the adopted official FCNet lineage
+    showed that this threshold is physically unsatisfiable on low-band files,
+    including for the injected ground truth. The threshold remains unchanged
+    for observation and provenance.
+  short_circuit: false
+- after_round: every
+  checks:
+  - config:
+      min_std_mv: 1.0
+      peek_file_indices: [3, 10, 17]
+      peek_samples: 100000
+      value_scale_unit: mV
+      value_scale_units_per_sample: 0.3125
+    name: output_std
+  gate_role: observational
+  id: output_std_blocking
+  on_fail: {action: continue}
+  on_pass: {action: continue}
+  reason: >-
+    Record-only for Gold under operator ruling D-HEALTH-1 (2026-08-27).
+    Production-semantics evaluation of the adopted official FCNet lineage
+    showed that this threshold is physically unsatisfiable on low-band files,
+    including for the injected ground truth. The threshold remains unchanged
+    for observation and provenance.
+  short_circuit: false
+- after_round: every
+  checks:
+  - config:
+      aggregation: all_pass
+      collapse_threshold: 0.95
+      peek_file_indices: [3, 10, 17]
+      peek_samples: 100000
+    name: amplitude_collapse
+  gate_role: blocking
+  id: amplitude_collapse_blocking
+  on_fail: {action: invalidate_round}
+  on_pass: {action: continue}
+  reason: >-
+    The sole blocking Gold check under operator ruling D-HEALTH-1
+    (2026-08-27). It rejects near-constant output when any inspected file has
+    a dominant value fraction above 0.95.
+  short_circuit: true
+- after_round: every
+  checks:
+  - config:
+      peek_samples: 1000000
+      value_scale_unit: mV
+      value_scale_units_per_sample: 0.3125
+    name: pearson_dispersion
+  gate_role: observational
+  id: pearson_dispersion_recording
+  on_fail: {action: continue}
+  on_pass: {action: continue}
+  reason: Records the spread of per-file Pearson values and never blocks.
+  short_circuit: false
+- after_round: every
+  checks:
+  - config:
+      peek_samples: 1000000
+      value_scale_unit: mV
+      value_scale_units_per_sample: 0.3125
+    name: spectral_peak_ratio
+  gate_role: observational
+  id: spectral_peak_ratio_recording
+  on_fail: {action: continue}
+  on_pass: {action: continue}
+  reason: Records per-file spectral peak ratios and never blocks.
+  short_circuit: false
+- after_round: every
+  checks:
+  - config:
+      peek_samples: 100000
+      value_scale_unit: mV
+      value_scale_units_per_sample: 0.3125
+    name: per_file_output_std
+  gate_role: observational
+  id: per_file_output_std_recording
+  on_fail: {action: continue}
+  on_pass: {action: continue}
+  reason: Records per-file output standard deviation and never blocks.
+  short_circuit: false
+task_health_binding: explicit

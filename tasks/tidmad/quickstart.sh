@@ -15,7 +15,7 @@ Required:
   --data_dir DIR            directory containing TIDMAD HDF5 files
 
 Bounded defaults:
-  one iteration, one tuner round, one epoch
+  two iterations, two tuner rounds, one epoch
   Trial/Formal batch parity (minimum Formal batch 1)
   trial/formal training and evaluation portion 0.02
   trial/formal time budget 20/60 minutes
@@ -73,7 +73,7 @@ compgen -G "${DATA_DIR}/abra_training_*.h5" >/dev/null || fail "no abra_training
 compgen -G "${DATA_DIR}/abra_validation_*.h5" >/dev/null || fail "no abra_validation_*.h5 files under '$DATA_DIR'"
 
 LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
-COMPOSITION="${PACK_DIR}/composition.yaml"
+COMPOSITION="${PACK_DIR}/workflows/qualification/composition.yaml"
 LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
 LIT_REVIEW_CONFIG="${PACK_DIR}/framework_configs/lit_review.yaml"
 GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
@@ -93,8 +93,8 @@ exec bash "$LAUNCHER" \
     --llm_config "$LLM_CONFIG" \
     --ml_lit_review_config "$LIT_REVIEW_CONFIG" \
     --start_iter 1 \
-    --num_iterations 1 \
-    --max_rounds 1 \
+    --num_iterations 2 \
+    --max_rounds 2 \
     --max_epochs 1 \
     --min_formal_batch_size 1 \
     --trial_portion 0.02 \
