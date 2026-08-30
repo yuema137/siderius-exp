@@ -15,7 +15,7 @@ capability remains owned by the pinned SIDERIUS revision.
 | task description / forward contract | REFERENCE to `configs/task_config.yaml` | README cites the owning path |
 | health policy | REFERENCE to `configs/health_checks.yaml` | README cites the owning path |
 | data root | REFERENCE to the `tidmad_data_config.yaml` mechanism | `data/README.md` |
-| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `d53893d1` |
+| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `384cc9e8` |
 
 **Nothing under `examples/tidmad/` is an authoring surface: the runtime does
 not read these snapshots as a task authority.** They are generated
@@ -41,7 +41,7 @@ test rather than being harmless.
 
 ## Separation qualification
 
-- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `d53893d1`
+- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `384cc9e8`
   with task-data-path id `tidmad`, primary metric
   `tidmad_denoising_score`, and semantic fingerprint
   `1d7aecac3a8af8dc53935be8ff6f0ba49d122a31b2991613e4f4c36c5fd9a364`.
@@ -49,6 +49,9 @@ test rather than being harmless.
   explicit SIDERIUS checkout, uses this package's composition, and emits
   `--min_formal_batch_size 1` so the qualification does not reintroduce the
   invalidated Formal-only batch guard.
+- Literature review resolves from the task-owned
+  `framework_configs/lit_review.yaml`; a composed run does not consume the
+  framework checkout's task-specific default.
 - A fresh small-scale real-data GPU iteration on the separated entrypoint is
   not yet complete.
 

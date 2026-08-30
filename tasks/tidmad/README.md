@@ -31,6 +31,7 @@ data is, and none ever will be.
 | shipped asset | path | what it is |
 |---|---|---|
 | task composition manifest | `composition.yaml` | the single declaration that binds this task for a run |
+| literature-review config | `framework_configs/lit_review.yaml` | TIDMAD root paper, search posture, and confidence rubric used when literature review is enabled |
 | resolved declarations | `resolved/*.json` | dataset profile, model I/O contract, deliverable spec, metric spec, file identity |
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |
 | reference artifacts | `reference_data/raw_baseline/`, `reference_data/ground_truth/`, `reference_data/official_paper_result/` | metric floor, metric ceiling, paper-comparable scores |
@@ -133,6 +134,7 @@ tasks/tidmad/quickstart.sh --help` prints the contract.
 | `--task_composition <siderius-exp>/tasks/tidmad/composition.yaml` | binds this external task package |
 | `--run_name tidmad_quickstart` | pins the run id |
 | `--llm_config <repo>/llm_configs/openai_tiered_pro.json` | per-node model routing. Without it the run falls back to a single default model with no routing. Override with `--llm_config llm_configs/deepseek_tiered_pro.json` or your own file |
+| `--ml_lit_review_config <siderius-exp>/tasks/tidmad/framework_configs/lit_review.yaml` | keeps TIDMAD-specific literature framing in the experiment repository even when the CLI enables or disables the advisor |
 | `--start_iter 1` | **not cosmetic — see below** |
 | `--num_iterations 1` · `--max_rounds 1` · `--max_epochs 1` | one shallow pass |
 | `--min_formal_batch_size 1` | preserves Trial/Formal batch parity in this qualification workflow |

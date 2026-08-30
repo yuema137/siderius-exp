@@ -1,0 +1,38 @@
+# Operator-visible configuration for TIDMAD literature review.
+#
+# This task-owned copy preserves the production TIDMAD treatment while keeping
+# task-specific root papers and confidence criteria outside SIDERIUS infra.
+
+enabled: false
+
+root_papers:
+  - source_type: arxiv
+    identifier: "2406.04378"
+    verbosity: 1
+
+dynamic_search:
+  enabled: true
+  max_rounds: 3
+  initial_verbosity: 0
+  escalation_allowed: true
+  results_per_query: 10
+  max_escalations_per_round: 2
+
+findings_verbosity: 1
+
+synthesis:
+  transfer_tolerance: moderate
+
+confidence_rubric:
+  omit_below: 0.40
+  abstract_only_ceiling: 0.79
+  bands:
+    - lower: 0.80
+      upper: 1.00
+      criteria: "deep-read (verbosity >= 1 extract) AND on-domain (1D / broadband signal denoising) AND directly addresses a current bottleneck"
+    - lower: 0.60
+      upper: 0.79
+      criteria: "deep-read with a clear mechanism transfer, OR an on-domain abstract with a strong specific signal"
+    - lower: 0.40
+      upper: 0.59
+      criteria: "abstract-only evidence, OR cross-domain with a plausible (unvalidated) transfer rationale"

@@ -18,6 +18,16 @@
 Raw data is NEVER committed to this repository (roadmap §22.23.10). Nothing in
 `examples/tidmad/` fetches it.
 
+## Literature-review configuration
+
+`framework_configs/lit_review.yaml` is the task-owned semantic projection of
+the production TIDMAD literature configuration from SIDERIUS `98610b8d`.
+That source file has SHA-256
+`004ffa44c7bfd3684c6e07c63091dabf6d059050309934fd3862577baaaae203`.
+The projection preserves every executable value while removing repository-
+internal historical commentary; task-specific root papers and confidence
+criteria therefore no longer live in framework infra.
+
 ## Machine-local data root (reference, no path recorded here)
 
 The data directory is configured per machine in the gitignored

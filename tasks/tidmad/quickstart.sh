@@ -75,10 +75,12 @@ compgen -G "${DATA_DIR}/abra_validation_*.h5" >/dev/null || fail "no abra_valida
 LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
 COMPOSITION="${PACK_DIR}/composition.yaml"
 LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
+LIT_REVIEW_CONFIG="${PACK_DIR}/framework_configs/lit_review.yaml"
 GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
 [ -f "$LAUNCHER" ] || fail "production launcher not found at '$LAUNCHER'"
 [ -f "$COMPOSITION" ] || fail "task composition not found at '$COMPOSITION'"
 [ -f "$LLM_CONFIG" ] || fail "LLM config not found at '$LLM_CONFIG'"
+[ -f "$LIT_REVIEW_CONFIG" ] || fail "literature-review config not found at '$LIT_REVIEW_CONFIG'"
 
 export SIDERIUS_GENERATED_LIBRARY_DIR="$GENERATED_LIBRARY_DIR"
 
@@ -89,6 +91,7 @@ exec bash "$LAUNCHER" \
     --data_dir "$DATA_DIR" \
     --run_name tidmad_quickstart \
     --llm_config "$LLM_CONFIG" \
+    --ml_lit_review_config "$LIT_REVIEW_CONFIG" \
     --start_iter 1 \
     --num_iterations 1 \
     --max_rounds 1 \
