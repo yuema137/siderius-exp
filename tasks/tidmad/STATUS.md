@@ -19,7 +19,7 @@ not be presented as tests executed from this repository.
 | task description / forward contract | REFERENCE to `configs/task_config.yaml` | README cites the owning path |
 | health policy | REFERENCE to `configs/health_checks.yaml` | README cites the owning path |
 | data root | REFERENCE to the `tidmad_data_config.yaml` mechanism | `data/README.md` |
-| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `a4e63655` |
+| run entrypoint | `quickstart.sh` — a thin adapter that requires an explicit SIDERIUS checkout, supplies this package's `composition.yaml`, and delegates to that checkout's `sdsc_submission_scripts/run_chain.sh`; it contains no framework code | separated dry-run against SIDERIUS `d53ac914` |
 
 **Nothing under `examples/tidmad/` is an authoring surface: the runtime does
 not read these snapshots as a task authority.** They are generated
@@ -45,7 +45,7 @@ test rather than being harmless.
 
 ## Separation qualification
 
-- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `a4e63655`
+- `composition.yaml` resolves from `siderius-exp` against SIDERIUS `d53ac914`
   with task-data-path id `tidmad`, primary metric
   `tidmad_denoising_score`, and semantic fingerprint
   `1d7aecac3a8af8dc53935be8ff6f0ba49d122a31b2991613e4f4c36c5fd9a364`.
@@ -81,8 +81,10 @@ test rather than being harmless.
   `-10.509863893769241`. This proves execution closure for the repair; it is
   not a scientific-performance result and does not make the stopped chain an
   authoritative completed iteration.
-- The independent time-warmup scope-identity coupling is tracked in SIDERIUS
-  issue #392. A fresh uninterrupted end-to-end qualification remains pending.
+- SIDERIUS `d53ac914` repairs the independent time-warmup scope-identity
+  coupling by passing the attempt's existing task-owned scope to the bound
+  external data path. A real RTX 5090 witness measured two batches at a median
+  `48.1323 ms`. A fresh uninterrupted end-to-end qualification remains pending.
 
 ## Maturity pins carried by this pack at PR0 (design §3.5)
 
