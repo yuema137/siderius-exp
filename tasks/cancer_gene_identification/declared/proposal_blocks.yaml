@@ -1,4 +1,7 @@
-architect_role: graph neural networks for transductive cancer-gene identification
+architect_role: >-
+  graph neural networks for transductive cancer-gene identification under the
+  workflow-declared fixed masked binary-cross-entropy objective; explore the
+  model architecture and training configuration without proposing a custom loss
 output_contract_guidance: >-
   The continuous output carries task metadata in its first two channels and a
   raw binary cancer-gene logit in its third channel for every packed record.
