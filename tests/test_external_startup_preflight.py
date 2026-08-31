@@ -26,8 +26,7 @@ TASK_MANIFESTS = {
     "davis_future_prediction": EXP_ROOT
     / "tasks/davis_future_prediction/compositions/bounded_qualification.yaml",
     "cancer_gene_identification": (
-        EXP_ROOT
-        / "tasks/cancer_gene_identification/workflows/qualification/composition.yaml"
+        EXP_ROOT / "tasks/cancer_gene_identification/compositions/two_network.yaml"
     ),
 }
 EXPECTED_OBJECTIVES = {

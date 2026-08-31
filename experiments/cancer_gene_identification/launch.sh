@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXPERIMENT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXP_ROOT="$(cd "${EXPERIMENT_ROOT}/../.." && pwd)"
+PACK_DIR="${EXP_ROOT}/tasks/cancer_gene_identification"
 
 usage() {
     cat <<USAGE
-Usage: bash tasks/cancer_gene_identification/quickstart.sh \
+Usage: bash experiments/cancer_gene_identification/launch.sh \
   --siderius-checkout DIR --workspace DIR --data_dir DIR \
-  [--workflow qualification|formal] [extra run_chain.sh args...]
+  [--experiment two_network_qualification|eight_network_comparison] \
+  [extra run_chain.sh args...]
 
 Required:
   --siderius-checkout DIR   exact SIDERIUS checkout to execute
@@ -15,14 +18,14 @@ Required:
   --data_dir DIR            NatureBench problem/data directory
 
 Common extras:
-  --workflow NAME   default: qualification
+  --experiment NAME default: two_network_qualification
   --run_name NAME   default: cancer_gene_quickstart
   --dry-run         print the resolved child command and run nothing
 USAGE
 }
 
 fail() {
-    echo "tasks/cancer_gene_identification/quickstart.sh: $1" >&2
+    echo "experiments/cancer_gene_identification/launch.sh: $1" >&2
     usage >&2
     exit 2
 }
@@ -30,7 +33,7 @@ fail() {
 SIDERIUS_CHECKOUT=""
 WORKSPACE=""
 DATA_DIR=""
-WORKFLOW="qualification"
+EXPERIMENT="two_network_qualification"
 PASSTHROUGH=()
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -49,9 +52,9 @@ while [ $# -gt 0 ]; do
             DATA_DIR="$2"
             shift 2
             ;;
-        --workflow)
-            [ $# -ge 2 ] || fail "missing value for --workflow"
-            WORKFLOW="$2"
+        --experiment)
+            [ $# -ge 2 ] || fail "missing value for --experiment"
+            EXPERIMENT="$2"
             shift 2
             ;;
         -h|--help)
@@ -69,15 +72,17 @@ done
 [ -d "$SIDERIUS_CHECKOUT" ] || fail "--siderius-checkout is not a directory: '$SIDERIUS_CHECKOUT'"
 [ -n "$WORKSPACE" ] || fail "missing required argument --workspace"
 [ -d "$DATA_DIR" ] || fail "--data_dir is not a directory: '$DATA_DIR'"
-case "$WORKFLOW" in
-    qualification)
+case "$EXPERIMENT" in
+    two_network_qualification)
         NETWORKS=(cpdb ltg)
+        COMPOSITION_NAME="two_network"
         ;;
-    formal)
+    eight_network_comparison)
         NETWORKS=(cpdb stringdb pcnet iref_v15 iref_v9 multinet mtg ltg)
+        COMPOSITION_NAME="eight_network"
         ;;
     *)
-        fail "unknown workflow '$WORKFLOW'; expected qualification or formal"
+        fail "unknown experiment '$EXPERIMENT'; expected two_network_qualification or eight_network_comparison"
         ;;
 esac
 for network in "${NETWORKS[@]}"; do
@@ -85,7 +90,7 @@ for network in "${NETWORKS[@]}"; do
 done
 
 LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
-COMPOSITION="${PACK_DIR}/workflows/${WORKFLOW}/composition.yaml"
+COMPOSITION="${PACK_DIR}/compositions/${COMPOSITION_NAME}.yaml"
 LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
 GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
 [ -f "$LAUNCHER" ] || fail "production launcher not found at '$LAUNCHER'"

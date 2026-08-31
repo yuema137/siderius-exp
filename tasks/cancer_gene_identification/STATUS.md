@@ -13,10 +13,10 @@ Proven on the `ligroup` development server:
 - train and validation labels remain separated by their declared masks;
 - the reference message-passing plugin, masked BCE, prediction codec, and
   unweighted mean AUPRC execute together on synthetic HDF5 data;
-- the production quickstart completes `--dry-run` and emits the expected
-  composed child command.
+- the external experiment launcher completes `--dry-run` and emits the
+  expected composed child command;
 - all eight official NatureBench HDF5 files match their source SHA-256 values;
-- the bounded `cpdb` and `ltg` qualification workflow materializes real graph
+- the bounded `cpdb` and `ltg` task composition materializes real graph
   records while preserving node counts and train masks;
 - the source-provided train, validation, and test masks are mutually disjoint.
 - one real `cpdb` epoch completed on an RTX 5090 through the task-owned data
