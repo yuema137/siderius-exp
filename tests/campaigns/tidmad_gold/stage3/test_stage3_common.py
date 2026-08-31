@@ -28,7 +28,7 @@ from pathlib import Path
 import pytest
 
 import campaigns.tidmad_gold.stage3.stage3_common as stage3_common
-from execute_tools.build_anchor_map import default_anchor_map_path
+from tasks.tidmad.runtime.anchor_map import default_anchor_map_path
 from execute_tools.dataset_config import (
     NUM_FILES,
     SEGMENTS_PER_FILE,

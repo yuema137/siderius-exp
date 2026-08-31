@@ -46,8 +46,8 @@ import math
 import os
 from collections.abc import Sequence
 
-from execute_tools.build_anchor_map import default_anchor_map_path, load_anchor_map
-from execute_tools.data_paths import TIDMAD_DATA_DIR
+from tasks.tidmad.runtime.anchor_map import load_anchor_map
+from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH
 from execute_tools.dataset_config import NUM_FILES, SEGMENTS_PER_FILE
 from execute_tools.deliverable_spec import DeliverableNaming
 from execute_tools.evaluation_metric import (
@@ -57,7 +57,7 @@ from execute_tools.evaluation_metric import (
     ScoreabilityFailure,
     ScoreabilityVerdict,
 )
-from execute_tools.scoring_utils import score_vector
+from tasks.tidmad.runtime.scoring import score_vector
 
 #: Contract id stamped on every composition refusal this module raises.
 COMPOSITION_CONTRACT_ID = "stage3_compose_and_score"
@@ -67,6 +67,8 @@ COMPOSITION_CONTRACT_ID = "stage3_compose_and_score"
 #: (its ``EXPECTED_S_MAX``). A different value means a swapped or rebuilt
 #: anchor artifact, which would silently re-rule every composed score — so it
 #: is refused, exactly as the reuse anchor refuses it.
+TIDMAD_DATA_DIR = os.environ.get("TIDMAD_DATA_DIR")
+
 EXPECTED_S_MAX = 295715680.14248306
 
 
@@ -279,11 +281,14 @@ def compose_and_score(
             f"never a raw dict and never a fresh derivation."
         )
 
+    if not TIDMAD_DATA_DIR:
+        raise ValueError("TIDMAD_DATA_DIR must name the explicit raw-data root for Stage-3 scoring.")
+
     resolved = resolve_pooled_deliverables(
         deliverable_dirs, reconciled_spec=reconciled_spec
     )
 
-    anchor_data = load_anchor_map(default_anchor_map_path())
+    anchor_data = load_anchor_map(str(ANCHOR_MAP_PATH))
     s_max = float(anchor_data["s_max"])
     if not math.isclose(s_max, EXPECTED_S_MAX, rel_tol=0.0, abs_tol=1e-6):
         raise _composition_refusal(

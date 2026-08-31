@@ -65,7 +65,7 @@ from typing import Any, Protocol, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from campaigns.tidmad_gold.paths import EXPERIMENT_ROOT
-from execute_tools.build_anchor_map import default_anchor_map_path
+from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH
 from execute_tools.evaluation_metric import MetricSpec, MetricSpecField
 from execute_tools.health_checks.candidate_eligibility import (
     CandidateHealthValidity,
@@ -612,7 +612,7 @@ def run_terminal_eval(
     anchor = (
         Path(anchor_map_path)
         if anchor_map_path is not None
-        else Path(default_anchor_map_path())
+        else ANCHOR_MAP_PATH
     )
     if not anchor.is_file():
         raise TerminalEvalError(f"canonical anchor map not found: {str(anchor)!r}")

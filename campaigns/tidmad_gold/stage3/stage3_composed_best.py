@@ -56,10 +56,10 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from campaigns.tidmad_gold.paths import EXPERIMENT_ROOT
+from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH, EXPERIMENT_ROOT
 from core.iteration_manifest import sha256_file, verify_iteration_manifest
 from core.run_invariants import load_run_invariants
-from execute_tools.build_anchor_map import default_anchor_map_path, load_anchor_map
+from tasks.tidmad.runtime.anchor_map import load_anchor_map
 from execute_tools.dataset_config import NUM_FILES
 from execute_tools.deliverable_spec import DeliverableNaming
 from execute_tools.evaluation_metric import (
@@ -599,7 +599,7 @@ def build_provenance(
     scalar: float,
 ) -> ComposedBestProvenance:
     """Assemble the provenance document (identity-only winners, one scalar)."""
-    anchor_path = default_anchor_map_path()
+    anchor_path = str(ANCHOR_MAP_PATH)
     winner_blocks: list[BandWinnerProvenance] = []
     for winner in winners:
         deliverables = [

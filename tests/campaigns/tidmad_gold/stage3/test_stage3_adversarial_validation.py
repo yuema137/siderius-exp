@@ -374,7 +374,7 @@ class _ReferenceStrictBestFinalizer:
 
 
 #: PHASE 2: the wrapper's own binding. ``stage3_common`` does
-#: ``from execute_tools.scoring_utils import score_vector``, so it holds its
+#: ``from tasks.tidmad.runtime.scoring import score_vector``, so it holds its
 #: OWN module attribute — patching the authority's home module would leave
 #: this binding untouched and the counter at zero.
 SCORE_VECTOR_IMPORT_SITE = "campaigns.tidmad_gold.stage3.stage3_common.score_vector"
