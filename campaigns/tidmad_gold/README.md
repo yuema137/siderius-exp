@@ -20,6 +20,9 @@ campaign's scientific treatment.
   executable launcher and Stage 2 remains unauthorized.
 - `config/llm_routing.json` owns the frozen role-to-model routing consumed by
   every Gold chain. SIDERIUS owns the generic parser, not this campaign value.
+- Stage 1 freezes Trial and Formal VRAM ceilings at `40/40` when no complete
+  operator override pair is supplied. Dry-runs, child argv, and launch
+  manifests report the same effective values.
 - `task/health_checks_effective_gold.yaml` is a preserved historical
   materialization, not the authoring authority for a future fresh launch.
 

@@ -81,16 +81,13 @@
 #   read rather than an echo of the declared one. The chain-level spellings
 #   (--required_runtime_profile[_path|_sha256]) are RESERVED passthrough.
 #
-# OPERATOR-SUPPLIED (not frozen) — the per-mode VRAM ceiling (D-HW-6):
+# FROZEN DEFAULT WITH AN EXPLICIT OVERRIDE — the per-mode VRAM ceiling (D-HW-6):
 #   --gold_trial_vram_budget_gb V and --gold_formal_vram_budget_gb V forward
 #   VERBATIM to the chain's EXISTING --trial_vram_budget_gb /
 #   --formal_vram_budget_gb on every stage-1 band and stage-2 unit. This is a
-#   TRANSPORT SEAM CARRYING NO VALUE: the campaign's ceiling is
-#   HARDWARE_DERIVED / PENDING_H100_QUALIFICATION, so no number is frozen,
-#   defaulted or embedded anywhere on this path. Before this seam existed the
-#   Gold layer had no VRAM surface at all, so a qualified number had nothing
-#   to travel through — the pin would have been real and unconsumed, the
-#   F-LLM-WIRE-1 class again.
+#   The v0.1.4 operator ruling freezes Trial=40 and Formal=40 when neither
+#   override is supplied. A complete pair may override those values for an
+#   explicitly qualified launch; a half-pair remains refused.
 #
 #   SUPPLY BOTH OR NEITHER. They are two independent per-mode ceilings (M4
 #   may measure trial and formal differently, and formal rounds are the
@@ -101,15 +98,12 @@
 #   exists to prevent, and the stage scripts fork one background chain per
 #   band, so a half-cap noticed downstream has already launched the fleet.
 #
-#   UNSUPPLIED IS LEGAL AND INERT — no token reaches the child argv and the
-#   launch is byte-identical to a pre-seam one. It does NOT refuse, unlike
-#   the generated-library root: omitting a ceiling diverges from no pinned
-#   authority (_chain_common.sh defaults both to empty == omit, which is the
-#   state every campaign launch has run in), and making the seam a launch
-#   blocker for a value the campaign deliberately has not frozen would block
-#   pre-M4 rehearsals to protect nothing. Absence is instead PRINTED in the
-#   dry-run table and RECORDED as null in the launch manifest, so "no ceiling
-#   was supplied" is an observed fact rather than a silence.
+#   UNSUPPLIED SELECTS THE FROZEN 40/40 DEFAULT — both tokens reach every
+#   child argv and the effective values are recorded in the launch manifest.
+#   It does NOT refuse because the campaign already owns a complete fallback
+#   pair. The dry-run and launch manifest distinguish `campaign_default` from
+#   `operator_supplied` while recording the same effective values sent to the
+#   child.
 #
 #   UNITS ARE NOT SETTLED HERE, DELIBERATELY. D-HW-6 flags a live GB/GiB gap
 #   (the flags spell '_gb' but agent/skills/evaluate_vram_skill/wrapper.py
@@ -287,13 +281,11 @@ gold_main() {
             echo "  \"required_runtime_profile_path\": $(if [ -n "$GOLD_REQUIRED_RUNTIME_PROFILE_PATH" ]; then printf '"%s"' "$GOLD_REQUIRED_RUNTIME_PROFILE_PATH"; else printf 'null'; fi),"
             echo "  \"required_runtime_profile\": $(if [ -n "$GOLD_REQUIRED_RUNTIME_PROFILE" ]; then printf '"%s"' "$GOLD_REQUIRED_RUNTIME_PROFILE"; else printf 'null'; fi),"
             echo "  \"required_runtime_profile_sha256\": $(if [ -n "$GOLD_REQUIRED_RUNTIME_PROFILE_SHA256" ]; then printf '"%s"' "$GOLD_REQUIRED_RUNTIME_PROFILE_SHA256"; else printf 'null'; fi),"
-            # D-HW-6: recorded as the operator SUPPLIED it — a string, not a
-            # number, and with no unit stamped. The GB/GiB question is open at
-            # the decision record, so the manifest must report what crossed,
-            # never an interpretation of it. null == no ceiling was supplied.
-            echo "  \"trial_vram_budget_gb\": $(if [ -n "$GOLD_TRIAL_VRAM_BUDGET_GB" ]; then printf '"%s"' "$GOLD_TRIAL_VRAM_BUDGET_GB"; else printf 'null'; fi),"
-            echo "  \"formal_vram_budget_gb\": $(if [ -n "$GOLD_FORMAL_VRAM_BUDGET_GB" ]; then printf '"%s"' "$GOLD_FORMAL_VRAM_BUDGET_GB"; else printf 'null'; fi),"
-            echo "  \"vram_budget_provenance\": $(if [ -n "$GOLD_TRIAL_VRAM_BUDGET_GB" ]; then printf '"OPERATOR_SUPPLIED (D-HW-6; verbatim, unit as declared by the decision record — not normalised here)"'; else printf '"NOT_SUPPLIED (D-HW-6 HARDWARE_DERIVED / PENDING_H100_QUALIFICATION; chain default applies: no operator ceiling)"'; fi),"
+            # D-HW-6: record the EFFECTIVE strings the child receives, never
+            # only the raw override fields. Units remain uninterpreted here.
+            echo "  \"trial_vram_budget_gb\": \"${GOLD_EFFECTIVE_TRIAL_VRAM_BUDGET_GB}\","
+            echo "  \"formal_vram_budget_gb\": \"${GOLD_EFFECTIVE_FORMAL_VRAM_BUDGET_GB}\","
+            echo "  \"vram_budget_provenance\": \"${GOLD_VRAM_BUDGET_SOURCE} (D-HW-6; effective values recorded verbatim; units not normalised here)\","
             echo "  \"generated_library_dir\": \"${GOLD_GENERATED_LIBRARY_DIR}\","
             echo "  \"frozen_values\": {"
             local row first=1

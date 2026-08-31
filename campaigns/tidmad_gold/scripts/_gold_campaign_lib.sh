@@ -345,7 +345,7 @@ gold_print_frozen_table() {
     # "none" while the child argv carried a ceiling — the precise drift the
     # production audit exists to prevent.
     echo "[gold-campaign]   supplied rlimit_as=${GOLD_SUBPROCESS_RLIMIT_AS_GB} GiB for training/inference/scoring (v0.1.4 ruling; exported as SIDERIUS_SUBPROCESS_RSS_GB — the name says RSS, the mechanism is RLIMIT_AS; the value v0.1.3 Gold ACTUALLY executed, previously supplied only by a pod-local env; 40/60/24 are the generic role defaults, never Gold's treatment)"
-    echo "[gold-campaign]   supplied vram_budget=trial:${GOLD_TRIAL_VRAM_BUDGET_GB:-40} formal:${GOLD_FORMAL_VRAM_BUDGET_GB:-40} (v0.1.4 operator ruling: 40 GiB EXPLICIT on both modes; carried VERBATIM to --trial/--formal_vram_budget_gb — units NOT interpreted here)"
+    echo "[gold-campaign]   effective vram_budget=trial:${GOLD_EFFECTIVE_TRIAL_VRAM_BUDGET_GB} formal:${GOLD_EFFECTIVE_FORMAL_VRAM_BUDGET_GB} source:${GOLD_VRAM_BUDGET_SOURCE} (v0.1.4 operator ruling: 40/40 campaign default; carried VERBATIM to --trial/--formal_vram_budget_gb — units NOT interpreted here)"
     # F-GENLIB-WIRE-1: the launch REFUSES when this is unset, so by the time
     # the table prints it is always a declared value. Printed so the operator
     # can confirm WHICH root this campaign's promoted capabilities land in —
@@ -471,16 +471,13 @@ gold_required_profile_args() {
     )
 }
 
-# gold_vram_budget_args — sets GOLD_VRAM_BUDGET_ARGS from the
-# OPERATOR-SUPPLIED per-mode VRAM ceiling (D-HW-6).
+# gold_vram_budget_args — sets GOLD_VRAM_BUDGET_ARGS from the frozen 40/40
+# campaign default or a complete operator-supplied override pair (D-HW-6).
 #
-# THIS FUNCTION CARRIES A VALUE AND NEVER SUPPLIES ONE. The campaign's
-# ceiling is HARDWARE_DERIVED / PENDING_H100_QUALIFICATION — deliberately
-# superseded from a frozen number so that no ceiling can acquire authority
-# in tagged code before it has been measured. So unlike every frozen row
-# above, there is no GOLD_*_VRAM_BUDGET constant here, and there must never
-# be one: a default would be indistinguishable from a measurement at every
-# surface an operator reads.
+# The v0.1.4 operator ruling supplies `GOLD_DEFAULT_VRAM_BUDGET_GB=40` for
+# both modes when neither override is present. The effective pair and its
+# source are exposed separately so dry-runs and manifests cannot mistake the
+# absence of an override for the absence of a campaign ceiling.
 #
 # WHY THE SEAM IS NEEDED AT ALL. The chain below has carried a complete
 # transport all along (_chain_common.sh parses --trial_vram_budget_gb /
@@ -501,15 +498,10 @@ gold_required_profile_args() {
 # uncapped formal on four co-resident bands is precisely the exhaustion the
 # ceiling exists to prevent, while LOOKING like a configuration.
 #
-# ABSENT == UNSUPPLIED == no operator ceiling, and NO token reaches the
-# child argv, so a pre-qualification launch is byte-identical to a pre-seam
-# one. This is deliberately NOT a refusal, unlike the generated-library
-# root: omitting a ceiling diverges from no pinned authority (_chain_common
-# defaults both budgets to "" == omit — the state every campaign launch has
-# run in), so refusing would make the seam a launch blocker for a value the
-# campaign has deliberately not frozen. The absence is instead PRINTED by
-# gold_print_frozen_table and RECORDED in the launch manifest, so "no
-# ceiling was supplied" is an observed fact rather than a silence.
+# ABSENT == no operator override == the frozen 40/40 campaign default. Both
+# effective tokens reach every child. The dry-run and manifest distinguish
+# `campaign_default` from `operator_supplied`; neither surface may describe
+# an absent override as an absent ceiling.
 #
 # UNITS ARE NOT SETTLED HERE, AND MUST NOT BE. D-HW-6 flags a live GB/GiB
 # gap: these flags spell '_gb', but agent/skills/evaluate_vram_skill/
@@ -541,6 +533,9 @@ gold_vram_budget_args() {
     local formal_raw="${GOLD_FORMAL_VRAM_BUDGET_GB:-}"
     local trial formal label value
     GOLD_VRAM_BUDGET_ARGS=()
+    GOLD_EFFECTIVE_TRIAL_VRAM_BUDGET_GB=""
+    GOLD_EFFECTIVE_FORMAL_VRAM_BUDGET_GB=""
+    GOLD_VRAM_BUDGET_SOURCE=""
     if { [ -n "$trial_raw" ] && [ -z "$formal_raw" ]; } \
         || { [ -z "$trial_raw" ] && [ -n "$formal_raw" ]; }; then
         trial="$trial_raw"; formal="$formal_raw"
@@ -574,6 +569,13 @@ gold_vram_budget_args() {
             return 1
         fi
     done
+    GOLD_EFFECTIVE_TRIAL_VRAM_BUDGET_GB="$trial"
+    GOLD_EFFECTIVE_FORMAL_VRAM_BUDGET_GB="$formal"
+    if [ -n "$trial_raw" ]; then
+        GOLD_VRAM_BUDGET_SOURCE="operator_supplied"
+    else
+        GOLD_VRAM_BUDGET_SOURCE="campaign_default"
+    fi
     GOLD_VRAM_BUDGET_ARGS=(
         --trial_vram_budget_gb "$trial"
         --formal_vram_budget_gb "$formal"

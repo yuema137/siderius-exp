@@ -87,9 +87,9 @@ stage1_main() {
     # formal-only VRAM ceiling (or a path-only / sha-only profile triple)
     # forwarded NOTHING, so the both-or-neither refusal in the band's
     # gold_frozen_chain_args never saw an incomplete group at all: rc=0,
-    # zero chain tokens, and a frozen-table row reading
-    # "vram_budget=(none — no operator ceiling)". Four co-resident bands
-    # would then run formal rounds with no cap, exit 0, no error.
+    # zero chain tokens despite the campaign's frozen 40/40 default. Four
+    # co-resident bands would then run formal rounds with no cap, exit 0,
+    # and contradict the operator-visible effective row.
     gold_required_profile_args || return 1
     gold_vram_budget_args || return 1
     if ! [[ "$STAGGER" =~ ^[0-9]+$ ]]; then
