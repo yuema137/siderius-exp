@@ -74,7 +74,17 @@ from typing import Any
 
 from pydantic import BaseModel
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+_configured_checkout = os.environ.get("SIDERIUS_CHECKOUT")
+if not _configured_checkout:
+    raise RuntimeError(
+        "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout used by the campaign"
+    )
+REPO_ROOT = Path(_configured_checkout).resolve()
+if not (REPO_ROOT / "scripts" / "inspect_run_state.py").is_file():
+    raise RuntimeError(
+        "SIDERIUS_CHECKOUT is not an executable SIDERIUS checkout: "
+        f"{REPO_ROOT} (missing scripts/inspect_run_state.py)"
+    )
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -314,14 +324,22 @@ def _load_fcnet_reference(path: Path, band: str) -> float | None:
     under ``"per_band"``. A present-but-non-finite value refuses.
     """
     data = json.loads(path.read_text(encoding="utf-8"))
-    table = data.get("per_band") if isinstance(data, dict) and "per_band" in data else data
+    table = (
+        data.get("per_band") if isinstance(data, dict) and "per_band" in data else data
+    )
     if not isinstance(table, dict):
         raise StateRefusal(f"{path}: FCNet reference must be a band->float mapping")
     if band not in table:
         return None
     value = table[band]
-    if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value):
-        raise StateRefusal(f"{path}: per-band reference for {band!r} is not a finite number")
+    if (
+        not isinstance(value, (int, float))
+        or isinstance(value, bool)
+        or not math.isfinite(value)
+    ):
+        raise StateRefusal(
+            f"{path}: per-band reference for {band!r} is not a finite number"
+        )
     return float(value)
 
 
@@ -344,7 +362,10 @@ def cmd_band_state(args: argparse.Namespace) -> int:
         tampered = irs.find_tampered_iters(reports)
         if tampered:
             names = ", ".join(f"iter_{i:03d}" for i in tampered)
-            print(f"REFUSED: tampered iteration(s) at {workspace}: {names}", file=sys.stderr)
+            print(
+                f"REFUSED: tampered iteration(s) at {workspace}: {names}",
+                file=sys.stderr,
+            )
             return 2
         next_iter = irs.compute_next_iter(reports, gap)
         committed = sorted(r.iter_idx for r in reports if r.status == "COMMITTED")
@@ -363,7 +384,9 @@ def cmd_band_state(args: argparse.Namespace) -> int:
         needs_force_fresh = False
 
     try:
-        candidates, spec, counts = _scan_formal_candidates(workspace, iter_dirs, require_valid=True)
+        candidates, spec, counts = _scan_formal_candidates(
+            workspace, iter_dirs, require_valid=True
+        )
         winner = _pick_winner(candidates, spec)
     # `RecordRoleError` is the shared role authority's own refusal; it is
     # caught beside this module's because an anomalous role shape is the same
@@ -376,7 +399,9 @@ def cmd_band_state(args: argparse.Namespace) -> int:
     reference: float | None = None
     if args.fcnet_reference_json:
         try:
-            reference = _load_fcnet_reference(Path(args.fcnet_reference_json), args.band)
+            reference = _load_fcnet_reference(
+                Path(args.fcnet_reference_json), args.band
+            )
         except (OSError, json.JSONDecodeError, StateRefusal) as exc:
             print(f"REFUSED: fcnet reference unusable: {exc}", file=sys.stderr)
             return 2
@@ -400,7 +425,9 @@ def cmd_band_state(args: argparse.Namespace) -> int:
     terminal = horizon_exhausted or satisfied
     terminal_ok = satisfied or (horizon_exhausted and len(committed) == horizon)
     terminal_reason = (
-        "stop_rule_satisfied" if satisfied else ("horizon_exhausted" if horizon_exhausted else None)
+        "stop_rule_satisfied"
+        if satisfied
+        else ("horizon_exhausted" if horizon_exhausted else None)
     )
 
     incumbent_payload = None
@@ -484,7 +511,10 @@ def _repo_sha() -> str:
         )
         return out.stdout.strip()
     except Exception as exc:  # recorded, not fatal
-        print(f"WARNING: repo sha unavailable ({exc}); recording 'unknown'", file=sys.stderr)
+        print(
+            f"WARNING: repo sha unavailable ({exc}); recording 'unknown'",
+            file=sys.stderr,
+        )
         return "unknown"
 
 
