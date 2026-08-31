@@ -14,7 +14,7 @@ not be presented as tests executed from this repository.
 | `DatasetProfile` | `resolved/dataset_profile.json` — GENERATED, DO NOT EDIT | `tests/unit/examples/test_tidmad_projection.py` (deep-compare vs `resolve_dataset_profile()`) |
 | `ModelIOContract` | `resolved/model_io_contract.json` — GENERATED | deep-compare vs `run_bound_model_io_contract()`; class axis fixed 256 pinned |
 | `DeliverableSpec` | `resolved/deliverable_spec.json` — GENERATED | deep-compare vs `derive_tidmad_deliverable_spec()` |
-| `MetricSpec` (golden metric) | `resolved/metric_spec.json` — GENERATED | deep-compare vs `derive_tidmad_metric_spec()`; `id == tidmad_denoising_score`, `direction == higher` pinned as literals |
+| `MetricSpec` (golden metric) | `resolved/metric_spec.json` — GENERATED | task-owned `runtime/scoring.py`; `id == tidmad_denoising_score`, `direction == higher` pinned as literals |
 | identity (file indices + file families) | `resolved/identity.json` — GENERATED | deep-compare |
 | task description / forward contract | REFERENCE to `configs/task_config.yaml` | README cites the owning path |
 | health policy | REFERENCE to `configs/health_checks.yaml` | README cites the owning path |

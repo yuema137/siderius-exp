@@ -15,7 +15,7 @@ dataset_profile:
 metric:
   declaration: ../resolved/metric_spec.json
   implementation:
-    module: execute_tools.evaluation_metric
+    file: ../runtime/scoring.py
     symbol: TidmadDenoisingMetric
 
 task_health:

@@ -44,6 +44,7 @@ EXPECTED = {
 CHILD = textwrap.dedent(
     """
     import json
+    import inspect
     import os
     import sys
     from pathlib import Path
@@ -72,6 +73,7 @@ CHILD = textwrap.dedent(
         json.dumps(
             {
                 "primary": [composition.metric.spec.id, composition.metric.spec.direction],
+                "primary_source": inspect.getsourcefile(type(composition.metric)),
                 "secondaries": [
                     [metric.spec.id, metric.spec.direction]
                     for metric in composition.secondary_metrics
@@ -118,3 +120,7 @@ def test_real_task_secondary_metric_declarations(task_id: str) -> None:
     assert len(receipt["declaration_paths"]) == len(receipt["secondaries"])
     assert all(Path(path).is_file() for path in receipt["declaration_paths"])
     assert Path(receipt["source_checkout"]) == checkout
+    if task_id == "tidmad":
+        assert Path(receipt["primary_source"]).resolve() == (
+            EXP_ROOT / "tasks/tidmad/runtime/scoring.py"
+        ).resolve()

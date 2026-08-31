@@ -54,12 +54,13 @@ different butterfly ordering, and does not produce bit-identical output.
 import gc
 import math
 import os
-from collections.abc import Callable
-from typing import Any, cast
+from collections.abc import Callable, Mapping
+from typing import Any, ClassVar, cast
 
 import h5py
 import numpy as np
 
+from execute_tools.evaluation_metric import EvaluationMetric
 from execute_tools.dataset_config import (
     NUM_FILES,
     SEGMENT_LENGTH,
@@ -743,6 +744,19 @@ def score_vector(
         final_scalar = float("-inf")
 
     return file_vector, final_scalar
+
+
+class TidmadDenoisingMetric(EvaluationMetric):
+    """Task-owned handle for the frozen TIDMAD scoring arithmetic."""
+
+    IMPLEMENTS: ClassVar[tuple[str, ...]] = ("tidmad_denoising_score",)
+
+    def _compute(
+        self, deliverables: Mapping[int, str], /, **compute_kwargs: Any
+    ) -> tuple[float, list[float | None] | None, tuple[str, ...]]:
+        del deliverables
+        file_vector, scalar = score_vector(**compute_kwargs)
+        return scalar, file_vector, ("anchor_map",)
 
 
 # ---------------------------------------------------------------------------
