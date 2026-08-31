@@ -44,6 +44,8 @@ stage1_main() {
     GOLD_FORMAL_VRAM_BUDGET_GB=""
     local PASSTHROUGH=()
 
+    gold_bind_siderius_checkout "${SIDERIUS_CHECKOUT:-}" || return 1
+
     while [[ $# -gt 0 ]]; do
         case $1 in
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;

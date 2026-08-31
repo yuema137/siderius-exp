@@ -49,6 +49,8 @@ stage2_main() {
     GOLD_FORMAL_VRAM_BUDGET_GB=""
     local PASSTHROUGH=()
 
+    gold_bind_siderius_checkout "${SIDERIUS_CHECKOUT:-}" || return 1
+
     while [[ $# -gt 0 ]]; do
         case $1 in
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
@@ -145,7 +147,7 @@ stage2_main() {
             fi
 
             local UNIT_CMD=(
-                bash "${GOLD_SCRIPT_DIR}/run_chain.sh"
+                bash "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/run_chain.sh"
                 --mode lilab
                 --workspace "$ws"
                 --run_name "$run_name"

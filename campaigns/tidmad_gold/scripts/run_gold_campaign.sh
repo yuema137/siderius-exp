@@ -22,7 +22,8 @@
 # stays untouched for X9 reproducibility, operator ruling D-ARCH-1/F-LAUNCH-2).
 #
 # Usage:
-#   bash sdsc_submission_scripts/run_gold_campaign.sh \
+#   bash campaigns/tidmad_gold/scripts/run_gold_campaign.sh \
+#       --siderius-checkout DIR \
 #       --workspace_root DIR --stage 1 \
 #       --gold_advice_file ADVICE.json \
 #       [--arm goldpod|blindpod] [--task_config PATH] \
@@ -141,7 +142,7 @@ gold_usage() {
 
 gold_main() {
     local WORKSPACE_ROOT="" STAGE="" ARM="goldpod" ADVICE_FILE=""
-    local TASK_CONFIG="${GOLD_PROJECT_DIR}/configs/task_config.yaml"
+    local SIDERIUS_CHECKOUT_ARG="" TASK_CONFIG=""
     # v0.1.4 operator ruling: the approved per-band FCNet references are
     # bound BY DEFAULT (D-FCNET-REF-1). Unbound, the FCNet+2.0 early stop is
     # not evaluable and every band runs the full 20-iteration horizon.
@@ -163,6 +164,7 @@ gold_main() {
 
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --siderius-checkout)    SIDERIUS_CHECKOUT_ARG="$2"; shift 2 ;;
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
             --stage)               STAGE="$2"; shift 2 ;;
             --arm)                 ARM="$2"; shift 2 ;;
@@ -182,6 +184,9 @@ gold_main() {
             *)                     PASSTHROUGH+=("$1"); shift ;;
         esac
     done
+
+    gold_bind_siderius_checkout "$SIDERIUS_CHECKOUT_ARG" || return 1
+    TASK_CONFIG="${TASK_CONFIG:-${GOLD_TASK_CONFIG_REGRESSION}}"
 
     # Boundary refusals BEFORE any work: retention (R-RETENTION-1) and every
     # frozen/arm/band-decided flag, by name.
@@ -236,8 +241,7 @@ gold_main() {
     fi
 
     echo "[gold-campaign] arm=$ARM stage=$STAGE workspace_root=$WORKSPACE_ROOT dry_run=$DRY_RUN"
-    echo "[gold-campaign] BOUND task_config=$GOLD_TASK_CONFIG_REGRESSION (regression; the task this run actually executes)"
-    echo "[gold-campaign] repo default task_config=$GOLD_TASK_CONFIG_ABS sha256=$GOLD_TASK_CONFIG_SHA256 (NOT bound; validated only)"
+    echo "[gold-campaign] BOUND task_config=$GOLD_TASK_CONFIG_ABS sha256=$GOLD_TASK_CONFIG_SHA256 (regression; campaign-owned)"
     echo "[gold-campaign] llm_config=$GOLD_LLM_CONFIG_ABS sha256=$GOLD_LLM_CONFIG_SHA256 (D-LLM-1, every role pinned)"
     if [ "$ARM" = "goldpod" ]; then
         echo "[gold-campaign] treatment: advice=$ADVICE_FILE (goldpod, injected every proposer round)"
@@ -258,6 +262,7 @@ gold_main() {
         {
             echo "{"
             echo "  \"entrypoint\": \"run_gold_campaign.sh\","
+            echo "  \"siderius_checkout\": \"${GOLD_PROJECT_DIR}\","
             echo "  \"stage\": ${STAGE},"
             echo "  \"arm\": \"${ARM}\","
             echo "  \"advice_file\": $(if [ -n "$ADVICE_FILE" ]; then printf '"%s"' "$ADVICE_FILE"; else printf '"EXPLICIT_NONE"'; fi),"
@@ -266,8 +271,8 @@ gold_main() {
             echo "  \"lit_review\": \"ON (D-LIT-ON-1 supersedes Q-LIT-1, explicit --ml_lit_review_enabled, symmetric, V19 config = shipped default)\","
             echo "  \"campaign_id\": \"${GOLD_CAMPAIGN_ID}\","
             echo "  \"stage2_authorized\": ${GOLD_STAGE2_AUTHORIZED},"
-            echo "  \"bound_task_config\": \"${GOLD_TASK_CONFIG_REGRESSION}\","
-            echo "  \"bound_task_config_sha256\": \"$(sha256sum "${GOLD_PROJECT_DIR}/${GOLD_TASK_CONFIG_REGRESSION}" | awk '{print $1}')\","
+            echo "  \"bound_task_config\": \"${GOLD_TASK_CONFIG_ABS}\","
+            echo "  \"bound_task_config_sha256\": \"${GOLD_TASK_CONFIG_SHA256}\","
             echo "  \"bound_health_checks_config\": \"${GOLD_HEALTH_CHECKS_EFFECTIVE}\","
             echo "  \"subprocess_rlimit_as_gb\": ${GOLD_SUBPROCESS_RLIMIT_AS_GB},"
             echo "  \"task_composition\": null,"
@@ -275,8 +280,6 @@ gold_main() {
             echo "  \"required_segmentation_size\": ${GOLD_REQUIRED_SEGMENTATION_SIZE},"
             echo "  \"order_strategy\": \"sequential\","
             echo "  \"sampling_seed\": ${GOLD_SAMPLING_SEED},"
-            echo "  \"repo_default_task_config_NOT_BOUND\": \"${GOLD_TASK_CONFIG_ABS}\","
-            echo "  \"repo_default_task_config_sha256\": \"${GOLD_TASK_CONFIG_SHA256}\","
             echo "  \"llm_config\": \"${GOLD_LLM_CONFIG_ABS}\","
             echo "  \"llm_config_sha256\": \"${GOLD_LLM_CONFIG_SHA256}\","
             echo "  \"fcnet_reference_json\": $(if [ -n "$FCNET_REFERENCE_JSON" ]; then printf '"%s"' "$FCNET_REFERENCE_JSON"; else printf 'null'; fi),"

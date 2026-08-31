@@ -31,7 +31,6 @@ data is, and none ever will be.
 | shipped asset | path | what it is |
 |---|---|---|
 | qualification composition | `compositions/bounded_qualification.yaml` | reusable task-owned scope selected by the qualification experiment |
-| Gold compatibility assets | `workflows/gold_stage1/`, `workflows/gold_stage2/` | pending migration into `campaigns/tidmad_gold`; they are not task authority |
 | literature-review config | `framework_configs/lit_review.yaml` | TIDMAD root paper, search posture, and confidence rubric used when literature review is enabled |
 | resolved declarations | `resolved/*.json` | dataset profile, model I/O contract, deliverable spec, metric spec, file identity |
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |

@@ -36,7 +36,24 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
 fi
 
 GOLD_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-GOLD_PROJECT_DIR="$(cd "${GOLD_LIB_DIR}/.." && pwd)"
+GOLD_CAMPAIGN_DIR="$(cd "${GOLD_LIB_DIR}/.." && pwd)"
+GOLD_PROJECT_DIR="${SIDERIUS_CHECKOUT:-}"
+
+gold_bind_siderius_checkout() {
+    local checkout="$1"
+    if [ -z "$checkout" ] || [ ! -d "$checkout" ]; then
+        echo "ERROR: --siderius-checkout must name an existing SIDERIUS checkout: $checkout" >&2
+        return 1
+    fi
+    checkout="$(cd "$checkout" && pwd)"
+    if [ ! -f "${checkout}/sdsc_submission_scripts/run_chain.sh" ] \
+        || [ ! -f "${checkout}/sdsc_submission_scripts/run_one_iteration.py" ]; then
+        echo "ERROR: --siderius-checkout is not an executable SIDERIUS checkout: $checkout" >&2
+        return 1
+    fi
+    GOLD_PROJECT_DIR="$checkout"
+    export SIDERIUS_CHECKOUT="$checkout"
+}
 
 # ---------------------------------------------------------------------------
 # THE FROZEN-VALUE TABLE — the TWENTY typed chain-boundary values.
@@ -184,10 +201,9 @@ GOLD_FCNET_STOP_MARGIN=2.0
 #: The four campaign bands (contract vocabulary; same literals as the X9
 #: band launcher's authority map — drift is caught by the pinned test).
 # ---- Gold campaign locks (operator-authorized) --------------------------
-#: The composition manifest carrying the regression task config, the approved
-#: Health roster (amplitude_collapse sole blocking) and the regression proposer
-#: prose. Path is RELATIVE to the project dir — run_chain.sh cd's there before
-#: exec, the same convention every other relative Gold path uses.
+#: Campaign-owned regression task config and calibrated Health roster. Both
+#: paths are external-consumer assets; the selected SIDERIUS checkout supplies
+#: execution machinery only.
 #: v0.1.5 CAMPAIGN IDENTITY. Enters every band's run_name AND workspace path,
 #: so the fresh repair campaign cannot collide with either preserved prior
 #: lineage even if an operator points them at the same parent directory.
@@ -220,12 +236,12 @@ GOLD_STAGE2_AUTHORIZED="${GOLD_STAGE2_AUTHORIZED:-false}"
 #: This binds the task DEFINITION and nothing else: no task scope, so
 #: inference, scoring, HealthGate, the deliverable writer and literature-review
 #: routing all take exactly the routes the proven TIDMAD path takes today.
-GOLD_TASK_CONFIG_REGRESSION="sdsc_submission_scripts/gold_task/task_config_regression.yaml"
+GOLD_TASK_CONFIG_REGRESSION="${GOLD_CAMPAIGN_DIR}/task/task_config_regression.yaml"
 
 #: The approved Gold HealthGate roster, pre-composed to an EFFECTIVE config so
 #: it binds on the non-composed path via --health_checks_config (D-HEALTH-1:
 #: amplitude_collapse sole blocking; every threshold unchanged).
-GOLD_HEALTH_CHECKS_EFFECTIVE="sdsc_submission_scripts/gold_task/health_checks_effective_gold.yaml"
+GOLD_HEALTH_CHECKS_EFFECTIVE="${GOLD_CAMPAIGN_DIR}/workflows/stage1/health_checks.yaml"
 
 #: v0.1.4 operator ruling: 40 GiB on BOTH modes when the operator supplies
 #: neither. Supplying exactly one half is still REFUSED.
@@ -351,8 +367,8 @@ gold_print_frozen_table() {
 # emission enables itself; the integration witness runs then.
 gold_bypass_ceiling_args() {
     GOLD_BYPASS_CEILING_ARGS=()
-    if grep -q -- "--bypass_formal_time_budget_minutes)" "${GOLD_LIB_DIR}/_chain_common.sh" \
-        && grep -q -- '"--bypass_formal_time_budget_minutes"' "${GOLD_LIB_DIR}/run_one_iteration.py"; then
+    if grep -q -- "--bypass_formal_time_budget_minutes)" "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/_chain_common.sh" \
+        && grep -q -- '"--bypass_formal_time_budget_minutes"' "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/run_one_iteration.py"; then
         GOLD_BYPASS_CEILING_ARGS=(--bypass_formal_time_budget_minutes "$GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES")
     else
         echo "[gold-campaign] NOTE: --bypass_formal_time_budget_minutes ${GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES} NOT emitted:" >&2
@@ -627,6 +643,8 @@ gold_require_generated_library() {
 gold_frozen_chain_args() {
     local stage="$1" key v horizon
     GOLD_FROZEN_CHAIN_ARGS=()
+    gold_bind_task_config "${GOLD_TASK_CONFIG_ABS:-$GOLD_TASK_CONFIG_REGRESSION}" \
+        || return 1
     horizon="$(gold_frozen_value num_iterations)" || return 1
     case "$stage" in
         stage1) GOLD_FROZEN_CHAIN_ARGS+=(--num_iterations "$horizon") ;;
@@ -768,14 +786,7 @@ gold_frozen_chain_args() {
     # different task, representation or segmentation than the stage-1 band it
     # retrains.
     #
-    # TRANSPORT. There is no `--task_config` argv path (see
-    # gold_bind_task_config). Composition is the ONLY shipped mechanism that
-    # binds a task config per run, so the regression task, the approved Health
-    # roster and the regression proposer prose all arrive through this one
-    # manifest. It repoints three refs and changes nothing else — same TIDMAD
-    # data path, dataset profile, metric, interpretation blocks, implementor
-    # blocks and deliverable naming.
-    GOLD_FROZEN_CHAIN_ARGS+=(--task_config "$GOLD_TASK_CONFIG_REGRESSION")
+    GOLD_FROZEN_CHAIN_ARGS+=(--task_config "$GOLD_TASK_CONFIG_ABS")
     # The approved Gold HealthGate roster (amplitude_collapse sole blocking,
     # D-HEALTH-1). Composition used to carry this; on the non-composed path it
     # binds as an already-materialized EFFECTIVE config, which the loader
@@ -1137,38 +1148,21 @@ gold_refuse_reserved_passthrough() {
     return 0
 }
 
-# gold_bind_task_config PATH — validate the task-config authority and set
-# GOLD_TASK_CONFIG_ABS + GOLD_TASK_CONFIG_SHA256.
-#
-# TRANSPORT GAP, recorded rather than papered over: neither run_chain.sh
-# nor run_one_iteration.py accepts a --task_config flag; the framework
-# reads configs/task_config.yaml from the repository the chain executes in
-# (run_chain cd's to the project dir). The binding is therefore VALIDATED
-# and RECORDED here (path + sha256 in the launch manifest), and a supplied
-# file whose CONTENT differs from the executing repo's is REFUSED — the
-# chain would silently execute the repo's copy, which is exactly the
-# divergence class F-SCANH-1 names.
+# gold_bind_task_config PATH — validate the campaign-owned task-config
+# authority and set GOLD_TASK_CONFIG_ABS + GOLD_TASK_CONFIG_SHA256.
 gold_bind_task_config() {
-    local path="$1" repo_cfg repo_sha
+    local path="$1" frozen_sha
     if [ ! -f "$path" ]; then
         echo "ERROR: --task_config not found: $path" >&2
         return 1
     fi
     GOLD_TASK_CONFIG_ABS="$(cd "$(dirname "$path")" && pwd)/$(basename "$path")"
     GOLD_TASK_CONFIG_SHA256="$(sha256sum "$GOLD_TASK_CONFIG_ABS" | awk '{print $1}')"
-    repo_cfg="${GOLD_PROJECT_DIR}/configs/task_config.yaml"
-    if [ ! -f "$repo_cfg" ]; then
-        echo "ERROR: the executing repository has no configs/task_config.yaml: $repo_cfg" >&2
-        return 1
-    fi
-    repo_sha="$(sha256sum "$repo_cfg" | awk '{print $1}')"
-    if [ "$GOLD_TASK_CONFIG_SHA256" != "$repo_sha" ]; then
-        echo "ERROR: --task_config content differs from the executing repository's" >&2
-        echo "  configs/task_config.yaml, and the chain has NO argv transport for a" >&2
-        echo "  task-config path — it would silently execute the repo's copy." >&2
+    frozen_sha="$(sha256sum "$GOLD_TASK_CONFIG_REGRESSION" | awk '{print $1}')"
+    if [ "$GOLD_TASK_CONFIG_SHA256" != "$frozen_sha" ]; then
+        echo "ERROR: --task_config content differs from the frozen Gold task config." >&2
         echo "    supplied: $GOLD_TASK_CONFIG_ABS (sha256 $GOLD_TASK_CONFIG_SHA256)" >&2
-        echo "    executes: $repo_cfg (sha256 $repo_sha)" >&2
-        echo "  Align the checkout or drop the flag (F-SCANH-1 divergence class)." >&2
+        echo "    frozen:   $GOLD_TASK_CONFIG_REGRESSION (sha256 $frozen_sha)" >&2
         return 1
     fi
 }

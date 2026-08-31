@@ -86,6 +86,8 @@ stage1_band_main() {
     GOLD_FORMAL_VRAM_BUDGET_GB=""
     local PASSTHROUGH=()
 
+    gold_bind_siderius_checkout "${SIDERIUS_CHECKOUT:-}" || return 1
+
     while [[ $# -gt 0 ]]; do
         case $1 in
             --band)                 BAND="$2"; shift 2 ;;
@@ -156,7 +158,7 @@ stage1_band_main() {
     # default (_chain_common's defaults are documented as NOT campaign
     # values — decisions F-LAUNCH-1).
     local CHAIN_CMD=(
-        bash "${GOLD_SCRIPT_DIR}/run_chain.sh"
+        bash "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/run_chain.sh"
         --mode lilab
         --workspace "$WORKSPACE"
         --run_name "$RUN_NAME"

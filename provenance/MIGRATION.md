@@ -43,7 +43,7 @@
 
 | Boundary | Current evidence | Required next decision |
 |---|---|---|
-| TIDMAD Gold workflow assets | `tasks/tidmad/workflows/gold_stage1/health_checks.yaml` carries the calibrated amplitude-only blocking treatment, while `campaigns/tidmad_gold/task/health_checks_effective_gold.yaml` is an older materialized artifact with equivalent gate actions but stale rationale text; Stage 2 has no executable task launcher | establish the campaign-owned authoritative source before removing the task-side compatibility copies; do not merge or rewrite scientific treatment implicitly |
+| TIDMAD Gold launcher portability | the entrypoint now requires an exact SIDERIUS checkout, executes that checkout's existing chain, and binds campaign-owned task and Health files; Stage-1 external dry-run and Stage-2 refusal pass | reconcile the broader imported deployment preflight and complete release/H100 qualification without changing frozen treatment or adding a second execution mechanism |
 
 ## Portability changes
 
@@ -60,3 +60,5 @@
 | 2026-08-30 | Cancer-gene experiment boundary | move the shared launcher under `experiments/cancer_gene_identification/`, rename the two task-owned scopes as `compositions/two_network.yaml` and `compositions/eight_network.yaml`, and expose them as two ordinary experiments over the same Trial/Formal workflow | none; graph sets, metrics, objective, batch lock, and launch treatment are preserved; neither experiment becomes a campaign |
 | 2026-08-30 | Multi-task campaign scaffold | add a common campaign package contract, retain TIDMAD Gold as the existing stopped campaign, and create non-launchable campaign packages for Pets, DAVIS, and Cancer with deployment ownership recorded separately | none; no campaign parameters, workflow semantics, authorization, or workload state changed |
 | 2026-08-30 | TIDMAD qualification boundary | move the bounded two-iteration launcher from the static task package to `experiments/tidmad/two_iteration_qualification/`, name its selected task-owned scope `compositions/bounded_qualification.yaml`, and retire the duplicate imported root composition | none; all resolved Trial/Formal treatment values and task declarations are preserved; Gold compatibility assets remain pending campaign reconciliation |
+| 2026-08-30 | TIDMAD Gold workflow ownership | move the calibrated Stage-1 Health source and unauthorized Stage-2 boundary from the static task package into `campaigns/tidmad_gold/workflows/`; retain the older materialized Health file as historical evidence only | none; gate roles, actions, thresholds, and Stage-2 refusal remain unchanged |
+| 2026-08-30 | TIDMAD Gold external launcher paths | require an explicit SIDERIUS checkout, execute its existing `run_chain.sh`, bind campaign-owned task and Health files by absolute path, and validate the exact task file passed to the child | none; the frozen chain values, band topology, run identity, and Stage-2 authorization barrier are unchanged |
