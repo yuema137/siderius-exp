@@ -2,11 +2,32 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 
 from execute_tools.evaluation_metric import MetricResult, MetricSpec, PresenceScoreabilityContract
 
 from tasks.tidmad.runtime import scoring
+
+
+def test_composed_metric_uses_the_task_owned_scoreability_contract() -> None:
+    """A legacy framework contract with the same id must not shadow the task."""
+    from workflows.task_composition import compose_run_task_bindings
+
+    manifest = (
+        Path(__file__).resolve().parents[3]
+        / "tasks"
+        / "tidmad"
+        / "compositions"
+        / "bounded_qualification.yaml"
+    )
+    composition = compose_run_task_bindings(str(manifest))
+
+    contract_type = type(composition.metric.spec.scoreability)
+    assert Path(inspect.getsourcefile(contract_type) or "").resolve() == (
+        manifest.parents[1] / "runtime" / "scoreability.py"
+    ).resolve()
+    assert contract_type.__name__ == "TidmadScoreabilityContract"
 
 
 def test_task_metric_delegates_once_to_the_frozen_task_scorer(

@@ -17,6 +17,10 @@ metric:
   implementation:
     file: ../runtime/scoring.py
     symbol: TidmadDenoisingMetric
+  scoreability_contracts:
+    tidmad_denoised_h5:
+      file: ../runtime/scoreability.py
+      symbol: TidmadScoreabilityContract
 
 task_health:
   config: ../framework_configs/health.yaml
