@@ -27,6 +27,7 @@
 | Cancer Gene import | Cancer Gene Identification package | `tasks/cancer_gene_identification` | `41c030721` | imported, not yet portable | byte equality plus `real_task_import_sha256.txt` |
 | Composition portability | four real task manifests | imported task packages | current migration head | composition-only validation passed | `validation/2026-08-29_external_composition.md` |
 | Cancer real-data checkpoint | complete NatureBench task plus bounded workflow | external data root and `tasks/cancer_gene_identification/workflows/**` | NatureBench `9e6a69f10865dd56f4991b49d1c974e2006b6b18`; SIDERIUS `8be2874d536a30e20a202e7d36568b596439e392` | 5090 data identity and materialization passed; GPU chain pending | `validation/2026-08-29_cancer_real_data_acquisition.md` |
+| Pets package-test ownership | Oxford-IIIT Pet composition, provenance pins, split isolation, and external quickstart boundary | `tests/tasks/oxford_iiit_pet/test_package_contract.py` | SIDERIUS `2406dadd8dc3e80d87733cdc1a68494d3d8cead7` | external task-owned checks pass; SIDERIUS source deletion remains pending responsibility-level comparison with the historical test modules | focused local pytest against the exact checkout |
 
 ## Framework blockers discovered during separation
 
