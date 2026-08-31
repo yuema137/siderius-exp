@@ -29,14 +29,16 @@ import threading
 import time
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT))
+CAMPAIGN_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(CAMPAIGN_ROOT))
 
 SYSTEM_PROMPT = "You are a reachability probe. Follow the instruction exactly."
 USER_PROMPT = "Reply with the single word OK."
 
 
-def _one_call(provider: str, model_id: str, timeout_s: float, results: list, idx: int) -> None:
+def _one_call(
+    provider: str, model_id: str, timeout_s: float, results: list, idx: int
+) -> None:
     from agent.llm_bridge import LLMBridge
 
     t0 = time.time()
@@ -52,7 +54,11 @@ def _one_call(provider: str, model_id: str, timeout_s: float, results: list, idx
             USER_PROMPT,
             label="campaign_preflight_llm_smoke",
         )
-        results[idx] = {"ok": True, "latency_s": round(time.time() - t0, 3), "reply": text[:40]}
+        results[idx] = {
+            "ok": True,
+            "latency_s": round(time.time() - t0, 3),
+            "reply": text[:40],
+        }
     except Exception as exc:  # a smoke reports every failure shape, it never raises
         results[idx] = {
             "ok": False,
@@ -65,10 +71,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
         "--llm-config",
-        default=str(REPO_ROOT / "llm_configs" / "openai_tiered_pro.json"),
-        help="WorkflowLLMConfig JSON (default: the campaign-standard openai_tiered_pro.json)",
+        default=str(CAMPAIGN_ROOT / "config" / "llm_routing.json"),
+        help="WorkflowLLMConfig JSON (default: the campaign-owned frozen routing config)",
     )
-    parser.add_argument("--n", type=int, default=8, help="burst size (default 8 = 2 fleets x 4)")
+    parser.add_argument(
+        "--n", type=int, default=8, help="burst size (default 8 = 2 fleets x 4)"
+    )
     parser.add_argument("--timeout-seconds", type=float, default=60.0)
     parser.add_argument("--out", default=None, help="optional JSON report path")
     args = parser.parse_args()
@@ -102,7 +110,8 @@ def main() -> int:
     burst_wall = round(time.time() - t0, 3)
 
     rows = [
-        r if r is not None else {"ok": False, "error": "thread did not finish"} for r in results
+        r if r is not None else {"ok": False, "error": "thread did not finish"}
+        for r in results
     ]
     successes = [r for r in rows if r.get("ok")]
     latencies = sorted(r["latency_s"] for r in rows if "latency_s" in r)
@@ -127,7 +136,9 @@ def main() -> int:
             json.dump(report, fh, indent=2, sort_keys=True)
             fh.write("\n")
 
-    print(f"[llm-smoke] success {len(successes)}/{args.n}  p95={p95}s  burst_wall={burst_wall}s")
+    print(
+        f"[llm-smoke] success {len(successes)}/{args.n}  p95={p95}s  burst_wall={burst_wall}s"
+    )
     for i, r in enumerate(rows):
         if not r.get("ok"):
             print(f"[llm-smoke]   call {i}: FAILED — {r.get('error')}", file=sys.stderr)

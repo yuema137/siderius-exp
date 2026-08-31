@@ -18,6 +18,8 @@ campaign's scientific treatment.
   diversity and standard-deviation checks are observational.
 - `workflows/stage2/` records the distinct Stage-2 boundary. It contains no
   executable launcher and Stage 2 remains unauthorized.
+- `config/llm_routing.json` owns the frozen role-to-model routing consumed by
+  every Gold chain. SIDERIUS owns the generic parser, not this campaign value.
 - `task/health_checks_effective_gold.yaml` is a preserved historical
   materialization, not the authoring authority for a future fresh launch.
 

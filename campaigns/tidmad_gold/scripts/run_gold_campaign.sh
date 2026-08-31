@@ -40,7 +40,8 @@
 #
 # Frozen bindings (see _gold_campaign_lib.sh for the table + decisions):
 #   * the nineteen chain-boundary values, typed, never defaulted;
-#   * --llm_config llm_configs/openai_tiered_pro.json, resolved absolute and
+#   * --llm_config config/llm_routing.json, resolved from this campaign package
+#     to an absolute path and
 #     emitted on EVERY stage-1 band and stage-2 unit argv (D-LLM-1); an
 #     unavailable file REFUSES the launch, because omitting the flag does
 #     NOT fail — it silently routes every LLM role to run_one_iteration.py's

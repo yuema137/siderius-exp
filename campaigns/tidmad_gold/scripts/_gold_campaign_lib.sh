@@ -174,10 +174,9 @@ GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES="${GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES
 #: THE FROZEN LLM ROUTING AUTHORITY (D-LLM-1; defect F-LLM-WIRE-1).
 #:
 #: The campaign pins every LLM role to the snapshot model in this file.
-#: It is stated RELATIVE to the executing repository and resolved to an
-#: ABSOLUTE path at bind time by gold_llm_config_args — run_chain.sh cd's
-#: to the project dir before exec (lilab mode), so a relative path would
-#: dangle (the same rule the advice artifact follows).
+#: It is owned by this campaign package and resolved to an ABSOLUTE path at
+#: bind time by gold_llm_config_args. The selected SIDERIUS checkout supplies
+#: the generic WorkflowLLMConfig parser and execution machinery only.
 #:
 #: WHY THIS IS A REFUSAL AND NOT A DEFAULT. `--llm_config` is optional all
 #: the way down (_chain_common.sh LLM_CONFIG="" forwards nothing;
@@ -191,7 +190,7 @@ GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES="${GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES
 #: MANDATORY on the campaign path and an unresolvable value REFUSES by
 #: name, rather than self-disabling the way the bypass ceiling above does
 #: (that flag may legitimately not be parseable yet; this one always is).
-GOLD_LLM_CONFIG_RELPATH="llm_configs/openai_tiered_pro.json"
+GOLD_LLM_CONFIG_RELPATH="config/llm_routing.json"
 
 #: FCNet+2 band-local early-stop margin (golden notebook / D-BUD-17). The
 #: rule is only EVALUABLE once A2-FCNET produces per-band FCNet references;
@@ -386,7 +385,7 @@ gold_bypass_ceiling_args() {
 # So the campaign path refuses instead of proceeding, and the refusal names
 # --llm_config, the file it expected, and what the omission would have done.
 gold_llm_config_args() {
-    local abs="${GOLD_PROJECT_DIR}/${GOLD_LLM_CONFIG_RELPATH}"
+    local abs="${GOLD_CAMPAIGN_DIR}/${GOLD_LLM_CONFIG_RELPATH}"
     if [ ! -f "$abs" ] || [ ! -r "$abs" ]; then
         echo "ERROR: the campaign's frozen LLM routing config is unavailable, so --llm_config" >&2
         echo "  cannot be bound and this launch is REFUSED (F-LLM-WIRE-1):" >&2
@@ -946,7 +945,7 @@ gold_select_bands() {
 # task_description is ignored by production and turns
 # test_step04b_task_description_single_source.py red.
 #
-# ROUTING NOTE (recorded, not re-litigated): llm_configs/openai_tiered_pro.json
+# ROUTING NOTE (recorded, not re-litigated): config/llm_routing.json
 # routes lit_review.main and lit_review.search to deepseek/deepseek-v4-pro
 # despite its filename, and D-PROV-1 records that DeepSeek exposes no immutable
 # revision. Enabling lit review therefore admits that unpinned authority. The

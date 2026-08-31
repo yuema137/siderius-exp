@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import shlex
 import subprocess
@@ -15,6 +16,7 @@ TASK = EXP_ROOT / "tasks" / "tidmad"
 CAMPAIGN = EXP_ROOT / "campaigns" / "tidmad_gold"
 STAGE1_HEALTH = CAMPAIGN / "workflows" / "stage1" / "health_checks.yaml"
 LAUNCHER = CAMPAIGN / "scripts" / "run_gold_campaign.sh"
+LLM_ROUTING = CAMPAIGN / "config" / "llm_routing.json"
 
 
 def _siderius_checkout() -> Path:
@@ -87,8 +89,6 @@ def test_stage1_dry_run_binds_external_campaign_to_selected_framework(
             "blindpod",
             "--fcnet_reference_json",
             str(fcnet_reference),
-            "--only",
-            "0-3",
             "--stagger-seconds",
             "0",
             "--dry-run",
@@ -102,19 +102,49 @@ def test_stage1_dry_run_binds_external_campaign_to_selected_framework(
     )
 
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    command_line = next(
+    command_lines = [
         line
         for line in completed.stdout.splitlines()
         if "sdsc_submission_scripts/run_chain.sh" in line
-    )
-    command = shlex.split(command_line)
+    ]
+    commands = [shlex.split(line) for line in command_lines]
+    assert len(commands) == 4
+    command = commands[0]
     assert str(checkout / "sdsc_submission_scripts" / "run_chain.sh") in command
     assert command[command.index("--task_config") + 1] == str(
         CAMPAIGN / "task" / "task_config_regression.yaml"
     )
     assert command[command.index("--health_checks_config") + 1] == str(STAGE1_HEALTH)
+    llm_configs = {
+        candidate[candidate.index("--llm_config") + 1] for candidate in commands
+    }
+    assert llm_configs == {str(LLM_ROUTING)}
+    assert not str(LLM_ROUTING).startswith(str(checkout))
     assert command[command.index("--min_formal_batch_size") + 1] == "1"
     assert command[command.index("--formal_time_budget_minutes") + 1] == "180"
+
+
+def test_gold_llm_routing_preserves_the_frozen_campaign_identity() -> None:
+    """Catch campaign routing drift during transfer out of SIDERIUS."""
+    routing = json.loads(LLM_ROUTING.read_text(encoding="utf-8"))
+
+    assert routing == {
+        "interpret": {"provider": "openai", "model_id": "gpt-5.5-2026-04-23"},
+        "propose": {
+            role: {"provider": "openai", "model_id": "gpt-5.5-2026-04-23"}
+            for role in ("comparison", "reasoning", "proposing")
+        },
+        "implement": {"provider": "openai", "model_id": "gpt-5.5-2026-04-23"},
+        "validate": {"provider": "openai", "model_id": "gpt-5.5-2026-04-23"},
+        "tune": {
+            role: {"provider": "openai", "model_id": "gpt-5.5-2026-04-23"}
+            for role in ("planner", "reflector")
+        },
+        "lit_review": {
+            role: {"provider": "deepseek", "model_id": "deepseek-v4-pro"}
+            for role in ("main", "search")
+        },
+    }
 
 
 def test_stage2_remains_refused_at_the_campaign_entrypoint(tmp_path: Path) -> None:
