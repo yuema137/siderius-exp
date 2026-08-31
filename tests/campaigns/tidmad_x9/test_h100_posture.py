@@ -43,7 +43,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 FRAMEWORK_ROOT = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
 POSTURE_FILE = REPO_ROOT / "campaigns" / "tidmad_x9" / "scripts" / "h100_posture.env"
 CHAIN_COMMON = FRAMEWORK_ROOT / "sdsc_submission_scripts" / "_chain_common.sh"
-RUNBOOK = FRAMEWORK_ROOT / "docs" / "guides" / "operating-a-run.md"
+RUNBOOK = REPO_ROOT / "campaigns" / "tidmad_x9" / "README.md"
 
 TABLE_BEGIN = "<!-- h100-posture-table:begin -->"
 TABLE_END = "<!-- h100-posture-table:end -->"
