@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXPERIMENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXP_ROOT="$(cd "${EXPERIMENT_DIR}/../../.." && pwd)"
+PACK_DIR="${EXP_ROOT}/tasks/oxford_iiit_pet"
 
 usage() {
     cat <<USAGE
-Usage: bash tasks/oxford_iiit_pet/quickstart.sh \
+Usage: bash experiments/oxford_iiit_pet/two_iteration_qualification/launch.sh \
   --siderius-checkout DIR --workspace DIR --data_dir DIR \
   [extra run_chain.sh args...]
 
@@ -22,7 +24,7 @@ USAGE
 }
 
 fail() {
-    echo "tasks/oxford_iiit_pet/quickstart.sh: $1" >&2
+    echo "experiments/oxford_iiit_pet/two_iteration_qualification/launch.sh: $1" >&2
     usage >&2
     exit 2
 }

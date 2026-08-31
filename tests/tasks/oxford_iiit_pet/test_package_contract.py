@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shlex
 import subprocess
 import sys
 import textwrap
@@ -17,7 +18,10 @@ EXP_ROOT = Path(__file__).resolve().parents[3]
 PACK = EXP_ROOT / "tasks" / "oxford_iiit_pet"
 COMPOSITION = PACK / "composition.yaml"
 MANIFESTS = PACK / "data" / "manifests"
-QUICKSTART = PACK / "quickstart.sh"
+EXPERIMENT = (
+    EXP_ROOT / "experiments" / "oxford_iiit_pet" / "two_iteration_qualification"
+)
+LAUNCHER = EXPERIMENT / "launch.sh"
 EXPECTED_FRAMEWORK_REVISION = "2406dadd8dc3e80d87733cdc1a68494d3d8cead7"
 
 COMPOSE_CHILD = textwrap.dedent(
@@ -164,10 +168,17 @@ def test_composition_paths_are_package_relative() -> None:
     assert "/tmp/" not in serialized
 
 
-def test_quickstart_dry_run_reaches_the_selected_framework_checkout(
+def test_task_package_contains_no_experiment_launcher() -> None:
+    """Static task ownership must not absorb workflow treatment parameters."""
+    assert not (PACK / "quickstart.sh").exists()
+    assert not (PACK / "workflows").exists()
+    assert LAUNCHER.is_file()
+
+
+def test_experiment_dry_run_reaches_the_selected_framework_checkout(
     tmp_path: Path,
 ) -> None:
-    """The task entrypoint must drive the selected framework without GPU work."""
+    """The experiment entrypoint must drive the selected framework without GPU work."""
     checkout = _siderius_checkout()
     workspace = tmp_path / "workspace"
     data_dir = tmp_path / "images"
@@ -179,7 +190,7 @@ def test_quickstart_dry_run_reaches_the_selected_framework_checkout(
     completed = subprocess.run(
         [
             "bash",
-            str(QUICKSTART),
+            str(LAUNCHER),
             "--siderius-checkout",
             str(checkout),
             "--workspace",
@@ -205,3 +216,30 @@ def test_quickstart_dry_run_reaches_the_selected_framework_checkout(
     assert str(COMPOSITION.resolve()) in completed.stdout
     assert f"--workspace {workspace}" in completed.stdout
     assert f"--data_dir {data_dir}" in completed.stdout
+
+    commands = [
+        shlex.split(line.strip())
+        for line in completed.stdout.splitlines()
+        if "run_one_iteration.py" in line
+    ]
+    assert len(commands) == 2
+    expected_values = {
+        "--run_name": "pets_qualification",
+        "--max_rounds": "2",
+        "--max_epochs": "1",
+        "--trial_portion": "1.0",
+        "--train_portion": "1.0",
+        "--eval_portion": "1.0",
+        "--formal_portion": "1.0",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--validation_max_samples": "74",
+        "--min_formal_batch_size": "1",
+        "--allowed_output_types": "classifier",
+        "--trial_vram_budget_gb": "8",
+        "--formal_vram_budget_gb": "12",
+    }
+    for index, command in enumerate(commands, start=1):
+        assert command[command.index("--start_iteration") + 1] == str(index)
+        for flag, expected in expected_values.items():
+            assert command[command.index(flag) + 1] == expected

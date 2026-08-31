@@ -48,3 +48,4 @@
 | 2026-08-29 | `tasks/tidmad/declared/task_config.yaml` | import the task declaration previously resolved from the SIDERIUS repository default | none; makes task ownership explicit |
 | 2026-08-29 | `tasks/cancer_gene_identification/workflows/**` | separate bounded two-network qualification from the complete eight-network formal campaign | qualification scope is intentionally smaller; formal task scope is unchanged |
 | 2026-08-29 | `tasks/cancer_gene_identification/quickstart.sh` | require an explicit SIDERIUS checkout and select an explicit workflow | removes repository-co-location dependence; scientific behavior remains owned by the selected workflow |
+| 2026-08-30 | Oxford-IIIT Pet qualification launcher | move the two-iteration treatment from `tasks/oxford_iiit_pet/quickstart.sh` to `experiments/oxford_iiit_pet/two_iteration_qualification/launch.sh` | none; resolved launch values are preserved while static task ownership is separated from experiment policy |
