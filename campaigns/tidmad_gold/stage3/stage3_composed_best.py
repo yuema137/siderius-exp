@@ -67,7 +67,7 @@ from execute_tools.evaluation_metric import (
     MetricIdentityConflictError,
     MetricSpec,
     StampedMetricSpec,
-    metric_spec_from_declaration,
+    metric_spec_from_persisted_record,
     reconcile_metric_specs,
 )
 from execute_tools.health_checks.candidate_eligibility import (
@@ -361,7 +361,7 @@ def _stamped_metric_spec(output: dict[str, Any], output_path: str) -> MetricSpec
         # MetricSpec.model_validate cannot re-instantiate the ABSTRACT
         # scoreability field from its own dump (its docstring's verified
         # 3-error refusal).
-        return metric_spec_from_declaration(raw)
+        return metric_spec_from_persisted_record(raw)
     except (ValidationError, ValueError, KeyError, TypeError) as exc:
         raise Stage3ComposedBestError(
             f"run output {output_path} carries a malformed metric_spec stamp "

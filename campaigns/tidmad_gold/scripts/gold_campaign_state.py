@@ -93,7 +93,7 @@ from execute_tools.dataset_config import DataScope  # noqa: E402
 from execute_tools.deliverable_spec import default_deliverable_naming  # noqa: E402
 from execute_tools.evaluation_metric import (  # noqa: E402
     MetricSpec,
-    metric_spec_from_declaration,
+    metric_spec_from_persisted_record,
 )
 from execute_tools.health_checks.candidate_eligibility import (  # noqa: E402
     CandidateHealthValidity,
@@ -254,7 +254,7 @@ def _scan_formal_candidates(
                     # The SAME reconstruction authority MetricSpecField uses
                     # (a plain model_validate refuses the serialized
                     # scoreability contract by design).
-                    spec = metric_spec_from_declaration(dict(spec_raw))
+                    spec = metric_spec_from_persisted_record(dict(spec_raw))
                 except Exception as exc:
                     raise StateRefusal(
                         f"{ro_path}: stamped metric_spec does not reconstruct "

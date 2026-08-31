@@ -208,10 +208,12 @@ def test_unknown_band_has_no_gpu_assignment() -> None:
 
 
 def test_external_gold_band_files_match_the_historical_x9_authority() -> None:
-    """Catch scoring-file drift while the historical X9 launcher remains in SIDERIUS."""
+    """Catch scoring-file drift against the experiment-owned historical X9 launcher."""
     x9 = (
-        _siderius_checkout()
-        / "sdsc_submission_scripts"
+        EXP_ROOT
+        / "campaigns"
+        / "tidmad_x9"
+        / "scripts"
         / "launch_prior_baseline_experiment.sh"
     ).read_text(encoding="utf-8")
 

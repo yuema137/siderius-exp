@@ -81,17 +81,16 @@ from campaigns.tidmad_gold.paths import (
 from agent.schemas.hyperparam_tuning import ExperimentRecord, HyperparamTuningOutput
 from core.iteration_manifest import publish_iteration_manifest
 from core.run_invariants import RunInvariants
-from execute_tools.dataset_config import resolve_dataset_profile
 from execute_tools.deliverable_spec import DeliverableNaming
 from execute_tools.evaluation_metric import (
     TIDMAD_METRIC_ID,
     MetricIdentityKey,
-    derive_tidmad_metric_spec,
 )
 from execute_tools.health_checks.candidate_eligibility import (
     is_valid_candidate,
     required_blocking_gate_ids,
 )
+from .metric_fixture import load_declared_tidmad_metric_spec
 from execute_tools.health_checks.config import (
     _DEFAULT_CONFIG_PATH,
     materialize_effective_config,
@@ -547,9 +546,7 @@ def _tuner_output_payload(
         health_gate_enabled=True,
         health_config_sha256=health_config_sha256,
         experiment_arm=experiment_arm,
-        metric_spec=derive_tidmad_metric_spec(resolve_dataset_profile()).model_dump(
-            mode="json"
-        ),
+        metric_spec=load_declared_tidmad_metric_spec().model_dump(mode="json"),
     )
     return output.model_dump(mode="json")
 
@@ -1004,9 +1001,9 @@ def build_stage2_tree(
                 json.dumps(
                     {
                         "run_name": run_name,
-                        "metric_spec": derive_tidmad_metric_spec(
-                            resolve_dataset_profile()
-                        ).model_dump(mode="json"),
+                        "metric_spec": load_declared_tidmad_metric_spec().model_dump(
+                            mode="json"
+                        ),
                         "all_records": [],
                     }
                 ),

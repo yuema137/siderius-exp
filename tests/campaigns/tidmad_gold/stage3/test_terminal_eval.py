@@ -21,8 +21,6 @@ import pytest
 
 from campaigns.tidmad_gold.paths import GOLD_HEALTH_CONFIG_PATH
 import campaigns.tidmad_gold.stage3.stage3_terminal_eval as te
-from execute_tools.dataset_config import resolve_dataset_profile
-from execute_tools.evaluation_metric import derive_tidmad_metric_spec
 from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
     ARTIFACT_NAMESPACE_KEY,
     CENSUS_ALLOWED_PRODUCTION_REFERENCES,
@@ -44,6 +42,7 @@ from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
     run_terminal_eval,
     terminal_namespace,
 )
+from .metric_fixture import load_declared_tidmad_metric_spec
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -153,7 +152,7 @@ class _ComposeStub:
 
 #: The champion's stamped 09a spec (tests play the STAMPING side; production
 #: champions carry the winner's reconciled persisted stamp).
-CHAMPION_SPEC = derive_tidmad_metric_spec(resolve_dataset_profile())
+CHAMPION_SPEC = load_declared_tidmad_metric_spec()
 
 
 def _champion(

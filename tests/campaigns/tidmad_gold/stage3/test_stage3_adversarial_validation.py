@@ -63,14 +63,12 @@ from typing import Any
 
 import pytest
 
-from execute_tools.dataset_config import resolve_dataset_profile
 from execute_tools.deliverable_spec import DeliverableNaming
 from execute_tools.evaluation_metric import (
     NotScoreableError,
     NotScoreableResult,
     ScoreabilityFailure,
     ScoreabilityVerdict,
-    derive_tidmad_metric_spec,
 )
 from execute_tools.metric_order import MetricOrder
 from campaigns.tidmad_gold.stage3.stage3_composed_best import (
@@ -78,6 +76,7 @@ from campaigns.tidmad_gold.stage3.stage3_composed_best import (
     _formal_role,  # deliberate private import: the role predicate under adversarial probe — renaming it breaks this suite by design
     select_band_winner,
 )
+from .metric_fixture import load_declared_tidmad_metric_spec
 from campaigns.tidmad_gold.stage3.stage3_composed_best import run as composed_best_run
 from campaigns.tidmad_gold.stage3.stage3_strict_best import (
     DEFAULT_SELECTION_RELPATH,
@@ -382,7 +381,7 @@ SCORE_VECTOR_IMPORT_SITE = "campaigns.tidmad_gold.stage3.stage3_common.score_vec
 
 #: The reconciled stamp threaded through direct §4 calls (the amendment's
 #: required identity transport; tests play the stamping side).
-RECONCILED_SPEC = derive_tidmad_metric_spec(resolve_dataset_profile())
+RECONCILED_SPEC = load_declared_tidmad_metric_spec()
 
 
 @pytest.fixture

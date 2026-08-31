@@ -34,9 +34,8 @@ from campaigns.tidmad_gold.paths import GOLD_TASK_HEALTH_CONFIG_PATH
 import campaigns.tidmad_gold.stage3.stage3_common as stage3_common
 from core.iteration_manifest import publish_iteration_manifest, sha256_file
 from core.run_invariants import RunInvariants, write_run_invariants
-from execute_tools.dataset_config import NUM_FILES, resolve_dataset_profile
+from execute_tools.dataset_config import NUM_FILES
 from execute_tools.deliverable_spec import DeliverableNaming
-from execute_tools.evaluation_metric import derive_tidmad_metric_spec
 from execute_tools.health_checks.candidate_eligibility import (
     resolve_scientific_gate_ids,
 )
@@ -51,6 +50,7 @@ from campaigns.tidmad_gold.stage3.stage3_composed_best import (
     run,
     select_band_winner,
 )
+from .metric_fixture import load_declared_tidmad_metric_spec
 
 NAMING = DeliverableNaming()
 ARM = "gold"
@@ -58,7 +58,7 @@ ARM = "gold"
 #: validates the whole MetricSpec, not id+direction alone). Tests play the
 #: STAMPING side here; a direction override simulates a different task's
 #: declaration.
-FULL_SPEC = derive_tidmad_metric_spec(resolve_dataset_profile())
+FULL_SPEC = load_declared_tidmad_metric_spec()
 METRIC = {"id": FULL_SPEC.id, "direction": FULL_SPEC.direction}
 FULL_STAMP = FULL_SPEC.model_dump()
 

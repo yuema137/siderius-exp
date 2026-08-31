@@ -32,21 +32,21 @@ from tasks.tidmad.runtime.anchor_map import default_anchor_map_path
 from execute_tools.dataset_config import (
     NUM_FILES,
     SEGMENTS_PER_FILE,
-    resolve_dataset_profile,
 )
 from execute_tools.deliverable_spec import DeliverableNaming
-from execute_tools.evaluation_metric import NotScoreableError, derive_tidmad_metric_spec
+from execute_tools.evaluation_metric import NotScoreableError
 from campaigns.tidmad_gold.stage3.stage3_common import (
     COMPOSITION_CONTRACT_ID,
     EXPECTED_S_MAX,
     compose_and_score,
 )
+from .metric_fixture import load_declared_tidmad_metric_spec
 
 NAMING = DeliverableNaming()
 
 #: The stamped spec every call transports (tests play the STAMPING side
 #: here — production callers reconcile persisted 09a stamps instead).
-RECONCILED_SPEC = derive_tidmad_metric_spec(resolve_dataset_profile())
+RECONCILED_SPEC = load_declared_tidmad_metric_spec()
 
 
 def _touch_deliverable(

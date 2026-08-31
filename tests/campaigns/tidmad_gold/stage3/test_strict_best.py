@@ -36,16 +36,15 @@ from pathlib import Path
 import pytest
 
 from core.iteration_manifest import publish_iteration_manifest, sha256_file
-from execute_tools.dataset_config import resolve_dataset_profile
 from execute_tools.evaluation_metric import (
     NotScoreableError,
     NotScoreableResult,
     ScoreabilityFailure,
     ScoreabilityVerdict,
-    derive_tidmad_metric_spec,
 )
 from execute_tools.metric_order import MetricOrder
 from campaigns.tidmad_gold.stage3 import stage3_strict_best as strict_best
+from .metric_fixture import load_declared_tidmad_metric_spec
 from campaigns.tidmad_gold.stage3.stage3_strict_best import (
     StrictBestRefusal,
     StrictBestSelection,
@@ -173,7 +172,7 @@ def _seam_spec(direction: str = "higher"):
     the seam narrowed to ``MetricSpec`` after the gate ruling (an identity
     key cannot cross the §4 composer boundary).
     """
-    base = derive_tidmad_metric_spec(resolve_dataset_profile())
+    base = load_declared_tidmad_metric_spec()
     return base.model_copy(
         update={"id": "strict_best_test_metric", "direction": direction}
     )
@@ -193,9 +192,7 @@ def _write_unit_workspaces(
     (self-digested, output-digested), never a hand-rolled one.
     """
     payload = (
-        stamp
-        if stamp is not None
-        else derive_tidmad_metric_spec(resolve_dataset_profile()).model_dump()
+        stamp if stamp is not None else load_declared_tidmad_metric_spec().model_dump()
     )
     for design in DESIGNS:
         for band in BANDS:
@@ -524,7 +521,7 @@ def test_production_metric_authority_selects(tmp_path: Path) -> None:
     """Without injection, selection follows the ONE production metric authority.
 
     The expected winner is computed here THROUGH the authority chain
-    (``derive_tidmad_metric_spec(resolve_dataset_profile())`` + MetricOrder) —
+    (the task-owned declared metric + ``MetricOrder``) —
     no direction literal appears in this test.
 
     Fails when: production stops consulting the derivation authority (e.g. a
@@ -548,7 +545,7 @@ def test_production_metric_authority_selects(tmp_path: Path) -> None:
         compose_and_score_fn=spy,
     )
     assert rc == 0
-    spec = derive_tidmad_metric_spec(resolve_dataset_profile())
+    spec = load_declared_tidmad_metric_spec()
     expected_design, _ = MetricOrder(spec).best(
         list(scores.items()), key=lambda kv: kv[1]
     )
