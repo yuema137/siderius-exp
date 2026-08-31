@@ -70,7 +70,7 @@
 #       UNPINNED child would resolve (the editable-install E1 trap).
 #   R3  dataset availability: abra_training_NNNN.h5 + abra_validation_NNNN.h5
 #       for every index of every band (0..19) under the resolved data dir
-#       (--data_dir > tidmad_data_config.yaml via execute_tools.data_paths).
+#       (required explicit --data_dir).
 #   R4  X9 ARMS ONLY. Posture arithmetic (sourced from h100_posture.env):
 #       chains x per-chain VRAM + min headroom must fit the card total
 #       (pure function, unit-tested); and H100_CORESIDENCY_FACTOR must be
@@ -590,13 +590,8 @@ pf_main() {
     rm -rf "$PROBE_TMP"
 
     # ---- R3: dataset availability ------------------------------------------
-    if [ -z "$DATA_DIR" ]; then
-        DATA_DIR="$(cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
-            "$PF_PY" -c 'from execute_tools.data_paths import TIDMAD_DATA_DIR; print(TIDMAD_DATA_DIR)' \
-            2>/dev/null | tail -1 || true)"
-    fi
     if [ -z "$DATA_DIR" ] || [ ! -d "$DATA_DIR" ]; then
-        pf_fail "R3 dataset dir unresolved or missing (--data_dir / tidmad_data_config.yaml): '${DATA_DIR:-}'"
+        pf_fail "R3 dataset dir unresolved or missing: pass --data_dir <existing-directory>"
     else
         local MISSING=0 band f idx
         for band in "${PF_BANDS[@]}"; do

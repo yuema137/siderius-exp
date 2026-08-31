@@ -73,16 +73,14 @@ Full staging is ~50 GB. `resolved/identity.json` lists every expected filename;
 the naming patterns themselves are owned by
 `execute_tools/dataset_config.py`, not by this pack.
 
-There are two ways to name that directory, and they are the same value:
+The caller names that directory explicitly:
 
 | mechanism | scope | use it when |
 |---|---|---|
 | `--data_dir <dir>` on the command below | this run | always — a published command should carry its own inputs |
-| `tidmad_data_dir:` in `tidmad_data_config.yaml` | this machine, every run | you have set the machine up permanently (`cp tidmad_data_config.example.yaml tidmad_data_config.yaml`) |
 
-Both resolve through `execute_tools/data_paths.py`, which validates the
-directory at launch — before any LLM call or GPU minute is spent. See
-`data/README.md`.
+The framework validates the directory at launch — before any LLM call or GPU
+minute is spent. See `data/README.md`.
 
 ### 4. Preview the run
 
@@ -229,7 +227,7 @@ Full-spectrum 1-D time-series denoising of SQUID dark-matter detector data
 | golden metric | `tidmad_denoising_score` · direction **higher** · anchor-normalised linear grand mean, log base 5.27 (frozen paper-comparable formula) | `resolved/metric_spec.json`, implemented by the pinned framework metric plugin |
 | health policy | HealthGate checks at tuner round boundaries | `framework_configs/health.yaml` |
 | training observation (Step 07a) | **R1** = the run-resolved training objective (`loss_config.loss_type` — a loss family is a run choice, not task semantics; identified on the record by `objective_kind` + `objective_config_fingerprint`); **R2** = per-epoch mean training objective (`loss_history`); **R3** = the SAME computation on the run-bound validation scope (the tuner's `eval_sample_set`, VALIDATION file family `abra_validation_*`), no backprop — **production-backed from 07a**; optional checkpointed observations: none declared. Persisted as `ExperimentRecord.training_history` / `.training_diagnosis` (per-run evidence, not task config — no `resolved/` snapshot); hidden from the planner / reflector until 07b | `execute_tools/train_engine_sandbox.py` (R3 pass), `execute_tools/training_history.py`, `agent/schemas/training_diagnosis.py` |
-| data root | machine-local, gitignored `tidmad_data_config.yaml` | `execute_tools/data_paths.py` — see `data/README.md` |
+| data root | explicit `--data_dir` argument | caller-owned; see `data/README.md` |
 | reference artifacts | anchors, raw baseline, ground truth, official paper scores | `reference_data/` |
 
 ## What this pack demonstrates at PR0

@@ -7,7 +7,7 @@ removed so this matches `scoring_utils.score_vector` exactly. **Global s_max**
 from the anchor map. Model, baseline, and ceiling all live on one ruler and are
 directly comparable at every index.
 
-- **Anchor map:** `{TIDMAD_DATA_DIR}/segment_anchors.json`
+- **Anchor map:** `tasks/tidmad/reference_data/segment_anchors.json`
 - **Global s_max:** `295_715_680.1425` (identical across all 41 reference JSONs)
 - **Raw baseline JSONs:** `reference_data/raw_baseline/raw_baseline_score_file_XXXX.json`
 - **Ground-truth JSONs:** `reference_data/ground_truth/ground_truth_score_file_XXXX.json`

@@ -383,13 +383,8 @@ pf_main() {
     rm -rf "$PROBE_TMP"
 
     # ---- R3: dataset availability ------------------------------------------
-    if [ -z "$DATA_DIR" ]; then
-        DATA_DIR="$(cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
-            "$PF_PY" -c 'from execute_tools.data_paths import TIDMAD_DATA_DIR; print(TIDMAD_DATA_DIR)' \
-            2>/dev/null | tail -1 || true)"
-    fi
     if [ -z "$DATA_DIR" ] || [ ! -d "$DATA_DIR" ]; then
-        pf_fail "R3 dataset dir unresolved or missing (--data_dir / tidmad_data_config.yaml): '${DATA_DIR:-}'"
+        pf_fail "R3 dataset dir unresolved or missing: pass --data_dir <existing-directory>"
     else
         local MISSING=0 band f idx
         for band in "${PF_BANDS[@]}"; do
