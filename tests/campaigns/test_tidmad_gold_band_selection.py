@@ -29,6 +29,8 @@ SELECTIONS = [
     (" 0-3 , 10-14 ", ["0-3", "10-14"]),
 ]
 
+GPU_MAP = {"0-3": "0", "4-9": "1", "10-14": "2", "15-19": "3"}
+
 
 def _siderius_checkout() -> Path:
     configured = os.environ.get("SIDERIUS_CHECKOUT")
@@ -135,3 +137,71 @@ def test_entrypoint_only_filter_reaches_exactly_one_band(tmp_path: Path) -> None
     assert len(command_lines) == 1
     command = shlex.split(command_lines[0])
     assert command[command.index("--data_scope") + 1] == "0-3"
+
+
+def test_stage1_dry_run_uses_the_frozen_band_to_gpu_map(tmp_path: Path) -> None:
+    """Each band must target its distinct physical Gold GPU."""
+    workspace = tmp_path / "workspace"
+    generated = tmp_path / "generated"
+    workspace.mkdir()
+    generated.mkdir()
+    fcnet_reference = tmp_path / "fcnet.json"
+    fcnet_reference.write_text("{}\n", encoding="utf-8")
+    env = os.environ.copy()
+    env["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(generated)
+    env.pop("CUDA_VISIBLE_DEVICES", None)
+
+    completed = subprocess.run(
+        [
+            "bash",
+            str(LAUNCHER),
+            "--siderius-checkout",
+            str(_siderius_checkout()),
+            "--workspace_root",
+            str(workspace),
+            "--stage",
+            "1",
+            "--arm",
+            "blindpod",
+            "--fcnet_reference_json",
+            str(fcnet_reference),
+            "--stagger-seconds",
+            "0",
+            "--dry-run",
+        ],
+        cwd=EXP_ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=120,
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    observed: dict[str, str] = {}
+    for line in completed.stdout.splitlines():
+        if "sdsc_submission_scripts/run_chain.sh" not in line:
+            continue
+        command = shlex.split(line)
+        band = command[command.index("--data_scope") + 1]
+        observed[band] = command[0].removeprefix("CUDA_VISIBLE_DEVICES=")
+    assert observed == GPU_MAP
+
+
+def test_unknown_band_has_no_gpu_assignment() -> None:
+    """An unknown band must fail rather than sharing a valid GPU silently."""
+    completed = subprocess.run(
+        [
+            "bash",
+            "-c",
+            f'source "{LIBRARY}"; gold_band_gpu 2-7',
+        ],
+        cwd=EXP_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=60,
+    )
+
+    assert completed.returncode != 0
+    assert "unknown band '2-7'" in completed.stderr
