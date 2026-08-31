@@ -97,16 +97,31 @@ def test_blind_arm_refuses_an_advice_artifact(tmp_path: Path) -> None:
     assert "WITHOUT_ADVICE" in completed.stderr
 
 
-def test_caller_cannot_override_a_frozen_campaign_flag(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "flag",
+    [
+        "--trial_portion",
+        "--max_rounds",
+        "--attempts_per_round",
+        "--attempts_per_formal_round",
+        "--max_fail_rounds",
+        "--max_proposal_attempts",
+        "--max_impl_attempts",
+        "--enable_chain_incumbent_formal_gates",
+    ],
+)
+def test_caller_cannot_override_a_frozen_campaign_flag(
+    tmp_path: Path, flag: str
+) -> None:
     """Campaign-fixed training scope must not be reopened by passthrough."""
     completed = _run(
         tmp_path,
         arm="blindpod",
         with_advice=False,
-        extra=("--trial_portion", "0.5"),
+        extra=(flag, "0.5"),
     )
     assert completed.returncode != 0
-    assert "--trial_portion" in completed.stderr
+    assert flag in completed.stderr
 
 
 def test_caller_cannot_override_the_frozen_llm_routing(tmp_path: Path) -> None:

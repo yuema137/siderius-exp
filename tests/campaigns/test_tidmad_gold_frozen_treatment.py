@@ -117,6 +117,7 @@ def test_all_four_bands_bind_the_current_frozen_chain_values(tmp_path: Path) -> 
         for flag, expected in FROZEN_CHAIN_VALUES.items():
             assert pairs.get(flag) == expected, (band, flag, pairs.get(flag))
         assert pairs["--bypass_formal_time_budget_minutes"] == "240"
+        assert "--enable_chain_incumbent_formal_gates" in command
         assert "--max_epochs" not in command
 
 

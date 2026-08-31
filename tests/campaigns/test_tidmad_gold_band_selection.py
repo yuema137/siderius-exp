@@ -205,3 +205,30 @@ def test_unknown_band_has_no_gpu_assignment() -> None:
 
     assert completed.returncode != 0
     assert "unknown band '2-7'" in completed.stderr
+
+
+def test_external_gold_band_files_match_the_historical_x9_authority() -> None:
+    """Catch scoring-file drift while the historical X9 launcher remains in SIDERIUS."""
+    x9 = (
+        _siderius_checkout()
+        / "sdsc_submission_scripts"
+        / "launch_prior_baseline_experiment.sh"
+    ).read_text(encoding="utf-8")
+
+    for band, files in {
+        "0-3": "0,1,2,3",
+        "4-9": "4,5,6,7,8,9",
+        "10-14": "10,11,12,13,14",
+        "15-19": "15,16,17,18,19",
+    }.items():
+        completed = subprocess.run(
+            ["bash", "-c", f'source "{LIBRARY}"; gold_band_files "{band}"'],
+            cwd=EXP_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=60,
+        )
+        assert completed.returncode == 0, completed.stderr
+        assert completed.stdout.strip() == files
+        assert f'BAND_HEALTH_FILES="{files}"' in x9
