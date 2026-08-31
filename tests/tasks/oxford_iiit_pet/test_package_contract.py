@@ -22,7 +22,9 @@ EXPERIMENT = (
     EXP_ROOT / "experiments" / "oxford_iiit_pet" / "two_iteration_qualification"
 )
 LAUNCHER = EXPERIMENT / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = "97523a99df436179c673db0abcfaa0ce8d8042e4"
+EXPECTED_FRAMEWORK_REVISION = (
+    (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
+)
 
 COMPOSE_CHILD = textwrap.dedent(
     """
