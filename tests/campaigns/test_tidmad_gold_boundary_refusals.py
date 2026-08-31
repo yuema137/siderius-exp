@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -10,7 +11,8 @@ import pytest
 
 
 EXP_ROOT = Path(__file__).resolve().parents[2]
-LAUNCHER = EXP_ROOT / "campaigns" / "tidmad_gold" / "scripts" / "run_gold_campaign.sh"
+CAMPAIGN = EXP_ROOT / "campaigns" / "tidmad_gold"
+LAUNCHER = CAMPAIGN / "scripts" / "run_gold_campaign.sh"
 
 
 def _siderius_checkout() -> Path:
@@ -28,6 +30,7 @@ def _run(
     arm: str,
     with_advice: bool,
     extra: tuple[str, ...] = (),
+    launcher: Path = LAUNCHER,
 ) -> subprocess.CompletedProcess[str]:
     workspace = tmp_path / "workspace"
     generated = tmp_path / "generated"
@@ -42,7 +45,7 @@ def _run(
 
     command = [
         "bash",
-        str(LAUNCHER),
+        str(launcher),
         "--siderius-checkout",
         str(_siderius_checkout()),
         "--workspace_root",
@@ -104,3 +107,38 @@ def test_caller_cannot_override_a_frozen_campaign_flag(tmp_path: Path) -> None:
     )
     assert completed.returncode != 0
     assert "--trial_portion" in completed.stderr
+
+
+def test_caller_cannot_override_the_frozen_llm_routing(tmp_path: Path) -> None:
+    """A passthrough config must not replace the campaign-owned routing."""
+    completed = _run(
+        tmp_path,
+        arm="blindpod",
+        with_advice=False,
+        extra=("--llm_config", "/tmp/unapproved-routing.json"),
+    )
+    assert completed.returncode != 0
+    assert "--llm_config" in completed.stderr
+
+
+def test_missing_campaign_llm_routing_refuses_before_dispatch(tmp_path: Path) -> None:
+    """A damaged campaign package must not fall through to framework defaults."""
+    isolated_campaign = tmp_path / "campaign_without_llm_config"
+    shutil.copytree(
+        CAMPAIGN,
+        isolated_campaign,
+        ignore=shutil.ignore_patterns("config", "__pycache__"),
+    )
+
+    completed = _run(
+        tmp_path,
+        arm="blindpod",
+        with_advice=False,
+        launcher=isolated_campaign / "scripts" / "run_gold_campaign.sh",
+    )
+
+    assert completed.returncode != 0
+    assert "--llm_config" in completed.stderr
+    assert "F-LLM-WIRE-1" in completed.stderr
+    assert "gemini-3.1-pro-preview" in completed.stderr
+    assert "run_chain argv" not in completed.stdout
