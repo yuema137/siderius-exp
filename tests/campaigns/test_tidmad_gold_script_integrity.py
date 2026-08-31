@@ -65,7 +65,7 @@ def test_campaign_entrypoints_use_the_source_safe_guard(script: Path) -> None:
 
 @pytest.mark.parametrize("script", EXECUTABLE_SCRIPTS, ids=lambda path: path.name)
 def test_sourcing_a_campaign_entrypoint_only_defines_it(script: Path) -> None:
-    """Reach the guard and prove source-time execution remains inert."""
+    """Prevent recurrence of the 2026-07-31 source-time launcher incident."""
     completed = _bash("-c", f"source '{script}'; printf '%s\\n' SOURCED_OK")
 
     assert completed.returncode == 0, completed.stderr
