@@ -23,7 +23,7 @@ recorded in `PROVENANCE.md`. Dataset bytes stay outside the repository.
 ## Package ownership
 
 ```text
-composition.yaml                       static task binding
+compositions/bounded_qualification.yaml  reusable bounded task binding
 data/manifests/                        task-owned identities and integrity pins
 declared/                              dataset, model I/O, metric, and Health declarations
 plugins/                               model, metric, and Health implementations
@@ -33,6 +33,10 @@ expected/                              preserved task evidence fixtures
 PROVENANCE.md                          dataset and derivation authority
 STATUS.md                              supported capability record
 ```
+
+The bounded composition defines a reusable 370-row training and 74-row
+validation scope. It does not decide that a run must use that scope; an
+experiment selects it explicitly.
 
 This directory intentionally contains no experiment launcher, iteration count,
 epoch count, data-exposure setting, literature-review treatment, output lock,

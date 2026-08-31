@@ -68,7 +68,7 @@ done
 compgen -G "${DATA_DIR}/*.jpg" >/dev/null || fail "no JPEG images found under '$DATA_DIR'"
 
 LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
-COMPOSITION="${PACK_DIR}/composition.yaml"
+COMPOSITION="${PACK_DIR}/compositions/bounded_qualification.yaml"
 LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
 GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
 [ -f "$LAUNCHER" ] || fail "production launcher not found at '$LAUNCHER'"

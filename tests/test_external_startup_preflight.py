@@ -21,7 +21,8 @@ import pytest
 EXP_ROOT = Path(__file__).resolve().parents[1]
 TASK_MANIFESTS = {
     "tidmad": EXP_ROOT / "tasks/tidmad/workflows/qualification/composition.yaml",
-    "oxford_iiit_pet": EXP_ROOT / "tasks/oxford_iiit_pet/composition.yaml",
+    "oxford_iiit_pet": EXP_ROOT
+    / "tasks/oxford_iiit_pet/compositions/bounded_qualification.yaml",
     "davis_future_prediction": EXP_ROOT
     / "tasks/davis_future_prediction/composition.yaml",
     "cancer_gene_identification": (

@@ -16,7 +16,7 @@ import yaml
 
 EXP_ROOT = Path(__file__).resolve().parents[3]
 PACK = EXP_ROOT / "tasks" / "oxford_iiit_pet"
-COMPOSITION = PACK / "composition.yaml"
+COMPOSITION = PACK / "compositions" / "bounded_qualification.yaml"
 MANIFESTS = PACK / "data" / "manifests"
 EXPERIMENT = (
     EXP_ROOT / "experiments" / "oxford_iiit_pet" / "two_iteration_qualification"
@@ -32,7 +32,7 @@ COMPOSE_CHILD = textwrap.dedent(
 
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
-    pack = manifest.parent
+    pack = manifest.parent.parent
     sys.path.insert(0, str(checkout))
 
     from workflows import task_composition as composition_module

@@ -21,8 +21,10 @@ import pytest
 EXP_ROOT = Path(__file__).resolve().parents[1]
 TASK_MANIFESTS = {
     "tidmad": EXP_ROOT / "tasks/tidmad/workflows/qualification/composition.yaml",
-    "oxford_iiit_pet": EXP_ROOT / "tasks/oxford_iiit_pet/composition.yaml",
-    "davis_future_prediction": EXP_ROOT / "tasks/davis_future_prediction/composition.yaml",
+    "oxford_iiit_pet": EXP_ROOT
+    / "tasks/oxford_iiit_pet/compositions/bounded_qualification.yaml",
+    "davis_future_prediction": EXP_ROOT
+    / "tasks/davis_future_prediction/composition.yaml",
 }
 EXPECTED = {
     "tidmad": {
@@ -87,7 +89,9 @@ CHILD = textwrap.dedent(
 def _siderius_checkout() -> Path:
     configured = os.environ.get("SIDERIUS_CHECKOUT")
     if not configured:
-        pytest.fail("SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test")
+        pytest.fail(
+            "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
+        )
     checkout = Path(configured).resolve()
     if not (checkout / "workflows/task_composition.py").is_file():
         pytest.fail(f"SIDERIUS_CHECKOUT is not a SIDERIUS checkout: {checkout}")

@@ -4,6 +4,11 @@ This experiment exercises the static Oxford-IIIT Pet task package through the
 normal SIDERIUS production chain. It is bounded engineering qualification, not
 a competitive scientific campaign.
 
+It explicitly selects
+`tasks/oxford_iiit_pet/compositions/bounded_qualification.yaml`, the task-owned
+370-row training and 74-row validation scope. The task defines that reusable
+scope; this experiment decides to use it.
+
 ## Frozen experiment configuration
 
 - two research iterations;
