@@ -20,6 +20,12 @@ campaign's scientific treatment.
   executable launcher and Stage 2 remains unauthorized.
 - `config/llm_routing.json` owns the frozen role-to-model routing consumed by
   every Gold chain. SIDERIUS owns the generic parser, not this campaign value.
+- `gold_advice_v6_regression.json` is the operator-approved Gold advice
+  artifact. Its exact bytes are campaign treatment and must be hashed at
+  launch.
+- `fcnet_band_references.json` is the approved per-band FCNet reference used
+  by the Stage-1 early-stop rule. Its recorded absolute paths are historical
+  provenance only; the launcher consumes the band values from this file.
 - Stage 1 freezes Trial and Formal VRAM ceilings at `40/40` when no complete
   operator override pair is supplied. Dry-runs, child argv, and launch
   manifests report the same effective values.

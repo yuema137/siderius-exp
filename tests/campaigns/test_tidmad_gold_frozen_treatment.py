@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 import shlex
 import subprocess
@@ -10,6 +11,7 @@ from pathlib import Path
 
 EXP_ROOT = Path(__file__).resolve().parents[2]
 LAUNCHER = EXP_ROOT / "campaigns" / "tidmad_gold" / "scripts" / "run_gold_campaign.sh"
+GOLD_PACKAGE = EXP_ROOT / "campaigns" / "tidmad_gold"
 
 FROZEN_CHAIN_VALUES = {
     "--num_iterations": "20",
@@ -39,6 +41,23 @@ EXPECTED_FILES = {
     "10-14": "10,11,12,13,14",
     "15-19": "15,16,17,18,19",
 }
+
+
+def test_operator_approved_campaign_artifacts_are_byte_pinned() -> None:
+    """Catch loss or silent replacement of the two immutable launch inputs."""
+    expected = {
+        "gold_advice_v6_regression.json": (
+            "e621e1a5aa7ee87eab6978cb125a6e1b4aa944669a4761cccac908175ad23eae"
+        ),
+        "fcnet_band_references.json": (
+            "f15ed7a5995dc86678a991ac26b76212361038d58d2cea96205a216f74f6d5a5"
+        ),
+    }
+    observed = {
+        name: hashlib.sha256((GOLD_PACKAGE / name).read_bytes()).hexdigest()
+        for name in expected
+    }
+    assert observed == expected
 
 
 def _siderius_checkout() -> Path:
