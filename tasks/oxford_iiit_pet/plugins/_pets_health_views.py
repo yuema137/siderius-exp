@@ -14,7 +14,7 @@ wholesale ``plugins/`` scan — the explicit ref above is its only path in.
 **Codec ownership honesty (§2.12).** This is a narrow pack-local
 projection of the pack's OWN deliverable format (one CSV, header
 ``image_id,predicted_class_index``). The production reader is
-``execute_tools/pets_data_path.py``; the mandatory codec-parity regression
+task-owned ``runtime/pets_data_path.py``; the mandatory codec-parity regression
 asserts both readers agree on the same bytes, so a format change cannot
 leave one silently accepting a different artifact than the other.
 """

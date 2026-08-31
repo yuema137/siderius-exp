@@ -4,7 +4,7 @@ Derives, from the PR0-frozen `sequences.csv` and the SHA-pinned frames:
 
 * ``data/manifests/clips.csv`` — the frozen clip identities
   ``(sequence_name, start_frame, scope)`` from
-  `execute_tools.davis_data_path.clip_starts` (the pure rule) over each
+  task-owned `runtime.davis_data_path.clip_starts` (the pure rule) over each
   sequence's ON-DISK frame count; scope inherited from the sequence, so
   sequence-disjointness is structural.
 * ``data/manifests/execution.json`` — the frozen decode/resize rule in
@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from execute_tools.davis_data_path import (
+from tasks.davis_future_prediction.runtime.davis_data_path import (
     CLIP_CAPS,
     CLIPS_MANIFEST_HEADER,
     CONTEXT_FRAMES,

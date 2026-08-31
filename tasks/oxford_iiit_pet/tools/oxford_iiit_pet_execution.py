@@ -5,7 +5,7 @@ Derives, from the FROZEN identity manifests and the machine-local images:
 * ``data/manifests/execution.json`` — the frozen decode/resize/crop/normalize
   rule in machine-readable form plus per-item float32-tensor SHA-256 probes
   (the FIRST train image of each of the 37 classes — class-covering, small).
-  The transform implementation is `execute_tools.pets_data_path` — the ONE
+  The transform implementation is task-owned `runtime.pets_data_path` — the ONE
   authority the runtime reader shares; the committed hashes are what keep a
   single authority honest (drift fails the pin, it is never regenerated
   away).
@@ -28,7 +28,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from execute_tools.pets_data_path import (
+from tasks.oxford_iiit_pet.runtime.pets_data_path import (
     CROP_SIZE,
     NUM_CLASSES,
     RESIZE_SHORTER_SIDE,

@@ -182,7 +182,7 @@ def _davis_truth(task_scope: Any, data_dir: str | None) -> Mapping[str, Any]:
     DAVIS clip is laid out — so this delegates to the pack's data path rather
     than re-implementing a second decoder that could drift from the first.
     """
-    from execute_tools.davis_data_path import truth_windows
+    from tasks.davis_future_prediction.runtime.davis_data_path import truth_windows
 
     rows = getattr(task_scope, "rows", None)
     if rows is None:

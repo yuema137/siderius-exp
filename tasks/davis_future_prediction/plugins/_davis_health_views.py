@@ -21,7 +21,7 @@ this projection (§3.5a).
 **Codec ownership honesty (§2.12).** This is a narrow pack-local
 projection of the pack's OWN deliverable format (one compressed npz of
 ``{clip_key: float32 array}``). The production reader is
-``execute_tools/davis_data_path.py``; the mandatory codec-parity
+task-owned ``runtime/davis_data_path.py``; the mandatory codec-parity
 regression asserts both readers agree on the same bytes.
 """
 
