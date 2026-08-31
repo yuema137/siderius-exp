@@ -35,6 +35,7 @@ data is, and none ever will be.
 | resolved declarations | `resolved/*.json` | dataset profile, model I/O contract, deliverable spec, metric spec, file identity |
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |
 | reference artifacts | `reference_data/raw_baseline/`, `reference_data/ground_truth/`, `reference_data/official_paper_result/` | metric floor, metric ceiling, paper-comparable scores |
+| reference loader | `runtime/reference_scores.py` | task-owned loading and validation of the frozen floor, ceiling, and ruler |
 | paper-spec baselines | `ml_models/legacy_baseline_configs.json` | the TIDMAD paper's hyperparameters |
 | the qualification entrypoint | `../../experiments/tidmad/two_iteration_qualification/launch.sh` | experiment-owned workflow treatment |
 
