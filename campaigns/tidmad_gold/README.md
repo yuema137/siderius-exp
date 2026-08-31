@@ -27,9 +27,9 @@ campaign's scientific treatment.
   materialization, not the authoring authority for a future fresh launch.
 - `stage3/` owns the imported composed-best, strict-best, and terminal
   evaluation writers. Their campaign behavior and 132-test witness suite are
-  preserved here before the SIDERIUS duplicates are retired. The remaining
-  dependency on framework-owned TIDMAD scoring defaults is explicitly pending
-  reconciliation; these writers are not yet launch-qualified from this path.
+  preserved here after the SIDERIUS duplicates are retired. They resolve the
+  task-owned scorer, anchor map, and explicit `TIDMAD_DATA_DIR` without a
+  framework-owned TIDMAD default.
 - `tasks/tidmad/reference_data/` owns byte-identical copies of the 54 frozen
   anchor, baseline, ground-truth, paper-result, and frequency artifacts.
 
