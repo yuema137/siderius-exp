@@ -13,6 +13,7 @@ import os
 import subprocess
 import sys
 import textwrap
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -140,6 +141,36 @@ def _siderius_checkout() -> Path:
     if not (checkout / "core/run_invariants.py").is_file():
         pytest.fail(f"SIDERIUS_CHECKOUT is not a SIDERIUS checkout: {checkout}")
     return checkout
+
+
+def test_dependency_pin_matches_the_checkout_under_qualification() -> None:
+    """Fail when installation, provenance, and executable source name different SHAs.
+
+    Without this check, ``SIDERIUS_REVISION`` can advance while the package
+    dependency still installs an older framework.  Composition tests against a
+    manually selected checkout would then certify code different from a clean
+    installation of the experiment repository.
+    """
+    expected = (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
+    project = tomllib.loads((EXP_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    dependency = next(
+        item
+        for item in project["project"]["dependencies"]
+        if item.startswith("siderius @ ")
+    )
+    dependency_revision = dependency.rsplit("@", maxsplit=1)[1]
+    checkout = _siderius_checkout()
+    checkout_revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=checkout,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+
+    assert len(expected) == 40
+    assert dependency_revision == expected
+    assert checkout_revision == expected
 
 
 @pytest.mark.parametrize("task_id", TASK_MANIFESTS)
