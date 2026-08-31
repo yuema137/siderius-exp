@@ -28,6 +28,7 @@
 | Composition portability | four real task manifests | imported task packages | current migration head | composition-only validation passed | `validation/2026-08-29_external_composition.md` |
 | Cancer real-data checkpoint | complete NatureBench task plus bounded workflow | external data root and `tasks/cancer_gene_identification/workflows/**` | NatureBench `9e6a69f10865dd56f4991b49d1c974e2006b6b18`; SIDERIUS `8be2874d536a30e20a202e7d36568b596439e392` | 5090 data identity and materialization passed; GPU chain pending | `validation/2026-08-29_cancer_real_data_acquisition.md` |
 | Pets package-test ownership | Oxford-IIIT Pet composition, provenance pins, split isolation, and external quickstart boundary | `tests/tasks/oxford_iiit_pet/test_package_contract.py` | SIDERIUS `63b98b58bd18b91ee840b8d1326bb292ef8cd893` | external task-owned checks pass after SIDERIUS removes the duplicated real-task package and runtime implementation | focused local pytest against the exact checkout |
+| TIDMAD Stage-3 and reference ownership | Stage-3 writers, adversarial witnesses, and 54 frozen reference artifacts | `campaigns/tidmad_gold/stage3`, `tests/campaigns/tidmad_gold/stage3`, `tasks/tidmad/reference_data` | SIDERIUS `63b98b58bd18b91ee840b8d1326bb292ef8cd893` | additive ownership checkpoint; 132 tests pass and every reference artifact is byte-identical; framework duplicates remain until the explicit scoring boundary is decided | focused local pytest plus complete relative-path SHA-256 comparison |
 
 ## Framework blockers discovered during separation
 
@@ -44,6 +45,7 @@
 | Boundary | Current evidence | Required next decision |
 |---|---|---|
 | TIDMAD Gold launcher portability | the entrypoint now requires an exact SIDERIUS checkout, executes that checkout's existing chain, and binds campaign-owned task and Health files; Stage-1 external dry-run and Stage-2 refusal pass | reconcile the broader imported deployment preflight and complete release/H100 qualification without changing frozen treatment or adding a second execution mechanism |
+| Stage-3 scoring boundary | Stage-3 code, all 132 existing witnesses, and byte-identical reference artifacts now have external owners; tests pass against SIDERIUS `63b98b58` | replace the remaining implicit framework TIDMAD scorer, anchor, and raw-data resolution with one explicit campaign-owned scoring binding before deleting the SIDERIUS copies |
 
 ## Portability changes
 

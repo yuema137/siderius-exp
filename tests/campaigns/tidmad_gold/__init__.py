@@ -1,0 +1,1 @@
+"""TIDMAD Gold campaign tests."""
