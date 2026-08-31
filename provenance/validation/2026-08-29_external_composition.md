@@ -18,7 +18,7 @@ Prove that each imported real task manifest composes from `siderius-exp` through
 |---|---|---|
 | `tasks/tidmad/composition.yaml` | `tidmad` | PASS |
 | `tasks/oxford_iiit_pet/compositions/bounded_qualification.yaml` | `oxford_iiit_pet` | PASS |
-| `tasks/davis_future_prediction/composition.yaml` | `davis_future_prediction` | PASS |
+| `tasks/davis_future_prediction/compositions/bounded_qualification.yaml` | `davis_future_prediction` | PASS |
 | `tasks/cancer_gene_identification/composition.yaml` | `naturebench_cancer_gene` | PASS |
 
 ## Findings

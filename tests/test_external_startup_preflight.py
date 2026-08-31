@@ -24,7 +24,7 @@ TASK_MANIFESTS = {
     "oxford_iiit_pet": EXP_ROOT
     / "tasks/oxford_iiit_pet/compositions/bounded_qualification.yaml",
     "davis_future_prediction": EXP_ROOT
-    / "tasks/davis_future_prediction/composition.yaml",
+    / "tasks/davis_future_prediction/compositions/bounded_qualification.yaml",
     "cancer_gene_identification": (
         EXP_ROOT
         / "tasks/cancer_gene_identification/workflows/qualification/composition.yaml"

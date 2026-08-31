@@ -1,18 +1,8 @@
-# DAVIS 2017 future-frame prediction — the SHIPPED task composition.
+# DAVIS future-frame bounded qualification composition.
 #
-# Step 12 / PR-12d D6. The canonical manifest an operator points
-# `--task_composition` at:
-#
-#     run_chain.sh ... --task_composition configs/task_composition/davis.yaml
-#
-# **This file is an ENTRYPOINT POINTER (Q-12d-1), not a second copy of the
-# task.** Every declaration it names lives with the pack under
-# `examples/davis_future_prediction/`; nothing below restates a threshold, a
-# direction, an aggregation or a piece of task prose. Move the pack and the
-# refs move with it; edit a threshold and you edit it in exactly one place.
-#
-# Paths resolve against THIS file's directory (`workflows/task_composition.py`
-# resolves refs relative to the manifest), which is why they are `../`-rooted.
+# This task-owned manifest binds the reusable 60-clip training and 15-clip
+# validation scope. It contains no iterations, epochs, resource budgets, or
+# launch policy. An experiment selects it explicitly and owns those values.
 #
 # Nothing here is special-cased. `davis_future_prediction` is an ordinary
 # declared id and every section uses the same mechanism an out-of-tree fourth
@@ -20,7 +10,7 @@
 # fourth task needs zero framework edits" would be untestable.
 
 task_data_path:
-  file: runtime/davis_data_path.py
+  file: ../runtime/davis_data_path.py
   symbol: DavisTaskDataPath
   id: davis_future_prediction
   # Seam A (D1). DAVIS' scope authority is its committed CLIP manifest — the
@@ -39,18 +29,18 @@ task_data_path:
   # the composed path is the only caller that has to choose.
   config:
     clips_path:
-      ref: data/manifests/gate2_train.csv
+      ref: ../data/manifests/gate2_train.csv
     eval_clips_path:
-      ref: data/manifests/gate2_validation.csv
+      ref: ../data/manifests/gate2_validation.csv
 
 dataset_profile:
-  config: declared/dataset_profile.json
+  config: ../declared/dataset_profile.json
 
 # PRIMARY: global mean squared error, direction LOWER. The only track of the
 # three whose primary is minimized, which is what makes it the falsifier for
 # every ordering site that could have hardcoded "bigger is better".
 metric:
-  declaration: declared/metric_mse.json
+  declaration: ../declared/metric_mse.json
   # Step 12 / PR-12d: the PACK'S OWN implementation, not the framework's
   # same-named one. Both compute identical arithmetic; they differ in calling
   # vocabulary. The framework's takes `predictions`/`truth` already assembled,
@@ -60,7 +50,7 @@ metric:
   # scoring child with `TypeError: ... unexpected keyword argument
   # 'evaluation_payload'`.
   implementation:
-    file: plugins/_davis_metrics.py
+    file: ../plugins/_davis_metrics.py
     symbol: DavisMseMetric
 
 # OBSERVATIONAL secondaries, and deliberately MIXED-DIRECTION: `psnr` is
@@ -75,17 +65,17 @@ metric:
 # F-12d-3 — both were previously bound to `GlobalMseMetric`, which computes
 # neither).
 secondary_metrics:
-  - declaration: declared/metric_psnr.json
+  - declaration: ../declared/metric_psnr.json
     implementation:
-      file: plugins/_davis_metrics.py
+      file: ../plugins/_davis_metrics.py
       symbol: DavisPsnrMetric
-  - declaration: declared/metric_mae.json
+  - declaration: ../declared/metric_mae.json
     implementation:
-      file: plugins/_davis_metrics.py
+      file: ../plugins/_davis_metrics.py
       symbol: DavisMaeMetric
 
 task_health:
-  config: declared/task_health.yaml
+  config: ../declared/task_health.yaml
 
 # NAMED absences, not omissions. DAVIS declares no interpretation, proposal or
 # implementor science, so a composed DAVIS run renders no header and no bytes
@@ -100,7 +90,7 @@ implementor_blocks:
   none: true
 
 model_plugins:
-  dir: plugins
+  dir: ../plugins
   require: [davis_reference_predictor]
 
 # D4c. The pack's exact-MAE objective (`PLUGIN_LOSS_TYPE = "davis_exact_l1"`),
@@ -111,7 +101,7 @@ model_plugins:
 # constraint to fit one task is forbidden. Declaring the objective as a pack
 # plugin is how the task gets what it needs without the framework yielding.
 loss_plugins:
-  dir: plugins
+  dir: ../plugins
 
 # Step 12 / PR-12d, F-12d-31 — the AUTHORITATIVE training objective.
 #
@@ -133,8 +123,8 @@ loss_plugins:
 # central enum grows for DAVIS.
 objective:
   implementation:
-    file: plugins/davis_exact_l1_loss.py
+    file: ../plugins/davis_exact_l1_loss.py
     symbol: PLUGIN_LOSS_TYPE
 
 task_config:
-  config: declared/task_config.yaml
+  config: ../declared/task_config.yaml

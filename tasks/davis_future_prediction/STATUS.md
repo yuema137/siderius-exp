@@ -84,27 +84,18 @@ never revisited:
 * **loader** — `execute_tools/davis_data_path.py` implements the frozen
   four-method `TaskDataPath`, including `training_dataset` /
   `validation_dataset`.
-* **launcher** — the composed entrypoint is
-  `--task_composition configs/task_composition/davis.yaml`; see the README.
+* **experiment launcher** — the bounded qualification entrypoint lives under
+  `experiments/davis_future_prediction/two_iteration_qualification/` and
+  selects this task's reusable bounded composition.
 
 A "by design" absence list is exactly the kind of prose that keeps reading as
 true after the thing it denies has landed, which is why the D-FINAL doc-sync
 step checks it against the shipped tree rather than against memory.
 
-**Amended again at Step 12 / PR-12e** (issue #267, mirroring the Pets
-cleanup). The composed entrypoint now has a published form: `quickstart.sh` is
-the pack's ONE documented run command, and it is deliberately not a launcher —
-it is a thin adapter that supplies this pack's composition manifest
-(`configs/task_composition/davis.yaml`) and a set of bounded defaults to the
-NORMAL production launcher (`sdsc_submission_scripts/run_chain.sh`). No
-execution logic, no DAVIS semantics and no example-only control lives in it:
-remove the file and the same run is still expressible by typing `run_chain.sh`
-directly. Guarded by
-`tests/unit/examples/test_step12_pr12e_davis_quickstart.py`, which drives the
-command parsed out of `README.md` rather than a restatement of it. The
-standing rule the D-FINAL paragraph names is now executable as well:
-`tests/unit/examples/test_step12_pr12e_pack_absence_claims.py` fails when a
-pack's README or STATUS still asserts the absence of something the pack ships.
+The static task package intentionally contains no workflow launcher. Iteration
+counts, epochs, portions, output locks, and resource budgets live under the
+selected experiment. The task retains the reusable composition, data
+identities, scientific declarations, plugins, and runtime adapter.
 
 
 ## Runner role and L3 evidence freshness (Step 10 / P5+P6 C7)

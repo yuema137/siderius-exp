@@ -22,7 +22,9 @@ scope; this experiment decides to use it.
 
 These values belong to this experiment. The task package owns the dataset,
 splits, model I/O contract, objective, metrics, Health semantics, plugins, and
-runtime adapter.
+runtime adapter. The selected SIDERIUS workflow owns Trial/Formal execution,
+round progression, retries, and persistence; this experiment supplies its
+approved parameter values.
 
 ## Launch
 

@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXPERIMENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXP_ROOT="$(cd "${EXPERIMENT_DIR}/../../.." && pwd)"
+PACK_DIR="${EXP_ROOT}/tasks/davis_future_prediction"
 
 usage() {
     cat <<USAGE
-Usage: bash tasks/davis_future_prediction/quickstart.sh \
+Usage: bash experiments/davis_future_prediction/two_iteration_qualification/launch.sh \
   --siderius-checkout DIR --workspace DIR --data_dir DIR \
   [extra run_chain.sh args...]
 
@@ -22,7 +24,7 @@ USAGE
 }
 
 fail() {
-    echo "tasks/davis_future_prediction/quickstart.sh: $1" >&2
+    echo "experiments/davis_future_prediction/two_iteration_qualification/launch.sh: $1" >&2
     usage >&2
     exit 2
 }
@@ -65,7 +67,7 @@ done
 [ -d "${DATA_DIR}/DAVIS/JPEGImages/480p" ] || fail "--data_dir must contain DAVIS/JPEGImages/480p: '$DATA_DIR'"
 
 LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
-COMPOSITION="${PACK_DIR}/composition.yaml"
+COMPOSITION="${PACK_DIR}/compositions/bounded_qualification.yaml"
 LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
 GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
 [ -f "$LAUNCHER" ] || fail "production launcher not found at '$LAUNCHER'"
