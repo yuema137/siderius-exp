@@ -20,7 +20,7 @@ EXPERIMENT = (
     EXP_ROOT / "experiments" / "davis_future_prediction" / "two_iteration_qualification"
 )
 LAUNCHER = EXPERIMENT / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = "2406dadd8dc3e80d87733cdc1a68494d3d8cead7"
+EXPECTED_FRAMEWORK_REVISION = "63b98b58bd18b91ee840b8d1326bb292ef8cd893"
 
 COMPOSE_CHILD = textwrap.dedent(
     """
