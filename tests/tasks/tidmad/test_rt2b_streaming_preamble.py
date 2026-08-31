@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 
 import pytest
 
@@ -29,15 +30,27 @@ from execute_tools.dataset_config import (
     bind_dataset_profile,
     tidmad_topology,
 )
-from execute_tools.task_data_path import bind_task_data_path
+from execute_tools.task_data_path import bind_task_data_path, effective_identity
 from ml_models.models_format_sandbox import LossConfig, TrainConfig, WaveNetConfig
 from tasks.tidmad.runtime.tidmad_data_path import (
     TIDMADEpochDataset,
     TidmadScope,
     TidmadTaskDataPath,
 )
+from workflows.task_composition import compose_run_task_bindings
 
 SEG_SIZE = 1000  # minimum segmentation_size; 1 PSD segment == 1 ML segment below
+TASK_MANIFEST = str(
+    Path(__file__).resolve().parents[3]
+    / "tasks"
+    / "tidmad"
+    / "compositions"
+    / "bounded_qualification.yaml"
+)
+
+
+def _composed_task_identity() -> str:
+    return effective_identity(compose_run_task_bindings(TASK_MANIFEST).task_data_path)
 
 
 @pytest.fixture
@@ -243,6 +256,12 @@ class TestMainArgvWiring:
                 "rt2b_main",
                 "--sample_set_json",
                 str(ss_path),
+                "--task_data_path_id",
+                "tidmad",
+                "--task_data_path_identity",
+                _composed_task_identity(),
+                "--task_manifest",
+                TASK_MANIFEST,
                 *extra_argv,
             ],
         )

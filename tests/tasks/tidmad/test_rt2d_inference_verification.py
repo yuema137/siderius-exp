@@ -17,6 +17,7 @@ component split (setup / compute / output write priced separately):
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import h5py
 import numpy as np
 import pytest
@@ -32,11 +33,24 @@ from execute_tools.dataset_config import (
     bind_dataset_profile,
     tidmad_topology,
 )
+from execute_tools.task_data_path import effective_identity
 from ml_models.models_format_sandbox import WaveNetConfig
 from ml_models.models_sandbox import MODEL_REGISTRY
+from workflows.task_composition import compose_run_task_bindings
 
 SEG_SIZE = 1000
 N_PSD_SEGMENTS = 30  # 30 inference batches at batch_size=1
+TASK_MANIFEST = (
+    Path(__file__).resolve().parents[3]
+    / "tasks"
+    / "tidmad"
+    / "compositions"
+    / "bounded_qualification.yaml"
+)
+
+
+def _composed_task_identity() -> str:
+    return effective_identity(compose_run_task_bindings(str(TASK_MANIFEST)).task_data_path)
 
 _MODEL_CFG = dict(
     segmentation_size=SEG_SIZE,
@@ -146,6 +160,12 @@ def tiny_setup(tmp_path, tiny_profile):
             str(ss_path),
             "--runtime_policy_json",
             str(rp_path),
+            "--task_data_path_id",
+            "tidmad",
+            "--task_data_path_identity",
+            _composed_task_identity(),
+            "--task_manifest",
+            str(TASK_MANIFEST),
         ],
     }
     with bind_dataset_profile(tiny_profile):

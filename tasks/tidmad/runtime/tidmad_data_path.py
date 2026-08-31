@@ -17,9 +17,8 @@ deliverable-spec naming/storage authorities and ``create_abra_file`` (imports,
 not copies); ``read_evaluation_payload`` resolves the persisted deliverables
 for the Step-06 handle and nothing more.
 
-REGISTRATION. Importing this module registers the implementation under
-``TIDMAD_COMPATIBILITY_ID`` (regime-A legacy resolution, child §4.2 row 1).
-Until C3/C4 rewire the production call sites the registration is inert.
+REGISTRATION. Importing this task module has no registry side effect. The
+composition loader instantiates and binds it from the task manifest.
 
 NOTE: no ``from __future__ import annotations`` here — under lazy annotations
 ruff (UP037) would force de-quoting an annotation INSIDE the verbatim-moved
@@ -54,15 +53,15 @@ from execute_tools.deliverable_spec import (
 )
 from execute_tools.sample_set_builder import build_sample_set
 from execute_tools.task_data_path import (
-    TIDMAD_COMPATIBILITY_ID,
     DeliverableWriteRequest,
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
     ScopeBuildRequest,
     ValidationScopeError,
-    register_task_data_path,
 )
+
+_TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
 
 def _h5_dataset(f: h5py.File, *path: str) -> h5py.Dataset:
@@ -339,7 +338,7 @@ class TidmadTaskDataPath:
     deliverable-spec authorities (naming + storage) and ``create_abra_file``.
     """
 
-    task_data_path_id: ClassVar[str] = TIDMAD_COMPATIBILITY_ID
+    task_data_path_id: ClassVar[str] = _TIDMAD_TASK_DATA_PATH_ID
 
     @staticmethod
     def _scope(scope: object) -> TidmadScope:
@@ -693,6 +692,3 @@ class TidmadTaskDataPath:
                 continue
             payload[file_index] = os.path.join(request.deliverable_dir, entry)
         return payload
-
-
-register_task_data_path(TidmadTaskDataPath())
