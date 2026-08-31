@@ -30,14 +30,14 @@ data is, and none ever will be.
 
 | shipped asset | path | what it is |
 |---|---|---|
-| qualification composition | `workflows/qualification/composition.yaml` | the bounded external-consumer workflow used by `quickstart.sh` |
-| Gold workflow assets | `workflows/gold_stage1/`, `workflows/gold_stage2/` | campaign-owned treatment kept separate from qualification; Stage 2 is not executable or authorized |
+| qualification composition | `compositions/bounded_qualification.yaml` | reusable task-owned scope selected by the qualification experiment |
+| Gold compatibility assets | `workflows/gold_stage1/`, `workflows/gold_stage2/` | pending migration into `campaigns/tidmad_gold`; they are not task authority |
 | literature-review config | `framework_configs/lit_review.yaml` | TIDMAD root paper, search posture, and confidence rubric used when literature review is enabled |
 | resolved declarations | `resolved/*.json` | dataset profile, model I/O contract, deliverable spec, metric spec, file identity |
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |
 | reference artifacts | `reference_data/raw_baseline/`, `reference_data/ground_truth/`, `reference_data/official_paper_result/` | metric floor, metric ceiling, paper-comparable scores |
 | paper-spec baselines | `ml_models/legacy_baseline_configs.json` | the TIDMAD paper's hyperparameters |
-| the entrypoint | `quickstart.sh` | this pack's one documented run command |
+| the qualification entrypoint | `../../experiments/tidmad/two_iteration_qualification/launch.sh` | experiment-owned workflow treatment |
 
 ### 2. The external data dependency
 
@@ -91,7 +91,7 @@ executing anything. Do this first.
 
 <!-- QUICKSTART-PREVIEW-COMMAND -->
 ```bash
-bash tasks/tidmad/quickstart.sh \
+bash experiments/tidmad/two_iteration_qualification/launch.sh \
     --siderius-checkout /path/to/SIDERIUS \
     --workspace /path/to/your/workspace \
     --data_dir /path/to/tidmad/data \
@@ -102,7 +102,7 @@ bash tasks/tidmad/quickstart.sh \
 
 <!-- QUICKSTART-RUN-COMMAND -->
 ```bash
-bash tasks/tidmad/quickstart.sh \
+bash experiments/tidmad/two_iteration_qualification/launch.sh \
     --siderius-checkout /path/to/SIDERIUS \
     --workspace /path/to/your/workspace \
     --data_dir /path/to/tidmad/data
@@ -113,13 +113,13 @@ no defaults**. The task package names its framework checkout, output location,
 and dataset explicitly instead of depending on repository co-location or a
 directory that happens to exist on one machine.
 
-`quickstart.sh` is a thin adapter. It resolves this task package from its own
+The experiment launcher is a thin adapter. It resolves this task package from its own
 location, validates the explicitly selected framework checkout and inputs, and
 then executes that checkout's normal production launcher:
 
 ```text
-tasks/tidmad/quickstart.sh
-  → <siderius-checkout>/sdsc_submission_scripts/run_chain.sh --task_composition <siderius-exp>/tasks/tidmad/workflows/qualification/composition.yaml
+experiments/tidmad/two_iteration_qualification/launch.sh
+  → <siderius-checkout>/sdsc_submission_scripts/run_chain.sh --task_composition <siderius-exp>/tasks/tidmad/compositions/bounded_qualification.yaml
   → sdsc_submission_scripts/run_one_iteration.py
   → the same workflow, declarations and plugins that CI and the Gates exercise
 ```
@@ -127,12 +127,12 @@ tasks/tidmad/quickstart.sh
 It applies one bounded posture so a first run is cheap. Every value is an
 ordinary launcher flag; passing the same flag yourself overrides it, and every
 other launcher argument is forwarded verbatim. `bash
-tasks/tidmad/quickstart.sh --help` prints the contract.
+experiments/tidmad/two_iteration_qualification/launch.sh --help` prints the contract.
 
 | default applied | why |
 |---|---|
 | `--mode lilab` | foreground subprocess |
-| `--task_composition <siderius-exp>/tasks/tidmad/workflows/qualification/composition.yaml` | binds the bounded external-consumer workflow, not a Gold campaign |
+| `--task_composition <siderius-exp>/tasks/tidmad/compositions/bounded_qualification.yaml` | binds the reusable task-owned qualification scope, not a Gold campaign |
 | `--run_name tidmad_quickstart` | pins the run id |
 | `--llm_config <repo>/llm_configs/openai_tiered_pro.json` | per-node model routing. Without it the run falls back to a single default model with no routing. Override with `--llm_config llm_configs/deepseek_tiered_pro.json` or your own file |
 | `--ml_lit_review_config <siderius-exp>/tasks/tidmad/framework_configs/lit_review.yaml` | keeps TIDMAD-specific literature framing in the experiment repository even when the CLI enables or disables the advisor |
@@ -207,7 +207,7 @@ the records the chain already persisted. The dashboard
 
 ### If it refuses
 
-Most first-run failures are deliberate refusals. `quickstart.sh` names the
+Most first-run failures are deliberate refusals. The experiment launcher names the
 missing input; beyond that, the table in
 [operating a run](../../docs/guides/operating-a-run.md#failures-and-refusals)
 maps each refusal to its cause.
@@ -222,12 +222,12 @@ Full-spectrum 1-D time-series denoising of SQUID dark-matter detector data
 
 | aspect | value | owning path (edit THERE, never here) |
 |---|---|---|
-| task description / forward contract | prose + `model_io` declaration | `configs/task_config.yaml` (single runtime task authority; Steps 03/04) |
-| model I/O contract | `[B, T] int64 → [B, 256, T] float32`, `class` axis fixed 256 → categorical | `configs/task_config.yaml` → `workflows/task_config.py::run_bound_model_io_contract` |
-| dataset profile | 20 validation files, 200 × 10 000 000-sample segments per file, 10 MS/s, `channel0001` input / `channel0002` truth, int8 storage +128 offset, 256 classes | `execute_tools/dataset_config.py::TIDMAD_PROFILE` / `resolve_dataset_profile()` |
-| deliverable | per-file HDF5 `abra_validation_denoised_{file_index:04d}.h5` | `execute_tools/deliverable_spec.py::derive_tidmad_deliverable_spec` |
-| golden metric | `tidmad_denoising_score` · direction **higher** · anchor-normalised linear grand mean, log base 5.27 (frozen paper-comparable formula). **The tuner's policy consumes this direction from 07b**: `MetricOrder` interprets it once per run and every ordering decision asks that object, so nothing in the tuner assumes bigger-is-better any more | `execute_tools/evaluation_metric.py::derive_tidmad_metric_spec` (arithmetic in `execute_tools/scoring_utils.py`); order authority `execute_tools/metric_order.py` |
-| health policy | HealthGate checks at tuner round boundaries | `configs/health_checks.yaml` (applicability semantics: Step 08) |
+| task description / forward contract | prose + model I/O declaration | `declared/task_config.yaml` |
+| model I/O contract | `[B, T] int64 → [B, 256, T] float32`, `class` axis fixed 256 → categorical | `resolved/model_io_contract.json`, bound by the task composition |
+| dataset profile | 20 validation files, 200 × 10 000 000-sample segments per file, 10 MS/s, `channel0001` input / `channel0002` truth, int8 storage +128 offset, 256 classes | `resolved/dataset_profile.json` |
+| deliverable | per-file HDF5 `abra_validation_denoised_{file_index:04d}.h5` | `compositions/bounded_qualification.yaml` and `runtime/tidmad_data_path.py` |
+| golden metric | `tidmad_denoising_score` · direction **higher** · anchor-normalised linear grand mean, log base 5.27 (frozen paper-comparable formula) | `resolved/metric_spec.json`, implemented by the pinned framework metric plugin |
+| health policy | HealthGate checks at tuner round boundaries | `framework_configs/health.yaml` |
 | training observation (Step 07a) | **R1** = the run-resolved training objective (`loss_config.loss_type` — a loss family is a run choice, not task semantics; identified on the record by `objective_kind` + `objective_config_fingerprint`); **R2** = per-epoch mean training objective (`loss_history`); **R3** = the SAME computation on the run-bound validation scope (the tuner's `eval_sample_set`, VALIDATION file family `abra_validation_*`), no backprop — **production-backed from 07a**; optional checkpointed observations: none declared. Persisted as `ExperimentRecord.training_history` / `.training_diagnosis` (per-run evidence, not task config — no `resolved/` snapshot); hidden from the planner / reflector until 07b | `execute_tools/train_engine_sandbox.py` (R3 pass), `execute_tools/training_history.py`, `agent/schemas/training_diagnosis.py` |
 | data root | machine-local, gitignored `tidmad_data_config.yaml` | `execute_tools/data_paths.py` — see `data/README.md` |
 | reference artifacts | anchors, raw baseline, ground truth, official paper scores | `reference_data/` |
@@ -258,7 +258,7 @@ copy here would be the parallel authority roadmap §22.23.1 forbids.
 
 ## Other ways to run
 
-`quickstart.sh` is this pack's one documented command, not the only way in.
+The qualification experiment launcher is the documented bounded command, not the only way in.
 Runs also go through the normal SIDERIUS interfaces documented for operators
 ([`docs/getting-started/first-run.md`](../../docs/getting-started/first-run.md),
 [`docs/guides/operating-a-run.md`](../../docs/guides/operating-a-run.md),
@@ -270,7 +270,7 @@ see `STATUS.md` for what is and is not projected here yet.
 
 ```text
 README.md          this file
-quickstart.sh      the ONE documented run command (a thin adapter over run_chain.sh)
+compositions/      reusable task-owned composition scopes
 PROVENANCE.md      data source, licence, reference artifacts, data-root mechanism
 STATUS.md          honest maturity + the seams not yet projected (mirror of the roadmap)
 data/README.md     how the machine-local data root is configured (no data here)

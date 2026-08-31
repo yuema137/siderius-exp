@@ -1,0 +1,39 @@
+# Bounded external-consumer composition for TIDMAD qualification.
+#
+# This task-owned composition declares reusable scientific scope. The
+# experiment selecting it owns iteration counts, budgets, and other workflow
+# treatment values. It is not a Gold campaign definition.
+
+task_data_path:
+  file: ../runtime/tidmad_data_path.py
+  symbol: TidmadTaskDataPath
+  id: tidmad
+
+dataset_profile:
+  config: ../resolved/dataset_profile.json
+
+metric:
+  declaration: ../resolved/metric_spec.json
+  implementation:
+    module: execute_tools.evaluation_metric
+    symbol: TidmadDenoisingMetric
+
+task_health:
+  config: ../framework_configs/health.yaml
+
+interpretation_blocks:
+  config: ../framework_configs/interpretation.yaml
+
+proposal_blocks:
+  config: ../framework_configs/proposal.yaml
+
+implementor_blocks:
+  config: ../framework_configs/implementor.yaml
+
+task_config:
+  config: ../declared/task_config.yaml
+
+deliverable:
+  prefix: abra_validation_denoised
+  extension: .h5
+  index_width: 4

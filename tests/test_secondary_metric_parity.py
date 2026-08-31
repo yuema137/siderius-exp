@@ -20,7 +20,7 @@ import pytest
 
 EXP_ROOT = Path(__file__).resolve().parents[1]
 TASK_MANIFESTS = {
-    "tidmad": EXP_ROOT / "tasks/tidmad/workflows/qualification/composition.yaml",
+    "tidmad": EXP_ROOT / "tasks/tidmad/compositions/bounded_qualification.yaml",
     "oxford_iiit_pet": EXP_ROOT
     / "tasks/oxford_iiit_pet/compositions/bounded_qualification.yaml",
     "davis_future_prediction": EXP_ROOT

@@ -39,6 +39,12 @@
 | SIDERIUS #386 | TIDMAD configuration resolution during generic workflow import | repaired and externally witnessed at `8be2874d` |
 | SIDERIUS #387 | non-applicable proposal preflight converted null factor with `float(None)` | reproduced by Cancer qualification and repaired at `52e3e8e0` |
 
+## Pending ownership reconciliation
+
+| Boundary | Current evidence | Required next decision |
+|---|---|---|
+| TIDMAD Gold workflow assets | `tasks/tidmad/workflows/gold_stage1/health_checks.yaml` carries the calibrated amplitude-only blocking treatment, while `campaigns/tidmad_gold/task/health_checks_effective_gold.yaml` is an older materialized artifact with equivalent gate actions but stale rationale text; Stage 2 has no executable task launcher | establish the campaign-owned authoritative source before removing the task-side compatibility copies; do not merge or rewrite scientific treatment implicitly |
+
 ## Portability changes
 
 | Date | Paths | Change | Semantic effect |
@@ -53,3 +59,4 @@
 | 2026-08-30 | DAVIS qualification boundary | move the two-iteration launcher to `experiments/davis_future_prediction/two_iteration_qualification/` and name its selected task-owned scope `tasks/davis_future_prediction/compositions/bounded_qualification.yaml` | none; the 60/15 clip scope, lower-is-better metric, objective, and exact launch treatment are preserved |
 | 2026-08-30 | Cancer-gene experiment boundary | move the shared launcher under `experiments/cancer_gene_identification/`, rename the two task-owned scopes as `compositions/two_network.yaml` and `compositions/eight_network.yaml`, and expose them as two ordinary experiments over the same Trial/Formal workflow | none; graph sets, metrics, objective, batch lock, and launch treatment are preserved; neither experiment becomes a campaign |
 | 2026-08-30 | Multi-task campaign scaffold | add a common campaign package contract, retain TIDMAD Gold as the existing stopped campaign, and create non-launchable campaign packages for Pets, DAVIS, and Cancer with deployment ownership recorded separately | none; no campaign parameters, workflow semantics, authorization, or workload state changed |
+| 2026-08-30 | TIDMAD qualification boundary | move the bounded two-iteration launcher from the static task package to `experiments/tidmad/two_iteration_qualification/`, name its selected task-owned scope `compositions/bounded_qualification.yaml`, and retire the duplicate imported root composition | none; all resolved Trial/Formal treatment values and task declarations are preserved; Gold compatibility assets remain pending campaign reconciliation |

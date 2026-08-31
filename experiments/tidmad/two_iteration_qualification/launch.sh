@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXPERIMENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXP_ROOT="$(cd "${EXPERIMENT_DIR}/../../.." && pwd)"
+PACK_DIR="${EXP_ROOT}/tasks/tidmad"
 
 usage() {
     cat <<USAGE
-Usage: bash tasks/tidmad/quickstart.sh \
+Usage: bash experiments/tidmad/two_iteration_qualification/launch.sh \
   --siderius-checkout DIR --workspace DIR --data_dir DIR \
   [extra run_chain.sh args...]
 
 Required:
   --siderius-checkout DIR   exact SIDERIUS checkout to execute
-  --workspace DIR           fresh run workspace
+  --workspace DIR           fresh qualification workspace
   --data_dir DIR            directory containing TIDMAD HDF5 files
 
 Bounded defaults:
@@ -28,7 +30,7 @@ USAGE
 }
 
 fail() {
-    echo "tasks/tidmad/quickstart.sh: $1" >&2
+    echo "experiments/tidmad/two_iteration_qualification/launch.sh: $1" >&2
     usage >&2
     exit 2
 }
@@ -73,7 +75,7 @@ compgen -G "${DATA_DIR}/abra_training_*.h5" >/dev/null || fail "no abra_training
 compgen -G "${DATA_DIR}/abra_validation_*.h5" >/dev/null || fail "no abra_validation_*.h5 files under '$DATA_DIR'"
 
 LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
-COMPOSITION="${PACK_DIR}/workflows/qualification/composition.yaml"
+COMPOSITION="${PACK_DIR}/compositions/bounded_qualification.yaml"
 LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
 LIT_REVIEW_CONFIG="${PACK_DIR}/framework_configs/lit_review.yaml"
 GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
