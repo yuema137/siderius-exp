@@ -37,7 +37,7 @@ from datetime import UTC
 from pathlib import Path
 from typing import cast
 
-from core.campaign_artifacts import (
+from tasks.tidmad.runtime.campaign_artifacts import (
     decide_phase1_reuse,
     sha256_file,
     validate_phase1_baseline,
@@ -53,7 +53,12 @@ from core.run_invariants import (
 from core.sandbox_executor import LocalRecorder, TidmadSandbox, sandbox_records_dir
 from execute_tools.build_anchor_map import load_anchor_map
 from execute_tools.data_paths import DatasetDirectoryUnavailable, resolve_dataset_dir
-from execute_tools.dataset_config import NUM_FILES, TIDMAD, DataScope, resolve_dataset_profile
+from execute_tools.dataset_config import (
+    NUM_FILES,
+    TIDMAD,
+    DataScope,
+    resolve_dataset_profile,
+)
 from execute_tools.deliverable_spec import default_deliverable_naming
 from execute_tools.health_checks.config import load_health_gates_config
 from execute_tools.health_checks.evaluation import evaluate_and_persist_health_gates
@@ -81,7 +86,12 @@ def _sha256(path: str) -> str:
 
 
 def _write_diagnostic_metadata(
-    model_type, run_name, run_dir, baseline_workspace, baseline_record, baseline_retrained
+    model_type,
+    run_name,
+    run_dir,
+    baseline_workspace,
+    baseline_record,
+    baseline_retrained,
 ):
     """Write the reproducibility snapshot for a diagnostic pre-v17 run."""
     import torch
@@ -94,7 +104,11 @@ def _write_diagnostic_metadata(
     )
     try:
         driver = subprocess.run(
-            ["nvidia-smi", "--query-gpu=driver_version,name,memory.total", "--format=csv,noheader"],
+            [
+                "nvidia-smi",
+                "--query-gpu=driver_version,name,memory.total",
+                "--format=csv,noheader",
+            ],
             capture_output=True,
             text=True,
             check=True,
@@ -122,9 +136,16 @@ def _write_diagnostic_metadata(
             "sha256": _sha256(anchor_path),
             "s_max": anchor_data["s_max"],
         },
-        "healthgate": {"path": HEALTH_CHECKS_PATH, "sha256": _sha256(HEALTH_CHECKS_PATH)},
+        "healthgate": {
+            "path": HEALTH_CHECKS_PATH,
+            "sha256": _sha256(HEALTH_CHECKS_PATH),
+        },
         "dataset_inventory": [
-            {"path": p, "size_bytes": os.path.getsize(p), "mtime_ns": os.stat(p).st_mtime_ns}
+            {
+                "path": p,
+                "size_bytes": os.path.getsize(p),
+                "mtime_ns": os.stat(p).st_mtime_ns,
+            }
             for p in dataset_files
         ],
         "runtime": {
@@ -176,7 +197,10 @@ def _agent_env() -> dict:
 
 
 def run_baseline(
-    model_type: str, baseline_workspace: str, progress_bar: bool = False, file_index: int = 6
+    model_type: str,
+    baseline_workspace: str,
+    progress_bar: bool = False,
+    file_index: int = 6,
 ) -> dict:
     """
     Runs the full pipeline (train -> inference -> score) with the exact legacy config
@@ -305,7 +329,9 @@ def run_baseline(
     }
 
     sandbox.save_record(record)
-    print(f"\n  Baseline complete. Denoising score: {score_res.get('denoising_score', 'N/A')}")
+    print(
+        f"\n  Baseline complete. Denoising score: {score_res.get('denoising_score', 'N/A')}"
+    )
     return record
 
 
@@ -379,7 +405,9 @@ def run_baseline_trial(
     print(f"  model_cfg   : {m_cfg}")
     print(f"  train_cfg   : {t_cfg}")
     print(f"  loss_cfg    : {l_cfg}")
-    print(f"  train scope : files {resolved_scope}, portion=1.0, train_portion=0.1/epoch")
+    print(
+        f"  train scope : files {resolved_scope}, portion=1.0, train_portion=0.1/epoch"
+    )
     print(f"  eval scope  : files {resolved_scope}, all segments")
     print()
 
@@ -415,9 +443,13 @@ def run_baseline_trial(
         )
         train_time = round(time.time() - t0, 1)
         if train_result["status"] != "success":
-            raise RuntimeError(f"Baseline training failed:\n{train_result.get('message')}")
+            raise RuntimeError(
+                f"Baseline training failed:\n{train_result.get('message')}"
+            )
     else:
-        train_time = float((existing_record.get("timing") or {}).get("train_time_s") or 0.0)
+        train_time = float(
+            (existing_record.get("timing") or {}).get("train_time_s") or 0.0
+        )
         train_result = {
             "status": "success",
             "results": {
@@ -426,7 +458,9 @@ def run_baseline_trial(
                 "model_params": existing_record.get("model_params"),
             },
         }
-        print("  [resume] Reusing validated Phase 1 checkpoint; regenerating inference/scoring.")
+        print(
+            "  [resume] Reusing validated Phase 1 checkpoint; regenerating inference/scoring."
+        )
 
     # --- Inference (all 20 files, all segments) ---
     t0 = time.time()
@@ -461,22 +495,30 @@ def run_baseline_trial(
         raw_data_dir=DATA_DIR,
     )
     scoring_time = round(time.time() - t0, 1)
-    checkpoint_path = os.path.join(sandbox.dirs["models"], f"model_{model_type}_{exp_id}_agent.pth")
+    checkpoint_path = os.path.join(
+        sandbox.dirs["models"], f"model_{model_type}_{exp_id}_agent.pth"
+    )
     health_context = HealthCheckContext(
         model_name=model_type,
         run_name=run_name,
         round_index=1,
-        denoised_filename_fn=lambda fi: os.path.join(baseline_workspace, _denoised_fn(fi)),
-        target_path_fn=lambda fi: os.path.join(DATA_DIR, f"abra_validation_{fi:04d}.h5"),
+        denoised_filename_fn=lambda fi: os.path.join(
+            baseline_workspace, _denoised_fn(fi)
+        ),
+        target_path_fn=lambda fi: os.path.join(
+            DATA_DIR, f"abra_validation_{fi:04d}.h5"
+        ),
         checkpoint_path=checkpoint_path,
         file_vector=file_vector,
         denoising_score=final_scalar,
     )
     if health_gate_enabled:
-        gate_results, persisted_gate_results, gate_action = evaluate_and_persist_health_gates(
-            health_context,
-            config_path=health_checks_config,
-            production_config_path=HEALTH_CHECKS_PATH,
+        gate_results, persisted_gate_results, gate_action = (
+            evaluate_and_persist_health_gates(
+                health_context,
+                config_path=health_checks_config,
+                production_config_path=HEALTH_CHECKS_PATH,
+            )
         )
     else:
         # DS6d — disabled mode mirrors the tuner: no evaluation, no
@@ -484,7 +526,10 @@ def run_baseline_trial(
         gate_results, persisted_gate_results, gate_action = [], [], GateAction.CONTINUE
     failed_gates = [result for result in gate_results if not result.passed]
     failure_reason = (
-        " | ".join(f"[{result.gate_id}] {result.failure_reason}" for result in failed_gates) or None
+        " | ".join(
+            f"[{result.gate_id}] {result.failure_reason}" for result in failed_gates
+        )
+        or None
     )
 
     # Extract training results. See run_baseline_single for the cast rationale.
@@ -494,7 +539,10 @@ def run_baseline_trial(
         "exp_id": exp_id,
         "status": (
             "failed_mode_collapse"
-            if any(item.would_invalidate_under_production_policy for item in persisted_gate_results)
+            if any(
+                item.would_invalidate_under_production_policy
+                for item in persisted_gate_results
+            )
             else "success"
         ),
         "campaign_run_name": campaign_run_name,
@@ -524,14 +572,18 @@ def run_baseline_trial(
         else "scorer returned no vector",
         "failure_reason": failure_reason,
         "gate_action": gate_action.value,
-        "health_gate_results": [item.model_dump(mode="json") for item in persisted_gate_results],
+        "health_gate_results": [
+            item.model_dump(mode="json") for item in persisted_gate_results
+        ],
         "checkpoint_path": checkpoint_path,
         "checkpoint_sha256": sha256_file(checkpoint_path),
         # DS6d — invariant stamps (scalar comparability boundary).
         "resolved_data_scope": resolved_scope,
         "health_gate_enabled": health_gate_enabled,
         "health_config_sha256": health_config_sha256,
-        "training_files": sorted(glob.glob(os.path.join(DATA_DIR, "abra_training_????.h5"))),
+        "training_files": sorted(
+            glob.glob(os.path.join(DATA_DIR, "abra_training_????.h5"))
+        ),
         "training_sample_set": train_sample_set,
         "evaluation_sample_set": eval_sample_set,
         "train_base_seed": 42,
@@ -567,7 +619,9 @@ def run_baseline_trial(
 
     sandbox.save_record(record)
     print(f"\n  Baseline complete. Anchor-normalized score: {final_scalar:.4f}")
-    print(f"  Timing: train={train_time}s, infer={inference_time}s, score={scoring_time}s")
+    print(
+        f"  Timing: train={train_time}s, infer={inference_time}s, score={scoring_time}s"
+    )
     return record
 
 
@@ -605,7 +659,9 @@ def seed_agent_memory(baseline_record: dict, agent_workspace: str, agent_run_nam
     workspace = os.path.abspath(agent_workspace)
     os.makedirs(workspace, exist_ok=True)
     summary_path = os.path.join(workspace, f"summary_{agent_run_name}.json")
-    recorder = LocalRecorder(sandbox_records_dir(workspace), summary_path, agent_run_name)
+    recorder = LocalRecorder(
+        sandbox_records_dir(workspace), summary_path, agent_run_name
+    )
 
     already_seeded = any(
         r.get("exp_id") == baseline_record.get("exp_id") for r in recorder.get_summary()
@@ -625,7 +681,9 @@ def seed_agent_memory(baseline_record: dict, agent_workspace: str, agent_run_nam
 PARTIAL_CAMPAIGN_EXIT_CODE = 2
 
 
-def _read_tuner_completion(output_path: str, *, requested_rounds: int) -> tuple[bool, str]:
+def _read_tuner_completion(
+    output_path: str, *, requested_rounds: int
+) -> tuple[bool, str]:
     """Return whether the persisted tuner result completed the request."""
     try:
         with open(output_path, encoding="utf-8") as f:
@@ -819,9 +877,13 @@ def run_agent(
     if runtime_trial_safety_factor is not None:
         cmd.extend(["--runtime_trial_safety_factor", str(runtime_trial_safety_factor)])
     if runtime_formal_safety_factor is not None:
-        cmd.extend(["--runtime_formal_safety_factor", str(runtime_formal_safety_factor)])
+        cmd.extend(
+            ["--runtime_formal_safety_factor", str(runtime_formal_safety_factor)]
+        )
     if runtime_watchdog_floor_seconds is not None:
-        cmd.extend(["--runtime_watchdog_floor_seconds", str(runtime_watchdog_floor_seconds)])
+        cmd.extend(
+            ["--runtime_watchdog_floor_seconds", str(runtime_watchdog_floor_seconds)]
+        )
     if enable_chain_incumbent_formal_gates:
         cmd.append("--enable_chain_incumbent_formal_gates")
     if resume:
@@ -1212,7 +1274,11 @@ def main():
     # DS6d — parse DataScope specs ('4-9' / '4,5,6,7,8,9' / mixed canonicalize
     # to one sorted deduplicated list).
     try:
-        data_scope = DataScope.from_cli(args.data_scope) if args.data_scope else DataScope.default()
+        data_scope = (
+            DataScope.from_cli(args.data_scope)
+            if args.data_scope
+            else DataScope.default()
+        )
         health_gate_files = (
             DataScope.from_cli(args.health_gate_files).file_indices
             if args.health_gate_files
@@ -1253,7 +1319,9 @@ def main():
     # comes from the operator's override or the gitignored per-machine config,
     # and from nowhere else.
     try:
-        resolved_data_dir = resolve_dataset_dir(args.data_dir, purpose="this comparison run")
+        resolved_data_dir = resolve_dataset_dir(
+            args.data_dir, purpose="this comparison run"
+        )
     except DatasetDirectoryUnavailable as e:
         raise SystemExit(f"[ERROR] {e}") from e
 
@@ -1269,7 +1337,9 @@ def main():
                     gate.on_pass.action.value != "continue"
                     or gate.on_fail.action.value != "continue"
                 ):
-                    policy_errors.append(f"{gate.id}: pass/fail actions must both be continue")
+                    policy_errors.append(
+                        f"{gate.id}: pass/fail actions must both be continue"
+                    )
             if policy_errors:
                 raise SystemExit(
                     "[ERROR] v17_pregate_baseline requires observe-only every-round gates:\n- "
@@ -1284,7 +1354,11 @@ def main():
     # unset = legacy behavior (reflector uses the planner's model).
     reflect_provider = args.reflect_provider
     reflect_model_id = args.reflect_model_id
-    if reflect_model_id is None and reflect_provider is None and args.provider == "gemini":
+    if (
+        reflect_model_id is None
+        and reflect_provider is None
+        and args.provider == "gemini"
+    ):
         # Apply the gemini-specific default. Stays on the gemini provider.
         reflect_model_id = "gemini-2.5-flash"
 
@@ -1292,7 +1366,9 @@ def main():
     human_advice: str = args.human_advice or ""
     if args.human_advice_file:
         if not os.path.exists(args.human_advice_file):
-            raise SystemExit(f"\n[ERROR] --human_advice_file not found: {args.human_advice_file}")
+            raise SystemExit(
+                f"\n[ERROR] --human_advice_file not found: {args.human_advice_file}"
+            )
         with open(args.human_advice_file, encoding="utf-8") as f:
             advice_blob = json.load(f)
         if not isinstance(advice_blob, dict) or "tune" not in advice_blob:
@@ -1358,7 +1434,9 @@ def main():
     if load_run_invariants(baseline_workspace) is not None:
         validate_run_invariants(baseline_workspace, run_invariants)
     else:
-        for _summary_path in glob.glob(os.path.join(baseline_workspace, "summary_*.json")):
+        for _summary_path in glob.glob(
+            os.path.join(baseline_workspace, "summary_*.json")
+        ):
             try:
                 with open(_summary_path, encoding="utf-8") as _f:
                     _history = json.load(_f)
@@ -1419,7 +1497,9 @@ def main():
                 ]
                 gate_ids = [
                     gate.id
-                    for gate in load_health_gates_config(args.health_checks_config).health_gates
+                    for gate in load_health_gates_config(
+                        args.health_checks_config
+                    ).health_gates
                     if gate.matches_round(1)
                 ]
                 decision = decide_phase1_reuse(
@@ -1451,7 +1531,9 @@ def main():
                     )
                 else:
                     print("\n  Phase 1 reuse rejected:")
-                    for error in validation.errors if validation else ["no campaign record"]:
+                    for error in (
+                        validation.errors if validation else ["no campaign record"]
+                    ):
                         print(f"    - {error}")
         except (OSError, json.JSONDecodeError):
             pass
@@ -1586,7 +1668,9 @@ def main():
                     ),
                     "summary": matches[0]
                     if matches
-                    else os.path.join(baseline_workspace, f"summary_{baseline_run_name}.json"),
+                    else os.path.join(
+                        baseline_workspace, f"summary_{baseline_run_name}.json"
+                    ),
                     "checkpoint": baseline_record["checkpoint_path"],
                     "checkpoint_sha256": baseline_record["checkpoint_sha256"],
                     "denoised_outputs": expected_outputs,
