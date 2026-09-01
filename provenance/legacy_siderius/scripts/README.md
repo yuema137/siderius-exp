@@ -24,3 +24,14 @@ recoverable while the generic isolated-probe tests continue in SIDERIUS. Their
 pre-move SHA-256 identities are
 `6431bc53edc78be405cae327258e2cb6aa34a1a739f2c7a65590bda62ae8080e` and
 `d37193a1e73f780041bd817962da6b799ec6f36b781471ee08b4d98db3e5a49d`.
+
+`runtime_bootstrap.py` preserves the C10 task-aware environment launcher
+that selected a fixed nano model, 40,000-sample segmentation, TIDMAD
+measurement capability, and legacy calibration registry behavior. Its two
+pre-split framework test modules are archived with it; the generic bootstrap
+core and its task-neutral tests remain in SIDERIUS. The three pre-move
+SHA-256 identities are
+`e4f61bc516f7f5ba454c47c6c9d02493f3cfa279747e7c4c57fa67d5a28dc538`,
+`c4ae7420edbe95a7cf80c7659d76ae423763bf6f47f2a76ca65a8830734323b4`,
+and
+`a38cae98eb029d6173448009f0271ead8804c116167425fbaed4a589db7e2941`.
