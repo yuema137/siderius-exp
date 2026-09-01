@@ -182,7 +182,7 @@ def _davis_truth(task_scope: Any, data_dir: str | None) -> Mapping[str, Any]:
     DAVIS clip is laid out — so this delegates to the pack's data path rather
     than re-implementing a second decoder that could drift from the first.
     """
-    from tasks.davis_future_prediction.runtime.davis_data_path import truth_windows
+    from execute_tools.task_data_path import require_bound_task_data_path
 
     rows = getattr(task_scope, "rows", None)
     if rows is None:
@@ -195,9 +195,15 @@ def _davis_truth(task_scope: Any, data_dir: str | None) -> Mapping[str, Any]:
             "the DAVIS metrics need `data_dir` to read the target frames; the "
             "framework transports it, so an absent value is a wiring defect."
         )
-    # `truth_windows` is the pack's EXISTING single authority for evaluation
-    # ground truth — its own docstring says "one authority; the metric never
-    # re-derives pixels". Assembling the mapping here from `load_window` would
-    # have been a second traversal that looked identical and could drift, which
-    # is precisely what that authority exists to prevent.
-    return truth_windows(data_dir, rows)
+    # The scoring child keeps the already-resolved task implementation bound
+    # during metric arithmetic.  Reusing that object avoids both a duplicate
+    # frame decoder and an ambient import of the experiment repository, which
+    # is intentionally absent for an isolated file plugin.
+    data_path = require_bound_task_data_path()
+    truth_reader = getattr(data_path, "evaluation_truth", None)
+    if not callable(truth_reader):
+        raise TypeError(
+            "the DAVIS metric requires its bound task data path to provide "
+            "evaluation_truth(scope, data_dir)."
+        )
+    return truth_reader(task_scope, data_dir)

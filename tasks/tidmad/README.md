@@ -158,16 +158,14 @@ the complete evaluation scope. Leaving that default in a bounded quickstart
 would make its advertised data and time bounds inconsistent. These ordinary
 task-agnostic knobs bound the run without silently dropping files.
 
-**Why the time budgets are here.** Passing a time budget switches on the
-wall-time pre-flight, which prices the training workload through **TIDMAD's
-dataset topology** (`psd_segment_length // segmentation_size`). TIDMAD declares
-that topology, so the estimate is meaningful, and the flags earn their place:
-a planner-chosen portion can otherwise produce a multi-hour round.
-
-A task that declares no such topology now takes a **named inapplicable path** —
-the pre-flight is skipped with a stated reason and the run continues, rather
-than failing before training. So the other packs simply have no use for these
-two flags, not a hazard from them.
+**Why the time budgets are here.** The two flags declare the Trial and Formal
+execution ceilings. The legacy advance wall-time forecast additionally needs
+the complete physical TIDMAD ``SampleSet`` consumed by all three of its phase
+estimators. This composed qualification carries an opaque task-owned scope, so
+it takes the named inapplicable forecast path rather than partially pricing
+only training. Formal execution still receives the declared ceiling through
+the measured in-subprocess runtime policy. The flags therefore remain useful
+without pretending that a legacy forecast can understand an opaque scope.
 
 You also need at least one LLM API key in the selected SIDERIUS checkout's
 `.env` and a CUDA GPU.
