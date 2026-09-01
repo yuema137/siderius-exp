@@ -58,3 +58,10 @@ and historical H100 watchdog/budget scenarios. The generic runtime-control
 mechanisms and their task-neutral tests remain in SIDERIUS. Its pre-move
 SHA-256 identity is
 `9d3413b9c4477ee9414a8a283120a32fd9ae8b714033549a5a4bc509fdf79acb`.
+
+`investigate_6_3556_mechanism.py` preserves the one-off scorer diagnostic for
+the historical 6.3556 phantom. It fixes TIDMAD's 10-Msample segment geometry,
+10-MHz sampling frequency, twenty-file/two-hundred-segment workload, int8-to-
+millivolt conversion, and the investigated `noise <= 1e-10` threshold. Its
+pre-move SHA-256 identity is
+`97e3813d37486fcddc9b7ce9870afceede553c7f56c194431e26873cd6a9b409`.
