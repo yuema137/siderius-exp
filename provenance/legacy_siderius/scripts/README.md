@@ -72,3 +72,11 @@ and band semantics, a FreLE literature finding, a legacy RTX 3090 context,
 and the P-a through P-e commit ladder. Current generic proposer contracts and
 prompt tests remain in SIDERIUS. Its pre-move SHA-256 identity is
 `687564e8b9bd7086c258d241c5e68c15b78580af7cd2928d42e9175f4ea352c2`.
+
+`c2_prephase_validation.py` preserves the V20 PR-C2 Gate-2 Lite GPU harness.
+It owns the dated case matrix, immutable attempt artifacts, bounded Formal
+comparison arms, TIDMAD SampleSet construction, and Gate-specific environment
+and peak-stability interpretation. The generic measurement, admission,
+environment-stability, and formal-stability components remain in SIDERIUS.
+Its pre-move SHA-256 identity is
+`e5be6df8ce89975f71435d648bfceee9ec3e64a4695317ddde1e03dbc535ea82`.
