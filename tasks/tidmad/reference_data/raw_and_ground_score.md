@@ -13,7 +13,7 @@ directly comparable at every index.
 - **Ground-truth JSONs:** `reference_data/ground_truth/ground_truth_score_file_XXXX.json`
 - **Scalar baseline:** `reference_data/raw_baseline/scalar_anchor_normalized.json`
 - **Scalar ceiling:** `reference_data/ground_truth/ceiling_anchor_normalized.json`
-- **Generators:** `compute_raw_baseline.py`, `compute_ground_truth.py`
+- **Ground-truth generator:** `tasks/tidmad/tools/compute_ground_truth.py`
 - **Regenerated:** 2026-07-22 (removed the outdated `+ 1e-10` offset and `round(·, 2)`)
 
 ## Per-file scores (all under global s_max)

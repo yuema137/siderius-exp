@@ -23,9 +23,11 @@ changes the frequency grid and every SNR (design §13.4).
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import math
 from pathlib import Path
+from types import ModuleType
 
 import h5py
 import numpy as np
@@ -39,6 +41,16 @@ REFERENCE = EXP_ROOT / "tasks" / "tidmad" / "reference_data"
 GOLDENS = Path(__file__).parent / "goldens"
 
 _S_MAX = 295715680.14248306
+
+
+def _load_ground_truth_tool() -> ModuleType:
+    path = EXP_ROOT / "tasks" / "tidmad" / "tools" / "compute_ground_truth.py"
+    spec = importlib.util.spec_from_file_location("tidmad_compute_ground_truth", path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load TIDMAD ground-truth tool from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _load_anchor_map() -> dict:
@@ -61,8 +73,12 @@ class TestNUM2AnchorMap:
 
     def test_canonical_content_digest(self):
         m = _load_anchor_map()
-        digest = hashlib.sha256(json.dumps(m, sort_keys=True).encode("utf-8")).hexdigest()
-        assert digest == "db806ecd1b05cc10e51b032ef41f0607c24d3daaedb3fcebe7a0999ffe8a2f17"
+        digest = hashlib.sha256(
+            json.dumps(m, sort_keys=True).encode("utf-8")
+        ).hexdigest()
+        assert (
+            digest == "db806ecd1b05cc10e51b032ef41f0607c24d3daaedb3fcebe7a0999ffe8a2f17"
+        )
 
 
 class TestNUM3GroundTruthDerivability:
@@ -70,19 +86,18 @@ class TestNUM3GroundTruthDerivability:
         """The committed ground-truth set is EXACTLY the output of the
         production ceiling functions applied to the committed anchor map
         (held exactly at audit time, asserted nowhere before Step 00)."""
-        from scripts.compute_ground_truth import (
-            _anchor_normalized_ceiling,
-            _global_per_file_ceiling,
-        )
+        tool = _load_ground_truth_tool()
 
         m = _load_anchor_map()
         for i in range(20):
             expected = json.loads(
-                (REFERENCE / "ground_truth" / f"ground_truth_score_file_{i:04d}.json").read_text(
-                    encoding="utf-8"
-                )
+                (
+                    REFERENCE / "ground_truth" / f"ground_truth_score_file_{i:04d}.json"
+                ).read_text(encoding="utf-8")
             )
-            score, linear_sum, n = _global_per_file_ceiling(m["anchors"][str(i)], m["s_max"])
+            score, linear_sum, n = tool._global_per_file_ceiling(
+                m["anchors"][str(i)], m["s_max"]
+            )
             assert score == expected["score"], f"file {i}"
             assert linear_sum == expected["linear_sum"], f"file {i}"
             assert n == expected["n_segments"], f"file {i}"
@@ -92,9 +107,38 @@ class TestNUM3GroundTruthDerivability:
                 encoding="utf-8"
             )
         )
-        file_vector, scalar = _anchor_normalized_ceiling(m["anchors"], m["s_max"])
+        file_vector, scalar = tool._anchor_normalized_ceiling(m["anchors"], m["s_max"])
         assert scalar == ceiling["scalar_score"]
         assert file_vector == ceiling["file_vector"]
+
+
+class TestGroundTruthFormulaBoundaries:
+    def test_zero_linear_mean_returns_negative_infinity(self):
+        tool = _load_ground_truth_tool()
+        score, linear_sum, n_segments = tool._global_per_file_ceiling(
+            [0.0, 0.0, 0.0], 10.0
+        )
+        assert score == float("-inf")
+        assert linear_sum == 0.0
+        assert n_segments == 3
+
+    def test_per_file_formula_uses_declared_global_maximum(self):
+        tool = _load_ground_truth_tool()
+        anchors = [2.0, 4.0]
+        score_at_two, _, _ = tool._global_per_file_ceiling(anchors, 2.0)
+        score_at_four, _, _ = tool._global_per_file_ceiling(anchors, 4.0)
+        assert score_at_two > score_at_four
+        assert score_at_two - score_at_four == pytest.approx(math.log(2.0, 5.27))
+
+    def test_scalar_weights_files_by_segment_count(self):
+        tool = _load_ground_truth_tool()
+        file_vector, scalar = tool._anchor_normalized_ceiling(
+            {"0": [10.0], "1": [1.0, 1.0, 1.0, 1.0]},
+            10.0,
+        )
+        assert file_vector == [10.0, 0.1]
+        assert scalar == pytest.approx(math.log(2.08, 5.27))
+        assert scalar != pytest.approx(math.log(sum(file_vector) / 2, 5.27))
 
 
 class TestNUM4PerFileArtifactConsistency:
@@ -104,15 +148,19 @@ class TestNUM4PerFileArtifactConsistency:
         ``score == _grand_mean_log_scalar(linear_sum, n_segments)`` — the
         PRODUCTION grand-mean/log helper, not a test-side formula."""
         prefix = (
-            "raw_baseline_score_file_" if family == "raw_baseline" else "ground_truth_score_file_"
+            "raw_baseline_score_file_"
+            if family == "raw_baseline"
+            else "ground_truth_score_file_"
         )
         for i in range(20):
             d = json.loads(
-                (REFERENCE / family / f"{prefix}{i:04d}.json").read_text(encoding="utf-8")
+                (REFERENCE / family / f"{prefix}{i:04d}.json").read_text(
+                    encoding="utf-8"
+                )
             )
-            assert d["score"] == _grand_mean_log_scalar(d["linear_sum"], d["n_segments"]), (
-                f"{family} file {i}"
-            )
+            assert d["score"] == _grand_mean_log_scalar(
+                d["linear_sum"], d["n_segments"]
+            ), f"{family} file {i}"
 
 
 class TestNUM5LogBaseCrossModuleIdentity:
@@ -258,9 +306,12 @@ class TestNUM6MechanismReplay:
         monkeypatch.setattr(scoring_utils, "SEGMENT_LENGTH", _N)
         monkeypatch.setattr(scoring_utils, "SEGMENTS_PER_FILE", _SEGS)
         # 1.5 segments: requesting segment 1 slices a 0.5-segment tail.
-        _write_h5(tmp_path / "abra_validation_0000.h5", 2, seed=10, total_override=_N + _N // 2)
+        _write_h5(
+            tmp_path / "abra_validation_0000.h5",
+            2,
+            seed=10,
+            total_override=_N + _N // 2,
+        )
         _write_h5(tmp_path / "denoised_0000.h5", _SEGS, seed=20)
         with pytest.raises(ValueError):
             self._score(tmp_path, {0: [1]})
-
-
