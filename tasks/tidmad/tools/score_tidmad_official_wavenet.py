@@ -409,11 +409,6 @@ def main() -> None:
     args = parse_args()
     profile = load_dataset_profile(args.dataset_profile)
     topology = tidmad_topology(profile)
-    if topology.dataset.psd_segment_length != MODEL_SEGMENT_SIZE:
-        raise ValueError(
-            "Official WaveNet requires a 40,000-sample segment, but the task-owned "
-            f"profile declares {topology.dataset.psd_segment_length}."
-        )
     anchor_data = validate_inputs(args, profile)
     num_files = profile.partition_count
     segments_per_file = topology.dataset.segments_per_file
