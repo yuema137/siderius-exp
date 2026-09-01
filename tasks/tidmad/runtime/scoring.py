@@ -52,9 +52,11 @@ different butterfly ordering, and does not produce bit-identical output.
 """
 
 import gc
+import json
 import math
 import os
 from collections.abc import Callable, Mapping
+from pathlib import Path
 from typing import Any, ClassVar, cast
 
 import h5py
@@ -162,7 +164,8 @@ def get_one_sec_psd(
             float, _h5_group(h5f, "timeseries", "channel0001").attrs["voltage_range_mV"]
         )
         sampling_freq = cast(
-            float, _h5_group(h5f, "timeseries", "channel0001").attrs["sampling_frequency"]
+            float,
+            _h5_group(h5f, "timeseries", "channel0001").attrs["sampling_frequency"],
         )
 
         scaling = np.float32(volt_range / (2 * 128.0))
@@ -178,7 +181,9 @@ def get_one_sec_psd(
         psd_chunk = (
             dt
             / N
-            * (abs(np.fft.rfft(TS.astype(np.float64).reshape(len(TS) // N, N))) ** 2).sum(0)[1:]
+            * (
+                abs(np.fft.rfft(TS.astype(np.float64).reshape(len(TS) // N, N))) ** 2
+            ).sum(0)[1:]
         )
         freq_array = np.linspace(0, 5 * 1e6, int(N / 2))
 
@@ -293,7 +298,9 @@ def _sample_set_bounds(profile: "DatasetProfile | None") -> tuple[int, int | Non
     """
     resolved = profile if profile is not None else resolve_dataset_profile()
     try:
-        return resolved.partition_count, tidmad_topology(resolved).dataset.segments_per_file
+        return resolved.partition_count, tidmad_topology(
+            resolved
+        ).dataset.segments_per_file
     except ValueError:
         return resolved.partition_count, None
 
@@ -445,19 +452,25 @@ def score_segments(
     if raw_data_dir is None:
         raw_data_dir = data_dir
     if raw_filename is None:
-        raw_filename = resolve_tidmad_topology().dataset.validation_file_name(file_index)
+        raw_filename = resolve_tidmad_topology().dataset.validation_file_name(
+            file_index
+        )
 
     file_anchors = anchor_map[str(file_index)]
     weighted_snrs = []
 
     for local_idx, seg_idx in enumerate(segment_indices):
         # CH2 center freq from raw validation file (use original segment index)
-        freq_ch2, psd_ch2 = get_one_sec_psd(raw_data_dir, raw_filename, ch=2, start=seg_idx)
+        freq_ch2, psd_ch2 = get_one_sec_psd(
+            raw_data_dir, raw_filename, ch=2, start=seg_idx
+        )
         _, center_freq = get_snr(freq_ch2, psd_ch2)
 
         # CH1 SNR from denoised file (use local position — trial mode
         # packs segments contiguously: original seg_idx → position local_idx)
-        freq_ch1, psd_ch1 = get_one_sec_psd(data_dir, denoised_filename, ch=1, start=local_idx)
+        freq_ch1, psd_ch1 = get_one_sec_psd(
+            data_dir, denoised_filename, ch=1, start=local_idx
+        )
         snr_squid = get_snr(freq_ch1, psd_ch1, target=center_freq)[0]
 
         # Anchor weight: pre-computed CH2 SNR / global max
@@ -518,7 +531,14 @@ def _collect_raw_pairs(
     symmetric with ``denoised_filename``, which has always travelled that
     way.
     """
-    data_dir, denoised_filename, file_index, segment_indices, raw_data_dir, raw_filename = args
+    (
+        data_dir,
+        denoised_filename,
+        file_index,
+        segment_indices,
+        raw_data_dir,
+        raw_filename,
+    ) = args
     if raw_data_dir is None:
         raw_data_dir = data_dir
 
@@ -526,14 +546,18 @@ def _collect_raw_pairs(
     for local_idx, seg_idx in enumerate(segment_indices):
         # CH2 (ground truth) from the raw validation file — provides both
         # snr_sg and the center frequency for the matched-filter CH1 SNR.
-        freq_ch2, psd_ch2 = get_one_sec_psd(raw_data_dir, raw_filename, ch=2, start=seg_idx)
+        freq_ch2, psd_ch2 = get_one_sec_psd(
+            raw_data_dir, raw_filename, ch=2, start=seg_idx
+        )
         snr_sg, center_freq = get_snr(freq_ch2, psd_ch2)
 
         # CH1 (SQUID / denoised) from the denoised file. Trial-mode layouts
         # pack sampled segments contiguously, so read by ``local_idx`` not
         # ``seg_idx``. Formal mode has all 200 segments in place and
         # ``local_idx == seg_idx``.
-        freq_ch1, psd_ch1 = get_one_sec_psd(data_dir, denoised_filename, ch=1, start=local_idx)
+        freq_ch1, psd_ch1 = get_one_sec_psd(
+            data_dir, denoised_filename, ch=1, start=local_idx
+        )
         snr_squid = get_snr(freq_ch1, psd_ch1, target=center_freq)[0]
 
         # v17 NaN filter — ``get_snr`` returns NaN when the noise window
@@ -755,8 +779,54 @@ class TidmadDenoisingMetric(EvaluationMetric):
         self, deliverables: Mapping[int, str], /, **compute_kwargs: Any
     ) -> tuple[float, list[float | None] | None, tuple[str, ...]]:
         del deliverables
+        if "evaluation_payload" in compute_kwargs:
+            compute_kwargs = _task_owned_score_kwargs(compute_kwargs)
         file_vector, scalar = score_vector(**compute_kwargs)
         return scalar, file_vector, ("anchor_map",)
+
+
+def _task_owned_score_kwargs(compute_kwargs: Mapping[str, Any]) -> dict[str, Any]:
+    """Translate the generic composed-scoring carrier into TIDMAD vocabulary."""
+    payload = compute_kwargs.get("evaluation_payload")
+    scope = compute_kwargs.get("task_scope")
+    data_dir = compute_kwargs.get("data_dir")
+    if not isinstance(payload, Mapping):
+        raise TypeError("TIDMAD evaluation_payload must map file indices to paths")
+    sample_set = getattr(scope, "sample_set", None)
+    if not isinstance(sample_set, dict):
+        raise TypeError("TIDMAD task_scope must expose its validated sample_set")
+    if not isinstance(data_dir, str) or not data_dir:
+        raise TypeError("TIDMAD composed scoring requires a physical data_dir")
+
+    deliverables = {int(file_index): str(path) for file_index, path in payload.items()}
+    missing = sorted(set(map(int, sample_set)) - set(deliverables))
+    if missing:
+        raise ValueError(f"TIDMAD evaluation payload is missing scoped files {missing}")
+
+    anchor_path = Path(data_dir) / "segment_anchors.json"
+    try:
+        anchor_data = json.loads(anchor_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(
+            f"cannot load TIDMAD anchor map at {anchor_path}: {exc}"
+        ) from exc
+    if (
+        not isinstance(anchor_data, dict)
+        or not {"anchors", "s_max"} <= anchor_data.keys()
+    ):
+        raise ValueError(
+            f"TIDMAD anchor map at {anchor_path} is missing anchors or s_max"
+        )
+
+    return {
+        "data_dir": data_dir,
+        "sample_set": sample_set,
+        "anchor_map": anchor_data["anchors"],
+        "s_max": anchor_data["s_max"],
+        "denoised_filename_fn": lambda file_index: deliverables[int(file_index)],
+        "raw_data_dir": data_dir,
+        "profile": getattr(scope, "profile", None),
+    }
 
 
 # ---------------------------------------------------------------------------

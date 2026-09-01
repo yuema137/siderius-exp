@@ -58,6 +58,7 @@ from execute_tools.task_data_path import (
     EvalMaterializationParams,
     EvaluationReadRequest,
     ScopeBuildRequest,
+    TaskEvaluationPayload,
     ValidationScopeError,
 )
 
@@ -196,7 +197,9 @@ class TIDMADEpochDataset(Dataset):
 
             with h5py.File(file_path, "r") as f:
                 ch1 = _h5_dataset(f, "timeseries", channels.input_channel, "timeseries")
-                ch2 = _h5_dataset(f, "timeseries", channels.target_channel, "timeseries")
+                ch2 = _h5_dataset(
+                    f, "timeseries", channels.target_channel, "timeseries"
+                )
                 for psd_idx in segments:
                     start = psd_idx * psd_len
                     end = start + psd_len
@@ -214,7 +217,10 @@ class TIDMADEpochDataset(Dataset):
             self.psd_segments_read += len(segments)
             file_rows = len(segments) * ml_segs_per_psd
             if file_rows:
-                self.file_row_ranges[file_index] = (rows_so_far, rows_so_far + file_rows)
+                self.file_row_ranges[file_index] = (
+                    rows_so_far,
+                    rows_so_far + file_rows,
+                )
                 rows_so_far += file_rows
 
             gc.collect()
@@ -277,7 +283,9 @@ def is_complete_trial_output(
     resolved = storage if storage is not None else default_deliverable_storage()
     try:
         with h5py.File(path, "r") as handle:
-            channel1 = _h5_dataset(handle, "timeseries", resolved.input_channel_group, "timeseries")
+            channel1 = _h5_dataset(
+                handle, "timeseries", resolved.input_channel_group, "timeseries"
+            )
             channel2 = _h5_dataset(
                 handle, "timeseries", resolved.target_channel_group, "timeseries"
             )
@@ -350,12 +358,16 @@ class TidmadTaskDataPath:
             )
         return scope
 
-    def training_dataset(self, scope: object, params: EpochSamplingParams) -> Dataset[Any]:
+    def training_dataset(
+        self, scope: object, params: EpochSamplingParams
+    ) -> Dataset[Any]:
         s = self._scope(scope)
         # The caller's freeze-subsample choice is already folded into
         # ``epoch_seed`` (child §3); a None seed preserves the class's own
         # unseeded default.
-        rng = random.Random(params.epoch_seed) if params.epoch_seed is not None else None
+        rng = (
+            random.Random(params.epoch_seed) if params.epoch_seed is not None else None
+        )
         return TIDMADEpochDataset(
             data_dir=params.data_dir,
             sample_set=s.sample_set,
@@ -382,7 +394,9 @@ class TidmadTaskDataPath:
     #: request's OPAQUE `task_parameters` (D-BC-1 extension, B3).
     _SEG_SIZE_PARAMETER: ClassVar[str] = "seg_size"
 
-    def _build_scope(self, request: ScopeBuildRequest, *, strategy: str, seed: int | None):
+    def _build_scope(
+        self, request: ScopeBuildRequest, *, strategy: str, seed: int | None
+    ):
         profile = resolve_dataset_profile()
         seg_size = request.task_parameters.get(self._SEG_SIZE_PARAMETER)
         if not isinstance(seg_size, int) or seg_size <= 0:
@@ -402,14 +416,18 @@ class TidmadTaskDataPath:
             trial_portion=request.portion,
             target_files=list(request.target_partitions) or None,
             seed=seed,
-            scope=DataScope.from_cli(request.subset_ref) if request.subset_ref else None,
+            scope=DataScope.from_cli(request.subset_ref)
+            if request.subset_ref
+            else None,
             profile=profile,
         )
         return TidmadScope(sample_set=sample_set, seg_size=seg_size, profile=profile)
 
     def build_training_scope(self, request: ScopeBuildRequest) -> object:
         """The attempt's TRAINING scope, through the existing authority."""
-        return self._build_scope(request, strategy=request.selection_strategy, seed=request.seed)
+        return self._build_scope(
+            request, strategy=request.selection_strategy, seed=request.seed
+        )
 
     def build_eval_scope(self, request: ScopeBuildRequest) -> object:
         """The attempt's EVALUATION scope.
@@ -418,7 +436,9 @@ class TidmadTaskDataPath:
         (``policy.py:1169``); the CALLER resolves that and hands it here, so
         this method does not re-decide policy it does not own.
         """
-        return self._build_scope(request, strategy=request.selection_strategy, seed=request.seed)
+        return self._build_scope(
+            request, strategy=request.selection_strategy, seed=request.seed
+        )
 
     def trial_anchor_path(self, data_root: str) -> str:
         """TIDMAD's trial-anchoring artifact (B7, satellite (e)).
@@ -457,7 +477,9 @@ class TidmadTaskDataPath:
         try:
             decoded = json.loads(payload)
         except json.JSONDecodeError as exc:
-            raise ValueError(f"TIDMAD scope payload is not valid JSON ({exc}).") from exc
+            raise ValueError(
+                f"TIDMAD scope payload is not valid JSON ({exc})."
+            ) from exc
         if not isinstance(decoded, dict):
             raise ValueError(
                 f"TIDMAD scope payload must be a JSON object, got {type(decoded).__name__}."
@@ -477,13 +499,17 @@ class TidmadTaskDataPath:
                 sample_set={int(k): list(v) for k, v in decoded["sample_set"].items()},
                 seg_size=decoded["seg_size"],
                 profile=(
-                    DatasetProfile.model_validate(raw_profile) if raw_profile is not None else None
+                    DatasetProfile.model_validate(raw_profile)
+                    if raw_profile is not None
+                    else None
                 ),
             )
         except (TypeError, ValueError, AttributeError) as exc:
             raise ValueError(f"TIDMAD scope payload is malformed ({exc}).") from exc
 
-    def validation_dataset(self, scope: object, params: EvalMaterializationParams) -> Dataset[Any]:
+    def validation_dataset(
+        self, scope: object, params: EvalMaterializationParams
+    ) -> Dataset[Any]:
         """Materialize the validation scope EXACTLY, failing closed.
 
         The exact-materialization check relocated verbatim from the engine's
@@ -504,16 +530,22 @@ class TidmadTaskDataPath:
             file_family="validation",
         )
         profile = s.profile or resolve_dataset_profile()
-        ml_segs_per_psd = tidmad_topology(profile).dataset.psd_segment_length // s.seg_size
+        ml_segs_per_psd = (
+            tidmad_topology(profile).dataset.psd_segment_length // s.seg_size
+        )
         per_file_requested = {
-            int(k): len(segments) * ml_segs_per_psd for k, segments in s.sample_set.items()
+            int(k): len(segments) * ml_segs_per_psd
+            for k, segments in s.sample_set.items()
         }
         requested_rows = sum(per_file_requested.values())
         materialized = len(ds)
         per_file_materialized = {
             idx: end - start for idx, (start, end) in ds.file_row_ranges.items()
         }
-        if materialized != requested_rows or per_file_materialized != per_file_requested:
+        if (
+            materialized != requested_rows
+            or per_file_materialized != per_file_requested
+        ):
             raise ValidationScopeError(
                 f"validation scope materialized {materialized} ML rows "
                 f"({per_file_materialized!r}) but {requested_rows} were requested "
@@ -611,7 +643,9 @@ class TidmadTaskDataPath:
                         f"TIDMAD prediction has decoded shape {decoded.shape}; "
                         f"expected {(scope.seg_size,)}"
                     )
-                denoised[local_row] = (decoded - encoding.value_offset).astype(storage_np)
+                denoised[local_row] = (decoded - encoding.value_offset).astype(
+                    storage_np
+                )
                 consumed += 1
 
             self._persist_file(
@@ -691,4 +725,4 @@ class TidmadTaskDataPath:
             if entry != expected:
                 continue
             payload[file_index] = os.path.join(request.deliverable_dir, entry)
-        return payload
+        return TaskEvaluationPayload(value=payload, deliverables=payload)
