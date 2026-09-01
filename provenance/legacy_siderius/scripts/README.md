@@ -65,3 +65,10 @@ the historical 6.3556 phantom. It fixes TIDMAD's 10-Msample segment geometry,
 millivolt conversion, and the investigated `noise <= 1e-10` threshold. Its
 pre-move SHA-256 identity is
 `97e3813d37486fcddc9b7ce9870afceede553c7f56c194431e26873cd6a9b409`.
+
+`render_proposer_prompts_for_audit.py` preserves the historical Checkpoint-P
+human prompt audit. Its synthetic evidence fixes PUNet/WaveNet, TIDMAD score
+and band semantics, a FreLE literature finding, a legacy RTX 3090 context,
+and the P-a through P-e commit ladder. Current generic proposer contracts and
+prompt tests remain in SIDERIUS. Its pre-move SHA-256 identity is
+`687564e8b9bd7086c258d241c5e68c15b78580af7cd2928d42e9175f4ea352c2`.
