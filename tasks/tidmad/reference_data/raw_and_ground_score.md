@@ -87,7 +87,7 @@ scalar_score = log_{5.27}(grand_mean)                               # -inf if gr
 | headroom (ceiling − baseline)  |       9.1127 | derived                                                   |
 
 Both scalars are computed by the same anchor-normalized grand-mean path —
-`compute_raw_baseline._maybe_write_anchor_normalized_scalar` and
+`tasks.tidmad.tools.compute_raw_baseline._maybe_write_anchor_normalized_scalar` and
 `compute_ground_truth._anchor_normalized_ceiling` are symmetric aggregators
 that sum `linear_sum` and `n_segments` across the 20 fine files before
 applying `log_{5.27}(grand_mean)`. The production scorer
@@ -98,4 +98,4 @@ Under trial-mode non-uniform sampling (`|S_f|` differs across files), the
 grand mean does not equal `mean_f(per_file_log)` — which is why averaging
 the per-file log scores is misleading and not shown here.
 
-See `docs/align_denoising_score.md` §4 and §C.2 for the full derivation.
+The generator and its focused aggregation tests live with this task package.
