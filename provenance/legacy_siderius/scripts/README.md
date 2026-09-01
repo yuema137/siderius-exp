@@ -35,3 +35,11 @@ SHA-256 identities are
 `c4ae7420edbe95a7cf80c7659d76ae423763bf6f47f2a76ca65a8830734323b4`,
 and
 `a38cae98eb029d6173448009f0271ead8804c116167425fbaed4a589db7e2941`.
+
+`build_diagnostic_summary.py` and the round-7 `agent_012` Health
+reproducer preserve the pre-V17 TIDMAD diagnostic review path. They encode a
+ten-round completion rule, TIDMAD score/vector fields, recovered HDF5
+artifacts, the PUNet launch decision, and a historical scientific collapse
+fingerprint. Their pre-move SHA-256 identities are
+`66cf0385178ff7f47279723dad6de154f02c0d859497e42b5d2c2d511d7d0529` and
+`65249c823b5bb4ea31057395a2dd571af274848e86355ca1bf796ad82bb5d75d`.
