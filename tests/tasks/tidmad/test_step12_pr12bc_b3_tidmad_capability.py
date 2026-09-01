@@ -32,14 +32,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 
 import h5py
 import numpy as np
 import pytest
 
 from execute_tools.dataset_config import (
-    NUM_FILES,
-    SEGMENTS_PER_FILE,
     ChannelIdentity,
     DataScope,
     DatasetConfig,
@@ -55,8 +54,14 @@ from execute_tools.task_data_path import (
     resolve_task_scope_capability,
 )
 from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
+from tasks.tidmad.runtime.profile import tidmad_topology
 
 IMPL = TidmadTaskDataPath()
+TASK_ROOT = Path(__file__).resolve().parents[3] / "tasks" / "tidmad"
+TASK_PROFILE = DatasetProfile.model_validate_json(
+    (TASK_ROOT / "resolved" / "dataset_profile.json").read_text(encoding="utf-8")
+)
+TASK_TOPOLOGY = tidmad_topology(TASK_PROFILE)
 SEG_SIZE = 10_000
 SMALL_DATASET = DatasetConfig(
     psd_segment_length=40,
@@ -77,6 +82,13 @@ SMALL_PROFILE = DatasetProfile(
     health_peek_files=[1],
 )
 SMALL_SEG_SIZE = 10
+
+
+@pytest.fixture(autouse=True)
+def _bind_task_owned_profile():
+    """Run every capability witness under TIDMAD's declared profile."""
+    with bind_dataset_profile(TASK_PROFILE):
+        yield
 
 
 def _request(**kw) -> ScopeBuildRequest:
@@ -118,7 +130,10 @@ class TestTidmadDeclaresTheCapability:
         assert "build_sample_set(" in src
         for copied in ("rng.sample(", "random.Random(", "anchor_selection_files"):
             assert (
-                copied not in src.split("def _build_scope")[1].split("def build_training_scope")[0]
+                copied
+                not in src.split("def _build_scope")[1].split(
+                    "def build_training_scope"
+                )[0]
             ), (
                 f"{copied!r} appears inside _build_scope — the selection logic was COPIED, not called"
             )
@@ -240,8 +255,11 @@ class TestTheUnseededDrawKeepsItsContract:
 
     def test_the_unseeded_draw_still_obeys_the_declared_topology(self):
         built = IMPL.build_training_scope(_request(portion=0.05, seed=None))
-        assert sorted(built.sample_set) == list(range(NUM_FILES))
-        assert all(len(v) == round(0.05 * SEGMENTS_PER_FILE) for v in built.sample_set.values())
+        assert sorted(built.sample_set) == list(range(TASK_TOPOLOGY.dataset.num_files))
+        assert all(
+            len(v) == round(0.05 * TASK_TOPOLOGY.dataset.segments_per_file)
+            for v in built.sample_set.values()
+        )
 
 
 # ======================================================================
@@ -283,7 +301,9 @@ class TestSerializationIsCanonical:
         """A scope that lost its profile would materialize against whatever
         was ambient — the exact defect the explicit-profile work removed.
         """
-        scope = TidmadScope(sample_set={0: [0]}, seg_size=SMALL_SEG_SIZE, profile=SMALL_PROFILE)
+        scope = TidmadScope(
+            sample_set={0: [0]}, seg_size=SMALL_SEG_SIZE, profile=SMALL_PROFILE
+        )
         back = IMPL.deserialize_scope(IMPL.serialize_scope(scope))
         assert back.profile == SMALL_PROFILE
         assert back.profile.partition_count == SMALL_DATASET.num_files
@@ -306,7 +326,9 @@ class TestDeserializationFailsClosed:
 
     def test_an_untagged_payload_is_refused(self):
         with pytest.raises(ValueError, match="declares kind None"):
-            IMPL.deserialize_scope(json.dumps({"sample_set": {"0": [0]}, "seg_size": 10}))
+            IMPL.deserialize_scope(
+                json.dumps({"sample_set": {"0": [0]}, "seg_size": 10})
+            )
 
     @pytest.mark.parametrize("missing", ["sample_set", "seg_size"])
     def test_a_truncated_payload_names_what_is_missing(self, missing):
@@ -334,7 +356,9 @@ class TestDeserializationFailsClosed:
         """``TidmadScope`` declares ``ge=1``; a zero would divide by zero deep
         inside materialization instead.
         """
-        payload = json.dumps({"kind": "tidmad_scope_v1", "sample_set": {"0": [0]}, "seg_size": 0})
+        payload = json.dumps(
+            {"kind": "tidmad_scope_v1", "sample_set": {"0": [0]}, "seg_size": 0}
+        )
         with pytest.raises(ValueError, match="malformed"):
             IMPL.deserialize_scope(payload)
 
@@ -347,7 +371,9 @@ class TestScopeConstructionFailsClosed:
         """
         with pytest.raises(ValueError, match="requires a positive 'seg_size'"):
             IMPL.build_training_scope(
-                ScopeBuildRequest(round_kind="trial", selection_strategy="snapshot", portion=0.1)
+                ScopeBuildRequest(
+                    round_kind="trial", selection_strategy="snapshot", portion=0.1
+                )
             )
 
     @pytest.mark.parametrize("bad", [0, -1, "10000", 1.5, None])
@@ -361,7 +387,9 @@ class TestScopeConstructionFailsClosed:
         unchanged — the capability relocates the call, it does not soften it.
         """
         with pytest.raises(ValueError, match="not allowed under a partial DataScope"):
-            IMPL.build_training_scope(_request(selection_strategy="anchors", subset_ref="4-9"))
+            IMPL.build_training_scope(
+                _request(selection_strategy="anchors", subset_ref="4-9")
+            )
 
 
 # ======================================================================
@@ -407,7 +435,9 @@ class TestARoundTrippedScopeMaterializesIdentically:
         round_tripped = IMPL.deserialize_scope(IMPL.serialize_scope(built))
         ds = IMPL.training_dataset(
             round_tripped,
-            EpochSamplingParams(data_dir=small_data_dir, epoch_seed=7, train_portion=1.0),
+            EpochSamplingParams(
+                data_dir=small_data_dir, epoch_seed=7, train_portion=1.0
+            ),
         )
         assert len(ds) == 24
         assert ds.psd_segments_read == 6
