@@ -8,6 +8,45 @@ from tasks.tidmad.runtime.profile import tidmad_topology
 
 TASK_ROOT = Path(__file__).resolve().parents[3] / "tasks" / "tidmad"
 
+EXPECTED_SEGMENTATION_SIZES = [
+    100,
+    125,
+    128,
+    160,
+    200,
+    250,
+    320,
+    400,
+    500,
+    625,
+    640,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3125,
+    3200,
+    4000,
+    5000,
+    6250,
+    8000,
+    10000,
+    12500,
+    15625,
+    16000,
+    20000,
+    25000,
+    31250,
+    40000,
+    50000,
+    62500,
+    78125,
+    80000,
+    100000,
+]
+
 
 def test_resolved_profile_drives_the_task_owned_topology() -> None:
     """Catches task tools falling back to a framework-shipped TIDMAD profile."""
@@ -31,7 +70,7 @@ def test_resolved_profile_drives_the_task_owned_topology() -> None:
         "value_offset": 128,
         "num_classes": 256,
     }
-    assert 40_000 in topology.dataset.valid_segmentation_sizes()
+    assert topology.dataset.valid_segmentation_sizes() == EXPECTED_SEGMENTATION_SIZES
 
 
 def test_profile_without_tidmad_sections_refuses() -> None:
