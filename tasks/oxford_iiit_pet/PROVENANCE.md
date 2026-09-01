@@ -81,7 +81,8 @@ any regeneration commit.
 curl -sSL -o /tmp/pets/annotations.tar.gz https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz
 sha256sum /tmp/pets/annotations.tar.gz      # must equal the archive SHA-256 above
 tar -xzf /tmp/pets/annotations.tar.gz -C /tmp/pets annotations/trainval.txt annotations/test.txt
-.venv/bin/python -m tools.example_packs.oxford_iiit_pet --annotations-dir /tmp/pets/annotations
+.venv/bin/python -m tasks.oxford_iiit_pet.tools.oxford_iiit_pet \
+  --annotations-dir /tmp/pets/annotations
 ```
 
 A regeneration that changes any manifest byte must be committed with its

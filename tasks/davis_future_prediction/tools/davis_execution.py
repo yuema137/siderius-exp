@@ -15,7 +15,7 @@ Derives, from the PR0-frozen `sequences.csv` and the SHA-pinned frames:
 
 Regenerate::
 
-    .venv/bin/python -m tools.example_packs.davis_execution \
+    .venv/bin/python -m tasks.davis_future_prediction.tools.davis_execution \
         --data-root /home/klz/Data/DAVIS_2017
 """
 
@@ -40,7 +40,7 @@ from tasks.davis_future_prediction.runtime.davis_data_path import (
     load_davis_sequences,
     window_probe_sha256,
 )
-from tools.example_packs._common import repo_root, write_json, write_text
+from tasks.shared.artifact_io import repo_root, write_json, write_text
 
 PACK_DIRNAME = "davis_future_prediction"
 MANIFEST_RELDIR = Path("data") / "manifests"

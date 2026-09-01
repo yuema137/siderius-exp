@@ -16,7 +16,7 @@ Derives, from the FROZEN identity manifests and the machine-local images:
 
 Regenerate (identity manifests and images must already exist)::
 
-    .venv/bin/python -m tools.example_packs.oxford_iiit_pet_execution \
+    .venv/bin/python -m tasks.oxford_iiit_pet.tools.oxford_iiit_pet_execution \
         --images-root /home/klz/Data/OXFORD_IIIT_PET/images
 """
 
@@ -34,8 +34,8 @@ from tasks.oxford_iiit_pet.runtime.pets_data_path import (
     RESIZE_SHORTER_SIDE,
     transform_probe_sha256,
 )
-from tools.example_packs._common import repo_root, write_json, write_sha256sums, write_text
-from tools.example_packs.oxford_iiit_pet import (
+from tasks.shared.artifact_io import repo_root, write_json, write_sha256sums, write_text
+from tasks.oxford_iiit_pet.tools.oxford_iiit_pet import (
     MANIFEST_RELDIR,
     PACK_DIRNAME,
     ManifestRow,

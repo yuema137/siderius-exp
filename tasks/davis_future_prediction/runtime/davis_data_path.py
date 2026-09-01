@@ -17,9 +17,8 @@ FROZEN TRANSFORM (child design §2.3; task table §22.9a):
             context [3,8,128,224] (start..start+7) + target [3,4,128,224]
             (start+8..start+11)
 
-Manifest parsing lives HERE, not in the pack tooling: production must never
-import `tools.example_packs` (§22.23.9 separability — the D14-2 C7 lesson,
-applied from the start).
+Manifest parsing lives HERE, not in task artifact-generation tooling. Runtime
+execution must not depend on an operator-only generator.
 
 BOUNDARIES (parent Amendment 2): codec only — the global-MSE metric and its
 scoreability belong to the Step-06 authority.

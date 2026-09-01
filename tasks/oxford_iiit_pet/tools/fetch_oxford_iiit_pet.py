@@ -15,7 +15,7 @@ independently corroborated: the archive's MD5 equals torchvision's official
 
 Usage::
 
-    .venv/bin/python -m tools.example_packs.fetch_oxford_iiit_pet \
+    .venv/bin/python -m tasks.oxford_iiit_pet.tools.fetch_oxford_iiit_pet \
         --dest /home/klz/Data/OXFORD_IIIT_PET --extract
 
 Idempotent: an existing archive is VERIFIED (never re-downloaded); a
@@ -29,7 +29,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from tools.example_packs._fetch_common import (
+from tasks.shared.archive_fetch import (
     ArchiveIntegrityError,  # noqa: F401  (re-exported: tests import it from here)
     ArchiveSpec,
     extract_archive,

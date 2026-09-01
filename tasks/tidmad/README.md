@@ -230,23 +230,14 @@ Full-spectrum 1-D time-series denoising of SQUID dark-matter detector data
 
 ## What this pack demonstrates at PR0
 
-`resolved/` holds **READ-ONLY resolved snapshots** of the five contracts above
-(`dataset_profile`, `model_io_contract`, `deliverable_spec`, `metric_spec`,
-`identity`), **GENERATED** from the production authorities by
-`tools/example_packs/projection.py`. **DO NOT EDIT them — the runtime does not
-read these files as an authoring surface.** To change the task, edit the owning
-path in the table;
-CI (`tests/unit/examples/test_tidmad_projection.py`) regenerates every
-snapshot and deep-compares it, so a drift is a red test resolved by
-regenerating in the same commit as the authority change
-(`.venv/bin/python -m tools.example_packs.projection`).
-
-One nuance worth knowing before you edit anything here: since the shipped
-composition manifest exists, `configs/task_composition/tidmad.yaml` *binds*
-`resolved/dataset_profile.json` and `resolved/metric_spec.json` as its
-declaration references, so a composed run does load those two. That does not
-make them an editing surface — it is precisely why a hand edit is caught as a
-red test rather than being harmless.
+`resolved/` carries the five frozen task declarations above: dataset profile,
+model-I/O contract, deliverable specification, metric specification, and
+identity. They were imported from the reviewed pre-separation projection and
+now have one owner in this task package. The composition reads its declared
+dataset and metric files at runtime; an intentional edit therefore changes
+task identity and must update provenance and external qualification evidence
+in the same commit. There is no framework-side regeneration tool or duplicate
+scientific authority.
 
 The task description, forward-contract prose and health config are
 **referenced**, not copied: their owning YAML files are the authority and a
