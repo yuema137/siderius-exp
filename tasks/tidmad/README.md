@@ -36,7 +36,7 @@ data is, and none ever will be.
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |
 | reference artifacts | `reference_data/raw_baseline/`, `reference_data/ground_truth/`, `reference_data/official_paper_result/` | metric floor, metric ceiling, paper-comparable scores |
 | reference loader | `runtime/reference_scores.py` | task-owned loading and validation of the frozen floor, ceiling, and ruler |
-| reference and calibration tools | `tools/compute_raw_baseline.py`, `tools/compute_ground_truth.py`, `tools/legacy_fcnet_timing.py`, `tools/fcnet_health_metrics_scan.py`, `tools/official_paper_health_scan.py`, `tools/render_official_paper_result.py` | task-owned regeneration of the reference ruler, bounded timing of the official FCNet source, calibrated Health scans, and deterministic paper-result rendering |
+| reference and calibration tools | `tools/compute_raw_baseline.py`, `tools/compute_ground_truth.py`, `tools/legacy_fcnet_timing.py`, `tools/fcnet_health_metrics_scan.py`, `tools/official_paper_health_scan.py`, `tools/score_tidmad_official_wavenet.py`, `tools/render_official_paper_result.py` | task-owned regeneration of the reference ruler, bounded timing and scoring of official sources, calibrated Health scans, and deterministic paper-result rendering |
 | paper-spec baselines | `reference_data/legacy_baseline_configs.json` | the TIDMAD paper's hyperparameters |
 | the qualification entrypoint | `../../experiments/tidmad/two_iteration_qualification/launch.sh` | experiment-owned workflow treatment |
 
