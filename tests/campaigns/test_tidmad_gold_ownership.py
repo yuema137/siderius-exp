@@ -122,6 +122,9 @@ def test_stage1_dry_run_binds_external_campaign_to_selected_framework(
     assert not str(LLM_ROUTING).startswith(str(checkout))
     assert command[command.index("--min_formal_batch_size") + 1] == "1"
     assert command[command.index("--formal_time_budget_minutes") + 1] == "180"
+    rules = json.loads(command[command.index("--workflow_parameter_rules") + 1])
+    assert rules == {"model_config.segmentation_size": {"exact": 40_000}}
+    assert "--required_segmentation_size" not in command
 
 
 def test_gold_llm_routing_preserves_the_frozen_campaign_identity() -> None:

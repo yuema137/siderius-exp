@@ -289,7 +289,7 @@ GOLD_ALLOWED_OUTPUT_TYPES="regressor"
 #: the paper-spec source of truth. NOT a universal value — transformer's
 #: paper-spec row is 20000 — which is why it is pinned to the reference this
 #: campaign is measured against rather than assumed.
-GOLD_REQUIRED_SEGMENTATION_SIZE=40000
+GOLD_WORKFLOW_PARAMETER_RULES='{"model_config.segmentation_size":{"exact":40000}}'
 #: Fixed so every round is reproducible and the seed is persisted with the run.
 #: v0.1.3 recorded none, so no round could be replayed.
 GOLD_SAMPLING_SEED=20260828
@@ -801,9 +801,11 @@ gold_frozen_chain_args() {
     GOLD_FROZEN_CHAIN_ARGS+=(--allowed_output_types "$GOLD_ALLOWED_OUTPUT_TYPES")
     # Comparability against the FCNet reference, whose paper-spec value is
     # recorded as fcnet.model_cfg.segmentation_size in
-    # tasks/tidmad/reference_data/legacy_baseline_configs.json. REJECTS a mismatch; never
-    # rewrites it, so the persisted record cannot disagree with what ran.
-    GOLD_FROZEN_CHAIN_ARGS+=(--required_segmentation_size "$GOLD_REQUIRED_SEGMENTATION_SIZE")
+    # tasks/tidmad/reference_data/legacy_baseline_configs.json. This uses the
+    # generic workflow rule surface: exact deterministically owns the executed
+    # value, and the canonical rule set joins the workspace run identity.
+    # It is a Gold workflow treatment, not a TIDMAD task default.
+    GOLD_FROZEN_CHAIN_ARGS+=(--workflow_parameter_rules "$GOLD_WORKFLOW_PARAMETER_RULES")
     # v0.1.3 resolved ordering to `shuffle` from the chain default — nothing
     # declared it. Stated explicitly now; the per-band ascending file order is
     # bound in gold_band_args, where the band's own file list already lives.

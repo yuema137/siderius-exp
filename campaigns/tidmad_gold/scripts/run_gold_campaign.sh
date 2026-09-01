@@ -272,7 +272,7 @@ gold_main() {
             echo "  \"subprocess_rlimit_as_gb\": ${GOLD_SUBPROCESS_RLIMIT_AS_GB},"
             echo "  \"task_composition\": null,"
             echo "  \"allowed_output_types\": \"${GOLD_ALLOWED_OUTPUT_TYPES}\","
-            echo "  \"required_segmentation_size\": ${GOLD_REQUIRED_SEGMENTATION_SIZE},"
+            echo "  \"workflow_parameter_rules\": ${GOLD_WORKFLOW_PARAMETER_RULES},"
             echo "  \"order_strategy\": \"sequential\","
             echo "  \"sampling_seed\": ${GOLD_SAMPLING_SEED},"
             echo "  \"llm_config\": \"${GOLD_LLM_CONFIG_ABS}\","
