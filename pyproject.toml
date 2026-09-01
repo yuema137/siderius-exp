@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Private scientific tasks and experiment campaigns for SIDERIUS"
 requires-python = ">=3.12"
 dependencies = [
-    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@521cfb3c7c0daf214e18463da705d0d140157621",
+    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@95867d84bb5d729a492072f9d2b578398c5e7a97",
 ]
 
 [tool.uv]
