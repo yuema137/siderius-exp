@@ -97,4 +97,5 @@ exec bash "$LAUNCHER" \
     --validation_max_samples 15 \
     --trial_vram_budget_gb 10 \
     --formal_vram_budget_gb 16 \
+    --vram_preflight_host_memory_limit_gb 32 \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

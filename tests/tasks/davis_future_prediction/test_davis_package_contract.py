@@ -214,6 +214,7 @@ def test_experiment_dry_run_preserves_the_qualification_treatment(
         "--allowed_output_types": "regressor",
         "--trial_vram_budget_gb": "10",
         "--formal_vram_budget_gb": "16",
+        "--vram_preflight_host_memory_limit_gb": "32",
     }
     for index, command in enumerate(commands, start=1):
         assert command[command.index("--start_iteration") + 1] == str(index)
