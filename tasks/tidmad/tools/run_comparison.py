@@ -34,6 +34,7 @@ import subprocess
 import sys
 import time
 from datetime import UTC
+from pathlib import Path
 from typing import cast
 
 from core.campaign_artifacts import (
@@ -63,7 +64,11 @@ from execute_tools.scoring_utils import score_vector
 SIDERIUS_ROOT = os.environ.get("SIDERIUS_CHECKOUT", "")
 ROOT_DATA_DIR = ""
 DATA_DIR = ""
-LEGACY_CONFIGS_PATH = os.path.join(SIDERIUS_ROOT, "ml_models", "legacy_baseline_configs.json")
+LEGACY_CONFIGS_PATH = str(
+    Path(__file__).resolve().parents[1]
+    / "reference_data"
+    / "legacy_baseline_configs.json"
+)
 HEALTH_CHECKS_PATH = os.path.join(SIDERIUS_ROOT, "configs", "health_checks.yaml")
 
 

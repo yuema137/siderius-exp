@@ -42,7 +42,7 @@ framework checkout nor repository-local configuration selects a task path.
 | raw baseline | `reference_data/raw_baseline/` | metric floor (no denoising) |
 | ground truth | `reference_data/ground_truth/` | metric ceiling |
 | official paper-model scores | `reference_data/official_paper_result/README.md` | paper comparability |
-| paper-spec baseline configs | `ml_models/legacy_baseline_configs.json` | paper-aligned hyperparameters |
+| paper-spec baseline configs | `reference_data/legacy_baseline_configs.json` | paper-aligned hyperparameters |
 | signal frequencies | `reference_data/tidmad_signal_frequencies.txt` | injected-signal reference |
 
 ## Snapshots in `resolved/` — provenance

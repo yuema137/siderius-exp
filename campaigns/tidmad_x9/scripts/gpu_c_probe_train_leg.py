@@ -13,7 +13,7 @@ orchestrator; this file is its two mechanical halves:
     Run ONE minimal REAL training workload on one band and time it. This
     is deliberately the zero-LLM half of ``scripts/run_comparison.py``'s
     Phase 1 baseline-trial path (``run_baseline_trial``): the paper-spec
-    config from ``ml_models/legacy_baseline_configs.json``, ``epochs=1``,
+    config from ``tasks/tidmad/reference_data/legacy_baseline_configs.json``, ``epochs=1``,
     a snapshot SampleSet over the band's DataScope, executed through the
     REAL ``TidmadSandbox.execute_training`` subprocess on real TIDMAD
     data. No LLM, no inference, no scoring — the probe is resource
@@ -60,7 +60,13 @@ CAMPAIGN_BANDS = ("0-3", "4-9", "10-14", "15-19")
 #: bands' different file counts cannot skew the ratio.
 REFERENCE_BAND = "0-3"
 
-LEGACY_CONFIGS_PATH = REPO_ROOT / "ml_models" / "legacy_baseline_configs.json"
+LEGACY_CONFIGS_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "tasks"
+    / "tidmad"
+    / "reference_data"
+    / "legacy_baseline_configs.json"
+)
 
 
 # ---------------------------------------------------------------------------

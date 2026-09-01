@@ -284,7 +284,8 @@ GOLD_FCNET_REFERENCE_JSON="${GOLD_FCNET_REFERENCE_JSON:-}"
 #: output_type (OutputTypeName = classifier|regressor), so it is not listed —
 #: fcnet still participates as a built-in.
 GOLD_ALLOWED_OUTPUT_TYPES="regressor"
-#: fcnet.model_cfg.segmentation_size in ml_models/legacy_baseline_configs.json,
+#: fcnet.model_cfg.segmentation_size in
+#: tasks/tidmad/reference_data/legacy_baseline_configs.json,
 #: the paper-spec source of truth. NOT a universal value — transformer's
 #: paper-spec row is 20000 — which is why it is pinned to the reference this
 #: campaign is measured against rather than assumed.
@@ -800,7 +801,7 @@ gold_frozen_chain_args() {
     GOLD_FROZEN_CHAIN_ARGS+=(--allowed_output_types "$GOLD_ALLOWED_OUTPUT_TYPES")
     # Comparability against the FCNet reference, whose paper-spec value is
     # recorded as fcnet.model_cfg.segmentation_size in
-    # ml_models/legacy_baseline_configs.json. REJECTS a mismatch; never
+    # tasks/tidmad/reference_data/legacy_baseline_configs.json. REJECTS a mismatch; never
     # rewrites it, so the persisted record cannot disagree with what ran.
     GOLD_FROZEN_CHAIN_ARGS+=(--required_segmentation_size "$GOLD_REQUIRED_SEGMENTATION_SIZE")
     # v0.1.3 resolved ordering to `shuffle` from the chain default — nothing
