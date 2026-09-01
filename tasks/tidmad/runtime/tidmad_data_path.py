@@ -44,7 +44,6 @@ from execute_tools.dataset_config import (
     DataScope,
     DatasetProfile,
     resolve_dataset_profile,
-    tidmad_topology,
 )
 from execute_tools.deliverable_spec import (
     DeliverableStorage,
@@ -61,6 +60,7 @@ from execute_tools.task_data_path import (
     TaskEvaluationPayload,
     ValidationScopeError,
 )
+from tasks.tidmad.runtime.profile import tidmad_topology
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 

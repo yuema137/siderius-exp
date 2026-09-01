@@ -45,19 +45,25 @@ is a production defect and a different PR.
 """
 
 import os
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from core.sandbox_executor import TidmadSandbox
-from execute_tools.dataset_config import resolve_tidmad_topology
+from execute_tools.dataset_config import DatasetProfile, bind_dataset_profile
 from execute_tools.sample_set_builder import build_sample_set
 from execute_tools.scoring_utils import validate_sample_set
+from tasks.tidmad.runtime.profile import resolve_tidmad_topology
 from tasks.tidmad.runtime.tidmad_data_path import TIDMADEpochDataset
 
 # Mirrors tests/unit/core/test_sandbox_scope.py — minimal configs that pass
 # Pydantic validation without a GPU or real data.
-MODEL_CFG = {"model_type": "fcnet", "segmentation_size": 10000, "latent_dims": [100, 10]}
+MODEL_CFG = {
+    "model_type": "fcnet",
+    "segmentation_size": 10000,
+    "latent_dims": [100, 10],
+}
 TRAIN_CFG = {"lr": 1e-4, "epochs": 1, "batch_size": 1, "device": "cpu"}
 LOSS_CFG = {"loss_type": "ce"}
 EXP_ID = "b1_roundtrip_exp"
@@ -68,6 +74,22 @@ RUN_NAME = "b1_roundtrip"
 #   lexicographic  -> "12", "4", "9"
 # A test that cannot tell the two apart would pass for the wrong reason.
 DIVERGENT_SS = {4: [0, 1], 9: [5], 12: [2, 3]}
+PROFILE_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "tasks"
+    / "tidmad"
+    / "resolved"
+    / "dataset_profile.json"
+)
+
+
+@pytest.fixture(autouse=True)
+def explicit_task_profile():
+    profile = DatasetProfile.model_validate_json(
+        PROFILE_PATH.read_text(encoding="utf-8")
+    )
+    with bind_dataset_profile(profile):
+        yield
 
 
 @pytest.fixture
@@ -100,7 +122,10 @@ def _sample_set_json_path(sandbox, phase: str, sample_set: dict) -> str:
         patch("core.sandbox_executor.subprocess.run") as m_run,
         patch("core.sandbox_executor.subprocess.Popen") as m_popen,
     ):
-        m_obs.return_value = (type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})(), None)
+        m_obs.return_value = (
+            type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})(),
+            None,
+        )
         try:
             if phase == "train":
                 sandbox.execute_training(
@@ -114,7 +139,12 @@ def _sample_set_json_path(sandbox, phase: str, sample_set: dict) -> str:
                 )
             else:
                 sandbox.execute_inference(
-                    EXP_ID, RUN_NAME, "fcnet", MODEL_CFG, LOSS_CFG, sample_set=sample_set
+                    EXP_ID,
+                    RUN_NAME,
+                    "fcnet",
+                    MODEL_CFG,
+                    LOSS_CFG,
+                    sample_set=sample_set,
                 )
         except Exception:
             # The mocked launch returns no usable result. Only the argv and
@@ -137,7 +167,9 @@ class TestProducerEmitsIntegerKeys:
     """The digests cannot see this: JSON stringifies both int and str keys."""
 
     def test_trial_sample_set_keys_are_int(self):
-        ss = build_sample_set(is_trial=True, trial_strategy="snapshot", trial_portion=0.05, seed=42)
+        ss = build_sample_set(
+            is_trial=True, trial_strategy="snapshot", trial_portion=0.05, seed=42
+        )
         assert ss, "builder returned an empty SampleSet"
         assert all(type(k) is int for k in ss), (
             f"non-int keys: {[k for k in ss if type(k) is not int]}"
@@ -165,7 +197,9 @@ class TestLiveConsumerReintsNumerically:
     """
 
     def _visited(self, capsys, sample_set, tmp_path) -> list[int]:
-        TIDMADEpochDataset(data_dir=str(tmp_path / "absent"), sample_set=sample_set, seg_size=10000)
+        TIDMADEpochDataset(
+            data_dir=str(tmp_path / "absent"), sample_set=sample_set, seg_size=10000
+        )
         out = capsys.readouterr().out
 
         # Map the profile's own filenames back to indices rather than

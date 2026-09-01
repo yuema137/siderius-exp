@@ -71,9 +71,8 @@ from execute_tools.dataset_config import (
     DatasetProfile,
     ScopeViolationError,
     resolve_dataset_profile,
-    resolve_tidmad_topology,
-    tidmad_topology,
 )
+from tasks.tidmad.runtime.profile import resolve_tidmad_topology, tidmad_topology
 
 
 def _h5_dataset(f: h5py.File, *path: str) -> h5py.Dataset:
