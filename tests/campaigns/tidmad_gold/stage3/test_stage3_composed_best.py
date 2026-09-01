@@ -32,8 +32,10 @@ import pytest
 
 from campaigns.tidmad_gold.paths import GOLD_TASK_HEALTH_CONFIG_PATH
 import campaigns.tidmad_gold.stage3.stage3_common as stage3_common
+import campaigns.tidmad_gold.stage3.stage3_composed_best as composed_best
 from core.iteration_manifest import publish_iteration_manifest, sha256_file
 from core.run_invariants import RunInvariants, write_run_invariants
+from core.sandbox_executor import sandbox_models_dir
 from execute_tools.dataset_config import NUM_FILES
 from execute_tools.deliverable_spec import DeliverableNaming
 from execute_tools.health_checks.candidate_eligibility import (
@@ -78,6 +80,22 @@ class _ScoreVectorStub:
 def score_stub(monkeypatch) -> _ScoreVectorStub:
     stub = _ScoreVectorStub()
     monkeypatch.setattr(stage3_common, "score_vector", stub)
+    monkeypatch.setattr(
+        composed_best,
+        "run_full_inference",
+        lambda candidate, **_: {
+            index: str(
+                Path(candidate.source_base_dir)
+                / NAMING.name(
+                    model_type=candidate.model_type,
+                    run_name=candidate.run_name,
+                    exp_id=candidate.exp_id,
+                    input_identity=index,
+                )
+            )
+            for index in candidate.file_indices
+        },
+    )
     return stub
 
 
@@ -108,6 +126,11 @@ def _record(
         "status": "success",
         "exp_id": exp_id,
         "model_type": model_type,
+        "params": {
+            "model_config": {"model_type": model_type},
+            "loss_config": {"loss_type": "ce"},
+            "inference_batch": 1,
+        },
         "denoising_score": score,
         "health_gate_results": gates,
     }
@@ -142,6 +165,7 @@ def _make_band_workspace(
         str(workspace),
         resolved_scope=indices,
         task_health_binding=str(GOLD_TASK_HEALTH_CONFIG_PATH),
+        dataset_partition_count=NUM_FILES,
     )
     required = resolve_scientific_gate_ids(
         str(workspace / "health_checks_effective.yaml")
@@ -175,6 +199,16 @@ def _make_band_workspace(
             del output["metric_spec"]
         output_path = sub / f"run_output_{run_name}.json"
         output_path.write_text(json.dumps(output), encoding="utf-8")
+        models = Path(sandbox_models_dir(str(sub)))
+        models.mkdir(parents=True, exist_ok=True)
+        for record in output["all_records"]:
+            exp_id = record.get("exp_id")
+            model_type = record.get("model_type")
+            if isinstance(exp_id, str) and isinstance(model_type, str):
+                (models / f"model_{model_type}_{exp_id}_agent.pth").write_bytes(
+                    f"checkpoint:{band}:{exp_id}".encode()
+                )
+                (models / f"_OK_{exp_id}").write_text("ok\n", encoding="utf-8")
         for exp_id, deliverable_indices in spec.get("deliverables", {}).items():
             for index in deliverable_indices:
                 name = NAMING.name(
@@ -261,7 +295,7 @@ def test_composed_best_end_to_end_selection_pooling_one_call(tmp_path, score_stu
     and the provenance pins the exact pooled bytes."""
     _make_campaign(tmp_path)
 
-    provenance_path = run(str(tmp_path), ARM)
+    provenance_path = run(str(tmp_path), ARM, str(tmp_path))
 
     provenance = json.loads(Path(provenance_path).read_text())
     winners = {block["band"]: block for block in provenance["winners"]}
@@ -273,10 +307,15 @@ def test_composed_best_end_to_end_selection_pooling_one_call(tmp_path, score_stu
     assert winners["0-3"]["iteration"] == "iter_002"
     assert winners["0-3"]["run_name"] == "iter_002"
     assert winners["0-3"]["experiment_arm"] == ARM
+    assert (
+        winners["0-3"]["checkpoint_sha256"]
+        == hashlib.sha256(b"checkpoint:0-3:expB").hexdigest()
+    )
 
     # ONE scoring call over the full pooled 0..19 set.
     assert len(score_stub.calls) == 1
     assert set(score_stub.calls[0]["sample_set"]) == set(range(NUM_FILES))
+    assert score_stub.calls[0]["raw_data_dir"] == str(tmp_path)
     assert provenance["denoising_score"] == score_stub.scalar
     assert provenance["file_vector"] == score_stub.vector
     assert provenance["metric"] == METRIC
@@ -312,7 +351,7 @@ def test_no_band_scalar_in_provenance_or_stdout(tmp_path, score_stub, capsys):
     winning record's own band-scoped ``denoising_score`` into provenance),
     add any ``band_*``/``*_band`` scalar key, or print a band aggregate."""
     _make_campaign(tmp_path)
-    provenance = json.loads(Path(run(str(tmp_path), ARM)).read_text())
+    provenance = json.loads(Path(run(str(tmp_path), ARM, str(tmp_path))).read_text())
 
     float_leaves: list[tuple[str, float]] = []
     all_keys: list[str] = []
@@ -452,7 +491,7 @@ def test_qs33_persisted_formal_shape_is_selectable(tmp_path):
             for gate in _passing_gates(required)
         ]
         base = _record("expPersisted", -2.0, gates)
-        base.update({"timestamp": "2026-08-26T12:00:00+00:00", "params": {}})
+        base.update({"timestamp": "2026-08-26T12:00:00+00:00"})
         dumped = ExperimentRecord.model_validate(base).model_dump(mode="json")
         # The materialized persisted shape — what the contract's literal
         # absence test misreads as anomalous:
@@ -508,7 +547,7 @@ def test_gate_ruling_divergent_band_specs_are_a_named_refusal(tmp_path):
             iteration["direction"] = "lower"
         _make_band_workspace(tmp_path, band, [iteration])
     with pytest.raises(Stage3ComposedBestError, match="diverges across bands"):
-        run(str(tmp_path), ARM)
+        run(str(tmp_path), ARM, str(tmp_path))
 
 
 def test_tampered_run_output_is_refused(tmp_path):
@@ -548,10 +587,8 @@ def test_scope_mismatch_refuses_the_workspace(tmp_path):
         select_band_winner(str(tmp_path), ARM, band)
 
 
-def test_missing_winner_deliverable_is_refused(tmp_path):
-    """A winner whose source-band deliverable set is incomplete on disk is a
-    refusal citing the Stage-1 retention clause — never a silent partial
-    pool."""
+def test_partial_stage1_deliverable_is_not_selected_as_stage3_input(tmp_path):
+    """Winner selection carries the checkpoint replay plan, not partial outputs."""
     band = BAND_LABELS[0]
     indices = band_file_indices(band)
 
@@ -570,5 +607,7 @@ def test_missing_winner_deliverable_is_refused(tmp_path):
         ],
     )
 
-    with pytest.raises(Stage3ComposedBestError, match="retention"):
-        select_band_winner(str(tmp_path), ARM, band)
+    winner = select_band_winner(str(tmp_path), ARM, band)
+
+    assert winner.deliverable_paths == {}
+    assert list(winner.inference_candidate.file_indices) == indices

@@ -213,12 +213,15 @@ def compose_and_score(
     files: range = range(20),
     sample_set: None = None,
     reconciled_spec: MetricSpec,
+    raw_data_dir: str | None = None,
 ) -> tuple[list[float], float]:
     """Compose a pooled 20-file deliverable set and score it EXACTLY ONCE.
 
-    The frozen §4 interface of ``docs/campaign/stage_artifact_contract.md``.
-    The signature is the contract's, byte-for-byte: ``files`` defaults to the
-    full ``0..19`` set and any OTHER range is refused (full-scope by
+    The §4 interface of ``docs/campaign/stage_artifact_contract.md``.
+    ``raw_data_dir`` is an additive explicit-root input used by Composed Best;
+    existing Strict Best and terminal-evaluation callers retain the legacy
+    ``TIDMAD_DATA_DIR`` compatibility source. ``files`` defaults to the full
+    ``0..19`` set and any OTHER range is refused (full-scope by
     contract — a partial range is the forbidden per-band construction,
     F-SCAND-1); ``sample_set`` is typed ``None`` because ``None`` — the FULL
     sample set — is the only legal value here, and a non-``None`` value is
@@ -239,6 +242,10 @@ def compose_and_score(
             and never alters composition or arithmetic. Callers obtain it by
             reconciling the persisted 09a stamps of the artifacts they pool
             (``reconcile_metric_specs``); this module derives nothing.
+        raw_data_dir: explicit raw-data root. Composed Best always passes the
+            same required ``--data_dir`` used for full inference. Omission is
+            retained only for the existing Strict Best and terminal-evaluation
+            environment contract.
 
     Returns:
         ``(file_vector, scalar)`` — ``score_vector``'s own 2-tuple: the
@@ -281,8 +288,11 @@ def compose_and_score(
             f"never a raw dict and never a fresh derivation."
         )
 
-    if not TIDMAD_DATA_DIR:
-        raise ValueError("TIDMAD_DATA_DIR must name the explicit raw-data root for Stage-3 scoring.")
+    resolved_raw_data_dir = raw_data_dir or TIDMAD_DATA_DIR
+    if not resolved_raw_data_dir:
+        raise ValueError(
+            "raw_data_dir must name the explicit raw-data root for Stage-3 scoring"
+        )
 
     resolved = resolve_pooled_deliverables(
         deliverable_dirs, reconciled_spec=reconciled_spec
@@ -318,7 +328,7 @@ def compose_and_score(
         anchor_map=anchor_data["anchors"],
         s_max=s_max,
         denoised_filename_fn=lambda file_index: resolved[int(file_index)],
-        raw_data_dir=TIDMAD_DATA_DIR,
+        raw_data_dir=resolved_raw_data_dir,
         legacy_mode=False,
     )
 

@@ -81,6 +81,7 @@ from campaigns.tidmad_gold.paths import (
 from agent.schemas.hyperparam_tuning import ExperimentRecord, HyperparamTuningOutput
 from core.iteration_manifest import publish_iteration_manifest
 from core.run_invariants import RunInvariants
+from core.sandbox_executor import sandbox_models_dir
 from execute_tools.deliverable_spec import DeliverableNaming
 from execute_tools.evaluation_metric import (
     TIDMAD_METRIC_ID,
@@ -472,7 +473,9 @@ def build_experiment_record(
         "timestamp": timestamp,
         "file_index": file_index,
         "params": {
-            "note": "adversarial fixture; not a physically meaningful configuration"
+            "model_config": {"model_type": model_type},
+            "loss_config": {"loss_type": "ce"},
+            "inference_batch": 1,
         },
         "denoising_score": denoising_score,
         "health_gate_enabled": True,
@@ -619,6 +622,7 @@ def build_stage1_layout(
             str(workspace),
             resolved_scope=list(files),
             task_health_binding=str(GOLD_TASK_HEALTH_CONFIG_PATH),
+            dataset_partition_count=NUM_FILES,
         )
 
         lock = RunInvariants(
@@ -763,6 +767,14 @@ def build_stage1_layout(
 
             if iteration == winner_iteration:
                 winner_dir = sandbox_base
+                models_dir = Path(sandbox_models_dir(str(sandbox_base)))
+                models_dir.mkdir(parents=True, exist_ok=True)
+                (
+                    models_dir / f"model_{model_type}_{winner_exp_id}_agent.pth"
+                ).write_bytes(f"checkpoint:{band}:{winner_exp_id}".encode())
+                (models_dir / f"_OK_{winner_exp_id}").write_text(
+                    "ok\n", encoding="utf-8"
+                )
                 written = _write_winner_deliverables(
                     sandbox_base,
                     naming=naming,

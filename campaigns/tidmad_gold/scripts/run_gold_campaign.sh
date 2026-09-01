@@ -24,7 +24,7 @@
 # Usage:
 #   bash campaigns/tidmad_gold/scripts/run_gold_campaign.sh \
 #       --siderius-checkout DIR \
-#       --workspace_root DIR --stage 1 \
+#       --workspace_root DIR --data_dir DIR --stage 1 \
 #       --gold_advice_file ADVICE.json \
 #       [--arm goldpod|blindpod] [--task_config PATH] \
 #       [--fcnet_reference_json PATH] [--only 0-3,4-9] \
@@ -136,7 +136,7 @@ gold_usage() {
 }
 
 gold_main() {
-    local WORKSPACE_ROOT="" STAGE="" ARM="goldpod" ADVICE_FILE=""
+    local WORKSPACE_ROOT="" DATA_DIR="" STAGE="" ARM="goldpod" ADVICE_FILE=""
     local SIDERIUS_CHECKOUT_ARG="" TASK_CONFIG=""
     # v0.1.4 operator ruling: the approved per-band FCNet references are
     # bound BY DEFAULT (D-FCNET-REF-1). Unbound, the FCNet+2.0 early stop is
@@ -161,6 +161,7 @@ gold_main() {
         case $1 in
             --siderius-checkout)    SIDERIUS_CHECKOUT_ARG="$2"; shift 2 ;;
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
+            --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --stage)               STAGE="$2"; shift 2 ;;
             --arm)                 ARM="$2"; shift 2 ;;
             --gold_advice_file)    ADVICE_FILE="$2"; shift 2 ;;
@@ -187,6 +188,7 @@ gold_main() {
     # frozen/arm/band-decided flag, by name.
     gold_refuse_reserved_passthrough ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"} || return 1
     gold_workspace_root_check "$WORKSPACE_ROOT" || return 1
+    gold_bind_data_dir "$DATA_DIR" || return 1
     gold_arm_args "$ARM" "$ADVICE_FILE" || return 1
     gold_bind_task_config "$TASK_CONFIG" || return 1
     # D-LLM-1 fail-fast: each stage re-derives its own argv from the same lib
@@ -236,6 +238,7 @@ gold_main() {
     fi
 
     echo "[gold-campaign] arm=$ARM stage=$STAGE workspace_root=$WORKSPACE_ROOT dry_run=$DRY_RUN"
+    echo "[gold-campaign] data_dir=$GOLD_DATA_DIR (explicit caller-owned input)"
     echo "[gold-campaign] BOUND task_config=$GOLD_TASK_CONFIG_ABS sha256=$GOLD_TASK_CONFIG_SHA256 (regression; campaign-owned)"
     echo "[gold-campaign] llm_config=$GOLD_LLM_CONFIG_ABS sha256=$GOLD_LLM_CONFIG_SHA256 (D-LLM-1, every role pinned)"
     if [ "$ARM" = "goldpod" ]; then
@@ -258,6 +261,7 @@ gold_main() {
             echo "{"
             echo "  \"entrypoint\": \"run_gold_campaign.sh\","
             echo "  \"siderius_checkout\": \"${GOLD_PROJECT_DIR}\","
+            echo "  \"data_dir\": \"${GOLD_DATA_DIR}\","
             echo "  \"stage\": ${STAGE},"
             echo "  \"arm\": \"${ARM}\","
             echo "  \"advice_file\": $(if [ -n "$ADVICE_FILE" ]; then printf '"%s"' "$ADVICE_FILE"; else printf '"EXPLICIT_NONE"'; fi),"
@@ -307,6 +311,7 @@ gold_main() {
 
     local COMMON=(
         --workspace_root "$WORKSPACE_ROOT"
+        --data_dir "$GOLD_DATA_DIR"
         --arm "$ARM"
     )
     [ -n "$ADVICE_FILE" ] && COMMON+=(--gold_advice_file "$ADVICE_FILE")

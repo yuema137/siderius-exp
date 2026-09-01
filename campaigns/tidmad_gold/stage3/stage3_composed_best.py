@@ -1,8 +1,8 @@
 """Stage-3 writer: Composed Best (stage_artifact_contract.md §1, §3, §4).
 
-Pools the four Stage-1 band winners' SOURCE-BAND deliverables and emits ONE
-authoritative Composed Best Golden score plus a provenance JSON, under
-``{workspace_root}/stage3/composed_best/``.
+Selects four Stage-1 band winners, replays their exact checkpoints through the
+task-owned full-scope inference path, and emits one authoritative Composed Best
+Golden score plus provenance under ``{workspace_root}/stage3/composed_best/``.
 
 Winner identification implements the contract's §1 table literally, through
 the cited authorities and nothing else:
@@ -26,12 +26,11 @@ the cited authorities and nothing else:
   ``metric_spec`` identity. Never assumed higher-is-better; a missing or
   divergent stamp is a refusal.
 
-Deliverable filenames resolve EXCLUSIVELY through the ``DeliverableNaming``
-authority for (``model_type``, ``run_name``, ``exp_id``, file index) in the
-winning iteration's sandbox base dir (the directory holding the tuner's
-``run_output_*.json`` — ``TidmadSandbox.base_dir``, where production writes
-deliverables: ``core/sandbox_executor.py:1151`` + ``records.py``'s Bug-A
-absolute-path contract).
+The winner identity includes the exact checkpoint digest. Stage 3 copies that
+checkpoint and the winner's run-scoped plugins into an isolated workspace,
+uses the existing inference executor over all 200 segments of each source-band
+file, and validates each complete HDF5 deliverable before scoring. Stage-1's
+bounded 10% deliverables are search evidence only and are never final inputs.
 
 No per-band scalar exists anywhere in this writer's outputs, logs, or
 provenance (F-SCAND-1). Winner provenance entries carry IDENTITY ONLY —
@@ -39,8 +38,9 @@ never the winning record's own band-scoped ``denoising_score``, because a
 band-scoped aggregate is exactly the scalar this stage must not put next to
 three others. Per-band information appears only as per-FILE vector entries.
 
-Reads are strictly read-only against Stage-1 workspaces: the pooled input is
-a symlink farm inside the stage3 namespace pointing at the winners' files.
+Reads are strictly read-only against Stage-1 workspaces. The pooled input is a
+symlink farm inside the Stage-3 namespace pointing at newly replayed full-scope
+deliverables, never at Stage-1's partial outputs.
 """
 
 from __future__ import annotations
@@ -56,12 +56,21 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH, EXPERIMENT_ROOT
+from campaigns.tidmad_gold.paths import (
+    ANCHOR_MAP_PATH,
+    EXPERIMENT_ROOT,
+    GOLD_STAGE3_TASK_COMPOSITION_PATH,
+)
+from campaigns.tidmad_gold.stage3.full_inference import (
+    FullInferenceCandidate,
+    FullInferenceError,
+    run_full_inference,
+)
 from core.iteration_manifest import sha256_file, verify_iteration_manifest
 from core.run_invariants import load_run_invariants
+from core.sandbox_executor import sandbox_models_dir
 from tasks.tidmad.runtime.anchor_map import load_anchor_map
 from execute_tools.dataset_config import NUM_FILES
-from execute_tools.deliverable_spec import DeliverableNaming
 from execute_tools.evaluation_metric import (
     MetricDirection,
     MetricIdentityConflictError,
@@ -133,6 +142,7 @@ class BandWinnerProvenance(BaseModel):
     iteration: str
     exp_id: str
     model_type: str
+    checkpoint_sha256: str
     run_name: str
     experiment_arm: str
     deliverables: list[DeliverableProvenance]
@@ -170,6 +180,7 @@ class _BandWinner(BaseModel):
     run_name: str
     experiment_arm: str
     metric: MetricSpec  # the workspace's RECONCILED 09a stamp (full spec)
+    inference_candidate: FullInferenceCandidate
     deliverable_paths: dict[int, str]
 
 
@@ -380,6 +391,7 @@ class _Candidate(BaseModel):
     run_name: str
     iteration: str
     base_dir: str
+    params: dict[str, Any]
 
 
 def _eligible_candidates(
@@ -415,6 +427,7 @@ def _eligible_candidates(
         exp_id = record.get("exp_id")
         model_type = record.get("model_type")
         score = record.get("denoising_score")
+        params = record.get("params")
         if not isinstance(exp_id, str) or not isinstance(model_type, str):
             raise Stage3ComposedBestError(
                 f"eligible record {where} lacks exp_id/model_type."
@@ -422,6 +435,10 @@ def _eligible_candidates(
         if not isinstance(score, int | float) or isinstance(score, bool):
             raise Stage3ComposedBestError(
                 f"eligible record {where} lacks a numeric score."
+            )
+        if not isinstance(params, dict):
+            raise Stage3ComposedBestError(
+                f"eligible record {where} lacks the persisted execution parameters."
             )
         candidates.append(
             _Candidate(
@@ -431,6 +448,7 @@ def _eligible_candidates(
                 run_name=run_name,
                 iteration=iteration_name,
                 base_dir=os.path.dirname(output_path),
+                params=params,
             )
         )
     return candidates
@@ -513,23 +531,34 @@ def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
     order = MetricOrder(metric)
     winner = order.best(candidates, key=lambda candidate: candidate.score)
 
-    naming = DeliverableNaming()
-    deliverable_paths: dict[int, str] = {}
-    for index in indices:
-        name = naming.name(
-            model_type=winner.model_type,
-            run_name=winner.run_name,
-            exp_id=winner.exp_id,
-            input_identity=index,
+    model_config = winner.params.get("model_config")
+    loss_config = winner.params.get("loss_config")
+    if not isinstance(model_config, dict) or not isinstance(loss_config, dict):
+        raise Stage3ComposedBestError(
+            f"winner {winner.exp_id} lacks model_config/loss_config required for "
+            "full-scope inference replay."
         )
-        path = os.path.join(winner.base_dir, name)
+    inference_batch = winner.params.get("inference_batch")
+    if inference_batch is not None and (
+        not isinstance(inference_batch, int) or isinstance(inference_batch, bool)
+    ):
+        raise Stage3ComposedBestError(
+            f"winner {winner.exp_id} carries invalid inference_batch={inference_batch!r}."
+        )
+    checkpoint_path = os.path.join(
+        sandbox_models_dir(winner.base_dir),
+        f"model_{winner.model_type}_{winner.exp_id}_agent.pth",
+    )
+    sentinel_path = os.path.join(
+        sandbox_models_dir(winner.base_dir), f"_OK_{winner.exp_id}"
+    )
+    for path in (checkpoint_path, sentinel_path):
         if not os.path.isfile(path):
             raise Stage3ComposedBestError(
-                f"winner deliverable missing for file {index}: {path} — the Stage-1 "
-                f"retention clause requires formal-round deliverables to be kept "
-                f"(contract §1); refusing."
+                f"winner {winner.exp_id} lacks checkpoint evidence required for "
+                f"full-scope inference replay: {path}"
             )
-        deliverable_paths[index] = path
+    checkpoint_sha256 = sha256_file(checkpoint_path)
 
     return _BandWinner(
         band=band,
@@ -540,7 +569,20 @@ def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
         run_name=winner.run_name,
         experiment_arm=arm,
         metric=metric,
-        deliverable_paths=deliverable_paths,
+        inference_candidate=FullInferenceCandidate(
+            band=band,
+            source_workspace=workspace,
+            source_base_dir=winner.base_dir,
+            exp_id=winner.exp_id,
+            run_name=winner.run_name,
+            model_type=winner.model_type,
+            checkpoint_sha256=checkpoint_sha256,
+            model_config=model_config,
+            loss_config=loss_config,
+            inference_batch=inference_batch,
+            file_indices=tuple(indices),
+        ),
+        deliverable_paths={},
     )
 
 
@@ -618,6 +660,7 @@ def build_provenance(
                 iteration=winner.iteration,
                 exp_id=winner.exp_id,
                 model_type=winner.model_type,
+                checkpoint_sha256=winner.inference_candidate.checkpoint_sha256,
                 run_name=winner.run_name,
                 experiment_arm=winner.experiment_arm,
                 deliverables=deliverables,
@@ -650,7 +693,7 @@ def _write_provenance(out_root: str, provenance: ComposedBestProvenance) -> str:
     return path
 
 
-def run(workspace_root: str, arm: str) -> str:
+def run(workspace_root: str, arm: str, data_dir: str) -> str:
     """Select, pool, score once, emit provenance. Returns the provenance path."""
     assert_band_partition(BAND_LABELS, NUM_FILES)
 
@@ -683,9 +726,29 @@ def run(workspace_root: str, arm: str) -> str:
 
     out_root = os.path.join(workspace_root, "stage3", "composed_best", arm)
     os.makedirs(out_root, exist_ok=True)
+    inference_root = os.path.join(out_root, "full_inference")
+    os.makedirs(inference_root, exist_ok=True)
+    try:
+        winners = [
+            winner.model_copy(
+                update={
+                    "deliverable_paths": run_full_inference(
+                        winner.inference_candidate,
+                        output_root=inference_root,
+                        data_dir=data_dir,
+                        task_manifest=str(GOLD_STAGE3_TASK_COMPOSITION_PATH),
+                    )
+                }
+            )
+            for winner in winners
+        ]
+    except FullInferenceError as exc:
+        raise Stage3ComposedBestError(str(exc)) from exc
     pooled = materialize_pooled_input(out_root, winners)
 
-    file_vector, scalar = compose_and_score([pooled], reconciled_spec=reconciled)
+    file_vector, scalar = compose_and_score(
+        [pooled], reconciled_spec=reconciled, raw_data_dir=data_dir
+    )
 
     provenance = build_provenance(arm, winners, pooled, file_vector, scalar)
     path = _write_provenance(out_root, provenance)
@@ -703,8 +766,8 @@ def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint."""
     parser = argparse.ArgumentParser(
         description=(
-            "Stage-3 Composed Best: pool the four Stage-1 band winners' source-band "
-            "deliverables and score the composed 20-file set exactly once "
+            "Stage-3 Composed Best: rerun each Stage-1 band winner over its full "
+            "evaluation scope and score the composed 20-file set exactly once "
             "(stage_artifact_contract.md §1/§3/§4)."
         )
     )
@@ -714,13 +777,18 @@ def main(argv: list[str] | None = None) -> int:
         help="The campaign's persistent workspace root (contract conventions).",
     )
     parser.add_argument(
+        "--data_dir",
+        required=True,
+        help="Caller-owned TIDMAD dataset root used for full-scope inference and scoring.",
+    )
+    parser.add_argument(
         "--arm",
         required=True,
         help="The campaign arm label (opaque; must match each workspace's lock).",
     )
     args = parser.parse_args(argv)
     try:
-        run(args.workspace_root, args.arm)
+        run(args.workspace_root, args.arm, args.data_dir)
     except Stage3ComposedBestError as error:
         print(f"[stage3.composed_best] REFUSED: {error}", file=sys.stderr)
         return 2

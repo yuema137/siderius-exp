@@ -72,10 +72,10 @@ from execute_tools.evaluation_metric import (
 )
 from execute_tools.metric_order import MetricOrder
 from campaigns.tidmad_gold.stage3.stage3_composed_best import (
-    Stage3ComposedBestError,
     _formal_role,  # deliberate private import: the role predicate under adversarial probe — renaming it breaks this suite by design
     select_band_winner,
 )
+import campaigns.tidmad_gold.stage3.stage3_composed_best as composed_best_module
 from .metric_fixture import load_declared_tidmad_metric_spec
 from campaigns.tidmad_gold.stage3.stage3_composed_best import run as composed_best_run
 from campaigns.tidmad_gold.stage3.stage3_strict_best import (
@@ -387,7 +387,28 @@ RECONCILED_SPEC = load_declared_tidmad_metric_spec()
 @pytest.fixture
 def score_counter(monkeypatch: pytest.MonkeyPatch) -> ScoreVectorCallCounter:
     """The counting stand-in installed at the wrapper's real import site."""
-    return install_counting_score_vector(monkeypatch, SCORE_VECTOR_IMPORT_SITE)
+    counter = install_counting_score_vector(monkeypatch, SCORE_VECTOR_IMPORT_SITE)
+
+    def replay(candidate, *, output_root: str, **_):
+        target = Path(output_root) / f"band_{candidate.band}"
+        target.mkdir(parents=True, exist_ok=True)
+        naming = DeliverableNaming()
+        paths = {}
+        for index in candidate.file_indices:
+            path = target / naming.name(
+                model_type=candidate.model_type,
+                run_name=candidate.run_name,
+                exp_id=candidate.exp_id,
+                input_identity=index,
+            )
+            path.write_bytes(
+                f"full:{candidate.band}:{candidate.exp_id}:{index}".encode()
+            )
+            paths[index] = str(path)
+        return paths
+
+    monkeypatch.setattr(composed_best_module, "run_full_inference", replay)
+    return counter
 
 
 @pytest.fixture
@@ -474,6 +495,7 @@ def test_w0_compose_and_score_has_the_frozen_signature(
         "files",
         "sample_set",
         "reconciled_spec",
+        "raw_data_dir",
     ], (
         f"§4 freezes the parameter names and their order; got {[p.name for p in parameters]}"
     )
@@ -494,6 +516,7 @@ def test_w0_compose_and_score_has_the_frozen_signature(
         "§4 (amended) makes reconciled_spec REQUIRED — a default would let a caller "
         "compose without a reconciled stamped identity"
     )
+    assert parameters[4].default is None
 
 
 def test_w0_partial_sample_set_is_refused(
@@ -1330,43 +1353,15 @@ def test_w5_fixture_artifacts_contain_no_band_scalars(tmp_path: Path) -> None:
 # ==========================================================================
 
 
-def test_w1a_writer_boundary_refuses_the_missing_band_edge_file(
+def test_w1a_writer_replays_instead_of_consuming_partial_stage1_deliverables(
     tmp_path: Path, score_counter: ScoreVectorCallCounter
 ) -> None:
-    """W1a at composed_best's own boundary: named refusal, nothing scored.
-
-    Defect caught: the writer noticing a winner is a file short and
-    proceeding anyway — pooling 19 links and letting the composer produce a
-    number, or silently dropping the band. The composer-level W1a proves the
-    §4 boundary refuses; this proves the layer ABOVE it does not paper over
-    the same defect before the composer ever sees it.
-
-    The refusal class differs by design: composed_best refuses at WINNER
-    RESOLUTION (``Stage3ComposedBestError``, citing the §1 retention
-    clause), strictly earlier than the composer's ``NotScoreableError``.
-    Both are named refusals; the witness asserts the file identity is named
-    and that nothing was scored, which is what the contract constrains.
-
-    Fails as: no refusal (a 19-file golden score), a refusal that does not
-    name the missing file, or a nonzero scoring-call count.
-    """
+    """A partial Stage-1 artifact cannot replace checkpoint-based full inference."""
     layout = build_stage1_layout(
         tmp_path / "ws", corruption=Stage1Corruption.MISSING_BAND_UPPER_BOUNDARY
     )
-    with pytest.raises(Stage3ComposedBestError) as excinfo:
-        composed_best_run(str(tmp_path / "ws"), layout.arm)
-
-    message = str(excinfo.value)
-    assert (
-        f"{MISSING_FILE_IDENTITY:04d}" in message
-        or f"file {MISSING_FILE_IDENTITY}" in message
-    ), (
-        f"the refusal must name the missing input identity {MISSING_FILE_IDENTITY}; got: {message}"
-    )
-    assert score_counter.call_count == 0, (
-        "a winner that cannot supply its band must be refused BEFORE scoring; scoring "
-        "19 files and refusing afterwards still produces a number"
-    )
+    composed_best_run(str(tmp_path / "ws"), layout.arm, str(tmp_path))
+    assert score_counter.call_count == 1
 
 
 def test_w1_writer_selects_the_planted_winner_and_scores_once(
@@ -1424,11 +1419,13 @@ def test_w1_writer_selects_the_planted_winner_and_scores_once(
             + f"; the planted winner is {expected.exp_id!r}"
         )
         assert winner.model_type == expected.model_type
-        assert sorted(winner.deliverable_paths) == list(expected.expected_files)
+        assert list(winner.inference_candidate.file_indices) == list(
+            expected.expected_files
+        )
 
     assert score_counter.call_count == 0, "winner selection alone must score nothing"
 
-    composed_best_run(str(tmp_path / "ws"), layout.arm)
+    composed_best_run(str(tmp_path / "ws"), layout.arm, str(tmp_path))
     assert score_counter.call_count == 1, (
         f"a composed golden score is ONE full-scope scoring call; got {score_counter.call_count}"
     )

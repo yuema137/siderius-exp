@@ -110,6 +110,8 @@ exec bash "$LAUNCHER" \
     --num_iterations 2 \
     --max_rounds 2 \
     --max_epochs 1 \
+    --trial_time_admission_source measured \
+    --formal_time_admission_source measured \
     --allowed_output_types regressor \
     --min_formal_batch_size 1 \
     --trial_portion 0.25 \

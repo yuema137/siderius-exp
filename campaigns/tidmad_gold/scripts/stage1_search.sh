@@ -33,7 +33,7 @@ GOLD_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${GOLD_SCRIPT_DIR}/_gold_campaign_lib.sh"
 
 stage1_main() {
-    local WORKSPACE_ROOT="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" FCNET_REFERENCE_JSON=""
+    local WORKSPACE_ROOT="" DATA_DIR="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" FCNET_REFERENCE_JSON=""
     local ONLY="" STAGGER=60 DRY_RUN=0
     # F-PROFILE-WIRE-1 — command-line only; never inherited from the shell.
     GOLD_REQUIRED_RUNTIME_PROFILE_PATH=""
@@ -49,6 +49,7 @@ stage1_main() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
+            --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --arm)                  ARM="$2"; shift 2 ;;
             --gold_advice_file)     ADVICE_FILE="$2"; shift 2 ;;
             --gold_advice_sha256) ADVICE_SHA256="$2"; shift 2 ;;
@@ -67,6 +68,7 @@ stage1_main() {
 
     gold_refuse_reserved_passthrough ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"} || return 1
     gold_workspace_root_check "$WORKSPACE_ROOT" || return 1
+    gold_bind_data_dir "$DATA_DIR" || return 1
     # Validates the arm + advice pairing up-front (each band re-derives its
     # own argv from the same lib, so this is a fail-fast, not the binding).
     # The campaign's ONE observed treatment identity (empty when this
@@ -115,6 +117,7 @@ stage1_main() {
 
     local BAND_ARGS_COMMON=(
         --workspace_root "$WORKSPACE_ROOT"
+        --data_dir "$GOLD_DATA_DIR"
         --arm "$ARM"
     )
     [ -n "$ADVICE_FILE" ] && BAND_ARGS_COMMON+=(--gold_advice_file "$ADVICE_FILE")

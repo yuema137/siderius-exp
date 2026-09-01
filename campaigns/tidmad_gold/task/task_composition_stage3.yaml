@@ -1,0 +1,37 @@
+task_data_path:
+  file: ../../../tasks/tidmad/runtime/tidmad_data_path.py
+  symbol: TidmadTaskDataPath
+  id: tidmad
+
+dataset_profile:
+  config: ../../../tasks/tidmad/resolved/dataset_profile.json
+
+metric:
+  declaration: ../../../tasks/tidmad/resolved/metric_spec.json
+  implementation:
+    file: ../../../tasks/tidmad/runtime/scoring.py
+    symbol: TidmadDenoisingMetric
+  scoreability_contracts:
+    tidmad_denoised_h5:
+      file: ../../../tasks/tidmad/runtime/scoreability.py
+      symbol: TidmadScoreabilityContract
+
+task_health:
+  config: task_health_regression.yaml
+
+interpretation_blocks:
+  config: ../../../tasks/tidmad/framework_configs/interpretation.yaml
+
+proposal_blocks:
+  config: task_proposal_regression.yaml
+
+implementor_blocks:
+  config: ../../../tasks/tidmad/framework_configs/implementor.yaml
+
+task_config:
+  config: task_config_regression.yaml
+
+deliverable:
+  prefix: abra_validation_denoised
+  extension: .h5
+  index_width: 4

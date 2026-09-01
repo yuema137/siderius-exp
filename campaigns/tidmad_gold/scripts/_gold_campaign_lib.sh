@@ -109,6 +109,8 @@ GOLD_FROZEN_ROWS=(
     # campaign number. The dry-run frozen table prints the EFFECTIVE value
     # verbatim, so an externally supplied budget stays observable.
     "formal_time_budget_minutes=${GOLD_FORMAL_TIME_BUDGET_MINUTES:-180}"
+    "trial_time_admission_source=measured"
+    "formal_time_admission_source=measured"
     # v0.1.5 operator ruling (2026-08-29): Gold Trial and Formal use the same
     # already-proven batch feasibility boundary. The generic chain default of
     # 4 is a provisional V18 incident guard, not a Gold scientific-treatment
@@ -659,6 +661,7 @@ gold_frozen_chain_args() {
         formal_portion formal_train_portion formal_eval_portion \
         trial_max_epochs formal_max_epochs \
         trial_time_budget_minutes formal_time_budget_minutes \
+        trial_time_admission_source formal_time_admission_source \
         min_formal_batch_size \
         skip_formal_min_delta bypass_formal_time_budget_min_delta \
         max_rounds attempts_per_round attempts_per_formal_round \
@@ -1098,6 +1101,7 @@ GOLD_RESERVED_PASSTHROUGH=(
     --formal_portion --formal_train_portion --formal_eval_portion
     --max_epochs --trial_max_epochs --formal_max_epochs
     --trial_time_budget_minutes --formal_time_budget_minutes
+    --trial_time_admission_source --formal_time_admission_source
     --skip_formal_min_delta --bypass_formal_time_budget_min_delta
     --bypass_formal_time_budget_minutes
     --enable_chain_incumbent_formal_gates
@@ -1113,7 +1117,7 @@ GOLD_RESERVED_PASSTHROUGH=(
     # value the launch manifest reports -- a pin the manifest misreports
     # is worse than no pin.
     --advice --advice_sha256 --human_advice_file
-    --data_scope --health_gate_files --band --workspace --run_name
+    --data_dir --data_scope --health_gate_files --band --workspace --run_name
     --mode --seed_paths --start_iter
     --auto_resume --no_auto_resume --force_fresh
     --validation_fixed_candidate_plan
@@ -1127,6 +1131,15 @@ GOLD_RESERVED_PASSTHROUGH=(
     --max_rounds --attempts_per_round --attempts_per_formal_round
     --max_fail_rounds --max_proposal_attempts --max_impl_attempts
 )
+
+gold_bind_data_dir() {
+    local supplied="${1:-}"
+    if [ -z "$supplied" ] || [ ! -d "$supplied" ]; then
+        echo "ERROR: --data_dir must name an existing caller-owned dataset directory: '$supplied'" >&2
+        return 1
+    fi
+    GOLD_DATA_DIR="$(cd "$supplied" && pwd)"
+}
 
 # gold_refuse_reserved_passthrough TOKEN... — refuse any reserved token,
 # naming it and the authority that owns it. --cleanup_denoised gets the

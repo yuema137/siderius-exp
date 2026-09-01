@@ -38,7 +38,7 @@ GOLD_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${GOLD_SCRIPT_DIR}/_gold_campaign_lib.sh"
 
 stage2_main() {
-    local WORKSPACE_ROOT="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" DESIGN_REGISTRY=""
+    local WORKSPACE_ROOT="" DATA_DIR="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" DESIGN_REGISTRY=""
     local DRY_RUN=0
     # F-PROFILE-WIRE-1 — command-line only; never inherited from the shell.
     GOLD_REQUIRED_RUNTIME_PROFILE_PATH=""
@@ -54,6 +54,7 @@ stage2_main() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
+            --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --arm)               ARM="$2"; shift 2 ;;
             --gold_advice_file)  ADVICE_FILE="$2"; shift 2 ;;
             --gold_advice_sha256) ADVICE_SHA256="$2"; shift 2 ;;
@@ -70,6 +71,7 @@ stage2_main() {
 
     gold_refuse_reserved_passthrough ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"} || return 1
     gold_workspace_root_check "$WORKSPACE_ROOT" || return 1
+    gold_bind_data_dir "$DATA_DIR" || return 1
     # NOTE (flagged for supervisor review in the F-LAUNCH-1 PR body): the
     # arm's treatment condition is kept UNIFORM across its own campaign —
     # goldpod Stage-2 units carry the same --advice artifact its Stage-1
@@ -151,6 +153,7 @@ stage2_main() {
                 --mode lilab
                 --workspace "$ws"
                 --run_name "$run_name"
+                --data_dir "$GOLD_DATA_DIR"
                 --validation_fixed_candidate_plan "$plan"
                 "${GOLD_FROZEN_CHAIN_ARGS[@]}"
                 "${GOLD_BAND_ARGS[@]}"

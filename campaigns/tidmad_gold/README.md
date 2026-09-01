@@ -34,11 +34,14 @@ campaign's scientific treatment.
 - `runtime/wave_records.py` owns the append-only wave evidence and derived
   summary contract. `scripts/record_wave_summary.py` is its campaign CLI;
   neither file is part of generic SIDERIUS execution.
-- `stage3/` owns the imported composed-best, strict-best, and terminal
-  evaluation writers. Their campaign behavior and 132-test witness suite are
-  preserved here after the SIDERIUS Stage-3 duplicates are retired. They resolve the
-  task-owned scorer, anchor map, and explicit `TIDMAD_DATA_DIR` without a
-  framework-owned TIDMAD default.
+- `stage3/` owns the composed-best, strict-best, and terminal-evaluation
+  writers. Composed Best selects the Stage-1 winner in each band, verifies its
+  checkpoint digest, reuses the task-owned inference executor over all 200
+  segments per file, validates the complete deliverables, and then calls the
+  canonical pooled scorer once. Stage-1's 10% deliverables remain search
+  evidence and are not final-score inputs. The Gold launcher supplies one
+  required explicit data root to inference and scoring; no framework-owned
+  TIDMAD data default is used.
 - `tasks/tidmad/reference_data/` owns byte-identical copies of the 54 frozen
   anchor, baseline, ground-truth, paper-result, and frequency artifacts.
 

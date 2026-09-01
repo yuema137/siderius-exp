@@ -54,6 +54,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from execute_tools.deliverable_spec import DeliverableNaming
+
 import pytest
 
 import campaigns.tidmad_gold.stage3.stage3_common as stage3_common
@@ -204,6 +206,24 @@ def test_three_mechanisms_end_to_end_against_real_composer(
 ) -> None:
     stub = _ArithmeticBoundaryStub()
     monkeypatch.setattr(stage3_common, "score_vector", stub)
+    import campaigns.tidmad_gold.stage3.stage3_composed_best as composed_best_module
+
+    monkeypatch.setattr(
+        composed_best_module,
+        "run_full_inference",
+        lambda candidate, **_: {
+            index: str(
+                Path(candidate.source_base_dir)
+                / DeliverableNaming().name(
+                    model_type=candidate.model_type,
+                    run_name=candidate.run_name,
+                    exp_id=candidate.exp_id,
+                    input_identity=index,
+                )
+            )
+            for index in candidate.file_indices
+        },
+    )
 
     # ONE synthetic campaign workspace: Stage-1 (writer C's builder, real
     # authorities) + Stage-2 (writer D's builder + band-file population).
@@ -215,7 +235,19 @@ def test_three_mechanisms_end_to_end_against_real_composer(
     _write_unit_workspaces(tmp_path)
 
     # --- composed_best: production CLI, real composer ---
-    assert composed_main(["--workspace_root", str(tmp_path), "--arm", ARM]) == 0
+    assert (
+        composed_main(
+            [
+                "--workspace_root",
+                str(tmp_path),
+                "--data_dir",
+                str(tmp_path),
+                "--arm",
+                ARM,
+            ]
+        )
+        == 0
+    )
 
     # --- strict_best: production CLI, REAL stage3_common resolved lazily ---
     assert (

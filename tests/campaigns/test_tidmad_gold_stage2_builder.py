@@ -48,6 +48,7 @@ def stage2_inputs(tmp_path: Path) -> dict[str, Path]:
         "generated": generated,
         "registry": registry,
         "advice": advice,
+        "data": tmp_path,
     }
 
 
@@ -61,6 +62,8 @@ def _dry(inputs: dict[str, Path], *extra: str) -> subprocess.CompletedProcess[st
             str(STAGE2),
             "--workspace_root",
             str(inputs["workspace"]),
+            "--data_dir",
+            str(inputs["data"]),
             "--arm",
             "goldpod",
             "--gold_advice_file",
@@ -113,6 +116,8 @@ def test_stage2_dry_run_builds_four_waves_of_four_frozen_units(
     for unit, command in commands.items():
         design, band = unit.rsplit("_", 1)
         pairs = _pairs(command)
+        assert command.count("--data_dir") == 1, unit
+        assert pairs["--data_dir"] == str(stage2_inputs["data"].resolve()), unit
         assert pairs["--validation_fixed_candidate_plan"] == str(
             stage2_inputs["registry"] / f"{design}.json"
         )

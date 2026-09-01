@@ -87,6 +87,8 @@ def _dry_run(tmp_path: Path) -> subprocess.CompletedProcess[str]:
             str(_siderius_checkout()),
             "--workspace_root",
             str(workspace),
+            "--data_dir",
+            str(tmp_path),
             "--stage",
             "1",
             "--arm",
@@ -133,6 +135,8 @@ def test_all_four_bands_bind_the_current_frozen_chain_values(tmp_path: Path) -> 
     assert set(commands) == set(EXPECTED_FILES)
     for band, command in commands.items():
         pairs = _pairs(command)
+        assert command.count("--data_dir") == 1, band
+        assert pairs["--data_dir"] == str(tmp_path.resolve()), band
         for flag, expected in FROZEN_CHAIN_VALUES.items():
             assert pairs.get(flag) == expected, (band, flag, pairs.get(flag))
         assert pairs["--bypass_formal_time_budget_minutes"] == "240"
