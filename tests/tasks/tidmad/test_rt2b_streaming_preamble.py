@@ -24,7 +24,10 @@ from pathlib import Path
 import pytest
 
 import execute_tools.train_engine_sandbox as tes
-from core.runtime_control.session import RuntimeControlPolicy, RuntimeVerificationSession
+from core.runtime_control.session import (
+    RuntimeControlPolicy,
+    RuntimeVerificationSession,
+)
 from execute_tools.dataset_config import (
     TIDMAD_PROFILE,
     bind_dataset_profile,
@@ -73,7 +76,9 @@ def tiny_setup(tmp_path, synthetic_h5, monkeypatch):
         kernel_size=2,
         num_blocks=1,
     )
-    train_cfg = TrainConfig(lr=1e-4, epochs=1, batch_size=1, optimizer_type="adam", device="cpu")
+    train_cfg = TrainConfig(
+        lr=1e-4, epochs=1, batch_size=1, optimizer_type="adam", device="cpu"
+    )
     loss_cfg = LossConfig()
 
     sandbox_dirs = {
@@ -146,9 +151,13 @@ class TestAdmittedPath:
         assert tiny_setup["counter"]["dataset_constructions"] == 1
         # Model + sentinel written (training genuinely continued).
         assert os.path.exists(
-            os.path.join(tiny_setup["sandbox_dirs"]["models"], "model_wavenet_exp_adm_agent.pth")
+            os.path.join(
+                tiny_setup["sandbox_dirs"]["models"], "model_wavenet_exp_adm_agent.pth"
+            )
         )
-        assert os.path.exists(os.path.join(tiny_setup["sandbox_dirs"]["models"], "_OK_exp_adm"))
+        assert os.path.exists(
+            os.path.join(tiny_setup["sandbox_dirs"]["models"], "_OK_exp_adm")
+        )
 
         obs = json.load(open(sidecar))
         assert obs["final_status"] == "completed"
@@ -172,7 +181,9 @@ class TestAdmittedPath:
 
 
 class TestRejectedPath:
-    def test_rejection_exits_cleanly_without_model_or_sentinel(self, tiny_setup, tmp_path):
+    def test_rejection_exits_cleanly_without_model_or_sentinel(
+        self, tiny_setup, tmp_path
+    ):
         sidecar = tmp_path / "rv.json"
         session = RuntimeVerificationSession(
             str(sidecar),
@@ -186,7 +197,9 @@ class TestRejectedPath:
         # Setup happened exactly once, then execution stopped.
         assert tiny_setup["counter"]["dataset_constructions"] == 1
         models_dir = tiny_setup["sandbox_dirs"]["models"]
-        assert not os.path.exists(os.path.join(models_dir, "model_wavenet_exp_rej_agent.pth"))
+        assert not os.path.exists(
+            os.path.join(models_dir, "model_wavenet_exp_rej_agent.pth")
+        )
         assert not os.path.exists(os.path.join(models_dir, "_OK_exp_rej"))
 
         obs = json.load(open(sidecar))
@@ -204,7 +217,29 @@ class TestNoSessionCompatibility:
         summary = _run(tiny_setup, None, "exp_legacy")
         assert summary is not None and "final_loss" in summary
         assert tiny_setup["counter"]["dataset_constructions"] == 1
-        assert os.path.exists(os.path.join(tiny_setup["sandbox_dirs"]["models"], "_OK_exp_legacy"))
+        assert os.path.exists(
+            os.path.join(tiny_setup["sandbox_dirs"]["models"], "_OK_exp_legacy")
+        )
+
+
+class TestF12d34StorageProvenanceWithoutLegacySampleSet:
+    """The dated composed-TIDMAD regression remains a task-owned oracle."""
+
+    def test_task_scope_reports_root_only_without_guessing_files(self, tmp_path):
+        provenance = tes._setup_storage_provenance(str(tmp_path), None, TIDMAD_PROFILE)
+
+        assert provenance["file_count"] == 0
+        assert provenance["dataset_root"] == str(tmp_path)
+
+    def test_legacy_sample_set_still_reports_scoped_files(self, tmp_path):
+        provenance = tes._setup_storage_provenance(
+            str(tmp_path), {"4": [0, 1]}, TIDMAD_PROFILE
+        )
+
+        assert provenance["file_count"] == 1
+        assert provenance["files_present"] == 0
+        assert provenance["total_file_bytes"] == 0
+        assert provenance["expected_raw_bytes"] > 0
 
 
 class TestMainArgvWiring:
@@ -277,8 +312,17 @@ class TestMainArgvWiring:
         captured = self._main_with_argv(
             tmp_path,
             monkeypatch,
-            ["--runtime_observation_out", str(rv_path), "--runtime_policy_json", str(rp_path)],
-            streaming_result={"final_loss": 0.1, "loss_history": [0.1], "model_params": 1},
+            [
+                "--runtime_observation_out",
+                str(rv_path),
+                "--runtime_policy_json",
+                str(rp_path),
+            ],
+            streaming_result={
+                "final_loss": 0.1,
+                "loss_history": [0.1],
+                "model_params": 1,
+            },
         )
         session = captured["runtime_session"]
         assert isinstance(session, RuntimeVerificationSession)
@@ -300,7 +344,11 @@ class TestMainArgvWiring:
             tmp_path,
             monkeypatch,
             [],
-            streaming_result={"final_loss": 0.1, "loss_history": [0.1], "model_params": 1},
+            streaming_result={
+                "final_loss": 0.1,
+                "loss_history": [0.1],
+                "model_params": 1,
+            },
         )
         assert captured["runtime_session"] is None
 
