@@ -87,7 +87,9 @@ ISOLATED_METRIC_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     deliverable = Path(sys.argv[3]).resolve()
+    dependency_root = Path(sys.argv[4]).resolve()
     sys.path.insert(0, str(checkout))
+    sys.path.insert(1, str(dependency_root))
 
     import numpy as np
     from execute_tools.task_data_path import bind_task_data_path
@@ -169,6 +171,9 @@ def test_metric_reuses_the_bound_data_path_without_importing_this_repository(
     it fails with ``ModuleNotFoundError: tasks`` if the ambient import returns.
     """
     checkout = _siderius_checkout()
+    import numpy as np
+
+    dependency_root = Path(np.__file__).resolve().parents[1]
     deliverable = tmp_path / "prediction.npz"
     deliverable.touch()
     completed = subprocess.run(
@@ -180,6 +185,7 @@ def test_metric_reuses_the_bound_data_path_without_importing_this_repository(
             str(checkout),
             str(COMPOSITION),
             str(deliverable),
+            str(dependency_root),
         ],
         cwd=checkout,
         text=True,
