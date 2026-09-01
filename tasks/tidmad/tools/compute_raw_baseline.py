@@ -52,12 +52,9 @@ import numpy as np
 from tqdm import tqdm
 
 from execute_tools.build_anchor_map import load_anchor_map
-from execute_tools.dataset_config import (
-    DatasetProfile,
-    load_dataset_profile,
-    tidmad_topology,
-)
+from execute_tools.dataset_config import DatasetProfile, load_dataset_profile
 from execute_tools.scoring_utils import coerce_nonfinite_to_none, process_segment
+from tasks.tidmad.runtime.profile import tidmad_topology
 
 # ---------------------------------------------------------------------------
 # Per-file score under the Option B global-s_max convention.

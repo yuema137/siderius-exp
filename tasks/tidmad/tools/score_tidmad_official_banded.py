@@ -60,13 +60,10 @@ import torch
 from tqdm import tqdm
 
 from execute_tools.build_anchor_map import load_anchor_map
-from execute_tools.dataset_config import (
-    DatasetProfile,
-    load_dataset_profile,
-    tidmad_topology,
-)
+from execute_tools.dataset_config import DatasetProfile, load_dataset_profile
 from execute_tools.scoring_helpers import file_vector_to_log_space
 from execute_tools.scoring_utils import score_vector
+from tasks.tidmad.runtime.profile import tidmad_topology
 
 TASK_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATASET_PROFILE = TASK_ROOT / "resolved" / "dataset_profile.json"
