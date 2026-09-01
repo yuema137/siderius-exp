@@ -4,12 +4,8 @@ import h5py
 import numpy as np
 import torch
 
-from execute_tools.dataset_config import DatasetProfile
-from execute_tools.task_data_path import (
-    DeliverableSourceContext,
-    DeliverableWriteRequest,
-)
-from tasks.tidmad.runtime.profile import tidmad_topology
+from execute_tools.dataset_config import DatasetProfile, tidmad_topology
+from execute_tools.task_data_path import DeliverableSourceContext, DeliverableWriteRequest
 from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
 
 
@@ -28,9 +24,7 @@ class _ValidationDataset:
         return 2
 
 
-def test_streamed_classification_predictions_are_decoded_and_persisted(
-    tmp_path, monkeypatch
-):
+def test_streamed_classification_predictions_are_decoded_and_persisted(tmp_path, monkeypatch):
     """Catch the separated inference host-memory failure from issue #391."""
     profile = DatasetProfile.model_validate_json(
         (PACK_DIR / "resolved" / "dataset_profile.json").read_text(encoding="utf-8")
@@ -39,15 +33,11 @@ def test_streamed_classification_predictions_are_decoded_and_persisted(
     scope = TidmadScope(sample_set={0: [0]}, seg_size=4, profile=profile)
     data_path = TidmadTaskDataPath()
     dataset = _ValidationDataset()
-    monkeypatch.setattr(
-        data_path, "validation_dataset", lambda _scope, _params: dataset
-    )
+    monkeypatch.setattr(data_path, "validation_dataset", lambda _scope, _params: dataset)
 
     def predictions():
         for winning_class in (129, 130):
-            logits = torch.zeros(
-                (topology.encoding.num_classes, 4), dtype=torch.float32
-            )
+            logits = torch.zeros((topology.encoding.num_classes, 4), dtype=torch.float32)
             logits[winning_class] = 1.0
             yield logits
 
@@ -66,11 +56,7 @@ def test_streamed_classification_predictions_are_decoded_and_persisted(
 
     output = next(tmp_path.glob("*.h5"))
     with h5py.File(output, "r") as handle:
-        denoised = handle["timeseries"][topology.channels.input_channel]["timeseries"][
-            :
-        ]
-        injected = handle["timeseries"][topology.channels.target_channel]["timeseries"][
-            :
-        ]
+        denoised = handle["timeseries"][topology.channels.input_channel]["timeseries"][:]
+        injected = handle["timeseries"][topology.channels.target_channel]["timeseries"][:]
     assert denoised.tolist() == [1, 1, 1, 1, 2, 2, 2, 2]
     assert injected.tolist() == [-3, -2, -1, 0, 1, 2, 3, 4]

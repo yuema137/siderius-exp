@@ -29,8 +29,9 @@ from core.runtime_control.session import (
     RuntimeVerificationSession,
 )
 from execute_tools.dataset_config import (
-    DatasetProfile,
+    TIDMAD_PROFILE,
     bind_dataset_profile,
+    tidmad_topology,
 )
 from execute_tools.task_data_path import bind_task_data_path, effective_identity
 from ml_models.models_format_sandbox import LossConfig, TrainConfig, WaveNetConfig
@@ -39,7 +40,6 @@ from tasks.tidmad.runtime.tidmad_data_path import (
     TidmadScope,
     TidmadTaskDataPath,
 )
-from tasks.tidmad.runtime.profile import tidmad_topology
 from workflows.task_composition import compose_run_task_bindings
 
 SEG_SIZE = 1000  # minimum segmentation_size; 1 PSD segment == 1 ML segment below
@@ -50,17 +50,6 @@ TASK_MANIFEST = str(
     / "compositions"
     / "bounded_qualification.yaml"
 )
-PROFILE_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "tasks"
-    / "tidmad"
-    / "resolved"
-    / "dataset_profile.json"
-)
-
-
-def _load_profile() -> DatasetProfile:
-    return DatasetProfile.model_validate_json(PROFILE_PATH.read_text(encoding="utf-8"))
 
 
 def _composed_task_identity() -> str:
@@ -108,16 +97,11 @@ def tiny_setup(tmp_path, synthetic_h5, monkeypatch):
 
     monkeypatch.setattr(TIDMADEpochDataset, "__init__", counting_init)
 
-    profile = _load_profile()
-    topology = tidmad_topology(profile)
-    _tiny = profile.model_copy(
+    _tiny = TIDMAD_PROFILE.model_copy(
         update={
-            "topology": {
-                **profile.topology,
-                "dataset": topology.dataset.model_copy(
-                    update={"psd_segment_length": SEG_SIZE}
-                ).model_dump(),
-            }
+            "dataset": tidmad_topology(TIDMAD_PROFILE).dataset.model_copy(
+                update={"psd_segment_length": SEG_SIZE}
+            )
         }
     )
     with bind_dataset_profile(_tiny), bind_task_data_path(TidmadTaskDataPath()):
@@ -242,14 +226,14 @@ class TestF12d34StorageProvenanceWithoutLegacySampleSet:
     """The dated composed-TIDMAD regression remains a task-owned oracle."""
 
     def test_task_scope_reports_root_only_without_guessing_files(self, tmp_path):
-        provenance = tes._setup_storage_provenance(str(tmp_path), None, _load_profile())
+        provenance = tes._setup_storage_provenance(str(tmp_path), None, TIDMAD_PROFILE)
 
         assert provenance["file_count"] == 0
         assert provenance["dataset_root"] == str(tmp_path)
 
     def test_legacy_sample_set_still_reports_scoped_files(self, tmp_path):
         provenance = tes._setup_storage_provenance(
-            str(tmp_path), {"4": [0, 1]}, _load_profile()
+            str(tmp_path), {"4": [0, 1]}, TIDMAD_PROFILE
         )
 
         assert provenance["file_count"] == 1
@@ -307,8 +291,6 @@ class TestMainArgvWiring:
                 "rt2b_main",
                 "--sample_set_json",
                 str(ss_path),
-                "--dataset_profile_json",
-                str(PROFILE_PATH),
                 "--task_data_path_id",
                 "tidmad",
                 "--task_data_path_identity",

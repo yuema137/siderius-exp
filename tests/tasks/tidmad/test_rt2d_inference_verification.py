@@ -25,20 +25,17 @@ import torch
 
 import execute_tools.inference_single as inf
 from core.runtime_control.adaptive import AdaptiveVerificationConfig
-from core.runtime_control.session import (
-    RuntimeControlPolicy,
-    RuntimeVerificationSession,
-)
+from core.runtime_control.session import RuntimeControlPolicy, RuntimeVerificationSession
 from core.runtime_control.steady_state import SteadyStateConfig
 from core.runtime_control.workload import ResolvedPhaseWorkload
 from execute_tools.dataset_config import (
-    DatasetProfile,
+    TIDMAD_PROFILE,
     bind_dataset_profile,
+    tidmad_topology,
 )
 from execute_tools.task_data_path import effective_identity
 from ml_models.models_format_sandbox import WaveNetConfig
 from ml_models.models_sandbox import MODEL_REGISTRY
-from tasks.tidmad.runtime.profile import tidmad_topology
 from workflows.task_composition import compose_run_task_bindings
 
 SEG_SIZE = 1000
@@ -50,14 +47,10 @@ TASK_MANIFEST = (
     / "compositions"
     / "bounded_qualification.yaml"
 )
-PROFILE_PATH = TASK_MANIFEST.parents[1] / "resolved" / "dataset_profile.json"
 
 
 def _composed_task_identity() -> str:
-    return effective_identity(
-        compose_run_task_bindings(str(TASK_MANIFEST)).task_data_path
-    )
-
+    return effective_identity(compose_run_task_bindings(str(TASK_MANIFEST)).task_data_path)
 
 _MODEL_CFG = dict(
     segmentation_size=SEG_SIZE,
@@ -81,18 +74,11 @@ def tiny_profile():
     of the migration. ``bind_dataset_profile`` is scoped, so the previous
     profile is restored even if a test raises.
     """
-    profile = DatasetProfile.model_validate_json(
-        PROFILE_PATH.read_text(encoding="utf-8")
-    )
-    topology = tidmad_topology(profile)
-    return profile.model_copy(
+    return TIDMAD_PROFILE.model_copy(
         update={
-            "topology": {
-                **profile.topology,
-                "dataset": topology.dataset.model_copy(
-                    update={"psd_segment_length": SEG_SIZE}
-                ).model_dump(),
-            }
+            "dataset": tidmad_topology(TIDMAD_PROFILE).dataset.model_copy(
+                update={"psd_segment_length": SEG_SIZE}
+            )
         }
     )
 
@@ -187,17 +173,13 @@ def tiny_setup(tmp_path, tiny_profile):
 
 
 def _run_inference(setup, monkeypatch, sidecar: str):
-    monkeypatch.setattr(
-        "sys.argv", [*setup["argv"], "--runtime_observation_out", sidecar]
-    )
+    monkeypatch.setattr("sys.argv", [*setup["argv"], "--runtime_observation_out", sidecar])
     inf.main()
     return json.load(open(sidecar))
 
 
 class TestInferenceVerification:
-    def test_resumed_observation_gains_inference_component(
-        self, tiny_setup, monkeypatch
-    ):
+    def test_resumed_observation_gains_inference_component(self, tiny_setup, monkeypatch):
         sidecar = str(tiny_setup["tmp"] / "rv.json")
         # Simulate the training subprocess's prior evidence.
         trainer_session = RuntimeVerificationSession(sidecar, attempt_id="exp_inf")
@@ -248,9 +230,7 @@ class TestInferenceVerification:
         # The instrumentation must not perturb the engine's outputs.
         sidecar = str(tiny_setup["tmp"] / "rv2.json")
         _run_inference(tiny_setup, monkeypatch, sidecar)
-        out = (
-            tiny_setup["tmp"] / "abra_validation_denoised_wavenet_rt2d_exp_inf_0000.h5"
-        )
+        out = tiny_setup["tmp"] / "abra_validation_denoised_wavenet_rt2d_exp_inf_0000.h5"
         assert out.exists()
         with h5py.File(out, "r") as f:
             ch1 = f["timeseries"]["channel0001"]["timeseries"]
