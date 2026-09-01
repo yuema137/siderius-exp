@@ -43,3 +43,10 @@ artifacts, the PUNet launch decision, and a historical scientific collapse
 fingerprint. Their pre-move SHA-256 identities are
 `66cf0385178ff7f47279723dad6de154f02c0d859497e42b5d2c2d511d7d0529` and
 `65249c823b5bb4ea31057395a2dd571af274848e86355ca1bf796ad82bb5d75d`.
+
+`finalize_recovered_diagnostic_round.py` preserves the one-off recovery of
+a TIDMAD diagnostic round after an NVRM Xid 8 incident. It encodes ten-round
+completion, eighteen reused outputs, regeneration of files 8 and 9, WaveNet
+record paths, and the historical Health/scoring treatment. Its pre-move
+SHA-256 identity is
+`01a2777a4e7b56d805da9e4cb7fc01ad9c48dd79e943d10a5ad459efff2a914f`.
