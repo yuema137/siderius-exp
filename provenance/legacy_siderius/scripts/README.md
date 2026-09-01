@@ -50,3 +50,11 @@ completion, eighteen reused outputs, regeneration of files 8 and 9, WaveNet
 record paths, and the historical Health/scoring treatment. Its pre-move
 SHA-256 identity is
 `01a2777a4e7b56d805da9e4cb7fc01ad9c48dd79e943d10a5ad459efff2a914f`.
+
+`pregate_runtime_control_validation.py` preserves the pre-Gate real-GPU
+runtime-control validation driver. It fixes a WaveNet architecture, focal
+loss, TIDMAD scopes and sample sets, the V18 480,000-step incident geometry,
+and historical H100 watchdog/budget scenarios. The generic runtime-control
+mechanisms and their task-neutral tests remain in SIDERIUS. Its pre-move
+SHA-256 identity is
+`9d3413b9c4477ee9414a8a283120a32fd9ae8b714033549a5a4bc509fdf79acb`.
