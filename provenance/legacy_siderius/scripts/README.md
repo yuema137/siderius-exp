@@ -15,3 +15,12 @@ wave-approval semantics, so it is experiment provenance rather than a generic
 framework reporting utility. Their pre-move SHA-256 identities are
 `b4a2b2d14b82e8948b938208f3529dcd2fb50e980b9b08d0bdaca5fdf5ee6558` and
 `63d5645a89d246b61caeaf85b5f3c6b1eca9b6bc52fad5bff88b718167851852`.
+
+`vram_preflight_validation.py` preserves the V19 candidate-scale validation
+matrix, including its three named model families, fixed 12-GiB envelope, and
+historical machine output location. The complete pre-split test module is
+archived beside it so the task-specific candidate assertions remain
+recoverable while the generic isolated-probe tests continue in SIDERIUS. Their
+pre-move SHA-256 identities are
+`6431bc53edc78be405cae327258e2cb6aa34a1a739f2c7a65590bda62ae8080e` and
+`d37193a1e73f780041bd817962da6b799ec6f36b781471ee08b4d98db3e5a49d`.
