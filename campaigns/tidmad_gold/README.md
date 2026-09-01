@@ -31,6 +31,9 @@ campaign's scientific treatment.
   manifests report the same effective values.
 - `task/health_checks_effective_gold.yaml` is a preserved historical
   materialization, not the authoring authority for a future fresh launch.
+- `runtime/wave_records.py` owns the append-only wave evidence and derived
+  summary contract. `scripts/record_wave_summary.py` is its campaign CLI;
+  neither file is part of generic SIDERIUS execution.
 - `stage3/` owns the imported composed-best, strict-best, and terminal
   evaluation writers. Their campaign behavior and 132-test witness suite are
   preserved here after the SIDERIUS Stage-3 duplicates are retired. They resolve the
