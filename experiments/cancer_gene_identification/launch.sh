@@ -119,5 +119,7 @@ exec bash "$LAUNCHER" \
     --formal_eval_portion 0.25 \
     --trial_vram_budget_gb 10 \
     --formal_vram_budget_gb 16 \
+    --vram_probe_step_timeout_seconds 600 \
+    --vram_preflight_total_timeout_seconds 1800 \
     --no-runtime_watchdog \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
