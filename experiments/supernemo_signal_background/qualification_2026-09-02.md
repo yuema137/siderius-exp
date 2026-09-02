@@ -73,3 +73,41 @@ dense 3D candidate: 5% scope with a 10% per-epoch subsample materialized about
 qualification profile now uses 1% scope with a 1% per-epoch subsample for both
 Trial and Formal training, while retaining 1% evaluation. Campaign portions
 are unchanged. A fresh workspace is required for the rerun.
+
+## Completed bounded qualification
+
+A fresh TestPod run completed at exact pair SIDERIUS
+`6bcdeb2f55b47ced6bcadaa08ddfd88875964261` and siderius-exp
+`9719616dcfc8dc7d80a6946d6ce67b56a4c88b84`, workspace
+`/workspace/supernemo_runs/qualification_9719616_6bcdeb2f_run2`. The launcher
+exit code was zero and both iteration manifests have status `completed`.
+
+Iteration 1 completed one Trial and one Formal round. The valid Trial score was
+`0.5857041215372332`; the valid Formal score was `0.6231508552021149`.
+Iteration 2 restored the prior plugin, proposal, Trial incumbent, and verified
+Formal incumbent. Its interpretation consumed both prior experiment records
+and produced a new proposal. The first proposed configuration used batch size
+64, which could not form one full resource-probe batch from the deliberately
+small qualification scope. The preflight refused it before training. The agent
+consumed that failure, reduced the batch size to 8, and completed valid Trial
+and Formal rounds with scores `0.6098216066481994` and
+`0.5892530294988616`, respectively.
+
+All four successful experiment records declare `energy_matched_roc_auc` as the
+higher-is-better golden metric and `ordinary_roc_auc` as secondary evidence.
+Both iterations used the same task-composition fingerprint, Health policy hash,
+Literature Review configuration hash, measured Trial/Formal admission mode,
+and 1% evaluation scope. Each manifest records real Formal evidence and valid
+Trial/Formal incumbents. The one rejected attempt is a correctly recorded
+resource refusal, not an infrastructure failure or scientific invalidation.
+
+The chain emitted warnings while looking for an iteration-1 interpretation
+digest during iteration-2 resume. This is a non-blocking observability edge:
+iteration 1 has no previous result to interpret, while iteration 2 created its
+own interpretation from iteration 1's two records and demonstrably consumed
+the restored state. No continuity evidence is missing from the completed run.
+
+Qualification verdict: PASS for the bounded external-consumer workflow. This
+run establishes execution and continuity, not scientific performance. The
+20-iteration campaign must use a fresh workspace and the documented campaign
+profile; it must not resume from this qualification identity.
