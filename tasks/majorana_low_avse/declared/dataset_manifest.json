@@ -1,0 +1,31 @@
+{
+  "record": 8257027,
+  "doi": "10.5281/zenodo.8257027",
+  "files": {
+    "MJD_NPML_0.hdf5": {"bytes": 1978084096, "md5": "a541c51dd15410e4ff6ef9fadee7954e", "role": "unlabeled"},
+    "MJD_NPML_1.hdf5": {"bytes": 1978084096, "md5": "75e63c47b91fb001156e66d9db8faaba", "role": "unlabeled"},
+    "MJD_NPML_2.hdf5": {"bytes": 903743200, "md5": "1eb6763a64aaa5ccbe471803e143daa7", "role": "unlabeled"},
+    "MJD_Test_0.hdf5": {"bytes": 1978866144, "md5": "6edfccabd99bd01ef3d203a53825264c", "role": "test"},
+    "MJD_Test_1.hdf5": {"bytes": 1978866144, "md5": "bf95b9ee0a651f2d9f725b5c66adbc75", "role": "test"},
+    "MJD_Test_2.hdf5": {"bytes": 1978866144, "md5": "00263e6037cd38aaae07e338b9bbbdb5", "role": "test"},
+    "MJD_Test_3.hdf5": {"bytes": 1978866144, "md5": "187e87b6f4e4a6b7b0a3c4efc95b88a7", "role": "test"},
+    "MJD_Test_4.hdf5": {"bytes": 1978866144, "md5": "e52aceaf4c73868572b460cc5a917d1a", "role": "test"},
+    "MJD_Test_5.hdf5": {"bytes": 1978866144, "md5": "44de297b59632b40a8071ffcfbbc7eea", "role": "test"},
+    "MJD_Train_0.hdf5": {"bytes": 1978866144, "md5": "3b6736c8916e3eb17bae1c3d7b33e2c6", "role": "train"},
+    "MJD_Train_1.hdf5": {"bytes": 1978866144, "md5": "8a056b5ab88d06b0c8817a6f9e76c528", "role": "train"},
+    "MJD_Train_2.hdf5": {"bytes": 1978866144, "md5": "1cebd6393563cd3668f8fe00c74100a8", "role": "train"},
+    "MJD_Train_3.hdf5": {"bytes": 1978866144, "md5": "82006bff38484ac3c1e4763d05c83e26", "role": "train"},
+    "MJD_Train_4.hdf5": {"bytes": 1978866144, "md5": "75dc221addfef13192c1dbb8e4e05101", "role": "train"},
+    "MJD_Train_5.hdf5": {"bytes": 1978866144, "md5": "ea012019ddae84a1d9de8468d9e71d8f", "role": "train"},
+    "MJD_Train_6.hdf5": {"bytes": 1978866144, "md5": "23c4310bb46bf6c64753bdfaacfff7d4", "role": "train"},
+    "MJD_Train_7.hdf5": {"bytes": 1978866144, "md5": "3095e06d1856c58f244f19908bcdb16e", "role": "train"},
+    "MJD_Train_8.hdf5": {"bytes": 1978866144, "md5": "74e0343fcd28ce3ae36a7e8f66959cd8", "role": "train"},
+    "MJD_Train_9.hdf5": {"bytes": 1978866144, "md5": "a53af83298d5630185e60fea9a4966a4", "role": "train"},
+    "MJD_Train_10.hdf5": {"bytes": 1978866144, "md5": "8188d76ae2465aaaa5804ba2a884d4b5", "role": "train"},
+    "MJD_Train_11.hdf5": {"bytes": 1978866144, "md5": "46161a4babf8ec59690c6f5eb664e610", "role": "train"},
+    "MJD_Train_12.hdf5": {"bytes": 1978866144, "md5": "9a1e0ea01931586687489245136cabb4", "role": "train"},
+    "MJD_Train_13.hdf5": {"bytes": 1978866144, "md5": "cf2e486193b0944b030758c165b980d6", "role": "train"},
+    "MJD_Train_14.hdf5": {"bytes": 1978866144, "md5": "73744513424b7d675206824dee40a611", "role": "train"},
+    "MJD_Train_15.hdf5": {"bytes": 1978866144, "md5": "4e3b5d05d7f65cb71900a75135281e97", "role": "train"}
+  }
+}

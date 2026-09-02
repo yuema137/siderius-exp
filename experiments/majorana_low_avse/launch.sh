@@ -12,6 +12,7 @@ WORKSPACE=""
 DATA_DIR=""
 PROFILE="qualification"
 LITERATURE="on"
+DRY_RUN=0
 PASSTHROUGH=()
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -20,6 +21,7 @@ while [ $# -gt 0 ]; do
         --data_dir) DATA_DIR="$2"; shift 2 ;;
         --profile) PROFILE="$2"; shift 2 ;;
         --literature) LITERATURE="$2"; shift 2 ;;
+        --dry-run) DRY_RUN=1; PASSTHROUGH+=("$1"); shift ;;
         *) PASSTHROUGH+=("$1"); shift ;;
     esac
 done
@@ -33,6 +35,13 @@ done
 for index in $(seq 0 5); do
     [ -f "${DATA_DIR}/MJD_Test_${index}.hdf5" ] || fail "missing MJD_Test_${index}.hdf5"
 done
+if [ "$DRY_RUN" -eq 0 ]; then
+    "${SIDERIUS_CHECKOUT}/.venv/bin/python" \
+        "${PACK_DIR}/tools/verify_dataset.py" \
+        "$DATA_DIR" \
+        "${PACK_DIR}/declared/dataset_manifest.json" \
+        --supervised-only
+fi
 case "$LITERATURE" in on|off) ;; *) fail "--literature must be on or off" ;; esac
 
 case "$PROFILE" in
