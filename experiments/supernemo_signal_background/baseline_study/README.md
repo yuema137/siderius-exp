@@ -21,10 +21,13 @@ Raw data and runtime artifacts live in the configured workspace, not in Git.
 
 ## Frozen study choices
 
-- Energy-matching bins: `[0, 100, ..., 3600]` keV.
+- Energy-matching bins: `[0, 25, ..., 3600]` keV.
 - Split identity: `(process, ev_no)`, hashed once into 80/10/10 partitions.
-- Training imbalance treatment: positive weighting in BCE; no event is moved
-  across a partition and no test event participates in model selection.
+- Training imbalance treatment: deterministic, without-replacement selection
+  of equal signal and background counts inside every fixed 25-keV energy bin.
+  Bins lacking either class do not enter training. Selection happens only
+  inside the fixed training partition; no event moves across a partition and
+  no test event participates in model selection.
 - Tracker representation: pointwise one-dimensional convolutions followed by
   masked symmetric pooling. This treats tracker hits as a variable-length set
   rather than assigning scientific meaning to their stored row order.
@@ -32,8 +35,13 @@ Raw data and runtime artifacts live in the configured workspace, not in Git.
 - Final runtime comparisons are measured in isolation. Concurrent exploratory
   runs may be used only to choose the configurations worth measuring.
 
-The 100-keV bin width was selected after a validation-partition sensitivity
-check at 25, 50, 100, 200, and 400 keV. Widths from 25 through 200 keV retained
-essentially the same common energy support; 100 keV avoids unnecessarily sparse
-bins without erasing the spectrum structure. This choice is frozen before any
-baseline score is examined.
+The 25-keV bin width was selected before the balanced baseline matrix after a
+validation-partition sensitivity check at 5, 10, 20, 25, 50, 100, and 200 keV.
+The energy-only residual AUC was 0.50030 at 25 keV, compared with 0.50109 at
+50 keV, 0.50426 at 100 keV, and 0.51643 at 200 keV. The complete validation
+partition retained 114 common bins and effective weight for 46,456 events per
+class at 25 keV; the median common count was 165 events per class per bin.
+Finer 5- and 10-keV grids reduced the already negligible residual but left many
+tail bins with only a few events. The 25-keV rule therefore controls residual
+energy leakage without paying unnecessary sparse-bin variance. It is frozen
+before any energy-balanced baseline score is examined.

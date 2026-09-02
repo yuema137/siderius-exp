@@ -24,6 +24,17 @@ class EnergyMatchedRoc:
     total_bins: int
 
 
+@dataclass(frozen=True, slots=True)
+class EnergyBalancedSelection:
+    """Deterministic event indices balanced by class inside every energy bin."""
+
+    indices: np.ndarray
+    common_bins: int
+    selected_signal: int
+    selected_background: int
+    excluded_events: int
+
+
 def _validated_vectors(
     labels: np.ndarray, scores: np.ndarray, energy_sum: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -87,6 +98,59 @@ def energy_matching_weights(
         weights[signal] = common_count / signal_count
         weights[background] = common_count / background_count
     return weights, common_bins
+
+
+def energy_balanced_indices(
+    labels: np.ndarray,
+    energy_sum: np.ndarray,
+    bin_edges: np.ndarray,
+) -> EnergyBalancedSelection:
+    """Select equal class counts per energy bin without replacement.
+
+    Input order is the deterministic tie breaker. Bins containing only one
+    class are excluded. The returned indices are sorted so downstream data
+    access remains stable and reproducible.
+    """
+    checked_labels = np.asarray(labels).reshape(-1)
+    checked_energy = np.asarray(energy_sum, dtype=np.float64).reshape(-1)
+    edges = np.asarray(bin_edges, dtype=np.float64).reshape(-1)
+    if checked_labels.size != checked_energy.size:
+        raise ValueError("labels and energy_sum must have equal lengths")
+    if edges.size < 2 or not np.all(np.isfinite(edges)):
+        raise ValueError("bin_edges must contain at least two finite values")
+    if np.any(edges[1:] <= edges[:-1]):
+        raise ValueError("bin_edges must be strictly increasing")
+    if not np.all(np.isin(checked_labels, (0, 1))):
+        raise ValueError("labels must be binary values 0 or 1")
+    if not np.all(np.isfinite(checked_energy)):
+        raise ValueError("energy_sum must be finite")
+
+    bin_ids = np.searchsorted(edges, checked_energy, side="right") - 1
+    bin_ids[checked_energy == edges[-1]] = edges.size - 2
+    in_range = (bin_ids >= 0) & (bin_ids < edges.size - 1)
+    selected_parts: list[np.ndarray] = []
+    common_bins = 0
+    selected_per_class = 0
+    for bin_id in np.unique(bin_ids[in_range]):
+        in_bin = in_range & (bin_ids == bin_id)
+        signal = np.flatnonzero(in_bin & (checked_labels == 1))
+        background = np.flatnonzero(in_bin & (checked_labels == 0))
+        common_count = min(signal.size, background.size)
+        if common_count == 0:
+            continue
+        common_bins += 1
+        selected_per_class += common_count
+        selected_parts.extend((signal[:common_count], background[:common_count]))
+    if not selected_parts:
+        raise ValueError("no energy bin contains both classes")
+    selected = np.sort(np.concatenate(selected_parts))
+    return EnergyBalancedSelection(
+        indices=selected,
+        common_bins=common_bins,
+        selected_signal=selected_per_class,
+        selected_background=selected_per_class,
+        excluded_events=int(checked_labels.size - selected.size),
+    )
 
 
 def weighted_roc(

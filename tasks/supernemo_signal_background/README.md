@@ -17,7 +17,7 @@ within one process file are tracker hits belonging to the same event.
 - Training objective: binary cross entropy.
 - Data cuts: no energy-window or TPP-separation cut is introduced implicitly.
 
-The energy-matching ruler uses fixed 100-keV bins from 0 through 3,600 keV.
+The energy-matching ruler uses fixed 25-keV bins from 0 through 3,600 keV.
 Within every bin containing both classes, signal and background each receive
 total weight equal to the smaller class count. Bins without both classes are
 excluded and their coverage is reported. This deterministic weighting removes

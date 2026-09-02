@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from tasks.supernemo_signal_background.plugins.energy_matched_auc import (
+    energy_balanced_indices,
     energy_matched_roc,
 )
 
@@ -54,3 +55,23 @@ def test_invalid_bin_edges_refuse() -> None:
             np.array([1.0, 1.0]),
             np.array([0.0, 1.0, 1.0]),
         )
+
+
+def test_training_selection_is_exactly_balanced_inside_each_energy_bin() -> None:
+    labels = np.array([1, 1, 1, 0, 1, 0, 0, 0, 1])
+    energy = np.array([0.2, 0.3, 0.4, 0.5, 1.2, 1.3, 1.4, 1.5, 2.2])
+    edges = np.array([0.0, 1.0, 2.0, 3.0])
+
+    result = energy_balanced_indices(labels, energy, edges)
+
+    selected_labels = labels[result.indices]
+    selected_energy = energy[result.indices]
+    selected_bins = np.searchsorted(edges, selected_energy, side="right") - 1
+    for bin_id in np.unique(selected_bins):
+        in_bin = selected_bins == bin_id
+        assert np.count_nonzero(selected_labels[in_bin] == 1) == np.count_nonzero(
+            selected_labels[in_bin] == 0
+        )
+    assert result.common_bins == 2
+    assert result.selected_signal == result.selected_background == 2
+    assert result.excluded_events == 5

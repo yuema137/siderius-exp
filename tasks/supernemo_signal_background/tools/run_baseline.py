@@ -16,6 +16,7 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from tasks.supernemo_signal_background.plugins.energy_matched_auc import (
+    energy_balanced_indices,
     energy_matched_roc,
     weighted_roc,
 )
@@ -29,7 +30,7 @@ FILES = {
 }
 LABELS = {"0nubb": 1, "2nubb": 0, "Bi214": 0, "Tl208": 0}
 SPLITS = {"train": 0, "validation": 1, "test": 2}
-ENERGY_BIN_EDGES_KEV = np.arange(0.0, 3600.0 + 100.0, 100.0)
+ENERGY_BIN_EDGES_KEV = np.arange(0.0, 3600.0 + 25.0, 25.0)
 TRACKER_KEYS = ("tX", "tY", "tZ", "tR")
 
 
@@ -40,6 +41,17 @@ class Arrays:
     labels: np.ndarray
     hits: np.ndarray | None = None
     hit_mask: np.ndarray | None = None
+
+
+def subset_arrays(source: Arrays, indices: np.ndarray) -> Arrays:
+    """Select one deterministic event subset across every aligned array."""
+    return Arrays(
+        event_features=source.event_features[indices],
+        energy_sum=source.energy_sum[indices],
+        labels=source.labels[indices],
+        hits=None if source.hits is None else source.hits[indices],
+        hit_mask=None if source.hit_mask is None else source.hit_mask[indices],
+    )
 
 
 def _bounded_indices(split_values: np.ndarray, split: str, limit: int) -> np.ndarray:
@@ -308,6 +320,11 @@ def main() -> int:
             args.validation_per_process,
             args.max_hits,
         )
+    unbalanced_train_events = int(train.labels.size)
+    balanced = energy_balanced_indices(
+        train.labels, train.energy_sum, ENERGY_BIN_EDGES_KEV
+    )
+    train = subset_arrays(train, balanced.indices)
     train, validation, normalization = standardize(train, validation)
     data_seconds = time.perf_counter() - load_started
     train_loader = make_loader(train, args.batch_size, True)
@@ -365,6 +382,14 @@ def main() -> int:
         "energy_bin_edges_kev": ENERGY_BIN_EDGES_KEV.tolist(),
         "parameters": parameters,
         "train_events": int(train.labels.size),
+        "unbalanced_train_events": unbalanced_train_events,
+        "training_energy_balance": {
+            "rule": "deterministic without-replacement downsampling to equal class counts within each fixed energy bin",
+            "common_bins": balanced.common_bins,
+            "selected_signal": balanced.selected_signal,
+            "selected_background": balanced.selected_background,
+            "excluded_events": balanced.excluded_events,
+        },
         "validation_events": int(validation.labels.size),
         "data_seconds": data_seconds,
         "training_seconds": train_seconds,
