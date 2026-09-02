@@ -342,6 +342,7 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
     assert len(commands) == 30
     for command in commands:
         expected_values = {
+            "--run_name": "cancer_mtg_campaign_v3_lit_on",
             "--trial_time_budget_minutes": "5",
             "--formal_time_budget_minutes": "15",
             "--trial_vram_budget_gb": "20",
@@ -352,3 +353,6 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
         }
         for flag, expected in expected_values.items():
             assert command[command.index(flag) + 1] == expected
+        assert Path(command[command.index("--advice") + 1]).name == (
+            "mtg_campaign_v3.json"
+        )

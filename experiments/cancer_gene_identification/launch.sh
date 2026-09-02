@@ -124,7 +124,7 @@ case "$PROFILE" in
     campaign)
         [ "$EXPERIMENT" = "mtg_campaign" ] || fail "--profile campaign requires --experiment mtg_campaign"
         PROFILE_ARGS=(
-            --run_name cancer_mtg_campaign_v2_lit_on
+            --run_name cancer_mtg_campaign_v3_lit_on
             --num_iterations 30
             --max_rounds 1
             --max_epochs 50
@@ -145,7 +145,7 @@ case "$PROFILE" in
             --ml_lit_review_config "${PACK_DIR}/framework_configs/lit_review.yaml"
         )
         ADVICE_ARGS=(
-            --advice "${EXPERIMENT_ROOT}/advice/mtg_campaign_v2.json"
+            --advice "${EXPERIMENT_ROOT}/advice/mtg_campaign_v3.json"
             --advice_sha256 "e6957a925e0953fe693afcac6861937c8c3192bf355bc7dfa8c490e51ce47a53"
         )
         ;;
