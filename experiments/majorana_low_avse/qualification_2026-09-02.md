@@ -39,3 +39,24 @@ The qualification treatment now keeps its one-minute Trial budget and raises
 only its Formal budget to two minutes. Campaign budgets remain unchanged at
 10 minutes for Trial and 30 minutes for Formal. A fresh exact-SHA workspace is
 required for the rerun.
+
+## Corrected two-minute Formal qualification
+
+The fresh rerun used SIDERIUS
+`6bcdeb2f55b47ced6bcadaa08ddfd88875964261` and siderius-exp
+`ef264e05a6bc746d3b768c8a8118f7b4bd4343d4` in workspace
+`/home/klz/Data/SIDERIUS_EXP/qualification/majorana_low_avse_ef264e0_6bcdeb2f_v2`.
+Both iterations completed two rounds and produced real Trial and Formal
+evidence under measured admission. Iteration 1 selected a best valid Trial
+energy-matched ROC AUC of `0.49331820632987017` and a best valid Formal score
+of `0.5499512683191314`. Iteration 2 consumed the first iteration's persisted
+state and selected a best valid Trial score of `0.49150936716816285` and a best
+valid Formal score of `0.5104347813453858`.
+
+The second iteration contains six attempt records, five Formal records, and one
+successful Formal record. Its manifest reports `status=completed`, two
+completed rounds, and `has_formal_evidence=true`. Together with the first
+iteration's completed manifest, this satisfies the bounded two-iteration
+external-consumer qualification. These scores are mechanism evidence from a
+one-epoch, deliberately small-scope qualification; they are not scientific
+campaign results.
