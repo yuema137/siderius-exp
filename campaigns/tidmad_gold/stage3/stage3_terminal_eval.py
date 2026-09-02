@@ -47,11 +47,13 @@ made in ``docs/campaign/stage_artifact_contract.md`` first; the pinned
 tests in ``tests/unit/scripts/stage3/test_terminal_eval.py`` fail loudly
 otherwise.
 
-The writer remains available as a tested mechanism, but its public execution
-boundary is disabled for the current Gold campaign. Strict Best spans four
-provenance workspaces while :class:`TerminalChampion` records one, so direct
-Python calls and the CLI both refuse before reading or scoring a champion
-rather than emitting a result with false provenance.
+The computation remains available as a tested mechanism, but artifact
+persistence is reachable only through the public execution boundary, which is
+disabled for the current Gold campaign. Strict Best spans four provenance
+workspaces while :class:`TerminalChampion` records one, so direct calls to the
+public Python entry and the CLI refuse before reading or scoring a champion.
+Calling the internal computation directly can return only an in-memory result;
+it has no path to write a campaign artifact with false provenance.
 """
 
 from __future__ import annotations
@@ -469,7 +471,7 @@ def _refuse_band_scalars(payload: Any, *, artifact: str, key_path: str = "$") ->
 
 
 # ---------------------------------------------------------------------------
-# Artifact writing (namespace-checked, band-scalar-checked, atomic)
+# Artifact payloads
 # ---------------------------------------------------------------------------
 
 
@@ -480,26 +482,6 @@ def _terminal_envelope(kind: str) -> dict[str, Any]:
         "scope": TERMINAL_SCOPE_DECLARATION,
         "generated_utc": datetime.now(UTC).isoformat(),
     }
-
-
-def _write_terminal_json(
-    layout: TerminalOutputLayout, path: Path, payload: dict[str, Any]
-) -> None:
-    """Write one terminal artifact: namespace defense-in-depth + band-scalar
-    refusal + atomic replace."""
-    resolved = path.resolve()
-    if not resolved.is_relative_to(layout.namespace):
-        raise TerminalNamespaceViolationError(
-            f"refusing to write {str(path)!r}: outside the terminal namespace "
-            f"{str(layout.namespace)!r} (contract §3 isolation rule)."
-        )
-    _refuse_band_scalars(payload, artifact=path.name)
-    resolved.parent.mkdir(parents=True, exist_ok=True)
-    tmp = resolved.with_name(resolved.name + ".tmp")
-    tmp.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    os.replace(tmp, resolved)
 
 
 # ---------------------------------------------------------------------------
@@ -573,54 +555,56 @@ class TerminalEvalResult(BaseModel):
     provenance_path: Path
 
 
+class TerminalEvalComputation(BaseModel):
+    """In-memory terminal measurement with no persistence capability."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    identity: ChampionIdentity
+    file_vector: list[float]
+    denoising_score: float
+    champion_payload: dict[str, Any]
+    score_payload: dict[str, Any]
+    provenance_payload: dict[str, Any]
+
+
 def _execute_terminal_eval(
     champion: TerminalChampion,
-    workspace_root: Path,
     *,
     compose_and_score_fn: ComposeAndScoreFn | None = None,
     anchor_map_path: Path | None = None,
     repo_sha: str | None = None,
-    layout: TerminalOutputLayout | None = None,
-) -> TerminalEvalResult:
-    """Execute the terminal algorithm after a public policy check.
+) -> TerminalEvalComputation:
+    """Compute a terminal measurement without writing campaign artifacts.
 
     Order is load-bearing:
 
-    1. the output layout is constructed (an out-of-namespace path refuses
-       HERE, before any side effect);
-    2. the champion's HealthGate validity is established through the ONE
+    1. the champion's HealthGate validity is established through the ONE
        authority (an invalid champion refuses BEFORE any scoring and
        BEFORE any write);
-    3. provenance inputs (deliverable hashes, anchor sha) are captured;
-    4. the shared ``compose_and_score`` wrapper is called EXACTLY ONCE with
+    2. provenance inputs (deliverable hashes, anchor sha) are captured;
+    3. the shared ``compose_and_score`` wrapper is called EXACTLY ONCE with
        its frozen full-scope defaults (contract §4);
-    5. the artifact set is written under the terminal namespace ONLY.
+    4. the would-be artifact payloads are returned in memory.
 
     Args:
         champion: the selected champion (identity + deliverable source +
             HealthGate provenance records).
-        workspace_root: the campaign's persistent root (contract header).
         compose_and_score_fn: test seam; ``None`` resolves the shared
             wrapper from :data:`COMPOSE_AND_SCORE_MODULE`.
         anchor_map_path: test seam; ``None`` uses the committed canonical
             anchor map (``reference_data/segment_anchors.json``).
         repo_sha: test seam; ``None`` resolves ``git rev-parse HEAD``
             best-effort (recorded as null when unresolvable).
-        layout: test seam; ``None`` builds the contract-default layout.
-
     Returns:
-        The measurement and its persisted artifact paths.
+        The measurement and artifact payloads, without filesystem paths or
+        persistence capability.
 
     Raises:
         InvalidChampionError: champion without HealthGate-valid provenance.
-        TerminalNamespaceViolationError: an output path outside the
-            terminal namespace.
         TerminalEvalError: missing deliverable dir / anchor map, or a
             wrapper result that is not the full 20-entry file vector.
     """
-    if layout is None:
-        layout = TerminalOutputLayout(workspace_root=workspace_root)
-
     # Refusal BEFORE any compute and BEFORE any write: selection happened
     # first, and an invalid champion is never terminal-evaluated.
     require_healthgate_valid(champion)
@@ -692,17 +676,13 @@ def _execute_terminal_eval(
         "repo_sha": resolved_repo_sha,
     }
 
-    _write_terminal_json(layout, layout.champion_input_path, champion_payload)
-    _write_terminal_json(layout, layout.score_path, score_payload)
-    _write_terminal_json(layout, layout.provenance_path, provenance_payload)
-
-    return TerminalEvalResult(
+    return TerminalEvalComputation(
         identity=champion.identity,
         file_vector=file_vector,
         denoising_score=scalar,
-        champion_input_path=layout.champion_input_path,
-        score_path=layout.score_path,
-        provenance_path=layout.provenance_path,
+        champion_payload=champion_payload,
+        score_payload=score_payload,
+        provenance_payload=provenance_payload,
     )
 
 
@@ -721,13 +701,40 @@ def run_terminal_eval(
     champion, scorer, filesystem, or internal mechanism is touched.
     """
     TERMINAL_EVAL_POLICY.require_enabled()
-    return _execute_terminal_eval(
+    computation = _execute_terminal_eval(
         champion,
-        workspace_root,
         compose_and_score_fn=compose_and_score_fn,
         anchor_map_path=anchor_map_path,
         repo_sha=repo_sha,
-        layout=layout,
+    )
+    resolved_layout = layout or TerminalOutputLayout(workspace_root=workspace_root)
+
+    def persist(path: Path, payload: dict[str, Any]) -> None:
+        """Write atomically inside the policy-checked public boundary."""
+        resolved = path.resolve()
+        if not resolved.is_relative_to(resolved_layout.namespace):
+            raise TerminalNamespaceViolationError(
+                f"refusing to write {str(path)!r}: outside the terminal namespace "
+                f"{str(resolved_layout.namespace)!r} (contract §3 isolation rule)."
+            )
+        _refuse_band_scalars(payload, artifact=path.name)
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        tmp = resolved.with_name(resolved.name + ".tmp")
+        tmp.write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        os.replace(tmp, resolved)
+
+    persist(resolved_layout.champion_input_path, computation.champion_payload)
+    persist(resolved_layout.score_path, computation.score_payload)
+    persist(resolved_layout.provenance_path, computation.provenance_payload)
+    return TerminalEvalResult(
+        identity=computation.identity,
+        file_vector=computation.file_vector,
+        denoising_score=computation.denoising_score,
+        champion_input_path=resolved_layout.champion_input_path,
+        score_path=resolved_layout.score_path,
+        provenance_path=resolved_layout.provenance_path,
     )
 
 

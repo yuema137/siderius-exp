@@ -64,6 +64,22 @@ _EXPECTED_CONSUMER_ENUMERATION = {
 _BAND_LABELS = ("0-3", "4-9", "10-14", "15-19")
 
 
+def _run_enabled_terminal_eval(
+    champion: TerminalChampion,
+    workspace_root: Path,
+    **kwargs: Any,
+) -> te.TerminalEvalResult:
+    """Exercise persistence through the policy-checked public boundary."""
+    original_policy = te.TERMINAL_EVAL_POLICY
+    te.TERMINAL_EVAL_POLICY = te.CapabilityExecutionPolicy(
+        capability="terminal_evaluation", enabled=True
+    )
+    try:
+        return te.run_terminal_eval(champion, workspace_root, **kwargs)
+    finally:
+        te.TERMINAL_EVAL_POLICY = original_policy
+
+
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -216,7 +232,7 @@ def test_happy_path_writes_only_terminal_namespace_full_scope(tmp_path: Path) ->
     stub = _ComposeStub()
     before = _walk_paths(ws)
 
-    result = _execute_terminal_eval(
+    result = _run_enabled_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=stub,
@@ -257,7 +273,7 @@ def test_provenance_records_hashes_anchor_sha_and_scope(tmp_path: Path) -> None:
     deliv = _make_deliverables(ws)
     anchor = _make_anchor(tmp_path)
 
-    result = _execute_terminal_eval(
+    result = _run_enabled_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -291,7 +307,7 @@ def test_partial_file_vector_refused(tmp_path: Path) -> None:
     deliv = _make_deliverables(ws)
     stub = _ComposeStub(vector=[0.1] * 19)
     with pytest.raises(TerminalEvalError, match="full-scope"):
-        _execute_terminal_eval(
+        _run_enabled_terminal_eval(
             _champion(deliv),
             ws,
             compose_and_score_fn=stub,
@@ -316,7 +332,7 @@ def test_invalid_champion_refused_by_name_before_any_effect(tmp_path: Path) -> N
     stub = _ComposeStub()
     bad = _valid_record() | {"status": "failed"}
     with pytest.raises(InvalidChampionError) as excinfo:
-        _execute_terminal_eval(
+        _run_enabled_terminal_eval(
             _champion(deliv, records=[bad]),
             ws,
             compose_and_score_fn=stub,
@@ -381,7 +397,7 @@ def test_a_champion_failing_its_RUNS_OWN_blocking_gate_is_refused(
 
     stub = _ComposeStub()
     with pytest.raises(InvalidChampionError, match="exp_champ"):
-        _execute_terminal_eval(
+        _run_enabled_terminal_eval(
             _champion(deliv, records=[record]),
             ws,
             compose_and_score_fn=stub,
@@ -422,7 +438,7 @@ def test_a_champion_passing_its_RUNS_OWN_blocking_gate_is_measured(
     }
 
     stub = _ComposeStub()
-    result = _execute_terminal_eval(
+    result = _run_enabled_terminal_eval(
         _champion(deliv, records=[record]),
         ws,
         compose_and_score_fn=stub,
@@ -464,7 +480,7 @@ def test_numerically_excellent_champion_without_gate_evidence_refused(
         "exp_id": "exp_champ",
     }
     with pytest.raises(InvalidChampionError, match="exp_champ"):
-        _execute_terminal_eval(
+        _run_enabled_terminal_eval(
             _champion(deliv, records=[excellent_invalid]),
             ws,
             compose_and_score_fn=stub,
@@ -481,7 +497,7 @@ def test_champion_with_no_provenance_records_refused(tmp_path: Path) -> None:
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
     with pytest.raises(InvalidChampionError, match="NO provenance"):
-        _execute_terminal_eval(
+        _run_enabled_terminal_eval(
             _champion(deliv, records=[]),
             ws,
             compose_and_score_fn=_ComposeStub(),
@@ -519,17 +535,6 @@ def test_traversal_escape_refused_at_construction(tmp_path: Path) -> None:
         TerminalOutputLayout(workspace_root=ws, input_dir=sneaky)
 
 
-def test_write_helper_defends_namespace_even_with_valid_layout(tmp_path: Path) -> None:
-    """Defect: a direct write-path bypass of the layout check. Fails when:
-    _write_terminal_json accepts a path outside the namespace."""
-    ws = _make_campaign_workspace(tmp_path)
-    layout = TerminalOutputLayout(workspace_root=ws)
-    target = ws / "stage3" / "composed_best" / "leak.json"
-    with pytest.raises(TerminalNamespaceViolationError):
-        te._write_terminal_json(layout, target, {"k": "v"})
-    assert not target.exists()
-
-
 # ---------------------------------------------------------------------------
 # W3 — the mutation-capable read-closure guard (contract §3 isolation)
 # ---------------------------------------------------------------------------
@@ -559,7 +564,7 @@ def test_read_closure_red_on_planted_terminal_artifact(tmp_path: Path) -> None:
     Stage-2 deliverables dir without the guard naming it."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
-    result = _execute_terminal_eval(
+    result = _run_enabled_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -592,7 +597,7 @@ def test_read_closure_red_on_symlink_resolving_into_namespace(tmp_path: Path) ->
     checked for consumable entries."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
-    result = _execute_terminal_eval(
+    result = _run_enabled_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -735,7 +740,7 @@ def test_terminal_artifacts_contain_no_band_level_scalar_field(tmp_path: Path) -
     (or numeric-sequence) value."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
-    result = _execute_terminal_eval(
+    result = _run_enabled_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -747,24 +752,19 @@ def test_terminal_artifacts_contain_no_band_level_scalar_field(tmp_path: Path) -
         assert _band_scalar_fields(payload) == [], f"band-level scalar in {path.name}"
 
 
-def test_band_scalar_emission_refused_at_write(tmp_path: Path) -> None:
-    """Defect: the writer emitting a band-level scalar field. Fails when: a
+def test_band_scalar_payload_validation() -> None:
+    """Defect: accepting a band-level scalar field. Fails when: a
     band-labelled or band-named key with a numeric value (or a numeric
     sequence — a per-band vector is aggregation too) reaches disk, or when
     legitimate band tokens in string VALUES / hash-keyed filenames are
     refused (false positive breaking real provenance)."""
-    ws = _make_campaign_workspace(tmp_path)
-    layout = TerminalOutputLayout(workspace_root=ws)
-    target = layout.namespace / "results" / "probe.json"
-
     for bad in (
         {"per_band_scores": {"0-3": 1.2}},
         {"0-3": 6.1},
         {"band_means": [1.0, 2.0, 3.0, 4.0]},
     ):
         with pytest.raises(te.BandScalarEmissionError):
-            te._write_terminal_json(layout, target, bad)
-        assert not target.exists()
+            te._refuse_band_scalars(bad, artifact="probe.json")
 
     # Band tokens in VALUES and in hash-map KEYS with string values are
     # provenance, not scalars — they must pass.
@@ -774,8 +774,7 @@ def test_band_scalar_emission_refused_at_write(tmp_path: Path) -> None:
             "abra_denoised_wavenet_goldA_band0-3_file0000.h5": "deadbeef"
         },
     }
-    te._write_terminal_json(layout, target, benign)
-    assert json.loads(target.read_text()) == benign
+    assert te._refuse_band_scalars(benign, artifact="probe.json") is None
 
 
 def test_band_guard_reached_on_every_production_write(
@@ -796,7 +795,7 @@ def test_band_guard_reached_on_every_production_write(
         original(payload, artifact=artifact, key_path=key_path)
 
     monkeypatch.setattr(te, "_refuse_band_scalars", spy)
-    _execute_terminal_eval(
+    _run_enabled_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -907,19 +906,38 @@ def test_public_entry_refuses_before_internal_mechanism(
     assert not terminal_namespace(ws).exists()
 
 
+def test_internal_computation_cannot_persist_campaign_artifacts(
+    tmp_path: Path,
+) -> None:
+    """Direct algorithm calls may compute, but cannot create result files."""
+    ws = _make_campaign_workspace(tmp_path)
+    deliv = _make_deliverables(ws)
+
+    computation = _execute_terminal_eval(
+        _champion(deliv),
+        compose_and_score_fn=_ComposeStub(),
+        anchor_map_path=_make_anchor(tmp_path),
+        repo_sha="x",
+    )
+
+    assert computation.denoising_score == 6.234
+    assert computation.score_payload["scope"] == "100%"
+    assert not terminal_namespace(ws).exists()
+
+
 def test_public_entry_can_execute_when_its_workflow_policy_is_enabled(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     """Another workflow policy can enable the mechanism without a new branch."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
-    expected = object()
     mechanism_called = False
+    original_mechanism = te._execute_terminal_eval
 
     def enabled_mechanism(*args: Any, **kwargs: Any) -> Any:
         nonlocal mechanism_called
         mechanism_called = True
-        return expected
+        return original_mechanism(*args, **kwargs)
 
     monkeypatch.setattr(
         te,
@@ -928,10 +946,16 @@ def test_public_entry_can_execute_when_its_workflow_policy_is_enabled(
     )
     monkeypatch.setattr(te, "_execute_terminal_eval", enabled_mechanism)
 
-    result = te.run_terminal_eval(_champion(deliv), ws)
+    result = te.run_terminal_eval(
+        _champion(deliv),
+        ws,
+        compose_and_score_fn=_ComposeStub(),
+        anchor_map_path=_make_anchor(tmp_path),
+        repo_sha="x",
+    )
 
     assert mechanism_called is True
-    assert result is expected
+    assert result.score_path.is_file()
 
 
 def test_internal_mechanism_has_no_production_caller() -> None:
