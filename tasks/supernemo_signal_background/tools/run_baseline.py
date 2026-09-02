@@ -355,9 +355,14 @@ def main() -> int:
             args.max_hits,
         )
     train, validation, normalization = standardize(train, validation)
+    validation_balance = energy_balanced_indices(
+        validation.labels, validation.energy_sum, ENERGY_BIN_EDGES_KEV
+    )
+    balanced_validation = subset_arrays(validation, validation_balance.indices)
     data_seconds = time.perf_counter() - load_started
     train_loader = make_loader(train, args.batch_size, True)
-    validation_loader = make_loader(validation, args.batch_size, False)
+    validation_loss_loader = make_loader(balanced_validation, args.batch_size, False)
+    validation_score_loader = make_loader(validation, args.batch_size, False)
     model = (
         Mlp(args.width, args.depth)
         if args.architecture == "mlp"
@@ -387,7 +392,7 @@ def main() -> int:
             batch_loss.backward()
             optimizer.step()
             total += float(batch_loss.detach()) * labels.numel()
-        validation_loss, scores = evaluate(model, validation_loader, loss, device)
+        validation_loss, _ = evaluate(model, validation_loss_loader, loss, device)
         history.append(
             {
                 "epoch": epoch,
@@ -397,6 +402,10 @@ def main() -> int:
         )
     torch.cuda.synchronize(device)
     train_seconds = time.perf_counter() - train_started
+    score_started = time.perf_counter()
+    _, scores = evaluate(model, validation_score_loader, loss, device)
+    torch.cuda.synchronize(device)
+    validation_score_seconds = time.perf_counter() - score_started
     matched = energy_matched_roc(
         validation.labels, scores, validation.energy_sum, ENERGY_BIN_EDGES_KEV
     )
@@ -420,8 +429,16 @@ def main() -> int:
             "excluded_events": balanced.excluded_events,
         },
         "validation_events": int(validation.labels.size),
+        "validation_loss_events": int(balanced_validation.labels.size),
+        "validation_energy_balance": {
+            "common_bins": validation_balance.common_bins,
+            "selected_signal": validation_balance.selected_signal,
+            "selected_background": validation_balance.selected_background,
+            "excluded_events": validation_balance.excluded_events,
+        },
         "data_seconds": data_seconds,
         "training_seconds": train_seconds,
+        "final_validation_scoring_seconds": validation_score_seconds,
         "events_per_training_second": args.epochs * train.labels.size / train_seconds,
         "peak_vram_bytes": int(torch.cuda.max_memory_allocated(device)),
         "energy_matched_auc": matched.auc,
