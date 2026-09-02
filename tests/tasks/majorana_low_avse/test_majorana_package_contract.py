@@ -83,6 +83,18 @@ def test_bounded_selection_preserves_balance_in_every_energy_bin() -> None:
         assert int((selected_labels == 0).sum()) == int((selected_labels == 1).sum())
 
 
+def test_unseeded_portion_is_reproducible_without_prefix_bias() -> None:
+    """Official file ordering must not turn a portion into an early-file prefix."""
+    from tasks.majorana_low_avse.plugins._majorana_data import _choose
+
+    values = np.arange(1000)
+    first = _choose(values, 0.10, None)
+    second = _choose(values, 0.10, None)
+    assert np.array_equal(first, second)
+    assert first.size == 100
+    assert int(first.max()) > 900
+
+
 def test_qualification_has_a_trial_round_before_forced_formal(tmp_path: Path) -> None:
     """One forced-Formal round would silently leave every Trial override unused."""
     data_dir = tmp_path / "data"

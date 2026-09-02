@@ -46,9 +46,9 @@ def _choose(values: np.ndarray, portion: float, seed: int | None) -> np.ndarray:
     keep = max(1, round(values.size * portion))
     if keep >= values.size:
         return values
-    if seed is None:
-        return values[:keep]
-    rng = np.random.default_rng(seed)
+    # A prefix would overrepresent early official files. Seed zero gives an
+    # explicit, reproducible whole-partition snapshot when no caller seed exists.
+    rng = np.random.default_rng(0 if seed is None else seed)
     return np.sort(rng.choice(values, size=keep, replace=False))
 
 
