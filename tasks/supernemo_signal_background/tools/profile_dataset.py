@@ -13,10 +13,10 @@ import h5py
 import numpy as np
 
 FILES = {
-    "0nubb": ("data_0nubb_merged.h5", 1_987_942, 1),
-    "2nubb": ("data_2nubb_merged.h5", 3_284_115, 0),
-    "Bi214": ("data_Bi214_merged.h5", 2_634_001, 0),
-    "Tl208": ("data_Tl208_merged.h5", 2_549_142, 0),
+    "0nubb": ("data_0nubb_merged.h5", 1_987_943, 1),
+    "2nubb": ("data_2nubb_merged.h5", 3_284_116, 0),
+    "Bi214": ("data_Bi214_merged.h5", 2_634_002, 0),
+    "Tl208": ("data_Tl208_merged.h5", 2_549_143, 0),
 }
 REQUIRED_KEYS = (
     "ev_no",
