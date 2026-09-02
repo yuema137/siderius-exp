@@ -26,6 +26,7 @@ separate.
 
 ```text
 compositions/two_network.yaml    complete cpdb and ltg graphs
+compositions/mtg_size.yaml       one complete mtg graph for size qualification
 compositions/eight_network.yaml  all eight complete NatureBench graphs
 ```
 
@@ -66,6 +67,7 @@ Each file provides `network`, `features`, `mask_train`, `mask_val`,
 
 ```text
 experiments/cancer_gene_identification/two_network_qualification/
+experiments/cancer_gene_identification/mtg_size_qualification/
 experiments/cancer_gene_identification/eight_network_comparison/
 ```
 

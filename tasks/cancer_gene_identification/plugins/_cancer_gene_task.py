@@ -7,8 +7,9 @@ multi-omics features together without teaching the framework graph vocabulary.
 
 from __future__ import annotations
 
+import hashlib
 import json
-import math
+import secrets
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, ClassVar, Literal
@@ -16,9 +17,6 @@ from typing import Any, ClassVar, Literal
 import h5py
 import numpy as np
 import torch
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
@@ -27,6 +25,8 @@ from execute_tools.task_data_path import (
     ScopeBuildRequest,
     ValidationScopeError,
 )
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 CANCER_GENE_TASK_ID = "naturebench_cancer_gene"
 INSTANCES = ("cpdb", "stringdb", "pcnet", "iref_v15", "iref_v9", "multinet", "mtg", "ltg")
@@ -40,15 +40,50 @@ class CancerGeneScope(BaseModel):
 
     instances: tuple[str, ...] = Field(min_length=1)
     evaluation_split: Literal["val", "test"] = "val"
+    active_fraction: float = Field(default=1.0, gt=0.0, le=1.0)
+    sampling_seed: int = Field(default=0, ge=0)
+    max_active_nodes: int | None = Field(default=None, ge=1)
+
+    def sampled_mask(self, mask: np.ndarray, *, network: str, split: str) -> np.ndarray:
+        """Select active nodes without changing the task-owned split boundary."""
+        active = np.flatnonzero(np.asarray(mask, dtype=bool).reshape(-1))
+        if active.size == 0:
+            raise ValueError(f"{network} {split} mask contains no active nodes")
+        keep = max(1, int(np.ceil(active.size * self.active_fraction)))
+        if self.max_active_nodes is not None:
+            keep = min(keep, self.max_active_nodes)
+        if keep < active.size:
+            digest = hashlib.sha256(
+                f"{self.sampling_seed}:{network}:{split}".encode()
+            ).digest()
+            rng = np.random.default_rng(int.from_bytes(digest[:8], "big"))
+            active = np.sort(rng.choice(active, size=keep, replace=False))
+        selected = np.zeros(np.asarray(mask).size, dtype=bool)
+        selected[active] = True
+        return selected
 
 
 class _GraphDataset(Dataset[Any]):
     def __init__(
-        self, scope: CancerGeneScope, data_dir: str, target_split: Literal["train", "val", "test"]
+        self,
+        scope: CancerGeneScope,
+        data_dir: str,
+        target_split: Literal["train", "val", "test"],
+        *,
+        active_fraction: float | None = None,
+        sampling_seed: int | None = None,
+        max_active_nodes: int | None = None,
     ):
         self._scope = scope
         self._data_dir = Path(data_dir)
         self._target_split = target_split
+        self._active_fraction = (
+            scope.active_fraction if active_fraction is None else active_fraction
+        )
+        self._sampling_seed = scope.sampling_seed if sampling_seed is None else sampling_seed
+        self._max_active_nodes = (
+            scope.max_active_nodes if max_active_nodes is None else max_active_nodes
+        )
         missing = [
             name for name in scope.instances if not (self._data_dir / name / "data.h5").is_file()
         ]
@@ -88,7 +123,18 @@ class _GraphDataset(Dataset[Any]):
             target = np.full((node_count + len(edge_src), 3), -1.0, dtype=np.float32)
             target[:, 0] = packed[:, 0]
             if self._target_split != "test":
-                mask = np.asarray(handle[f"mask_{self._target_split}"]).astype(bool).reshape(-1)
+                sampling_scope = self._scope.model_copy(
+                    update={
+                        "active_fraction": self._active_fraction,
+                        "sampling_seed": self._sampling_seed,
+                        "max_active_nodes": self._max_active_nodes,
+                    }
+                )
+                mask = sampling_scope.sampled_mask(
+                    np.asarray(handle[f"mask_{self._target_split}"]),
+                    network=name,
+                    split=self._target_split,
+                )
                 labels = np.asarray(handle[f"y_{self._target_split}"], dtype=np.float32).reshape(-1)
                 packed[:node_count, 3] = mask.astype(np.float32)
                 target[:node_count, 2][mask] = labels[mask]
@@ -137,21 +183,31 @@ class CancerGeneTaskDataPath:
                 raise ValueError(
                     "target_partitions contains an out-of-range network index"
                 ) from exc
-        keep = max(1, math.ceil(len(candidates) * request.portion))
-        if keep < len(candidates):
-            rng = np.random.default_rng(request.seed)
-            chosen = sorted(rng.choice(len(candidates), size=keep, replace=False).tolist())
-            candidates = [candidates[index] for index in chosen]
         return tuple(candidates)
 
-    def build_training_scope(self, request: ScopeBuildRequest) -> object:
+    @staticmethod
+    def _scope_from_request(
+        instances: tuple[str, ...],
+        request: ScopeBuildRequest,
+        evaluation_split: Literal["val", "test"],
+    ) -> CancerGeneScope:
+        seed = request.seed if request.seed is not None else secrets.randbits(32)
         return CancerGeneScope(
-            instances=self._select(request), evaluation_split=self._evaluation_split
+            instances=instances,
+            evaluation_split=evaluation_split,
+            active_fraction=request.portion,
+            sampling_seed=seed,
+            max_active_nodes=request.max_samples,
+        )
+
+    def build_training_scope(self, request: ScopeBuildRequest) -> object:
+        return self._scope_from_request(
+            self._select(request), request, self._evaluation_split
         )
 
     def build_eval_scope(self, request: ScopeBuildRequest) -> object:
-        return CancerGeneScope(
-            instances=self._select(request), evaluation_split=self._evaluation_split
+        return self._scope_from_request(
+            self._select(request), request, self._evaluation_split
         )
 
     def max_inference_batch_size(self) -> int:
@@ -182,18 +238,13 @@ class CancerGeneTaskDataPath:
 
     def training_dataset(self, scope: object, params: EpochSamplingParams) -> Dataset[Any]:
         checked = self._scope(scope)
-        instances = list(checked.instances)
-        if params.train_portion is not None and params.train_portion < 1.0:
-            keep = max(1, math.ceil(len(instances) * params.train_portion))
-            rng = np.random.default_rng(params.epoch_seed)
-            chosen = sorted(rng.choice(len(instances), size=keep, replace=False).tolist())
-            instances = [instances[index] for index in chosen]
-        if params.max_samples is not None:
-            instances = instances[: params.max_samples]
         return _GraphDataset(
-            CancerGeneScope(instances=tuple(instances), evaluation_split=checked.evaluation_split),
+            checked,
             params.data_dir,
             "train",
+            active_fraction=params.train_portion,
+            sampling_seed=params.epoch_seed,
+            max_active_nodes=params.max_samples,
         )
 
     def validation_dataset(self, scope: object, params: EvalMaterializationParams) -> Dataset[Any]:

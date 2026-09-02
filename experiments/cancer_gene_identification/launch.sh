@@ -9,7 +9,7 @@ usage() {
     cat <<USAGE
 Usage: bash experiments/cancer_gene_identification/launch.sh \
   --siderius-checkout DIR --workspace DIR --data_dir DIR \
-  [--experiment two_network_qualification|eight_network_comparison] \
+  [--experiment mtg_size_qualification|two_network_qualification|eight_network_comparison] \
   [extra run_chain.sh args...]
 
 Required:
@@ -18,7 +18,7 @@ Required:
   --data_dir DIR            NatureBench problem/data directory
 
 Common extras:
-  --experiment NAME default: two_network_qualification
+  --experiment NAME default: mtg_size_qualification
   --run_name NAME   default: cancer_gene_quickstart
   --dry-run         print the resolved child command and run nothing
 USAGE
@@ -33,7 +33,7 @@ fail() {
 SIDERIUS_CHECKOUT=""
 WORKSPACE=""
 DATA_DIR=""
-EXPERIMENT="two_network_qualification"
+EXPERIMENT="mtg_size_qualification"
 PASSTHROUGH=()
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -73,6 +73,10 @@ done
 [ -n "$WORKSPACE" ] || fail "missing required argument --workspace"
 [ -d "$DATA_DIR" ] || fail "--data_dir is not a directory: '$DATA_DIR'"
 case "$EXPERIMENT" in
+    mtg_size_qualification)
+        NETWORKS=(mtg)
+        COMPOSITION_NAME="mtg_size"
+        ;;
     two_network_qualification)
         NETWORKS=(cpdb ltg)
         COMPOSITION_NAME="two_network"
@@ -82,7 +86,7 @@ case "$EXPERIMENT" in
         COMPOSITION_NAME="eight_network"
         ;;
     *)
-        fail "unknown experiment '$EXPERIMENT'; expected two_network_qualification or eight_network_comparison"
+        fail "unknown experiment '$EXPERIMENT'; expected mtg_size_qualification, two_network_qualification, or eight_network_comparison"
         ;;
 esac
 for network in "${NETWORKS[@]}"; do
@@ -114,11 +118,12 @@ exec bash "$LAUNCHER" \
     --formal_time_admission_source measured \
     --allowed_output_types regressor \
     --min_formal_batch_size 1 \
-    --trial_portion 0.25 \
+    --trial_portion 1.0 \
+    --train_portion 0.25 \
     --eval_portion 0.25 \
     --formal_portion 1.0 \
-    --formal_train_portion 0.25 \
-    --formal_eval_portion 0.25 \
+    --formal_train_portion 1.0 \
+    --formal_eval_portion 1.0 \
     --trial_vram_budget_gb 10 \
     --formal_vram_budget_gb 16 \
     --vram_probe_step_timeout_seconds 600 \

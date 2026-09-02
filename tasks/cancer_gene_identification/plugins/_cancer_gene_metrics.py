@@ -7,7 +7,6 @@ from typing import Any, ClassVar
 
 import h5py
 import numpy as np
-
 from execute_tools.evaluation_metric import EvaluationMetric
 
 
@@ -68,7 +67,11 @@ def _scores(
         if name not in evaluation_payload:
             raise ValueError(f"cancer-gene deliverable is missing network {name!r}")
         with h5py.File(f"{data_dir}/{name}/data.h5", "r") as handle:
-            mask = np.asarray(handle["mask_val"]).astype(bool).reshape(-1)
+            mask = task_scope.sampled_mask(
+                np.asarray(handle["mask_val"]),
+                network=name,
+                split="val",
+            )
             labels = np.asarray(handle["y_val"]).reshape(-1)[mask]
         predictions = np.asarray(evaluation_payload[name], dtype=np.float64).reshape(-1)
         if len(predictions) != int(mask.sum()):

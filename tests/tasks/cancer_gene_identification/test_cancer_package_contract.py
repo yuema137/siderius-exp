@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shlex
@@ -10,16 +11,24 @@ import sys
 import textwrap
 from pathlib import Path
 
+import h5py
+import numpy as np
 import pytest
-
+from execute_tools.task_data_path import (
+    EpochSamplingParams,
+    EvalMaterializationParams,
+    ScopeBuildRequest,
+)
 
 EXP_ROOT = Path(__file__).resolve().parents[3]
 PACK = EXP_ROOT / "tasks" / "cancer_gene_identification"
 COMPOSITIONS = {
+    "mtg_size_qualification": PACK / "compositions" / "mtg_size.yaml",
     "two_network_qualification": PACK / "compositions" / "two_network.yaml",
     "eight_network_comparison": PACK / "compositions" / "eight_network.yaml",
 }
 EXPECTED_NETWORKS = {
+    "mtg_size_qualification": ["mtg"],
     "two_network_qualification": ["cpdb", "ltg"],
     "eight_network_comparison": [
         "cpdb",
@@ -36,6 +45,16 @@ LAUNCHER = EXP_ROOT / "experiments" / "cancer_gene_identification" / "launch.sh"
 EXPECTED_FRAMEWORK_REVISION = (
     (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
 )
+
+
+def _task_module():
+    path = PACK / "plugins" / "_cancer_gene_task.py"
+    spec = importlib.util.spec_from_file_location("cancer_gene_task_test", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 COMPOSE_CHILD = textwrap.dedent(
     """
@@ -157,6 +176,62 @@ def test_task_package_contains_no_experiment_or_workflow_launcher() -> None:
     assert LAUNCHER.is_file()
 
 
+def test_mtg_size_treatment_changes_masks_without_changing_the_graph(tmp_path: Path) -> None:
+    """Trial must reduce active nodes, not replace or truncate the MTG graph."""
+    module = _task_module()
+    network_dir = tmp_path / "mtg"
+    network_dir.mkdir()
+    with h5py.File(network_dir / "data.h5", "w") as handle:
+        handle["features"] = np.arange(12 * 64, dtype=np.float32).reshape(12, 64)
+        handle["network"] = np.eye(12, dtype=np.int8)
+        handle["mask_train"] = np.array([1] * 8 + [0] * 4, dtype=np.int8)
+        handle["mask_val"] = np.array([0] * 8 + [1] * 4, dtype=np.int8)
+        handle["mask_test"] = np.zeros(12, dtype=np.int8)
+        handle["y_train"] = np.arange(12) % 2
+        handle["y_val"] = np.arange(12) % 2
+
+    task = module.CancerGeneTaskDataPath(instances=["mtg"])
+    complete_scope = task.build_training_scope(
+        ScopeBuildRequest(
+            round_kind="formal", selection_strategy="snapshot", portion=1.0, seed=7
+        )
+    )
+    trial_input, trial_target = task.training_dataset(
+        complete_scope,
+        EpochSamplingParams(data_dir=str(tmp_path), train_portion=0.25, epoch_seed=11),
+    )[0]
+    formal_input, formal_target = task.training_dataset(
+        complete_scope,
+        EpochSamplingParams(data_dir=str(tmp_path), train_portion=1.0, epoch_seed=11),
+    )[0]
+    trial_eval_scope = task.build_eval_scope(
+        ScopeBuildRequest(
+            round_kind="trial", selection_strategy="snapshot", portion=0.25, seed=13
+        )
+    )
+    formal_eval_scope = task.build_eval_scope(
+        ScopeBuildRequest(
+            round_kind="formal", selection_strategy="snapshot", portion=1.0, seed=13
+        )
+    )
+    _, trial_eval_target = task.validation_dataset(
+        trial_eval_scope, EvalMaterializationParams(data_dir=str(tmp_path))
+    )[0]
+    _, formal_eval_target = task.validation_dataset(
+        formal_eval_scope, EvalMaterializationParams(data_dir=str(tmp_path))
+    )[0]
+
+    assert trial_input.shape == formal_input.shape == (12, 68)
+    assert int((trial_target[:, 1] > 0.5).sum()) == 2
+    assert int((formal_target[:, 1] > 0.5).sum()) == 8
+    assert int((trial_eval_target[:, 1] > 0.5).sum()) == 1
+    assert int((formal_eval_target[:, 1] > 0.5).sum()) == 4
+    assert not np.any(
+        (formal_target[:, 1].numpy() > 0.5)
+        & (formal_eval_target[:, 1].numpy() > 0.5)
+    )
+
+
 @pytest.mark.parametrize("experiment", COMPOSITIONS)
 def test_experiment_dry_run_preserves_the_trial_formal_treatment(
     experiment: str, tmp_path: Path
@@ -205,11 +280,12 @@ def test_experiment_dry_run_preserves_the_trial_formal_treatment(
         "--run_name": "cancer_gene_quickstart",
         "--max_rounds": "2",
         "--max_epochs": "1",
-        "--trial_portion": "0.25",
+        "--trial_portion": "1.0",
+        "--train_portion": "0.25",
         "--eval_portion": "0.25",
         "--formal_portion": "1.0",
-        "--formal_train_portion": "0.25",
-        "--formal_eval_portion": "0.25",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
         "--min_formal_batch_size": "1",
         "--allowed_output_types": "regressor",
         "--trial_vram_budget_gb": "10",
