@@ -19,8 +19,8 @@ from typing import Any
 
 import pytest
 
-from campaigns.tidmad_gold.paths import GOLD_HEALTH_CONFIG_PATH
 import campaigns.tidmad_gold.stage3.stage3_terminal_eval as te
+from campaigns.tidmad_gold.paths import GOLD_HEALTH_CONFIG_PATH
 from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
     ARTIFACT_NAMESPACE_KEY,
     CENSUS_ALLOWED_PRODUCTION_REFERENCES,
@@ -42,6 +42,7 @@ from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
     run_terminal_eval,
     terminal_namespace,
 )
+
 from .metric_fixture import load_declared_tidmad_metric_spec
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -349,6 +350,7 @@ def test_a_champion_failing_its_RUNS_OWN_blocking_gate_is_refused(
         pinned_workspace_gate_ids,
         required_blocking_gate_ids,
     )
+
     from tests.helpers.health_task_config import write_pinned_effective_config
 
     ws = _make_campaign_workspace(tmp_path)
@@ -848,9 +850,7 @@ def test_compose_and_score_resolved_from_agreed_module(monkeypatch: Any) -> None
 
 
 def test_cli_refusal_exits_nonzero_naming_reason(tmp_path: Path, capsys: Any) -> None:
-    """Defect: the CLI swallowing a refusal into exit 0, making an invalid
-    champion look operationally like a successful terminal measurement.
-    Fails when: an invalid champion yields exit 0 or an unnamed error."""
+    """The campaign CLI must refuse before evaluating any champion."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
     champion = _champion(deliv, records=[_valid_record() | {"status": "failed"}])
@@ -861,16 +861,14 @@ def test_cli_refusal_exits_nonzero_naming_reason(tmp_path: Path, capsys: Any) ->
     captured = capsys.readouterr()
     assert rc == 2
     assert "REFUSED" in captured.err
-    assert "exp_champ" in captured.err
+    assert "four provenance workspaces" in captured.err
     assert not terminal_namespace(ws).exists()
 
 
-def test_cli_happy_path_reports_full_scope(
+def test_cli_refuses_even_a_valid_single_workspace_champion(
     tmp_path: Path, capsys: Any, monkeypatch: Any
 ) -> None:
-    """Defect: the CLI wiring dropping the terminal semantics (wrong module
-    seam, or reporting something other than the full-scope scalar). Fails
-    when: exit != 0, or the report omits the 100% scope."""
+    """A valid payload must not bypass the campaign provenance refusal."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
     fake = types.ModuleType("campaigns.tidmad_gold.stage3.stage3_common")
@@ -881,7 +879,7 @@ def test_cli_happy_path_reports_full_scope(
 
     rc = te.main(["--champion_json", str(champion_json), "--workspace_root", str(ws)])
     captured = capsys.readouterr()
-    assert rc == 0
-    assert "scope 100%" in captured.out
-    assert "6.234" in captured.out
-    assert (terminal_namespace(ws) / "results" / "terminal_score.json").is_file()
+    assert rc == 2
+    assert "REFUSED" in captured.err
+    assert "TerminalChampion records one" in captured.err
+    assert not terminal_namespace(ws).exists()

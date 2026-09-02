@@ -46,6 +46,11 @@ contract's frozen clauses. Any edit here is a CONTRACT change and must be
 made in ``docs/campaign/stage_artifact_contract.md`` first; the pinned
 tests in ``tests/unit/scripts/stage3/test_terminal_eval.py`` fail loudly
 otherwise.
+
+The writer remains available as a tested mechanism, but its CLI is disabled
+for the current Gold campaign. Strict Best spans four provenance workspaces
+while :class:`TerminalChampion` records one, so the CLI refuses before reading
+or scoring a champion rather than emitting a result with false provenance.
 """
 
 from __future__ import annotations
@@ -62,16 +67,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol, cast
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
-
-from campaigns.tidmad_gold.paths import EXPERIMENT_ROOT
-from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH
 from execute_tools.evaluation_metric import MetricSpec, MetricSpecField
 from execute_tools.health_checks.candidate_eligibility import (
     CandidateHealthValidity,
     classify_under_pinned_policy,
     pinned_workspace_gate_ids,
 )
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH, EXPERIMENT_ROOT
 
 # ---------------------------------------------------------------------------
 # Frozen contract constants
@@ -96,6 +100,16 @@ TERMINAL_FILE_COUNT = 20
 #: Stage-1 root globs and the band-scalar emission refusal) — never as an
 #: artifact field.
 BAND_LABELS: tuple[str, str, str, str] = ("0-3", "4-9", "10-14", "15-19")
+
+# This writer remains a reusable, tested mechanism, but the current Gold
+# campaign cannot invoke it truthfully: Strict Best pools four provenance
+# workspaces while TerminalChampion records one. The campaign CLI therefore
+# refuses until a multi-workspace provenance contract exists.
+CAMPAIGN_TERMINAL_EVAL_REFUSAL = (
+    "terminal evaluation is out of scope for the TIDMAD Gold campaign: "
+    "Strict Best spans four provenance workspaces, but TerminalChampion "
+    "records one"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -609,11 +623,7 @@ def run_terminal_eval(
         else _resolve_compose_and_score()
     )
 
-    anchor = (
-        Path(anchor_map_path)
-        if anchor_map_path is not None
-        else ANCHOR_MAP_PATH
-    )
+    anchor = Path(anchor_map_path) if anchor_map_path is not None else ANCHOR_MAP_PATH
     if not anchor.is_file():
         raise TerminalEvalError(f"canonical anchor map not found: {str(anchor)!r}")
     anchor_sha = _sha256_file(anchor)
@@ -993,11 +1003,11 @@ def census_terminal_namespace_references(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Terminal evaluation entrypoint.
+    """Refuse terminal evaluation for the current Gold campaign.
 
-    A refusal (invalid champion, namespace violation, missing inputs) exits
-    non-zero with the named reason on stderr — it must never look like a
-    successful terminal measurement.
+    Argument parsing remains active so malformed invocations still receive
+    ordinary CLI feedback. A well-formed invocation exits non-zero before any
+    input is read, score is computed, or artifact is written.
     """
     parser = argparse.ArgumentParser(
         description=__doc__.splitlines()[0] if __doc__ else ""
@@ -1015,23 +1025,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         type=Path,
         help="The campaign's persistent workspace root (contract header).",
     )
-    args = parser.parse_args(argv)
+    parser.parse_args(argv)
 
-    try:
-        champion = TerminalChampion.model_validate_json(
-            args.champion_json.read_text(encoding="utf-8")
-        )
-        result = run_terminal_eval(champion, args.workspace_root)
-    except (TerminalEvalError, OSError, ValidationError) as exc:
-        print(f"REFUSED: {exc}", file=sys.stderr)
-        return 2
-    print(
-        f"terminal denoising_score={result.denoising_score} "
-        f"(scope {TERMINAL_SCOPE_DECLARATION}, {len(result.file_vector)} files)"
-    )
-    print(f"score:      {result.score_path}")
-    print(f"provenance: {result.provenance_path}")
-    return 0
+    print(f"REFUSED: {CAMPAIGN_TERMINAL_EVAL_REFUSAL}", file=sys.stderr)
+    return 2
 
 
 if __name__ == "__main__":

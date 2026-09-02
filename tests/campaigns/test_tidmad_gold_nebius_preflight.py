@@ -31,7 +31,9 @@ def _stage_band(data_dir: Path, indices: range) -> None:
             (data_dir / f"abra_{split}_{index:04d}.h5").touch()
 
 
-def test_single_band_staging_does_not_require_the_other_32_files(tmp_path: Path) -> None:
+def test_single_band_staging_does_not_require_the_other_32_files(
+    tmp_path: Path,
+) -> None:
     """A correctly staged 0-3 host must not be rejected for absent other bands."""
     _stage_band(tmp_path, range(4))
     (tmp_path / "segment_anchors.json").write_text("{}\n", encoding="utf-8")
@@ -72,16 +74,12 @@ def test_checksum_validation_is_scoped_to_the_selected_band(tmp_path: Path) -> N
         rows.append(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}")
     manifest.write_text("\n".join(rows) + "\n", encoding="utf-8")
 
-    result = _call(
-        f'preflight_data_checksum_errors "{tmp_path}" "{manifest}" 0-3'
-    )
+    result = _call(f'preflight_data_checksum_errors "{tmp_path}" "{manifest}" 0-3')
     assert result.returncode == 0, result.stderr
     assert result.stdout == ""
 
     (tmp_path / "abra_training_0002.h5").write_bytes(b"corrupt")
-    corrupted = _call(
-        f'preflight_data_checksum_errors "{tmp_path}" "{manifest}" 0-3'
-    )
+    corrupted = _call(f'preflight_data_checksum_errors "{tmp_path}" "{manifest}" 0-3')
     assert "checksum mismatch for abra_training_0002.h5" in corrupted.stdout
 
 
@@ -93,9 +91,7 @@ def test_free_space_threshold_is_caller_owned_and_launch_blocking(
     assert available.returncode == 0, available.stdout + available.stderr
     assert "required=0 GiB" in available.stdout
 
-    impossible = _call(
-        f'preflight_free_space_check "{tmp_path}" 999999999999'
-    )
+    impossible = _call(f'preflight_free_space_check "{tmp_path}" 999999999999')
     assert impossible.returncode != 0
     assert "required=999999999999 GiB" in impossible.stdout
 
@@ -112,6 +108,24 @@ def test_terminal_eval_policy_refuses_single_workspace_provenance() -> None:
     result = _call('printf "%s\\n" "$GOLD_TERMINAL_EVAL_POLICY"')
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "out_of_scope_multi_workspace_provenance"
+
+
+def test_preflight_refuses_a_framework_revision_other_than_the_exp_pin() -> None:
+    """The repository-owned pin must be the authority for R2."""
+    accepted = _call(
+        'preflight_siderius_pin_matches "$(preflight_pinned_siderius_revision)"'
+    )
+    assert accepted.returncode == 0, accepted.stderr
+    pinned = accepted.stdout.strip()
+    assert len(pinned) == 40
+    assert pinned == (EXP_ROOT / "SIDERIUS_REVISION").read_text().strip()
+
+    refused = _call(
+        'preflight_siderius_pin_matches "0000000000000000000000000000000000000000"'
+    )
+    assert refused.returncode != 0
+    assert "SIDERIUS pin mismatch" in refused.stdout
+    assert f"exp_pin={pinned}" in refused.stdout
 
 
 def test_resume_requires_attributable_noncorrupt_state(tmp_path: Path) -> None:
@@ -149,7 +163,7 @@ def test_preflight_main_reaches_the_summary_without_llm_or_gpu(tmp_path: Path) -
     """A missing runtime asset must not abort the preflight between named rows."""
     siderius_checkout = os.environ.get("SIDERIUS_CHECKOUT")
     if not siderius_checkout:
-        pytest.skip("SIDERIUS_CHECKOUT must name the exact framework checkout")
+        pytest.fail("SIDERIUS_CHECKOUT must name the exact framework checkout")
     framework_root = Path(siderius_checkout).resolve()
     framework_revision = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -202,6 +216,7 @@ def test_preflight_main_reaches_the_summary_without_llm_or_gpu(tmp_path: Path) -
         env={
             **os.environ,
             "SIDERIUS_CHECKOUT": str(framework_root),
+            "SIDERIUS_PYTHON": str(framework_root / ".venv" / "bin" / "python"),
             "SIDERIUS_GENERATED_LIBRARY_DIR": str(generated),
         },
         text=True,

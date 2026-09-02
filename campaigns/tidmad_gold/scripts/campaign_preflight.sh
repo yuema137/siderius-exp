@@ -317,6 +317,34 @@ preflight_free_space_check() {
     [ "$available_gib" -ge "$minimum_gib" ]
 }
 
+# Print the exact framework revision pinned by this experiment checkout.
+# The operator-supplied revision is evidence only after it agrees with this
+# repository-owned authority; otherwise two individually clean checkouts can
+# still form a pair the campaign never qualified.
+preflight_pinned_siderius_revision() {
+    local pin_file="${PF_EXP_ROOT}/SIDERIUS_REVISION" pinned
+    if [ ! -f "$pin_file" ]; then
+        printf 'experiment checkout lacks SIDERIUS_REVISION: %s\n' "$pin_file"
+        return 1
+    fi
+    pinned="$(tr -d '[:space:]' < "$pin_file")"
+    if ! [[ "$pinned" =~ ^[0-9a-f]{40}$ ]]; then
+        printf 'experiment SIDERIUS_REVISION is not a full SHA: %s\n' "${pinned:-empty}"
+        return 1
+    fi
+    printf '%s\n' "$pinned"
+}
+
+preflight_siderius_pin_matches() {
+    local supplied_revision="$1" pinned_revision
+    pinned_revision="$(preflight_pinned_siderius_revision)" || return 1
+    if [ "$supplied_revision" != "$pinned_revision" ]; then
+        printf '%s\n' "SIDERIUS pin mismatch: supplied=$supplied_revision exp_pin=$pinned_revision"
+        return 1
+    fi
+    printf '%s\n' "$pinned_revision"
+}
+
 # The per-band chain workspace ROOT/ARM_bandBAND, for the arm actually
 # under check. AUTHORITY: both launchers build this same path — the X9
 # band launcher at launch_prior_baseline_experiment.sh:222 and the campaign
@@ -725,13 +753,15 @@ pf_main() {
         pf_pass "R2 siderius-exp revision $REPO_SHA matches --revision and the tree is clean"
     fi
 
-    local SIDERIUS_SHA SIDERIUS_DIRTY
+    local SIDERIUS_SHA SIDERIUS_DIRTY PINNED_SIDERIUS_REVISION=""
     SIDERIUS_SHA="$(git -C "$PF_SIDERIUS_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
     SIDERIUS_DIRTY="$(git -C "$PF_SIDERIUS_ROOT" status --porcelain 2>/dev/null || true)"
-    if [ "$SIDERIUS_SHA" = "unknown" ]; then
+    if ! PINNED_SIDERIUS_REVISION="$(preflight_siderius_pin_matches "$SIDERIUS_REVISION")"; then
+        pf_fail "R2 SIDERIUS pin unavailable or invalid: $PINNED_SIDERIUS_REVISION"
+    elif [ "$SIDERIUS_SHA" = "unknown" ]; then
         pf_fail "R2 framework root is not a git checkout: $PF_SIDERIUS_ROOT"
-    elif [ "${#SIDERIUS_REVISION}" -lt 7 ] || [[ "$SIDERIUS_SHA" != "$SIDERIUS_REVISION"* ]]; then
-        pf_fail "R2 SIDERIUS revision mismatch: HEAD=$SIDERIUS_SHA expected=$SIDERIUS_REVISION*"
+    elif [ "$SIDERIUS_SHA" != "$PINNED_SIDERIUS_REVISION" ]; then
+        pf_fail "R2 SIDERIUS revision mismatch: HEAD=$SIDERIUS_SHA exp_pin=$PINNED_SIDERIUS_REVISION"
     elif [ -n "$SIDERIUS_DIRTY" ]; then
         pf_fail "R2 SIDERIUS tree is dirty: $(echo "$SIDERIUS_DIRTY" | head -3 | tr '\n' ' ')"
     else

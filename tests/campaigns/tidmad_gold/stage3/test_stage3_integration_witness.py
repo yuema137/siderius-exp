@@ -1,15 +1,19 @@
-"""Stage-3 INTEGRATION WITNESS — the three mechanisms against the REAL composer.
+"""Stage-3 INTEGRATION WITNESS — the campaign mechanisms against the REAL composer.
 
-The three Stage-3 writers were built in parallel lanes, each stubbing the
-shared ``compose_and_score`` boundary (contract §4). Every per-lane suite is
-therefore green even if the lanes disagree about the boundary in practice.
+The Stage-3 writers were built in parallel lanes, each stubbing the shared
+``compose_and_score`` boundary (contract §4). Every per-lane suite is therefore
+green even if the active campaign lanes disagree about the boundary in
+practice. Terminal evaluation remains a separately tested mechanism but is not
+an active campaign lane because its single-workspace provenance contract cannot
+represent the four Strict Best workspaces.
 This module is the subtree's one end-to-end witness: ONE synthetic campaign
-workspace, all three production CLIs, the REAL ``campaigns.tidmad_gold.stage3.stage3_common``
-(resolution, refusals, anchor-ruler pin — no stubs), with exactly ONE patch at
-the arithmetic boundary: ``stage3_common.score_vector`` is replaced by a
-deterministic counting stub, because the frozen TIDMAD arithmetic needs real
-ABRA HDF5 + the committed anchor map's data, which a unit test must not.
-Composition, refusal, selection, and isolation logic are all real.
+workspace, both active production CLIs, and the REAL
+``campaigns.tidmad_gold.stage3.stage3_common`` (resolution, refusals,
+anchor-ruler pin — no stubs), with exactly ONE patch at the arithmetic boundary:
+``stage3_common.score_vector`` is replaced by a deterministic counting stub,
+because the frozen TIDMAD arithmetic needs real ABRA HDF5 plus the committed
+anchor map's data, which a unit test must not. Composition, refusal, and
+selection logic are all real.
 
 Defects only this witness catches (and how it fails when they break):
 
@@ -20,15 +24,11 @@ Defects only this witness catches (and how it fails when they break):
 * the composer resolving a pooled set the writers did not intend
   (duplicate/missing file indices across pooled dirs — the call-count and
   per-call 20-distinct-paths assertions go red);
-* ``score_vector`` invoked more or fewer than EXACTLY ONCE per composition
-  (total-call-count assertion: 1 composed + 4 strict + 1 terminal = 6);
+* ``score_vector`` invoked more or fewer than EXACTLY ONCE per campaign
+  composition (total-call-count assertion: 1 composed + 4 strict = 5);
 * strict selection ignoring ``MetricOrder`` direction (the planted scalars
   are all NEGATIVE with the winner nearest zero: a lower-is-better or
   ``min``-shaped bug selects rnnD instead of wavenetA);
-* a terminal artifact escaping the isolation namespace (every emitted file
-  that self-declares the terminal namespace marker must live under it, and
-  the terminal writer's own read-closure guard must hold on the REAL final
-  tree);
 * a per-band scalar appearing in ANY Stage-3 artifact or stdout line
   (independent walker below — not the writers' own guards).
 
@@ -55,24 +55,18 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+import pytest
+from execute_tools.dataset_config import NUM_FILES, SEGMENTS_PER_FILE
 from execute_tools.deliverable_spec import DeliverableNaming
 
-import pytest
-
-import campaigns.tidmad_gold.stage3.stage3_common as stage3_common
-from execute_tools.dataset_config import NUM_FILES, SEGMENTS_PER_FILE
+from campaigns.tidmad_gold.stage3 import stage3_common
 from campaigns.tidmad_gold.stage3.stage3_composed_best import band_file_indices
 from campaigns.tidmad_gold.stage3.stage3_composed_best import main as composed_main
 from campaigns.tidmad_gold.stage3.stage3_strict_best import main as strict_main
-from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
-    ARTIFACT_NAMESPACE_KEY,
-    TERMINAL_NAMESPACE_MARKER,
-    assert_terminal_read_closure,
-)
-from campaigns.tidmad_gold.stage3.stage3_terminal_eval import main as terminal_main
+
+from .stage3_adversarial_fixtures import write_placeholder_deliverable
 from .test_stage3_composed_best import (
     ARM,
-    FULL_STAMP,
     NAMING,
     _make_campaign,
 )
@@ -82,8 +76,6 @@ from .test_strict_best import (
     _build_tree,
     _write_unit_workspaces,
 )
-from .test_terminal_eval import _valid_record
-from .stage3_adversarial_fixtures import write_placeholder_deliverable
 
 # The strict-selection plant: all NEGATIVE, winner nearest zero. Under the
 # production metric (higher-is-better) wavenetA wins; a min-shaped or
@@ -135,9 +127,10 @@ class _ArithmeticBoundaryStub:
         else:
             design = next(
                 (
-                d
-                for d in _STRICT_PLANT
-                if d in first.parts or any(p.startswith(f"{d}_") for p in first.parts)
+                    d
+                    for d in _STRICT_PLANT
+                    if d in first.parts
+                    or any(p.startswith(f"{d}_") for p in first.parts)
                 ),
                 None,
             )
@@ -287,46 +280,6 @@ def test_three_mechanisms_end_to_end_against_real_composer(
         == 0
     )
 
-    # --- terminal_eval: production CLI; champion = the strict winner's units ---
-    champion_path = tmp_path / "champion.json"
-    strict_selection = json.loads(
-        (
-            tmp_path / "stage3" / "strict_best" / "strict_best_selection.json"
-        ).read_text(encoding="utf-8")
-    )
-    winner_dirs = strict_selection["selected_deliverable_dirs"]
-    champion_path.write_text(
-        json.dumps(
-            {
-                "identity": {
-                    "exp_id": "exp_wavenetA_0-3",
-                    "model_type": "wavenet",
-                    "iteration": 1,
-                    "experiment_arm": ARM,
-                },
-                "deliverable_dirs": winner_dirs,
-                "provenance_records": [_valid_record()],
-                # F-4: the run workspace whose PINNED effective HealthGate
-                # config governs the provenance record — never the
-                # repo-current shipped one.
-                "provenance_workspace": str(
-                    (
-                        tmp_path / "stage2" / f"wavenetA_{BANDS[0]}" / "workspace"
-                    ).resolve()
-                ),
-                # The champion's reconciled 09a stamp (§4 amendment): the
-                # round-trip-safe MetricSpecField re-hydrates this dump.
-                "metric_spec": FULL_STAMP,
-            }
-        ),
-        encoding="utf-8",
-    )
-    assert (
-        terminal_main(
-            ["--champion_json", str(champion_path), "--workspace_root", str(tmp_path)]
-        )
-        == 0
-    )
     stdout = capsys.readouterr().out
 
     # 1. The composed scalar exists, at full scope, in the composed namespace.
@@ -358,29 +311,12 @@ def test_three_mechanisms_end_to_end_against_real_composer(
     )
     assert selection["metric_direction"] == "higher"
 
-    # 3. Terminal artifacts land ONLY in the terminal namespace: every JSON
-    #    under the workspace that self-declares the terminal marker lives
-    #    under stage3/terminal_eval/, and at least one such artifact exists.
-    terminal_ns = tmp_path / "stage3" / "terminal_eval"
-    declared: list[Path] = []
-    for json_file in tmp_path.rglob("*.json"):
-        try:
-            payload = json.loads(json_file.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if (
-            isinstance(payload, dict)
-            and payload.get(ARTIFACT_NAMESPACE_KEY) == TERMINAL_NAMESPACE_MARKER
-        ):
-            declared.append(json_file)
-    assert declared, "terminal_eval emitted no self-declared artifact"
-    escaped = [p for p in declared if not p.is_relative_to(terminal_ns)]
-    assert escaped == [], f"terminal artifacts escaped the namespace: {escaped}"
-    # The terminal writer's own read-closure guard holds on the REAL tree.
-    assert_terminal_read_closure(tmp_path)
+    # 3. Terminal evaluation is not a campaign mechanism: no terminal
+    #    namespace may be produced by the composed/strict integration path.
+    assert not (tmp_path / "stage3" / "terminal_eval").exists()
 
     # 4. Zero band scalars anywhere: every Stage-3 JSON artifact plus the
-    #    three CLIs' combined stdout (independent walker, not the guards
+    #    both CLIs' combined stdout (independent walker, not the guards
     #    the writers ship).
     for json_file in (tmp_path / "stage3").rglob("*.json"):
         try:
@@ -397,13 +333,10 @@ def test_three_mechanisms_end_to_end_against_real_composer(
                 f"...{stdout[max(0, match.start() - 20) : match.end() + 30]!r}..."
             )
 
-    # 5. score_vector ran EXACTLY once per composition: 1 composed + 4 strict
-    #    (one per design) + 1 terminal.
+    # 5. score_vector ran EXACTLY once per campaign composition: 1 composed
+    #    plus 4 strict (one per design).
     kinds = Counter(call["kind"] for call in stub.calls)
     expected = Counter({f"design:{design}": 1 for design in DESIGNS})
-    expected["design:wavenetA"] += (
-        1  # the terminal champion re-scores the winner's units
-    )
     expected["composed"] = 1
     assert kinds == expected, f"composition call census: {dict(kinds)}"
-    assert sum(kinds.values()) == 6
+    assert sum(kinds.values()) == 5
