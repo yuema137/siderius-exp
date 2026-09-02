@@ -250,7 +250,18 @@ def _coordinates(
     return left, right, top, bottom, y_min, y_max, x, y
 
 
-def _panel_svg(panel: dict[str, Any]) -> str:
+def _axis_controls(scale: AxisScale) -> str:
+    return f"""
+  <div class="axis-controls">
+    <label>Y min <input class="y-min" type="number" step="any" value="{scale.minimum:g}"></label>
+    <label>Y max <input class="y-max" type="number" step="any" value="{scale.maximum:g}"></label>
+    <label>Tick step <input class="y-step" type="number" step="any" value="{scale.tick_step:g}"></label>
+    <button class="apply-axis" type="button">Apply</button>
+    <span class="axis-error" role="status"></span>
+  </div>"""
+
+
+def _panel_svg(panel: dict[str, Any], panel_index: int) -> str:
     width, height = 620, 330
     points = list(panel.get("points") or [])
     name = html.escape(str(panel["name"]))
@@ -268,6 +279,7 @@ def _panel_svg(panel: dict[str, Any]) -> str:
     left, right, top, bottom, y_min, y_max, x, y = _coordinates(
         points, width, height, scale
     )
+    initial_scale = scale or AxisScale(y_min, y_max, (y_max - y_min) / 4)
     plot_right, plot_bottom = width - right, height - bottom
     grid = []
     y_ticks = (
@@ -298,6 +310,12 @@ def _panel_svg(panel: dict[str, Any]) -> str:
         axes.append(
             f'<text class="tick" x="{x_pos:.1f}" y="{plot_bottom + 22}" text-anchor="middle">{iteration}</text>'
         )
+    current_coordinates = [
+        [x(point["iteration"]), float(point["current"])] for point in points
+    ]
+    best_coordinates = [
+        [x(point["iteration"]), float(point["best"])] for point in points
+    ]
     current_line = " ".join(
         f"{x(point['iteration']):.1f},{y(point['current']):.1f}" for point in points
     )
@@ -312,23 +330,27 @@ def _panel_svg(panel: dict[str, Any]) -> str:
             f"({point['phase']}, {point['exp_id']})"
         )
         marks.append(
-            f'<circle class="current-dot" cx="{x_pos:.1f}" cy="{y_pos:.1f}" r="4"><title>{title}</title></circle>'
+            f'<circle class="current-dot" data-score="{point["current"]:.17g}" cx="{x_pos:.1f}" cy="{y_pos:.1f}" r="4"><title>{title}</title></circle>'
         )
         if point["new_best"]:
             marks.append(
-                f'<text class="star" x="{x_pos:.1f}" y="{y_pos - 10:.1f}" text-anchor="middle">★<title>New best: {title}</title></text>'
+                f'<text class="star" data-score="{point["current"]:.17g}" x="{x_pos:.1f}" y="{y_pos - 10:.1f}" text-anchor="middle">★<title>New best: {title}</title></text>'
             )
     provisional = any(point["phase"] != "formal" for point in points)
     note = " · latest point provisional until Formal" if provisional else ""
     return f"""
-<section class="panel">
+<section class="panel" data-interactive-axis="true" data-panel-index="{panel_index}">
   <h2>{name}</h2>
   <div class="metric">{metric} · {direction} is better{note}</div>
-  <svg viewBox="0 0 {width} {height}" role="img" aria-label="{name} metric trajectory">
-    {"".join(grid)}{"".join(axes)}
-    <polyline class="best-line" points="{best_line}"/>
-    <polyline class="current-line" points="{current_line}"/>
-    {"".join(marks)}
+  {_axis_controls(initial_scale)}
+  <svg viewBox="0 0 {width} {height}" role="img" aria-label="{name} metric trajectory" data-top="{top}" data-bottom="{plot_bottom}">
+    <defs><clipPath id="plot-clip-{panel_index}"><rect x="{left}" y="{top}" width="{plot_right - left}" height="{plot_bottom - top}"/></clipPath></defs>
+    <g class="y-grid">{"".join(grid)}</g>{"".join(axes)}
+    <g class="series" clip-path="url(#plot-clip-{panel_index})">
+      <polyline class="best-line" data-values="{html.escape(json.dumps(best_coordinates), quote=True)}" points="{best_line}"/>
+      <polyline class="current-line" data-values="{html.escape(json.dumps(current_coordinates), quote=True)}" points="{current_line}"/>
+      {"".join(marks)}
+    </g>
     <text class="axis-label" x="{(left + plot_right) / 2:.1f}" y="{height - 10}" text-anchor="middle">Iteration</text>
   </svg>
   <div class="legend"><span class="solid"></span> cumulative best <span class="dashed"></span> current iteration <span class="legend-star">★</span> new best</div>
@@ -337,7 +359,9 @@ def _panel_svg(panel: dict[str, Any]) -> str:
 
 def render_dashboard(panels: list[dict[str, Any]], output: Path) -> None:
     generated_at = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
-    panel_html = "\n".join(_panel_svg(panel) for panel in panels)
+    panel_html = "\n".join(
+        _panel_svg(panel, index) for index, panel in enumerate(panels)
+    )
     document = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="30">
 <title>SIDERIUS experiment trajectories</title>
@@ -347,12 +371,68 @@ def render_dashboard(panels: list[dict[str, Any]], output: Path) -> None:
 main{{max-width:1500px;margin:auto;padding:28px}} h1{{margin:0 0 4px;font-size:25px}} .updated{{color:var(--muted);margin-bottom:22px}}
 .panels{{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px}} .panel{{background:var(--panel);border:1px solid #24314a;border-radius:14px;padding:18px;box-shadow:0 8px 30px #0004}}
 h2{{margin:0;font-size:19px}} .metric{{color:var(--muted);margin:4px 0 8px}} svg{{width:100%;height:auto;overflow:visible}}
+.axis-controls{{display:flex;align-items:end;flex-wrap:wrap;gap:8px;margin:10px 0 2px}} .axis-controls label{{display:grid;gap:2px;color:var(--muted);font-size:12px}} .axis-controls input{{width:82px;border:1px solid #3a4964;border-radius:5px;background:#0b1020;color:var(--ink);padding:5px 6px}} .axis-controls button{{border:1px solid #4f6b95;border-radius:5px;background:#223451;color:var(--ink);padding:5px 11px;cursor:pointer}} .axis-error{{color:#ff8d8d;font-size:12px;min-height:18px}}
 .grid{{stroke:var(--grid);stroke-width:1}} .axis{{stroke:#64748b;stroke-width:1.2}} .tick,.axis-label{{fill:var(--muted);font-size:12px}}
 .best-line,.current-line{{fill:none;stroke-linejoin:round;stroke-linecap:round}} .best-line{{stroke:var(--best);stroke-width:3}} .current-line{{stroke:var(--current);stroke-width:2.5;stroke-dasharray:8 6}}
 .current-dot{{fill:var(--current);stroke:var(--panel);stroke-width:2}} .star{{fill:var(--star);color:var(--star);font-size:18px}} .legend-star{{fill:var(--star);color:var(--star);font-size:21px}} .legend{{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:15px}}
 .solid,.dashed{{display:inline-block;width:28px;border-top:3px solid var(--best)}} .dashed{{border-top:2px dashed var(--current);margin-left:10px}} .empty{{height:300px;display:grid;place-items:center;color:var(--muted)}}
 @media(max-width:1050px){{.panels{{grid-template-columns:1fr}}}} @media print{{:root{{--bg:#fff;--panel:#fff;--ink:#111;--muted:#555;--grid:#ddd}}.panel{{box-shadow:none}}}}
-</style></head><body><main><h1>Scientific metric trajectories</h1><div class="updated">Generated {generated_at}. Solid = cumulative best; dashed = current iteration.</div><div class="panels">{panel_html}</div></main></body></html>"""
+</style></head><body><main><h1>Scientific metric trajectories</h1><div class="updated">Generated {generated_at}. Solid = cumulative best; dashed = current iteration.</div><div class="panels">{panel_html}</div></main>
+<script>
+const svgNamespace = "http://www.w3.org/2000/svg";
+function updateAxis(panel) {{
+  const minimum = Number(panel.querySelector(".y-min").value);
+  const maximum = Number(panel.querySelector(".y-max").value);
+  const step = Number(panel.querySelector(".y-step").value);
+  const error = panel.querySelector(".axis-error");
+  if (![minimum, maximum, step].every(Number.isFinite) || maximum <= minimum || step <= 0) {{
+    error.textContent = "Use finite values with max > min and step > 0.";
+    return;
+  }}
+  const intervalCount = Math.round((maximum - minimum) / step);
+  if (intervalCount < 1 || Math.abs(minimum + intervalCount * step - maximum) > 1e-9) {{
+    error.textContent = "Range must be an integer multiple of tick step.";
+    return;
+  }}
+  if (intervalCount > 40) {{
+    error.textContent = "Choose a tick step that produces at most 40 intervals.";
+    return;
+  }}
+  error.textContent = "";
+  const svg = panel.querySelector("svg");
+  const top = Number(svg.dataset.top);
+  const bottom = Number(svg.dataset.bottom);
+  const y = score => top + (maximum - score) * (bottom - top) / (maximum - minimum);
+  const decimals = Math.min(8, (String(step).split(".")[1] || "").length);
+  const grid = svg.querySelector(".y-grid");
+  grid.replaceChildren();
+  for (let index = 0; index <= intervalCount; index += 1) {{
+    const value = maximum - index * step;
+    const position = y(value);
+    const line = document.createElementNS(svgNamespace, "line");
+    line.setAttribute("class", "grid");
+    line.setAttribute("x1", "62"); line.setAttribute("x2", "598");
+    line.setAttribute("y1", position.toFixed(1)); line.setAttribute("y2", position.toFixed(1));
+    const label = document.createElementNS(svgNamespace, "text");
+    label.setAttribute("class", "tick"); label.setAttribute("x", "54");
+    label.setAttribute("y", (position + 4).toFixed(1)); label.setAttribute("text-anchor", "end");
+    label.textContent = value.toFixed(decimals);
+    grid.append(line, label);
+  }}
+  svg.querySelectorAll("polyline[data-values]").forEach(line => {{
+    const coordinates = JSON.parse(line.dataset.values);
+    line.setAttribute("points", coordinates.map(([xValue, score]) => `${{xValue.toFixed(1)}},${{y(score).toFixed(1)}}`).join(" "));
+  }});
+  svg.querySelectorAll("circle[data-score]").forEach(dot => dot.setAttribute("cy", y(Number(dot.dataset.score)).toFixed(1)));
+  svg.querySelectorAll("text.star[data-score]").forEach(star => star.setAttribute("y", (y(Number(star.dataset.score)) - 10).toFixed(1)));
+}}
+document.querySelectorAll(".panel[data-interactive-axis]").forEach(panel => {{
+  panel.querySelector(".apply-axis").addEventListener("click", () => updateAxis(panel));
+  panel.querySelectorAll(".axis-controls input").forEach(input => input.addEventListener("keydown", event => {{
+    if (event.key === "Enter") updateAxis(panel);
+  }}));
+}});
+</script></body></html>"""
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(document, encoding="utf-8")
 

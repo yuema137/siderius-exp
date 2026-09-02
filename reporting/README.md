@@ -22,7 +22,9 @@ python reporting/metric_dashboard.py render \
 `--y-axis NAME=MIN:MAX:STEP` is optional and repeatable. It fixes a panel's
 display range and tick spacing without embedding task-specific presentation
 rules in the renderer. `NAME` must exactly match the panel name recorded by
-the collector.
+the collector. Every populated panel also includes browser-side Y min, Y max,
+and tick-step controls. Applying those controls redraws that panel immediately;
+it does not modify the receipt or any experiment artifact.
 
 Only successful, finite primary-metric results that were not refused or
 invalidated contribute points. Formal results take precedence within an
