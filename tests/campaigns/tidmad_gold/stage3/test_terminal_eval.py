@@ -36,10 +36,10 @@ from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
     TerminalNamespaceViolationError,
     TerminalOutputLayout,
     VacuousReadClosureError,
+    _execute_terminal_eval,
     assert_terminal_read_closure,
     audit_terminal_read_closure,
     census_terminal_namespace_references,
-    run_terminal_eval,
     terminal_namespace,
 )
 
@@ -216,7 +216,7 @@ def test_happy_path_writes_only_terminal_namespace_full_scope(tmp_path: Path) ->
     stub = _ComposeStub()
     before = _walk_paths(ws)
 
-    result = run_terminal_eval(
+    result = _execute_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=stub,
@@ -257,7 +257,7 @@ def test_provenance_records_hashes_anchor_sha_and_scope(tmp_path: Path) -> None:
     deliv = _make_deliverables(ws)
     anchor = _make_anchor(tmp_path)
 
-    result = run_terminal_eval(
+    result = _execute_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -291,7 +291,7 @@ def test_partial_file_vector_refused(tmp_path: Path) -> None:
     deliv = _make_deliverables(ws)
     stub = _ComposeStub(vector=[0.1] * 19)
     with pytest.raises(TerminalEvalError, match="full-scope"):
-        run_terminal_eval(
+        _execute_terminal_eval(
             _champion(deliv),
             ws,
             compose_and_score_fn=stub,
@@ -316,7 +316,7 @@ def test_invalid_champion_refused_by_name_before_any_effect(tmp_path: Path) -> N
     stub = _ComposeStub()
     bad = _valid_record() | {"status": "failed"}
     with pytest.raises(InvalidChampionError) as excinfo:
-        run_terminal_eval(
+        _execute_terminal_eval(
             _champion(deliv, records=[bad]),
             ws,
             compose_and_score_fn=stub,
@@ -381,7 +381,7 @@ def test_a_champion_failing_its_RUNS_OWN_blocking_gate_is_refused(
 
     stub = _ComposeStub()
     with pytest.raises(InvalidChampionError, match="exp_champ"):
-        run_terminal_eval(
+        _execute_terminal_eval(
             _champion(deliv, records=[record]),
             ws,
             compose_and_score_fn=stub,
@@ -422,7 +422,7 @@ def test_a_champion_passing_its_RUNS_OWN_blocking_gate_is_measured(
     }
 
     stub = _ComposeStub()
-    result = run_terminal_eval(
+    result = _execute_terminal_eval(
         _champion(deliv, records=[record]),
         ws,
         compose_and_score_fn=stub,
@@ -464,7 +464,7 @@ def test_numerically_excellent_champion_without_gate_evidence_refused(
         "exp_id": "exp_champ",
     }
     with pytest.raises(InvalidChampionError, match="exp_champ"):
-        run_terminal_eval(
+        _execute_terminal_eval(
             _champion(deliv, records=[excellent_invalid]),
             ws,
             compose_and_score_fn=stub,
@@ -481,7 +481,7 @@ def test_champion_with_no_provenance_records_refused(tmp_path: Path) -> None:
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
     with pytest.raises(InvalidChampionError, match="NO provenance"):
-        run_terminal_eval(
+        _execute_terminal_eval(
             _champion(deliv, records=[]),
             ws,
             compose_and_score_fn=_ComposeStub(),
@@ -559,7 +559,7 @@ def test_read_closure_red_on_planted_terminal_artifact(tmp_path: Path) -> None:
     Stage-2 deliverables dir without the guard naming it."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
-    result = run_terminal_eval(
+    result = _execute_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -592,7 +592,7 @@ def test_read_closure_red_on_symlink_resolving_into_namespace(tmp_path: Path) ->
     checked for consumable entries."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
-    result = run_terminal_eval(
+    result = _execute_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -735,7 +735,7 @@ def test_terminal_artifacts_contain_no_band_level_scalar_field(tmp_path: Path) -
     (or numeric-sequence) value."""
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
-    result = run_terminal_eval(
+    result = _execute_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -796,7 +796,7 @@ def test_band_guard_reached_on_every_production_write(
         original(payload, artifact=artifact, key_path=key_path)
 
     monkeypatch.setattr(te, "_refuse_band_scalars", spy)
-    run_terminal_eval(
+    _execute_terminal_eval(
         _champion(deliv),
         ws,
         compose_and_score_fn=_ComposeStub(),
@@ -883,3 +883,71 @@ def test_cli_refuses_even_a_valid_single_workspace_champion(
     assert "REFUSED" in captured.err
     assert "TerminalChampion records one" in captured.err
     assert not terminal_namespace(ws).exists()
+
+
+def test_public_entry_refuses_before_internal_mechanism(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    """Direct Python calls must not bypass the workflow capability policy."""
+    ws = _make_campaign_workspace(tmp_path)
+    deliv = _make_deliverables(ws)
+    mechanism_called = False
+
+    def forbidden_mechanism(*args: Any, **kwargs: Any) -> Any:
+        nonlocal mechanism_called
+        mechanism_called = True
+        raise AssertionError("disabled public entry reached the internal mechanism")
+
+    monkeypatch.setattr(te, "_execute_terminal_eval", forbidden_mechanism)
+
+    with pytest.raises(te.CapabilityExecutionRefused, match="four provenance"):
+        te.run_terminal_eval(_champion(deliv), ws)
+
+    assert mechanism_called is False
+    assert not terminal_namespace(ws).exists()
+
+
+def test_public_entry_can_execute_when_its_workflow_policy_is_enabled(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    """Another workflow policy can enable the mechanism without a new branch."""
+    ws = _make_campaign_workspace(tmp_path)
+    deliv = _make_deliverables(ws)
+    expected = object()
+    mechanism_called = False
+
+    def enabled_mechanism(*args: Any, **kwargs: Any) -> Any:
+        nonlocal mechanism_called
+        mechanism_called = True
+        return expected
+
+    monkeypatch.setattr(
+        te,
+        "TERMINAL_EVAL_POLICY",
+        te.CapabilityExecutionPolicy(capability="terminal_evaluation", enabled=True),
+    )
+    monkeypatch.setattr(te, "_execute_terminal_eval", enabled_mechanism)
+
+    result = te.run_terminal_eval(_champion(deliv), ws)
+
+    assert mechanism_called is True
+    assert result is expected
+
+
+def test_internal_mechanism_has_no_production_caller() -> None:
+    """Campaign production code must reach terminal scoring through policy."""
+    owner = (
+        REPO_ROOT / "campaigns" / "tidmad_gold" / "stage3" / "stage3_terminal_eval.py"
+    )
+    offenders = []
+    for path in (REPO_ROOT / "campaigns").rglob("*.py"):
+        if path == owner:
+            continue
+        if "_execute_terminal_eval" in path.read_text(
+            encoding="utf-8", errors="replace"
+        ):
+            offenders.append(path.relative_to(REPO_ROOT).as_posix())
+
+    assert offenders == [], (
+        f"production code bypasses the workflow capability policy: {sorted(offenders)}"
+    )

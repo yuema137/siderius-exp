@@ -47,10 +47,11 @@ made in ``docs/campaign/stage_artifact_contract.md`` first; the pinned
 tests in ``tests/unit/scripts/stage3/test_terminal_eval.py`` fail loudly
 otherwise.
 
-The writer remains available as a tested mechanism, but its CLI is disabled
-for the current Gold campaign. Strict Best spans four provenance workspaces
-while :class:`TerminalChampion` records one, so the CLI refuses before reading
-or scoring a champion rather than emitting a result with false provenance.
+The writer remains available as a tested mechanism, but its public execution
+boundary is disabled for the current Gold campaign. Strict Best spans four
+provenance workspaces while :class:`TerminalChampion` records one, so direct
+Python calls and the CLI both refuse before reading or scoring a champion
+rather than emitting a result with false provenance.
 """
 
 from __future__ import annotations
@@ -73,8 +74,12 @@ from execute_tools.health_checks.candidate_eligibility import (
     classify_under_pinned_policy,
     pinned_workspace_gate_ids,
 )
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+from campaigns.capability_policy import (
+    CapabilityExecutionPolicy,
+    CapabilityExecutionRefused,
+)
 from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH, EXPERIMENT_ROOT
 
 # ---------------------------------------------------------------------------
@@ -103,12 +108,15 @@ BAND_LABELS: tuple[str, str, str, str] = ("0-3", "4-9", "10-14", "15-19")
 
 # This writer remains a reusable, tested mechanism, but the current Gold
 # campaign cannot invoke it truthfully: Strict Best pools four provenance
-# workspaces while TerminalChampion records one. The campaign CLI therefore
-# refuses until a multi-workspace provenance contract exists.
-CAMPAIGN_TERMINAL_EVAL_REFUSAL = (
-    "terminal evaluation is out of scope for the TIDMAD Gold campaign: "
-    "Strict Best spans four provenance workspaces, but TerminalChampion "
-    "records one"
+# workspaces while TerminalChampion records one. The public execution boundary
+# therefore refuses until a multi-workspace provenance contract exists.
+TERMINAL_EVAL_POLICY = CapabilityExecutionPolicy(
+    capability="terminal_evaluation",
+    enabled=False,
+    disabled_reason=(
+        "out of scope for this workflow because Strict Best spans four "
+        "provenance workspaces while TerminalChampion records one"
+    ),
 )
 
 
@@ -565,7 +573,7 @@ class TerminalEvalResult(BaseModel):
     provenance_path: Path
 
 
-def run_terminal_eval(
+def _execute_terminal_eval(
     champion: TerminalChampion,
     workspace_root: Path,
     *,
@@ -574,7 +582,7 @@ def run_terminal_eval(
     repo_sha: str | None = None,
     layout: TerminalOutputLayout | None = None,
 ) -> TerminalEvalResult:
-    """Take the ONE terminal full-scope measurement of the selected champion.
+    """Execute the terminal algorithm after a public policy check.
 
     Order is load-bearing:
 
@@ -695,6 +703,31 @@ def run_terminal_eval(
         champion_input_path=layout.champion_input_path,
         score_path=layout.score_path,
         provenance_path=layout.provenance_path,
+    )
+
+
+def run_terminal_eval(
+    champion: TerminalChampion,
+    workspace_root: Path,
+    *,
+    compose_and_score_fn: ComposeAndScoreFn | None = None,
+    anchor_map_path: Path | None = None,
+    repo_sha: str | None = None,
+    layout: TerminalOutputLayout | None = None,
+) -> TerminalEvalResult:
+    """Run terminal evaluation only when this workflow enables it.
+
+    The policy check is the public side-effect boundary. It runs before the
+    champion, scorer, filesystem, or internal mechanism is touched.
+    """
+    TERMINAL_EVAL_POLICY.require_enabled()
+    return _execute_terminal_eval(
+        champion,
+        workspace_root,
+        compose_and_score_fn=compose_and_score_fn,
+        anchor_map_path=anchor_map_path,
+        repo_sha=repo_sha,
+        layout=layout,
     )
 
 
@@ -1025,10 +1058,29 @@ def main(argv: Sequence[str] | None = None) -> int:
         type=Path,
         help="The campaign's persistent workspace root (contract header).",
     )
-    parser.parse_args(argv)
+    args = parser.parse_args(argv)
 
-    print(f"REFUSED: {CAMPAIGN_TERMINAL_EVAL_REFUSAL}", file=sys.stderr)
-    return 2
+    try:
+        TERMINAL_EVAL_POLICY.require_enabled()
+        champion = TerminalChampion.model_validate_json(
+            args.champion_json.read_text(encoding="utf-8")
+        )
+        result = run_terminal_eval(champion, args.workspace_root)
+    except (
+        CapabilityExecutionRefused,
+        TerminalEvalError,
+        OSError,
+        ValidationError,
+    ) as exc:
+        print(f"REFUSED: {exc}", file=sys.stderr)
+        return 2
+    print(
+        f"terminal denoising_score={result.denoising_score} "
+        f"(scope {TERMINAL_SCOPE_DECLARATION}, {len(result.file_vector)} files)"
+    )
+    print(f"score:      {result.score_path}")
+    print(f"provenance: {result.provenance_path}")
+    return 0
 
 
 if __name__ == "__main__":

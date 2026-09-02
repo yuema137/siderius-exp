@@ -54,3 +54,25 @@ campaign-owned task and Health files from this package. Its separated dry-run
 is qualified in `provenance/validation/2026-08-30_tidmad_gold_external_dry_run.md`.
 This does not qualify an H100 launch: deployment preflight, runtime-profile
 binding, dataset availability, and the final release revision remain pending.
+
+## Local launch-readiness qualification
+
+The reachability witness deliberately fails when `SIDERIUS_CHECKOUT` is not
+set. Use an absolute checkout path, verify that it is the revision pinned by
+this experiment repository, and run the tests with that checkout's own virtual
+environment:
+
+```bash
+export SIDERIUS_CHECKOUT=/absolute/path/to/SIDERIUS
+test "$(git -C "$SIDERIUS_CHECKOUT" rev-parse HEAD)" = \
+  "$(tr -d '[:space:]' < SIDERIUS_REVISION)"
+"$SIDERIUS_CHECKOUT/.venv/bin/python" -m pytest -q \
+  tests/campaigns/test_capability_policy.py \
+  tests/campaigns/test_tidmad_gold_nebius_preflight.py \
+  tests/campaigns/tidmad_gold/stage3/test_terminal_eval.py \
+  tests/campaigns/tidmad_gold/stage3/test_stage3_integration_witness.py
+```
+
+Prepare the framework environment in that exact checkout with
+`uv sync --group dev --frozen`. Do not substitute another checkout's virtual
+environment or use `PYTHONPATH` to mix revisions.
