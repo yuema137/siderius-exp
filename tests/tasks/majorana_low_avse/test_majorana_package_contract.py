@@ -139,6 +139,58 @@ def test_qualification_has_a_trial_round_before_forced_formal(tmp_path: Path) ->
         assert command[command.index("--formal_time_budget_minutes") + 1] == "2"
 
 
+def test_demo_locks_snapshot_scope_and_surfaces_resource_advice(
+    tmp_path: Path,
+) -> None:
+    """Dropping the scope override or advice recreates the failed demo launch."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    for index in range(16):
+        (data_dir / f"MJD_Train_{index}.hdf5").touch()
+    for index in range(6):
+        (data_dir / f"MJD_Test_{index}.hdf5").touch()
+    completed = subprocess.run(
+        [
+            "bash",
+            str(LAUNCHER),
+            "--profile",
+            "demo",
+            "--literature",
+            "on",
+            "--siderius-checkout",
+            str(_checkout()),
+            "--workspace",
+            str(tmp_path / "workspace"),
+            "--data_dir",
+            str(data_dir),
+            "--dry-run",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=120,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    commands = [
+        shlex.split(line)
+        for line in completed.stdout.splitlines()
+        if "run_one_iteration.py" in line
+    ]
+    assert len(commands) == 30
+    for command in commands:
+        assert json.loads(command[command.index("--plan_overrides") + 1]) == {
+            "eval_strategy": "snapshot",
+            "trial_strategy": "snapshot",
+        }
+        assert command[command.index("--trial_time_budget_minutes") + 1] == "10"
+        assert command[command.index("--formal_time_budget_minutes") + 1] == "20"
+        assert command[command.index("--trial_vram_budget_gb") + 1] == "10"
+        assert command[command.index("--formal_vram_budget_gb") + 1] == "10"
+        assert command[command.index("--advice_sha256") + 1] == (
+            "7007b9e6eda5147a48bf34880935a9838efcfc5f4e25bf73c13cffce51894719"
+        )
+
+
 def test_official_train_and_test_event_ids_do_not_overlap() -> None:
     data_dir = Path(os.environ.get("MAJORANA_DATA_DIR", "/home/klz/Data/MAJORANA"))
     if not data_dir.is_dir():

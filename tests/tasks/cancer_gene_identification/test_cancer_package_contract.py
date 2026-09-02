@@ -56,6 +56,7 @@ def _task_module():
     spec.loader.exec_module(module)
     return module
 
+
 COMPOSE_CHILD = textwrap.dedent(
     """
     import json
@@ -176,7 +177,9 @@ def test_task_package_contains_no_experiment_or_workflow_launcher() -> None:
     assert LAUNCHER.is_file()
 
 
-def test_mtg_size_treatment_changes_masks_without_changing_the_graph(tmp_path: Path) -> None:
+def test_mtg_size_treatment_changes_masks_without_changing_the_graph(
+    tmp_path: Path,
+) -> None:
     """Trial must reduce active nodes, not replace or truncate the MTG graph."""
     module = _task_module()
     network_dir = tmp_path / "mtg"
@@ -227,8 +230,7 @@ def test_mtg_size_treatment_changes_masks_without_changing_the_graph(tmp_path: P
     assert int((trial_eval_target[:, 1] > 0.5).sum()) == 1
     assert int((formal_eval_target[:, 1] > 0.5).sum()) == 4
     assert not np.any(
-        (formal_target[:, 1].numpy() > 0.5)
-        & (formal_eval_target[:, 1].numpy() > 0.5)
+        (formal_target[:, 1].numpy() > 0.5) & (formal_eval_target[:, 1].numpy() > 0.5)
     )
 
 
@@ -299,5 +301,54 @@ def test_experiment_dry_run_preserves_the_trial_formal_treatment(
             COMPOSITIONS[experiment]
         )
         assert "--no-runtime_watchdog" in command
+        for flag, expected in expected_values.items():
+            assert command[command.index(flag) + 1] == expected
+
+
+def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None:
+    """The proposer must receive the same ceilings enforced by execution."""
+    checkout = _siderius_checkout()
+    data_dir = tmp_path / "data"
+    mtg_dir = data_dir / "mtg"
+    mtg_dir.mkdir(parents=True)
+    (mtg_dir / "data.h5").touch()
+    completed = subprocess.run(
+        [
+            "bash",
+            str(LAUNCHER),
+            "--experiment",
+            "mtg_campaign",
+            "--profile",
+            "campaign",
+            "--siderius-checkout",
+            str(checkout),
+            "--workspace",
+            str(tmp_path / "workspace"),
+            "--data_dir",
+            str(data_dir),
+            "--dry-run",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=120,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    commands = [
+        shlex.split(line)
+        for line in completed.stdout.splitlines()
+        if "run_one_iteration.py" in line
+    ]
+    assert len(commands) == 30
+    for command in commands:
+        expected_values = {
+            "--trial_time_budget_minutes": "5",
+            "--formal_time_budget_minutes": "15",
+            "--trial_vram_budget_gb": "20",
+            "--formal_vram_budget_gb": "20",
+            "--advice_sha256": (
+                "e6957a925e0953fe693afcac6861937c8c3192bf355bc7dfa8c490e51ce47a53"
+            ),
+        }
         for flag, expected in expected_values.items():
             assert command[command.index(flag) + 1] == expected

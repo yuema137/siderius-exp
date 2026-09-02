@@ -52,7 +52,9 @@ case "$PROFILE" in
             --trial_portion 0.05 --train_portion 0.10 --eval_portion 0.01
             --formal_portion 0.10 --formal_train_portion 0.10 --formal_eval_portion 0.01
             --trial_time_budget_minutes 1 --formal_time_budget_minutes 2
-        ) ;;
+        )
+        ADVICE_ARGS=()
+        ;;
     campaign)
         PROFILE_ARGS=(
             --run_name "majorana_campaign_v1_lit_${LITERATURE}"
@@ -61,16 +63,23 @@ case "$PROFILE" in
             --trial_portion 0.20 --train_portion 0.20 --eval_portion 0.20
             --formal_portion 1.0 --formal_train_portion 0.20 --formal_eval_portion 1.0
             --trial_time_budget_minutes 10 --formal_time_budget_minutes 30
-        ) ;;
+        )
+        ADVICE_ARGS=()
+        ;;
     demo)
         PROFILE_ARGS=(
-            --run_name "majorana_model_demo_v2_lit_${LITERATURE}"
+            --run_name "majorana_model_demo_v3_lit_${LITERATURE}"
             --num_iterations 30 --max_rounds 2 --max_epochs 50
             --workflow_parameter_rules '{"train_config.epochs":{"range":{"min":5,"max":50}}}'
             --trial_portion 0.50 --train_portion 0.05 --eval_portion 0.05
             --formal_portion 1.0 --formal_train_portion 0.10 --formal_eval_portion 0.10
-            --trial_time_budget_minutes 5 --formal_time_budget_minutes 10
-        ) ;;
+            --trial_time_budget_minutes 10 --formal_time_budget_minutes 20
+        )
+        ADVICE_ARGS=(
+            --advice "${EXPERIMENT_ROOT}/advice/model_demo_v3.json"
+            --advice_sha256 "7007b9e6eda5147a48bf34880935a9838efcfc5f4e25bf73c13cffce51894719"
+        )
+        ;;
     *) fail "--profile must be qualification, campaign, or demo" ;;
 esac
 
@@ -89,10 +98,11 @@ exec bash "${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh" \
     --data_dir "$DATA_DIR" \
     --llm_config "${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json" \
     --start_iter 1 \
+    --plan_overrides '{"trial_strategy":"snapshot","eval_strategy":"snapshot"}' \
     --allowed_output_types classifier \
     --min_formal_batch_size 1 \
     --trial_vram_budget_gb 10 --formal_vram_budget_gb 10 \
     --trial_time_admission_source measured --formal_time_admission_source measured \
     --vram_probe_step_timeout_seconds 300 --vram_preflight_total_timeout_seconds 600 \
-    "${LIT_ARGS[@]}" "${PROFILE_ARGS[@]}" \
+    "${LIT_ARGS[@]}" "${ADVICE_ARGS[@]}" "${PROFILE_ARGS[@]}" \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

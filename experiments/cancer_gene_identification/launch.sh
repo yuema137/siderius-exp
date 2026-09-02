@@ -119,11 +119,12 @@ case "$PROFILE" in
             --formal_vram_budget_gb 16
         )
         LIT_ARGS=()
+        ADVICE_ARGS=()
         ;;
     campaign)
         [ "$EXPERIMENT" = "mtg_campaign" ] || fail "--profile campaign requires --experiment mtg_campaign"
         PROFILE_ARGS=(
-            --run_name cancer_mtg_campaign_v1_lit_on
+            --run_name cancer_mtg_campaign_v2_lit_on
             --num_iterations 30
             --max_rounds 1
             --max_epochs 50
@@ -142,6 +143,10 @@ case "$PROFILE" in
         LIT_ARGS=(
             --ml_lit_review_enabled
             --ml_lit_review_config "${PACK_DIR}/framework_configs/lit_review.yaml"
+        )
+        ADVICE_ARGS=(
+            --advice "${EXPERIMENT_ROOT}/advice/mtg_campaign_v2.json"
+            --advice_sha256 "e6957a925e0953fe693afcac6861937c8c3192bf355bc7dfa8c490e51ce47a53"
         )
         ;;
     *)
@@ -177,5 +182,6 @@ exec bash "$LAUNCHER" \
     --vram_preflight_total_timeout_seconds 1800 \
     --no-runtime_watchdog \
     "${LIT_ARGS[@]}" \
+    "${ADVICE_ARGS[@]}" \
     "${PROFILE_ARGS[@]}" \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

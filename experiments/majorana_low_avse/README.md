@@ -1,6 +1,6 @@
 # Majorana Low-AvsE experiments
 
-`launch.sh` exposes two profiles and an orthogonal literature switch:
+`launch.sh` exposes three profiles and an orthogonal literature switch:
 
 - `qualification`: two iterations, one Trial round plus one forced Formal
   round, one epoch, a one-minute Trial budget, a two-minute Formal budget, and
@@ -18,5 +18,8 @@ Always use a fresh workspace and campaign identity for the Lit OFF control.
 
 The separate `demo` profile runs 30 iterations with one Trial round followed
 by one forced Formal round. Trial uses half of the Formal scope, with a
-five-minute Trial budget and a ten-minute Formal budget; Formal uses 10% of
-official Train and 10% of official Test.
+10-minute Trial budget and a 20-minute Formal budget; Formal uses 10% of
+official Train and 10% of official Test. The launcher locks both training and
+evaluation selection to deterministic snapshot scopes. The versioned demo
+advice states the same time and 10-GiB VRAM limits to the proposer and tuner;
+its SHA-256 is pinned by the launcher.
