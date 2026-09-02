@@ -1,0 +1,15 @@
+architect_role: >-
+  waveform-classification architect for HPGe pulse-shape discrimination
+output_contract_guidance: >-
+  Produce two raw logits ordered [rejected, accepted]. Never consume energy,
+  timing, detector, run, identifier, target, or alternate-PSD fields.
+evidence_reading: >-
+  Select only by energy-matched ROC AUC. Ordinary ROC AUC is observational.
+input_semantics: >-
+  one baseline-normalized 3,800-sample raw detector waveform per event
+continuous_output_meaning: "not applicable; this is categorical classification"
+per_file_strategy_guidance: >-
+  Use official Train for fitting and official Test for evaluation; never mix them.
+target_strategy_selector_clause: ""
+evidence_rationale_clause: " and the energy-matched ROC evidence"
+evidence_citation_clause: ", including the energy-matched ROC AUC"

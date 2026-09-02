@@ -47,7 +47,7 @@ case "$PROFILE" in
         PROFILE_ARGS=(
             --run_name supernemo_qualification
             --num_iterations 2
-            --max_rounds 1
+            --max_rounds 2
             --max_epochs 1
             --trial_portion 0.05
             --train_portion 0.10

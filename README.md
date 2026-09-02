@@ -55,6 +55,19 @@ Raw data, generated workspaces, model artifacts, caches, and secrets are runtime
 state rather than repository content. Their configured external paths may be
 temporary or machine-persistent, but they must not be committed here.
 
+## Active classification tasks
+
+- `tasks/supernemo_signal_background/` owns event-level SuperNEMO
+  signal/background classification with fixed 25-keV energy matching.
+- `tasks/majorana_low_avse/` owns fixed-length Majorana Demonstrator waveform
+  classification for `psd_label_low_avse`, also with fixed 25-keV energy
+  matching. It uses the Zenodo partial release's official Train/Test boundary;
+  unlabeled NPML files never enter supervised execution.
+
+The corresponding `experiments/` launchers keep bounded qualification separate
+from 20-iteration scientific campaigns. Literature ON and OFF runs must use
+fresh workspaces and differ only in the declared literature switch.
+
 ## Migration status
 
 The repository boundary is being established from the SIDERIUS `v0.1.4` release and the unpublished `v0.1.5` Gold repair lineage. See `provenance/MIGRATION.md`. No campaign is authorized to launch merely because its files exist here.

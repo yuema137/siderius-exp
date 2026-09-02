@@ -1,0 +1,9 @@
+{
+  "aggregation": "deterministic_weighted_roc_auc_after_25_kev_energy_matching",
+  "direction": "higher",
+  "id": "energy_matched_roc_auc",
+  "references": [],
+  "scoreability": {"contract_id": "deliverable_presence"},
+  "transform": null,
+  "transform_params": {}
+}

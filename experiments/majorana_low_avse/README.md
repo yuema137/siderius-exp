@@ -1,0 +1,16 @@
+# Majorana Low-AvsE experiments
+
+`launch.sh` exposes two profiles and an orthogonal literature switch:
+
+- `qualification`: two iterations, one Trial round plus one forced Formal
+  round, one epoch, one-minute budgets, and small data scopes;
+- `campaign`: 20 iterations, three rounds, agent-selected 5–50 epochs,
+  10-minute Trial and 30-minute Formal budgets, and 10-GiB VRAM ceilings;
+- `--literature on|off`: the only intended variable between the primary
+  campaign and its fresh control.
+
+The campaign uses 20% × 20% of official Train for Trial, and 100% × 20% for
+Formal. Trial evaluates on 20% of official Test; Formal evaluates on all of it.
+Every scope is balanced exactly by class inside fixed 25-keV energy bins.
+
+Always use a fresh workspace and campaign identity for the Lit OFF control.

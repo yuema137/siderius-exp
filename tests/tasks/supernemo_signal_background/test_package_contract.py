@@ -131,7 +131,7 @@ def test_launch_profiles_preserve_the_approved_treatments(tmp_path: Path) -> Non
 
     expected = {
         "qualification": {
-            "--max_rounds": "1",
+            "--max_rounds": "2",
             "--max_epochs": "1",
             "--trial_time_budget_minutes": "1",
             "--formal_time_budget_minutes": "1",
