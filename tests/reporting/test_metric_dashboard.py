@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
-from reporting.metric_dashboard import collect_panel, render_dashboard
+from reporting.metric_dashboard import AxisScale, collect_panel, main, render_dashboard
 
 
 def _record(
@@ -131,3 +132,101 @@ def test_iteration_output_is_authority_for_formal_result(tmp_path: Path) -> None
             "exp_id": "formal_iter_001",
         }
     ]
+
+
+def test_explicit_axis_controls_limits_and_tick_spacing(tmp_path: Path) -> None:
+    """A task's presentation range must not be replaced by data-driven limits."""
+    panel = {
+        "name": "MAJORANA",
+        "workspace": "/runtime/majorana",
+        "metric_id": "energy_matched_roc_auc",
+        "direction": "higher",
+        "y_axis": {
+            "minimum": 0.94,
+            "maximum": 1.00,
+            "tick_step": 0.01,
+        },
+        "points": [
+            {
+                "iteration": 1,
+                "current": 0.97,
+                "best": 0.97,
+                "new_best": True,
+                "phase": "formal",
+                "exp_id": "model_iter_001_001",
+            }
+        ],
+    }
+    output = tmp_path / "dashboard.html"
+
+    render_dashboard([panel], output)
+
+    document = output.read_text(encoding="utf-8")
+    for label in ("1.00", "0.99", "0.98", "0.97", "0.96", "0.95", "0.94"):
+        assert f">{label}</text>" in document
+    assert "font-size:15px" in document
+    assert "font-size:21px" in document
+
+
+def test_axis_scale_refuses_non_integral_tick_range() -> None:
+    """A partial final interval must not silently produce misleading ticks."""
+    scale = AxisScale(minimum=0.60, maximum=0.80, tick_step=0.03)
+
+    try:
+        scale.ticks()
+    except ValueError as exc:
+        assert "integer multiple" in str(exc)
+    else:
+        raise AssertionError("non-integral tick range was accepted")
+
+
+def test_render_cli_applies_named_axis_to_receipt(tmp_path: Path, monkeypatch) -> None:
+    """The documented CLI must carry an explicit scale into the rendered panel."""
+    receipt = tmp_path / "receipt.json"
+    receipt.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "panels": [
+                    {
+                        "name": "SuperNEMO",
+                        "workspace": "/runtime/supernemo",
+                        "metric_id": "energy_matched_roc_auc",
+                        "direction": "higher",
+                        "points": [
+                            {
+                                "iteration": 1,
+                                "current": 0.70,
+                                "best": 0.70,
+                                "new_best": True,
+                                "phase": "formal",
+                                "exp_id": "model_iter_001_001",
+                            }
+                        ],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "dashboard.html"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "metric_dashboard.py",
+            "render",
+            "--receipt",
+            str(receipt),
+            "--y-axis",
+            "SuperNEMO=0.60:0.80:0.05",
+            "--output",
+            str(output),
+        ],
+    )
+
+    assert main() == 0
+
+    document = output.read_text(encoding="utf-8")
+    for label in ("0.80", "0.75", "0.70", "0.65", "0.60"):
+        assert f">{label}</text>" in document

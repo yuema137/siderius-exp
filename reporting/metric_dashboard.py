@@ -36,6 +36,42 @@ class TrajectoryPoint:
     exp_id: str
 
 
+@dataclass(frozen=True)
+class AxisScale:
+    """Explicit y-axis limits for a panel."""
+
+    minimum: float
+    maximum: float
+    tick_step: float
+
+    def __post_init__(self) -> None:
+        if not all(
+            math.isfinite(value)
+            for value in (self.minimum, self.maximum, self.tick_step)
+        ):
+            raise ValueError("axis limits and tick step must be finite")
+        if self.maximum <= self.minimum:
+            raise ValueError("axis maximum must be greater than minimum")
+        if self.tick_step <= 0:
+            raise ValueError("axis tick step must be positive")
+
+    def ticks(self) -> list[float]:
+        count = round((self.maximum - self.minimum) / self.tick_step)
+        if not math.isclose(
+            self.minimum + count * self.tick_step,
+            self.maximum,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        ):
+            raise ValueError("axis range must be an integer multiple of tick step")
+        return [self.maximum - index * self.tick_step for index in range(count + 1)]
+
+    @property
+    def decimals(self) -> int:
+        text = f"{self.tick_step:.10f}".rstrip("0")
+        return len(text.partition(".")[2])
+
+
 def _iteration_from_path(path: Path, workspace: Path) -> int | None:
     for part in path.relative_to(workspace).parts:
         match = _ITERATION.fullmatch(part)
@@ -181,7 +217,12 @@ def collect_panel(name: str, workspace: Path) -> dict[str, Any]:
     }
 
 
-def _coordinates(points: list[dict[str, Any]], width: int, height: int):
+def _coordinates(
+    points: list[dict[str, Any]],
+    width: int,
+    height: int,
+    scale: AxisScale | None = None,
+):
     left, right, top, bottom = 62, 22, 34, 50
     plot_width = width - left - right
     plot_height = height - top - bottom
@@ -190,12 +231,15 @@ def _coordinates(points: list[dict[str, Any]], width: int, height: int):
     x_min, x_max = min(iterations), max(iterations)
     if x_min == x_max:
         x_min, x_max = max(0, x_min - 1), x_max + 1
-    y_min, y_max = min(values), max(values)
-    if y_min == y_max:
-        padding = max(abs(y_min) * 0.05, 0.05)
+    if scale is not None:
+        y_min, y_max = scale.minimum, scale.maximum
     else:
-        padding = (y_max - y_min) * 0.12
-    y_min, y_max = y_min - padding, y_max + padding
+        y_min, y_max = min(values), max(values)
+        if y_min == y_max:
+            padding = max(abs(y_min) * 0.05, 0.05)
+        else:
+            padding = (y_max - y_min) * 0.12
+        y_min, y_max = y_min - padding, y_max + padding
 
     def x(value: float) -> float:
         return left + (value - x_min) * plot_width / (x_max - x_min)
@@ -219,16 +263,27 @@ def _panel_svg(panel: dict[str, Any]) -> str:
             '<div class="empty">No valid scored iteration yet.</div></section>'
         )
 
-    left, right, top, bottom, y_min, y_max, x, y = _coordinates(points, width, height)
+    scale_payload = panel.get("y_axis")
+    scale = AxisScale(**scale_payload) if isinstance(scale_payload, dict) else None
+    left, right, top, bottom, y_min, y_max, x, y = _coordinates(
+        points, width, height, scale
+    )
     plot_right, plot_bottom = width - right, height - bottom
     grid = []
-    for index in range(5):
-        fraction = index / 4
-        y_value = y_max - fraction * (y_max - y_min)
-        y_pos = top + fraction * (plot_bottom - top)
+    y_ticks = (
+        scale.ticks()
+        if scale is not None
+        else [y_max - index * (y_max - y_min) / 4 for index in range(5)]
+    )
+    decimals = scale.decimals if scale is not None else None
+    for y_value in y_ticks:
+        y_pos = y(y_value)
+        tick_label = (
+            f"{y_value:.{decimals}f}" if decimals is not None else f"{y_value:.4g}"
+        )
         grid.append(
             f'<line class="grid" x1="{left}" y1="{y_pos:.1f}" x2="{plot_right}" y2="{y_pos:.1f}"/>'
-            f'<text class="tick" x="{left - 8}" y="{y_pos + 4:.1f}" text-anchor="end">{y_value:.4g}</text>'
+            f'<text class="tick" x="{left - 8}" y="{y_pos + 4:.1f}" text-anchor="end">{tick_label}</text>'
         )
     x_ticks = sorted({int(point["iteration"]) for point in points})
     if len(x_ticks) > 8:
@@ -294,7 +349,7 @@ main{{max-width:1500px;margin:auto;padding:28px}} h1{{margin:0 0 4px;font-size:2
 h2{{margin:0;font-size:19px}} .metric{{color:var(--muted);margin:4px 0 8px}} svg{{width:100%;height:auto;overflow:visible}}
 .grid{{stroke:var(--grid);stroke-width:1}} .axis{{stroke:#64748b;stroke-width:1.2}} .tick,.axis-label{{fill:var(--muted);font-size:12px}}
 .best-line,.current-line{{fill:none;stroke-linejoin:round;stroke-linecap:round}} .best-line{{stroke:var(--best);stroke-width:3}} .current-line{{stroke:var(--current);stroke-width:2.5;stroke-dasharray:8 6}}
-.current-dot{{fill:var(--current);stroke:var(--panel);stroke-width:2}} .star,.legend-star{{fill:var(--star);color:var(--star);font-size:18px}} .legend{{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px}}
+.current-dot{{fill:var(--current);stroke:var(--panel);stroke-width:2}} .star{{fill:var(--star);color:var(--star);font-size:18px}} .legend-star{{fill:var(--star);color:var(--star);font-size:21px}} .legend{{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:15px}}
 .solid,.dashed{{display:inline-block;width:28px;border-top:3px solid var(--best)}} .dashed{{border-top:2px dashed var(--current);margin-left:10px}} .empty{{height:300px;display:grid;place-items:center;color:var(--muted)}}
 @media(max-width:1050px){{.panels{{grid-template-columns:1fr}}}} @media print{{:root{{--bg:#fff;--panel:#fff;--ink:#111;--muted:#555;--grid:#ddd}}.panel{{box-shadow:none}}}}
 </style></head><body><main><h1>Scientific metric trajectories</h1><div class="updated">Generated {generated_at}. Solid = cumulative best; dashed = current iteration.</div><div class="panels">{panel_html}</div></main></body></html>"""
@@ -309,6 +364,29 @@ def _parse_task(value: str) -> tuple[str, Path]:
     return name, Path(path)
 
 
+def _parse_y_axis(value: str) -> tuple[str, AxisScale]:
+    name, separator, limits = value.partition("=")
+    parts = limits.split(":")
+    if not separator or not name or len(parts) != 3:
+        raise argparse.ArgumentTypeError("y-axis must use NAME=MIN:MAX:STEP")
+    try:
+        scale = AxisScale(*(float(part) for part in parts))
+        scale.ticks()
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+    return name, scale
+
+
+def _apply_y_axes(
+    panels: list[dict[str, Any]], configured: list[tuple[str, AxisScale]]
+) -> None:
+    by_name = {str(panel["name"]): panel for panel in panels}
+    for name, scale in configured:
+        if name not in by_name:
+            raise ValueError(f"y-axis names unknown panel: {name}")
+        by_name[name]["y_axis"] = asdict(scale)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -317,6 +395,13 @@ def main() -> int:
     collect.add_argument("--output", type=Path, required=True)
     render = subparsers.add_parser("render", help="render one or more receipts")
     render.add_argument("--receipt", action="append", type=Path, required=True)
+    render.add_argument(
+        "--y-axis",
+        action="append",
+        type=_parse_y_axis,
+        default=[],
+        help="fixed panel scale as NAME=MIN:MAX:STEP",
+    )
     render.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -341,6 +426,7 @@ def main() -> int:
                 raise ValueError(f"duplicate panel name: {panel['name']}")
             names.add(panel["name"])
             panels.append(panel)
+    _apply_y_axes(panels, args.y_axis)
     render_dashboard(panels, args.output)
     return 0
 

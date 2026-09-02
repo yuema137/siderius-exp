@@ -15,8 +15,14 @@ python reporting/metric_dashboard.py collect \
 python reporting/metric_dashboard.py render \
   --receipt /runtime/task-a-receipt.json \
   --receipt /runtime/task-b-receipt.json \
+  --y-axis 'Task A=0.60:0.80:0.05' \
   --output /runtime/metric-dashboard.html
 ```
+
+`--y-axis NAME=MIN:MAX:STEP` is optional and repeatable. It fixes a panel's
+display range and tick spacing without embedding task-specific presentation
+rules in the renderer. `NAME` must exactly match the panel name recorded by
+the collector.
 
 Only successful, finite primary-metric results that were not refused or
 invalidated contribute points. Formal results take precedence within an
