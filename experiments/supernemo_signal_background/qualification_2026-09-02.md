@@ -32,3 +32,22 @@ excluding task-owned DataLoader latency. It predicted 16.9298 seconds for 576
 steps and admitted the 60-second budget; actual training took 154.6803 seconds,
 a 9.1366x underprediction. The rerun was stopped after preserving its runtime
 record. Qualification remains incomplete pending a generic framework repair.
+
+## Generic repair witness
+
+SIDERIUS pull request 421 (`2c818e12`) moves the measured optimizer-step wall
+clock ahead of task-owned batch acquisition. A fresh TestPod run used the same
+external SuperNEMO composition at exact pair SIDERIUS `2c818e12` and
+siderius-exp `c4cca635`, workspace
+`/workspace/supernemo_runs/qualification_c4cca63_2c818e12_b`.
+
+The first candidate measured a steady median of 645.6681 ms over ten optimizer
+steps, including task-owned loading, host-to-device transfer, and optimizer
+compute. It projected 371.9048 seconds for 576 training steps and a known-cost
+lower bound of 376.9550 seconds including setup. The measured admission layer
+therefore refused the 60-second Trial budget after 12.8074 seconds of setup and
+verification work. A later candidate failed to establish steady state within
+the bounded verifier and was also refused fail-closed. The witness was stopped
+after the generic acceptance property was established; it is not a completed
+task qualification and its workspace is retained as non-authoritative repair
+evidence.
