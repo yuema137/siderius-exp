@@ -124,7 +124,7 @@ case "$PROFILE" in
     campaign)
         [ "$EXPERIMENT" = "mtg_campaign" ] || fail "--profile campaign requires --experiment mtg_campaign"
         PROFILE_ARGS=(
-            --run_name cancer_mtg_campaign_v5_lit_on
+            --run_name cancer_mtg_campaign_v6_lit_on
             --num_iterations 30
             --max_rounds 2
             --max_epochs 50

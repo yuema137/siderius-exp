@@ -342,7 +342,7 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
     assert len(commands) == 30
     for command in commands:
         expected_values = {
-            "--run_name": "cancer_mtg_campaign_v5_lit_on",
+            "--run_name": "cancer_mtg_campaign_v6_lit_on",
             "--max_rounds": "2",
             "--trial_time_budget_minutes": "10",
             "--formal_time_budget_minutes": "15",
