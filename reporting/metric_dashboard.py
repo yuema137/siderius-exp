@@ -260,7 +260,8 @@ def _axis_controls(scale: AxisScale) -> str:
     <label>Y max <input class="y-max" type="number" step="any" value="{scale.maximum:g}"></label>
     <label>Tick step <input class="y-step" type="number" step="any" value="{scale.tick_step:g}"></label>
     <button class="apply-axis" type="button">Apply</button>
-    <span class="axis-error" role="status"></span>
+    <button class="save-axis" type="button">Set as default</button>
+    <span class="axis-status" role="status"></span>
   </div>"""
 
 
@@ -342,7 +343,7 @@ def _panel_svg(panel: dict[str, Any], panel_index: int) -> str:
     provisional = any(point["phase"] != "formal" for point in points)
     note = " · latest point provisional until Formal" if provisional else ""
     return f"""
-<section class="panel" data-interactive-axis="true" data-panel-index="{panel_index}">
+<section class="panel" data-interactive-axis="true" data-panel-index="{panel_index}" data-panel-name="{name}">
   <h2>{name}</h2>
   <div class="metric">{metric} · {direction} is better{note}</div>
   {_axis_controls(initial_scale)}
@@ -374,7 +375,7 @@ def render_dashboard(panels: list[dict[str, Any]], output: Path) -> None:
 main{{max-width:1500px;margin:auto;padding:28px}} h1{{margin:0 0 4px;font-size:25px}} .updated{{color:var(--muted);margin-bottom:22px}}
 .panels{{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:18px}} .panel{{background:var(--panel);border:1px solid #24314a;border-radius:14px;padding:18px;box-shadow:0 8px 30px #0004}}
 h2{{margin:0;font-size:19px}} .metric{{color:var(--muted);margin:4px 0 8px}} svg{{width:100%;height:auto;overflow:visible}}
-.axis-controls{{display:flex;align-items:end;flex-wrap:wrap;gap:8px;margin:10px 0 2px}} .axis-controls label{{display:grid;gap:2px;color:var(--muted);font-size:12px}} .axis-controls input{{width:82px;border:1px solid #3a4964;border-radius:5px;background:#0b1020;color:var(--ink);padding:5px 6px}} .axis-controls button{{border:1px solid #4f6b95;border-radius:5px;background:#223451;color:var(--ink);padding:5px 11px;cursor:pointer}} .axis-error{{color:#ff8d8d;font-size:12px;min-height:18px}}
+.axis-controls{{display:flex;align-items:end;flex-wrap:wrap;gap:8px;margin:10px 0 2px}} .axis-controls label{{display:grid;gap:2px;color:var(--muted);font-size:12px}} .axis-controls input{{width:82px;border:1px solid #3a4964;border-radius:5px;background:#0b1020;color:var(--ink);padding:5px 6px}} .axis-controls button{{border:1px solid #4f6b95;border-radius:5px;background:#223451;color:var(--ink);padding:5px 11px;cursor:pointer}} .axis-status{{color:var(--muted);font-size:12px;min-height:18px}} .axis-status.error{{color:#ff8d8d}}
 .grid{{stroke:var(--grid);stroke-width:1}} .axis{{stroke:#64748b;stroke-width:1.2}} .tick,.axis-label{{fill:var(--muted);font-size:12px}}
 .best-line,.current-line{{fill:none;stroke-linejoin:round;stroke-linecap:round}} .best-line{{stroke:var(--best);stroke-width:3}} .current-line{{stroke:var(--current);stroke-width:2.5;stroke-dasharray:8 6}}
 .current-dot{{fill:var(--current);stroke:var(--panel);stroke-width:2}} .star{{fill:var(--star);color:var(--star);font-size:18px}} .legend-star{{fill:var(--star);color:var(--star);font-size:21px}} .legend{{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:15px}}
@@ -383,25 +384,41 @@ h2{{margin:0;font-size:19px}} .metric{{color:var(--muted);margin:4px 0 8px}} svg
 </style></head><body><main><h1>Scientific metric trajectories</h1><div class="updated">Generated {generated_at}. Solid = cumulative best; dashed = current iteration.</div><div class="panels">{panel_html}</div></main>
 <script>
 const svgNamespace = "http://www.w3.org/2000/svg";
+function storageKey(panel) {{ return `siderius-dashboard-axis:${{panel.dataset.panelName}}`; }}
+function readStoredAxis(storage, key) {{
+  try {{ return JSON.parse(storage.getItem(key)); }} catch (_) {{ return null; }}
+}}
+function writeStoredAxis(storage, key, values) {{
+  try {{ storage.setItem(key, JSON.stringify(values)); return true; }} catch (_) {{ return false; }}
+}}
+function axisValues(panel) {{
+  return {{
+    minimum: Number(panel.querySelector(".y-min").value),
+    maximum: Number(panel.querySelector(".y-max").value),
+    step: Number(panel.querySelector(".y-step").value),
+  }};
+}}
 function updateAxis(panel) {{
-  const minimum = Number(panel.querySelector(".y-min").value);
-  const maximum = Number(panel.querySelector(".y-max").value);
-  const step = Number(panel.querySelector(".y-step").value);
-  const error = panel.querySelector(".axis-error");
+  const {{minimum, maximum, step}} = axisValues(panel);
+  const status = panel.querySelector(".axis-status");
   if (![minimum, maximum, step].every(Number.isFinite) || maximum <= minimum || step <= 0) {{
-    error.textContent = "Use finite values with max > min and step > 0.";
-    return;
+    status.classList.add("error");
+    status.textContent = "Use finite values with max > min and step > 0.";
+    return false;
   }}
   const intervalCount = Math.round((maximum - minimum) / step);
   if (intervalCount < 1 || Math.abs(minimum + intervalCount * step - maximum) > 1e-9) {{
-    error.textContent = "Range must be an integer multiple of tick step.";
-    return;
+    status.classList.add("error");
+    status.textContent = "Range must be an integer multiple of tick step.";
+    return false;
   }}
   if (intervalCount > 40) {{
-    error.textContent = "Choose a tick step that produces at most 40 intervals.";
-    return;
+    status.classList.add("error");
+    status.textContent = "Choose a tick step that produces at most 40 intervals.";
+    return false;
   }}
-  error.textContent = "";
+  status.classList.remove("error");
+  status.textContent = "";
   const svg = panel.querySelector("svg");
   const top = Number(svg.dataset.top);
   const bottom = Number(svg.dataset.bottom);
@@ -428,11 +445,31 @@ function updateAxis(panel) {{
   }});
   svg.querySelectorAll("circle[data-score]").forEach(dot => dot.setAttribute("cy", y(Number(dot.dataset.score)).toFixed(1)));
   svg.querySelectorAll("text.star[data-score]").forEach(star => star.setAttribute("y", (y(Number(star.dataset.score)) - 10).toFixed(1)));
+  return true;
 }}
 document.querySelectorAll(".panel[data-interactive-axis]").forEach(panel => {{
-  panel.querySelector(".apply-axis").addEventListener("click", () => updateAxis(panel));
+  const key = storageKey(panel);
+  const restored = readStoredAxis(sessionStorage, key) || readStoredAxis(localStorage, key);
+  if (restored && [restored.minimum, restored.maximum, restored.step].every(Number.isFinite)) {{
+    panel.querySelector(".y-min").value = restored.minimum;
+    panel.querySelector(".y-max").value = restored.maximum;
+    panel.querySelector(".y-step").value = restored.step;
+    updateAxis(panel);
+  }}
+  panel.querySelector(".apply-axis").addEventListener("click", () => {{
+    if (updateAxis(panel)) writeStoredAxis(sessionStorage, key, axisValues(panel));
+  }});
+  panel.querySelector(".save-axis").addEventListener("click", () => {{
+    if (!updateAxis(panel)) return;
+    const values = axisValues(panel);
+    writeStoredAxis(sessionStorage, key, values);
+    const saved = writeStoredAxis(localStorage, key, values);
+    const status = panel.querySelector(".axis-status");
+    status.textContent = saved ? "Default saved in this browser." : "Browser blocked persistent storage.";
+    status.classList.toggle("error", !saved);
+  }});
   panel.querySelectorAll(".axis-controls input").forEach(input => input.addEventListener("keydown", event => {{
-    if (event.key === "Enter") updateAxis(panel);
+    if (event.key === "Enter" && updateAxis(panel)) writeStoredAxis(sessionStorage, key, axisValues(panel));
   }}));
 }});
 </script></body></html>"""

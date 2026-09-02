@@ -114,8 +114,11 @@ def test_renderer_is_self_contained_and_labels_both_series(tmp_path: Path) -> No
     assert "<svg" in document
     assert 'class="axis-controls"' in document
     assert 'class="apply-axis"' in document
+    assert 'class="save-axis"' in document
     assert 'clip-path="url(#plot-clip-0)"' in document
     assert "function updateAxis(panel)" in document
+    assert "writeStoredAxis(sessionStorage" in document
+    assert "writeStoredAxis(localStorage" in document
     assert "polyline[data-values]" in document
     assert 'http-equiv="refresh" content="30"' in document
     assert "https://" not in document
