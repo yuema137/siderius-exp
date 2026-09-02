@@ -87,4 +87,5 @@ def test_renderer_is_self_contained_and_labels_both_series(tmp_path: Path) -> No
     assert "current iteration" in document
     assert "★" in document
     assert "<svg" in document
+    assert 'http-equiv="refresh" content="30"' in document
     assert "https://" not in document

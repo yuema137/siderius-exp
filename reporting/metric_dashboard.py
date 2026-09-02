@@ -243,7 +243,7 @@ def render_dashboard(panels: list[dict[str, Any]], output: Path) -> None:
     generated_at = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     panel_html = "\n".join(_panel_svg(panel) for panel in panels)
     document = f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="30">
 <title>SIDERIUS experiment trajectories</title>
 <style>
 :root{{--bg:#0b1020;--panel:#121a2d;--ink:#e8edf7;--muted:#91a0b8;--grid:#27344c;--best:#52d3a5;--current:#7da7ff;--star:#ffd166}}

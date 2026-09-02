@@ -23,4 +23,4 @@ invalidated contribute points. Formal results take precedence within an
 iteration; a Trial-only point is explicitly labelled provisional. The dashed
 line is the selected current-iteration score, the solid line is the cumulative
 best according to the metric's declared direction, and a star marks each new
-best.
+best. The generated page reloads itself every 30 seconds when served over HTTP.
