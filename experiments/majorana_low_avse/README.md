@@ -3,7 +3,8 @@
 `launch.sh` exposes two profiles and an orthogonal literature switch:
 
 - `qualification`: two iterations, one Trial round plus one forced Formal
-  round, one epoch, one-minute budgets, and small data scopes;
+  round, one epoch, a one-minute Trial budget, a two-minute Formal budget, and
+  small data scopes;
 - `campaign`: 20 iterations, three rounds, agent-selected 5–50 epochs,
   10-minute Trial and 30-minute Formal budgets, and 10-GiB VRAM ceilings;
 - `--literature on|off`: the only intended variable between the primary

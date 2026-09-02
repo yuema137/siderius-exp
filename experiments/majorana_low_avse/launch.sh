@@ -51,7 +51,7 @@ case "$PROFILE" in
             --num_iterations 2 --max_rounds 2 --max_epochs 1
             --trial_portion 0.05 --train_portion 0.10 --eval_portion 0.01
             --formal_portion 0.10 --formal_train_portion 0.10 --formal_eval_portion 0.01
-            --trial_time_budget_minutes 1 --formal_time_budget_minutes 1
+            --trial_time_budget_minutes 1 --formal_time_budget_minutes 2
         ) ;;
     campaign)
         PROFILE_ARGS=(

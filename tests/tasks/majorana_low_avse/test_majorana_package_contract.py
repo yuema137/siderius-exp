@@ -135,6 +135,8 @@ def test_qualification_has_a_trial_round_before_forced_formal(tmp_path: Path) ->
         assert command[command.index("--max_rounds") + 1] == "2"
         assert command[command.index("--trial_portion") + 1] == "0.05"
         assert command[command.index("--formal_portion") + 1] == "0.10"
+        assert command[command.index("--trial_time_budget_minutes") + 1] == "1"
+        assert command[command.index("--formal_time_budget_minutes") + 1] == "2"
 
 
 def test_official_train_and_test_event_ids_do_not_overlap() -> None:
