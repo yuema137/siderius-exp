@@ -3,9 +3,10 @@
 The static scientific task lives under
 `tasks/supernemo_signal_background/`. This directory owns workflow treatment.
 
-- `qualification`: two iterations, one round, one epoch, tiny deterministic
-  scopes, one-minute Trial/Formal budgets, and a 10-GiB VRAM ceiling. It proves
-  the external task path, not scientific performance.
+- `qualification`: two iterations, one Trial round plus one forced Formal
+  round, one epoch, 1% scope with a 1% per-epoch training subsample, 1%
+  evaluation, one-minute Trial/Formal budgets, and a 10-GiB VRAM ceiling. It
+  proves the external task path, not scientific performance.
 - `campaign`: 20 iterations and three rounds under the operator-approved
   treatment. Agents choose 5--50 epochs and architecture-specific batch sizes.
   Trial uses 20% scope and 20% of that scope for training; Formal uses the full

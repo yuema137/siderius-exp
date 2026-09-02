@@ -51,3 +51,25 @@ the bounded verifier and was also refused fail-closed. The witness was stopped
 after the generic acceptance property was established; it is not a completed
 task qualification and its workspace is retained as non-authoritative repair
 evidence.
+
+## Loader-aware merged-SHA rerun
+
+A fresh TestPod run used SIDERIUS
+`6bcdeb2f55b47ced6bcadaa08ddfd88875964261` and siderius-exp
+`16a0823afd78ca014444a34730c04ebfda30a45c` in workspace
+`/workspace/supernemo_runs/qualification_16a0823_6bcdeb2f_run1`.
+
+The repaired measured-admission path behaved correctly. Three executable
+candidates were refused after real setup and training verification projected
+known-cost lower bounds of 572.4, 380.7, and 313.2 seconds against the
+one-minute Trial budget. No rejected attempt wrote an experiment result. A
+planner proposal using a non-snapshot selection strategy was independently
+refused by the task-owned deterministic-snapshot contract; the subsequent
+proposal consumed that feedback and returned to snapshot selection.
+
+The run established that the original qualification scope was too large for a
+dense 3D candidate: 5% scope with a 10% per-epoch subsample materialized about
+37,000 training events. It was stopped after the evidence was recorded. The
+qualification profile now uses 1% scope with a 1% per-epoch subsample for both
+Trial and Formal training, while retaining 1% evaluation. Campaign portions
+are unchanged. A fresh workspace is required for the rerun.
