@@ -59,6 +59,17 @@ def _bounded_indices(split_values: np.ndarray, split: str, limit: int) -> np.nda
     return available[: min(limit, available.size)]
 
 
+def _local_selection(
+    global_selection: np.ndarray, global_offset: int, process_count: int
+) -> np.ndarray:
+    """Map sorted concatenated indices back to one process-local index space."""
+    left = np.searchsorted(global_selection, global_offset, side="left")
+    right = np.searchsorted(
+        global_selection, global_offset + process_count, side="left"
+    )
+    return global_selection[left:right] - global_offset
+
+
 def load_event_arrays(index_dir: Path, split: str, per_process: int) -> Arrays:
     features, energies, labels = [], [], []
     for process in PROCESSES:
@@ -80,11 +91,20 @@ def load_tracker_arrays(
     split: str,
     per_process: int,
     max_hits: int,
+    global_selection: np.ndarray | None = None,
 ) -> Arrays:
     event_parts, energy_parts, label_parts, hit_parts, mask_parts = [], [], [], [], []
+    global_offset = 0
     for process in PROCESSES:
         with np.load(index_dir / f"{process}_event_index.npz") as index:
             selected = _bounded_indices(index["splits"], split, per_process)
+            process_count = selected.size
+            if global_selection is not None:
+                local_selection = _local_selection(
+                    global_selection, global_offset, process_count
+                )
+                selected = selected[local_selection]
+            global_offset += process_count
             starts = index["row_starts"][selected]
             counts = index["hit_counts"][selected]
             event_parts.append(index["event_features"][selected])
@@ -301,30 +321,39 @@ def main() -> int:
     torch.manual_seed(args.seed)
     device = torch.device("cuda")
     load_started = time.perf_counter()
-    loader = load_event_arrays if args.architecture == "mlp" else load_tracker_arrays
     if args.architecture == "mlp":
-        train = loader(args.index_dir, "train", args.train_per_process)
-        validation = loader(args.index_dir, "validation", args.validation_per_process)
+        train = load_event_arrays(args.index_dir, "train", args.train_per_process)
+        unbalanced_train_events = int(train.labels.size)
+        balanced = energy_balanced_indices(
+            train.labels, train.energy_sum, ENERGY_BIN_EDGES_KEV
+        )
+        train = subset_arrays(train, balanced.indices)
+        validation = load_event_arrays(
+            args.index_dir, "validation", args.validation_per_process
+        )
     else:
-        train = loader(
+        train_metadata = load_event_arrays(
+            args.index_dir, "train", args.train_per_process
+        )
+        unbalanced_train_events = int(train_metadata.labels.size)
+        balanced = energy_balanced_indices(
+            train_metadata.labels, train_metadata.energy_sum, ENERGY_BIN_EDGES_KEV
+        )
+        train = load_tracker_arrays(
             args.data_dir,
             args.index_dir,
             "train",
             args.train_per_process,
             args.max_hits,
+            balanced.indices,
         )
-        validation = loader(
+        validation = load_tracker_arrays(
             args.data_dir,
             args.index_dir,
             "validation",
             args.validation_per_process,
             args.max_hits,
         )
-    unbalanced_train_events = int(train.labels.size)
-    balanced = energy_balanced_indices(
-        train.labels, train.energy_sum, ENERGY_BIN_EDGES_KEV
-    )
-    train = subset_arrays(train, balanced.indices)
     train, validation, normalization = standardize(train, validation)
     data_seconds = time.perf_counter() - load_started
     train_loader = make_loader(train, args.batch_size, True)
