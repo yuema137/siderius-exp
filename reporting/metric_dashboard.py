@@ -231,6 +231,9 @@ def _coordinates(
     x_min, x_max = min(iterations), max(iterations)
     if x_min == x_max:
         x_min, x_max = max(0, x_min - 1), x_max + 1
+    else:
+        x_padding = (x_max - x_min) * 0.02
+        x_min, x_max = x_min - x_padding, x_max + x_padding
     if scale is not None:
         y_min, y_max = scale.minimum, scale.maximum
     else:

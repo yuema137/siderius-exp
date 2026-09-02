@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -183,6 +184,35 @@ def test_axis_scale_refuses_non_integral_tick_range() -> None:
         assert "integer multiple" in str(exc)
     else:
         raise AssertionError("non-integral tick range was accepted")
+
+
+def test_iteration_endpoints_leave_room_for_markers(tmp_path: Path) -> None:
+    """The first new-best star must not be clipped against the plot boundary."""
+    panel = {
+        "name": "example",
+        "workspace": "/runtime/example",
+        "metric_id": "auc",
+        "direction": "higher",
+        "points": [
+            {
+                "iteration": iteration,
+                "current": score,
+                "best": score,
+                "new_best": True,
+                "phase": "formal",
+                "exp_id": f"model_iter_{iteration:03d}",
+            }
+            for iteration, score in ((1, 0.70), (2, 0.72))
+        ],
+    }
+    output = tmp_path / "dashboard.html"
+
+    render_dashboard([panel], output)
+
+    document = output.read_text(encoding="utf-8")
+    first_dot = re.search(r'class="current-dot"[^>]+cx="([0-9.]+)"', document)
+    assert first_dot is not None
+    assert float(first_dot.group(1)) > 62.0
 
 
 def test_render_cli_applies_named_axis_to_receipt(tmp_path: Path, monkeypatch) -> None:
