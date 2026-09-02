@@ -16,6 +16,11 @@ The static scientific task lives under
 
 Both profiles use normal measured admission and normal Trial-to-Formal
 promotion. Neither bypasses resource budgets or Formal execution.
+
+The `demo` profile is a separate bounded treatment: 30 iterations, one Trial
+round followed by one forced Formal round, a five-minute Trial budget, and a
+ten-minute Formal budget. Trial uses half of the Formal scope. It does not
+replace the `campaign` profile.
 The workflow locks both training and evaluation selection to deterministic
 snapshot scopes because this task's external data adapter exposes that one
 selection policy. The lock uses SIDERIUS's generic ``plan_overrides`` contract;

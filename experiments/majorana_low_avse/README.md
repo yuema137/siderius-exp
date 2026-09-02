@@ -15,3 +15,8 @@ Formal. Trial evaluates on 20% of official Test; Formal evaluates on all of it.
 Every scope is balanced exactly by class inside fixed 25-keV energy bins.
 
 Always use a fresh workspace and campaign identity for the Lit OFF control.
+
+The separate `demo` profile runs 30 iterations with one Trial round followed
+by one forced Formal round. Trial uses half of the Formal scope, with a
+five-minute Trial budget and a ten-minute Formal budget; Formal uses 10% of
+official Train and 10% of official Test.

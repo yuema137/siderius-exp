@@ -62,7 +62,16 @@ case "$PROFILE" in
             --formal_portion 1.0 --formal_train_portion 0.20 --formal_eval_portion 1.0
             --trial_time_budget_minutes 10 --formal_time_budget_minutes 30
         ) ;;
-    *) fail "--profile must be qualification or campaign" ;;
+    demo)
+        PROFILE_ARGS=(
+            --run_name "majorana_model_demo_v2_lit_${LITERATURE}"
+            --num_iterations 30 --max_rounds 2 --max_epochs 50
+            --workflow_parameter_rules '{"train_config.epochs":{"range":{"min":5,"max":50}}}'
+            --trial_portion 0.50 --train_portion 0.05 --eval_portion 0.05
+            --formal_portion 1.0 --formal_train_portion 0.10 --formal_eval_portion 0.10
+            --trial_time_budget_minutes 5 --formal_time_budget_minutes 10
+        ) ;;
+    *) fail "--profile must be qualification, campaign, or demo" ;;
 esac
 
 LIT_ARGS=()
