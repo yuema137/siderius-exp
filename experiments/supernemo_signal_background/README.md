@@ -16,6 +16,10 @@ The static scientific task lives under
 
 Both profiles use normal measured admission and normal Trial-to-Formal
 promotion. Neither bypasses resource budgets or Formal execution.
+The workflow locks both training and evaluation selection to deterministic
+snapshot scopes because this task's external data adapter exposes that one
+selection policy. The lock uses SIDERIUS's generic ``plan_overrides`` contract;
+the adapter still refuses unsupported strategies as defense in depth.
 
 ```bash
 bash experiments/supernemo_signal_background/launch.sh \

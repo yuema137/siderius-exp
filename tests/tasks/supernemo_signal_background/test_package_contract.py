@@ -188,3 +188,7 @@ def test_launch_profiles_preserve_the_approved_treatments(tmp_path: Path) -> Non
         for command in commands:
             for flag, value in values.items():
                 assert command[command.index(flag) + 1] == value
+            assert json.loads(command[command.index("--plan_overrides") + 1]) == {
+                "eval_strategy": "snapshot",
+                "trial_strategy": "snapshot",
+            }

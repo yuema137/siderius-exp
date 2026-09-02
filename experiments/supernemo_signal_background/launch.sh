@@ -91,6 +91,7 @@ exec bash "$LAUNCHER" \
     --ml_lit_review_config "$LIT_CONFIG" \
     --ml_lit_review_enabled \
     --start_iter 1 \
+    --plan_overrides '{"trial_strategy":"snapshot","eval_strategy":"snapshot"}' \
     --allowed_output_types classifier \
     --min_formal_batch_size 1 \
     --trial_vram_budget_gb 10 \
