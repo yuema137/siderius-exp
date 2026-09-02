@@ -61,6 +61,20 @@ def _quantiles(values: np.ndarray) -> dict[str, float]:
     return {f"q{level:g}": float(value) for level, value in zip(levels, result)}
 
 
+def _finite_quantiles(values: np.ndarray) -> tuple[dict[str, float], dict[str, int]]:
+    """Summarize finite values and report missing/non-finite observations."""
+    finite = np.isfinite(values)
+    counts = {
+        "finite": int(np.count_nonzero(finite)),
+        "nan": int(np.count_nonzero(np.isnan(values))),
+        "positive_infinity": int(np.count_nonzero(np.isposinf(values))),
+        "negative_infinity": int(np.count_nonzero(np.isneginf(values))),
+    }
+    if not np.any(finite):
+        raise ValueError("tracker feature contains no finite sampled values")
+    return _quantiles(values[finite]), counts
+
+
 def _sha256_array(values: np.ndarray) -> str:
     contiguous = np.ascontiguousarray(values)
     return hashlib.sha256(contiguous.view(np.uint8)).hexdigest()
@@ -144,7 +158,11 @@ def profile_file(
                 num=min(1_000_000, event_rows.size),
                 dtype=np.int64,
             )
-            tracker_ranges[key] = _quantiles(row_values[sample_indices])
+            quantiles, nonfinite_counts = _finite_quantiles(row_values[sample_indices])
+            tracker_ranges[key] = {
+                "quantiles": quantiles,
+                "sample_counts": nonfinite_counts,
+            }
 
     split_counts = {
         name: int(np.count_nonzero(splits == index))

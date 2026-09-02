@@ -17,8 +17,17 @@ within one process file are tracker hits belonging to the same event.
 - Training objective: binary cross entropy.
 - Data cuts: no energy-window or TPP-separation cut is introduced implicitly.
 
-The energy-matching bin edges and weighting rule are task-owned and fixed
-before qualification. Agents may not alter the metric definition.
+The energy-matching ruler uses fixed 100-keV bins from 0 through 3,600 keV.
+Within every bin containing both classes, signal and background each receive
+total weight equal to the smaller class count. Bins without both classes are
+excluded and their coverage is reported. This deterministic weighting removes
+the energy-spectrum population shortcut without random downsampling. The
+edges and weighting rule are task-owned; agents may not alter them.
+
+The released tracker-radius column contains a small number of `NaN` values
+(0.41--0.60% depending on process). Tracker models replace a missing `tR` with
+zero before standardization and receive a separate missingness indicator. No
+other non-finite tracker values were observed in the complete scan.
 
 ## Split invariant
 
@@ -31,4 +40,3 @@ model selection.
 
 Raw HDF5 files and generated indexes remain in an operator-supplied data
 directory outside the repository.
-

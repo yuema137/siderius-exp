@@ -19,3 +19,21 @@ The study must record:
 The held-out test partition is not used for model selection in this study.
 Raw data and runtime artifacts live in the configured workspace, not in Git.
 
+## Frozen study choices
+
+- Energy-matching bins: `[0, 100, ..., 3600]` keV.
+- Split identity: `(process, ev_no)`, hashed once into 80/10/10 partitions.
+- Training imbalance treatment: positive weighting in BCE; no event is moved
+  across a partition and no test event participates in model selection.
+- Tracker representation: pointwise one-dimensional convolutions followed by
+  masked symmetric pooling. This treats tracker hits as a variable-length set
+  rather than assigning scientific meaning to their stored row order.
+- Missing `tR`: zero imputation plus an explicit missingness channel.
+- Final runtime comparisons are measured in isolation. Concurrent exploratory
+  runs may be used only to choose the configurations worth measuring.
+
+The 100-keV bin width was selected after a validation-partition sensitivity
+check at 25, 50, 100, 200, and 400 keV. Widths from 25 through 200 keV retained
+essentially the same common energy support; 100 keV avoids unnecessarily sparse
+bins without erasing the spectrum structure. This choice is frozen before any
+baseline score is examined.
