@@ -251,6 +251,7 @@ gold_main() {
         echo "[gold-campaign] treatment: advice=EXPLICIT_NONE (blindpod, named absence)"
     fi
     echo "[gold-campaign] lit_review=ON (operator D-LIT-ON-1, supersedes Q-LIT-1; explicit --ml_lit_review_enabled, symmetric; V19 config = shipped default)"
+    echo "[gold-campaign] terminal_eval=$GOLD_TERMINAL_EVAL_POLICY (Composed Best and Strict Best are the full-scope campaign results)"
     gold_print_frozen_table
 
     # The resolved launch manifest — every behaviorally relevant value the
@@ -271,6 +272,7 @@ gold_main() {
             echo "  \"lit_review\": \"ON (D-LIT-ON-1 supersedes Q-LIT-1, explicit --ml_lit_review_enabled, symmetric, V19 config = shipped default)\","
             echo "  \"campaign_id\": \"${GOLD_CAMPAIGN_ID}\","
             echo "  \"stage2_authorized\": ${GOLD_STAGE2_AUTHORIZED},"
+            echo "  \"terminal_eval_policy\": \"${GOLD_TERMINAL_EVAL_POLICY}\","
             echo "  \"bound_task_config\": \"${GOLD_TASK_CONFIG_ABS}\","
             echo "  \"bound_task_config_sha256\": \"${GOLD_TASK_CONFIG_SHA256}\","
             echo "  \"bound_health_checks_config\": \"${GOLD_HEALTH_CHECKS_EFFECTIVE}\","

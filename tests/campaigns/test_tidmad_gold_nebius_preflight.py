@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-import subprocess
 import hashlib
+import os
+import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 
 EXP_ROOT = Path(__file__).resolve().parents[2]
 PREFLIGHT = EXP_ROOT / "campaigns" / "tidmad_gold" / "scripts" / "campaign_preflight.sh"
@@ -98,6 +100,20 @@ def test_free_space_threshold_is_caller_owned_and_launch_blocking(
     assert "required=999999999999 GiB" in impossible.stdout
 
 
+def test_gold_capacity_default_is_three_tib() -> None:
+    """Omitting the deployment flag must retain a launch-blocking threshold."""
+    result = _call('printf "%s\\n" "$GOLD_MINIMUM_FREE_GIB_DEFAULT"')
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "3072"
+
+
+def test_terminal_eval_policy_refuses_single_workspace_provenance() -> None:
+    """Gold must not silently wire four Strict Best units into one provenance root."""
+    result = _call('printf "%s\\n" "$GOLD_TERMINAL_EVAL_POLICY"')
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "out_of_scope_multi_workspace_provenance"
+
+
 def test_resume_requires_attributable_noncorrupt_state(tmp_path: Path) -> None:
     """Resume must reject wrong-arm state even when the inspector reports clean."""
     workspace = tmp_path / "workspace"
@@ -127,3 +143,74 @@ def test_resume_requires_attributable_noncorrupt_state(tmp_path: Path) -> None:
     )
     assert accepted.returncode == 0, accepted.stdout + accepted.stderr
     assert accepted.stdout.strip() == "2"
+
+
+def test_preflight_main_reaches_the_summary_without_llm_or_gpu(tmp_path: Path) -> None:
+    """A missing runtime asset must not abort the preflight between named rows."""
+    siderius_checkout = os.environ.get("SIDERIUS_CHECKOUT")
+    if not siderius_checkout:
+        pytest.skip("SIDERIUS_CHECKOUT must name the exact framework checkout")
+    framework_root = Path(siderius_checkout).resolve()
+    framework_revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=framework_root,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    exp_revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=EXP_ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    workspace = tmp_path / "workspace"
+    data_dir = tmp_path / "data"
+    generated = tmp_path / "generated"
+    workspace.mkdir()
+    data_dir.mkdir()
+    generated.mkdir()
+    completed = subprocess.run(
+        [
+            "bash",
+            str(PREFLIGHT),
+            "--workspace-root",
+            str(workspace),
+            "--arm",
+            "blindpod",
+            "--revision",
+            exp_revision,
+            "--siderius-checkout",
+            str(framework_root),
+            "--siderius-revision",
+            framework_revision,
+            "--data_dir",
+            str(data_dir),
+            "--only",
+            "0-3",
+            "--minimum-free-gib",
+            "0",
+            "--skip-llm-smoke",
+            "--",
+            "--healthgate_mode",
+            "blocking",
+            "--result_authority",
+            "scientific",
+        ],
+        cwd=EXP_ROOT,
+        env={
+            **os.environ,
+            "SIDERIUS_CHECKOUT": str(framework_root),
+            "SIDERIUS_GENERATED_LIBRARY_DIR": str(generated),
+        },
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=120,
+    )
+    output = completed.stdout + completed.stderr
+    assert "CAMPAIGN PREFLIGHT SUMMARY" in output, output
+    assert "R2b pinned import resolution" in output
+    assert "R9 LLM smoke SKIPPED" in output
+    assert "R10 terminal evaluation OUT OF SCOPE" in output

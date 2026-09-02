@@ -34,8 +34,12 @@ campaign's scientific treatment.
 - `runtime/wave_records.py` owns the append-only wave evidence and derived
   summary contract. `scripts/record_wave_summary.py` is its campaign CLI;
   neither file is part of generic SIDERIUS execution.
-- `stage3/` owns the composed-best, strict-best, and terminal-evaluation
-  writers. Composed Best selects the Stage-1 winner in each band, verifies its
+- `stage3/` owns the composed-best, strict-best, and reusable terminal-evaluation
+  writers. This campaign reports Composed Best and Strict Best; terminal
+  evaluation is explicitly out of scope because its current champion contract
+  records one provenance workspace while a Strict Best design is assembled
+  from four. No caller may collapse those four roots into a fabricated single
+  provenance claim. Composed Best selects the Stage-1 winner in each band, verifies its
   checkpoint digest, reuses the task-owned inference executor over all 200
   segments per file, validates the complete deliverables, and then calls the
   canonical pooled scorer once. Stage-1's 10% deliverables remain search

@@ -46,9 +46,10 @@
 #       typically the ephemeral container overlay, so pod loss would
 #       silently destroy the very artifacts H100 qualification produces.
 #       Converts R8's former RETAIN-by-design assumption into a check.
-#   R1d optional caller-owned free-space threshold. Capacity is measured by
-#       preflight, while deployment supplies the GiB requirement because
-#       qualification, Stage 1, and Stage 3 retain different volumes.
+#   R1d launch-blocking free-space threshold. Gold defaults to 3072 GiB: a
+#       conservative binary-unit ceiling over the approximately 3.0 TB
+#       two-arm retained-volume estimate while remaining below the provisioned
+#       4 TiB shared filesystem. Deployment may raise it explicitly.
 #   R1c generated-capability library root DECLARED and on a PERSISTENT
 #       mount (F-GENLIB-WIRE-1; same fstype logic as R1/R1b). The root is
 #       resolved by CALLING the production authority
@@ -62,10 +63,9 @@
 #       the next arm's proposer surface. R8 cannot see this: it globs the
 #       CHECKOUT dir only and is blind to this root, which is exactly how
 #       the contamination went unnoticed.
-#   R2  authoritative code revision: `git rev-parse HEAD` printed
-#       (launch-packet row `repo_sha=`), compared against --revision
-#       (prefix >= 7 chars accepted); a DIRTY tree FAILS — commit first,
-#       a campaign must be attributable to one SHA.
+#   R2  authoritative revision pair: siderius-exp is compared against
+#       --revision and the explicit SIDERIUS checkout against
+#       --siderius-revision. Either dirty tree or mismatch fails.
 #   R2b import resolution: a neutral-cwd probe proves the PINNED
 #       (PYTHONPATH=this tree) child resolves hyperparam_tuning inside this
 #       tree with the #299-tolerant loss_history, and reports what an
@@ -164,14 +164,22 @@
 #       repo's own config loading; success count + p95 latency. NOT a
 #       quota guarantee (provider-side limits act on the sustained
 #       pattern) — skip with --skip_llm_smoke for offline rehearsals.
+#   R10 terminal-evaluation campaign scope. The writer remains a reusable
+#       mechanism, but this campaign reports Composed Best and Strict Best.
+#       A Strict Best winner spans four provenance workspaces, while the
+#       current TerminalChampion contract records one; fabricating a single
+#       provenance root is refused by declaring terminal evaluation out of
+#       scope until a genuine multi-root provenance contract exists.
 #
 # Usage (campaign host):
 #   bash campaigns/tidmad_gold/scripts/campaign_preflight.sh \
 #       --workspace-root /persist/siderius_campaign \
 #       --arm with-prior-art|without-prior-art|goldpod|blindpod \
-#       --revision <expected sha> \
+#       --revision <expected exp sha> \
+#       --siderius-checkout /path/to/SIDERIUS \
+#       --siderius-revision <expected framework sha> \
 #       [--data_dir DIR] [--only BAND] [--resume] \
-#       [--minimum-free-gib N] [--llm_config FILE] [--skip_llm_smoke] \
+#       [--minimum-free-gib N=3072] [--llm_config FILE] [--skip_llm_smoke] \
 #       [--gold_advice_file FILE] [--gold_advice_sha256 SHA256] \
 #       [--symmetry-band 0-3] \
 #       -- --healthgate_mode blocking --result_authority scientific \
@@ -194,15 +202,18 @@
 set -euo pipefail
 
 PF_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PF_PROJECT_DIR="$(cd "${PF_SCRIPT_DIR}/.." && pwd)"
+PF_CAMPAIGN_DIR="$(cd "${PF_SCRIPT_DIR}/.." && pwd)"
+PF_EXP_ROOT="$(cd "${PF_CAMPAIGN_DIR}/../.." && pwd)"
+PF_SIDERIUS_ROOT=""
 PF_LAUNCHER="${PF_SCRIPT_DIR}/launch_prior_baseline_experiment.sh"
 PF_POSTURE="${PF_SCRIPT_DIR}/h100_posture.env"
 PF_SYMMETRY="${PF_SCRIPT_DIR}/campaign_arm_symmetry.py"
 PF_SURFACE="${PF_SCRIPT_DIR}/campaign_arm_surface.py"
 PF_SMOKE="${PF_SCRIPT_DIR}/campaign_llm_smoke.py"
 PF_PROBE="${PF_SCRIPT_DIR}/gpu_c_coresidency_probe.sh"
-PF_DATA_MANIFEST="${PF_PROJECT_DIR}/inputs/q3_data_manifest.sha256"
+PF_DATA_MANIFEST="${PF_CAMPAIGN_DIR}/inputs/q3_data_manifest.sha256"
 PF_DATA_MANIFEST_SHA256="39270b4578206db86d3aeb7e31ef1134e65fc1e375ce3f7f00e857fad633ad85"
+GOLD_MINIMUM_FREE_GIB_DEFAULT=3072
 # shellcheck source=_gold_campaign_lib.sh
 source "${PF_SCRIPT_DIR}/_gold_campaign_lib.sh"
 
@@ -463,9 +474,9 @@ preflight_evidence_state() {
 # another clone's templates describes prompts this launch will not send.
 pf_capture_surface() {
     local arm="$1" isolation="$2" out="$3"
-    (cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+    (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
         "$PF_PY" "$PF_SURFACE" --arm "$arm" --baseline-isolation "$isolation" \
-        --project-dir "$PF_PROJECT_DIR" --out "$out")
+        --project-dir "$PF_SIDERIUS_ROOT" --out "$out")
 }
 
 # --- row bookkeeping --------------------------------------------------------
@@ -487,17 +498,17 @@ pf_resolve_python() {
         PF_PY="$SIDERIUS_PYTHON"
     elif [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
         PF_PY="$VIRTUAL_ENV/bin/python"
-    elif [ -x "${PF_PROJECT_DIR}/.venv/bin/python" ]; then
-        PF_PY="${PF_PROJECT_DIR}/.venv/bin/python"
+    elif [ -x "${PF_SIDERIUS_ROOT}/.venv/bin/python" ]; then
+        PF_PY="${PF_SIDERIUS_ROOT}/.venv/bin/python"
     else
-        echo "ERROR: no project python (SIDERIUS_PYTHON / \$VIRTUAL_ENV / ${PF_PROJECT_DIR}/.venv)." >&2
+        echo "ERROR: no SIDERIUS checkout python (SIDERIUS_PYTHON / \$VIRTUAL_ENV / ${PF_SIDERIUS_ROOT}/.venv)." >&2
         return 1
     fi
 }
 
 pf_main() {
-    local WORKSPACE_ROOT="" ARM="" REVISION="" DATA_DIR="" LLM_CONFIG="" ONLY=""
-    local MINIMUM_FREE_GIB=""
+    local WORKSPACE_ROOT="" ARM="" REVISION="" SIDERIUS_REVISION="" DATA_DIR="" LLM_CONFIG="" ONLY=""
+    local SIDERIUS_CHECKOUT_ARG="" MINIMUM_FREE_GIB="$GOLD_MINIMUM_FREE_GIB_DEFAULT"
     local ADVICE_FILE="" ADVICE_SHA256=""
     local SKIP_LLM=0 RESUME_MODE=0 SYMMETRY_BAND="0-3"
     local PASSTHROUGH=()
@@ -507,6 +518,8 @@ pf_main() {
             --workspace-root|--workspace_root) WORKSPACE_ROOT="$2"; shift 2 ;;
             --arm)            ARM="$2"; shift 2 ;;
             --revision)       REVISION="$2"; shift 2 ;;
+            --siderius-revision) SIDERIUS_REVISION="$2"; shift 2 ;;
+            --siderius-checkout) SIDERIUS_CHECKOUT_ARG="$2"; shift 2 ;;
             --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --only|--band)    ONLY="$2"; shift 2 ;;
             --gold_advice_file) ADVICE_FILE="$2"; shift 2 ;;
@@ -527,8 +540,17 @@ pf_main() {
         esac
     done
 
-    if [ -z "$WORKSPACE_ROOT" ] || [ -z "$ARM" ] || [ -z "$REVISION" ]; then
-        echo "Required: --workspace-root DIR --arm ARM --revision SHA (see --help)" >&2
+    if [ -z "$WORKSPACE_ROOT" ] || [ -z "$ARM" ] || [ -z "$REVISION" ] \
+        || [ -z "$SIDERIUS_REVISION" ] || [ -z "$SIDERIUS_CHECKOUT_ARG" ]; then
+        echo "Required: --workspace-root DIR --arm ARM --revision EXP_SHA --siderius-checkout DIR --siderius-revision SHA (see --help)" >&2
+        return 1
+    fi
+    PF_SIDERIUS_ROOT="$(cd "$SIDERIUS_CHECKOUT_ARG" 2>/dev/null && pwd)" || {
+        echo "ERROR: --siderius-checkout is not an existing directory: $SIDERIUS_CHECKOUT_ARG" >&2
+        return 1
+    }
+    if [ ! -f "${PF_SIDERIUS_ROOT}/sdsc_submission_scripts/_import_resolution_probe.py" ]; then
+        echo "ERROR: --siderius-checkout lacks the import-resolution probe: ${PF_SIDERIUS_ROOT}" >&2
         return 1
     fi
     if [ -n "$MINIMUM_FREE_GIB" ] && ! [[ "$MINIMUM_FREE_GIB" =~ ^[0-9]+$ ]]; then
@@ -610,15 +632,11 @@ pf_main() {
         esac
     fi
 
-    if [ -z "$MINIMUM_FREE_GIB" ]; then
-        pf_info "R1d free-space threshold not supplied; pass --minimum-free-gib N to make capacity launch-blocking"
+    local CAPACITY
+    if CAPACITY="$(preflight_free_space_check "$WORKSPACE_ROOT" "$MINIMUM_FREE_GIB")"; then
+        pf_pass "R1d workspace capacity: $CAPACITY"
     else
-        local CAPACITY
-        if CAPACITY="$(preflight_free_space_check "$WORKSPACE_ROOT" "$MINIMUM_FREE_GIB")"; then
-            pf_pass "R1d workspace capacity: $CAPACITY"
-        else
-            pf_fail "R1d workspace capacity insufficient or unmeasurable: $CAPACITY"
-        fi
+        pf_fail "R1d workspace capacity insufficient or unmeasurable: $CAPACITY"
     fi
 
     # ---- R1b: calibration store persistence (H100-prep finding) ------------
@@ -658,7 +676,7 @@ pf_main() {
     # itself REFUSED the value (a relative override), which is a FAIL here
     # rather than a silent fallback.
     local GENLIB_RAW GENLIB_SOURCE GENLIB_ROOT
-    if GENLIB_RAW="$(cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+    if GENLIB_RAW="$(cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
         "$PF_PY" -c 'from core.generated_library import resolve_generated_library as r; x = r(); print(x.source + "\t" + x.root)' \
         2>/dev/null | tail -1)" && [ -n "$GENLIB_RAW" ]; then
         GENLIB_SOURCE="${GENLIB_RAW%%$'\t'*}"
@@ -692,11 +710,11 @@ pf_main() {
 
     # ---- R2: authoritative revision ----------------------------------------
     local REPO_SHA DIRTY
-    REPO_SHA="$(git -C "$PF_PROJECT_DIR" rev-parse HEAD 2>/dev/null || echo unknown)"
-    DIRTY="$(git -C "$PF_PROJECT_DIR" status --porcelain 2>/dev/null || true)"
+    REPO_SHA="$(git -C "$PF_EXP_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+    DIRTY="$(git -C "$PF_EXP_ROOT" status --porcelain 2>/dev/null || true)"
     echo "[preflight] repo_sha=${REPO_SHA}"
     if [ "$REPO_SHA" = "unknown" ]; then
-        pf_fail "R2 not a git checkout: $PF_PROJECT_DIR"
+        pf_fail "R2 siderius-exp root is not a git checkout: $PF_EXP_ROOT"
     elif [ "${#REVISION}" -lt 7 ]; then
         pf_fail "R2 --revision '$REVISION' too short (>= 7 hex chars)"
     elif [[ "$REPO_SHA" != "$REVISION"* ]]; then
@@ -704,7 +722,20 @@ pf_main() {
     elif [ -n "$DIRTY" ]; then
         pf_fail "R2 dirty tree — a campaign must be attributable to one SHA; commit first: $(echo "$DIRTY" | head -3 | tr '\n' ' ')"
     else
-        pf_pass "R2 revision $REPO_SHA matches --revision and the tree is clean"
+        pf_pass "R2 siderius-exp revision $REPO_SHA matches --revision and the tree is clean"
+    fi
+
+    local SIDERIUS_SHA SIDERIUS_DIRTY
+    SIDERIUS_SHA="$(git -C "$PF_SIDERIUS_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+    SIDERIUS_DIRTY="$(git -C "$PF_SIDERIUS_ROOT" status --porcelain 2>/dev/null || true)"
+    if [ "$SIDERIUS_SHA" = "unknown" ]; then
+        pf_fail "R2 framework root is not a git checkout: $PF_SIDERIUS_ROOT"
+    elif [ "${#SIDERIUS_REVISION}" -lt 7 ] || [[ "$SIDERIUS_SHA" != "$SIDERIUS_REVISION"* ]]; then
+        pf_fail "R2 SIDERIUS revision mismatch: HEAD=$SIDERIUS_SHA expected=$SIDERIUS_REVISION*"
+    elif [ -n "$SIDERIUS_DIRTY" ]; then
+        pf_fail "R2 SIDERIUS tree is dirty: $(echo "$SIDERIUS_DIRTY" | head -3 | tr '\n' ' ')"
+    else
+        pf_pass "R2 SIDERIUS revision $SIDERIUS_SHA matches --siderius-revision and the tree is clean"
     fi
 
     # ---- R2b: import resolution (P0 launch blocker, supervisor 2026-08-25) --
@@ -712,19 +743,19 @@ pf_main() {
     # whose cwd leaves this tree silently imports THAT tree's code (the E1
     # trap — concretely, a campaign without #299's divergence repair while
     # its git SHA says otherwise). The launchers export
-    # PYTHONPATH=$PF_PROJECT_DIR; this row PROVES the pinned resolution from
+    # PYTHONPATH=$PF_SIDERIUS_ROOT; this row PROVES the pinned resolution from
     # a NEUTRAL cwd (a copied probe file — `-c` is blind, cwd sits on
     # sys.path) and REPORTS what an unpinned child would resolve.
     local PROBE_TMP
     PROBE_TMP="$(mktemp -d)"
-    cp "${PF_SCRIPT_DIR}/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
+    cp "${PF_SIDERIUS_ROOT}/sdsc_submission_scripts/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
     local UNPINNED
-    UNPINNED="$(cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_PROJECT_DIR" 2>/dev/null | head -1 || true)"
+    UNPINNED="$(cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" 2>/dev/null | head -1 || true)"
     echo "[preflight] R2b unpinned child would resolve: ${UNPINNED#*-> }"
-    if (cd "$PROBE_TMP" && PYTHONPATH="$PF_PROJECT_DIR" "$PF_PY" probe.py "$PF_PROJECT_DIR" >/dev/null 2>&1); then
+    if (cd "$PROBE_TMP" && PYTHONPATH="$PF_SIDERIUS_ROOT" "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" >/dev/null 2>&1); then
         pf_pass "R2b pinned import resolution: hyperparam_tuning resolves in this tree with the #299-tolerant loss_history"
     else
-        (cd "$PROBE_TMP" && PYTHONPATH="$PF_PROJECT_DIR" "$PF_PY" probe.py "$PF_PROJECT_DIR") 2>&1 | tail -3 >&2 || true
+        (cd "$PROBE_TMP" && PYTHONPATH="$PF_SIDERIUS_ROOT" "$PF_PY" probe.py "$PF_SIDERIUS_ROOT") 2>&1 | tail -3 >&2 || true
         pf_fail "R2b import resolution: the PINNED probe failed — chains would execute another tree's code (see [import-probe] lines)"
     fi
     rm -rf "$PROBE_TMP"
@@ -921,7 +952,7 @@ pf_main() {
                 # it back is what keeps this script from forming a second
                 # opinion about how strong its own evidence is.
                 local SYM_REPORT="${SCRATCH}/arm_symmetry_report.txt" SYM_RC=0
-                (cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+                (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
                         "$PF_PY" "$PF_SYMMETRY" --with-output "$WITH_CAP" --without-output "$WITHOUT_CAP" \
                         --workspace-root "$WORKSPACE_ROOT" --band "$SYMMETRY_BAND" \
                         --with-surface "$WITH_SURF" --without-surface "$WITHOUT_SURF" \
@@ -970,8 +1001,8 @@ pf_main() {
             pf_fail "R8 item1 band $band workspace NOT empty ($WS) — a reused workspace resumes, it does not start cold"
         fi
     done
-    local GEN_MODELS="${PF_PROJECT_DIR}/agent_generated/models"
-    local GEN_INDEX="${PF_PROJECT_DIR}/agent_generated/_capability_index.json"
+    local GEN_MODELS="${PF_SIDERIUS_ROOT}/agent_generated/models"
+    local GEN_INDEX="${PF_SIDERIUS_ROOT}/agent_generated/_capability_index.json"
     local LEFTOVER
     LEFTOVER="$(find "$GEN_MODELS" -maxdepth 1 -name '*.py' 2>/dev/null | head -5 || true)"
     if [ -n "$LEFTOVER" ]; then
@@ -1004,12 +1035,18 @@ pf_main() {
     else
         local SMOKE_ARGS=(--out "${SCRATCH}/llm_smoke.json")
         [ -n "$LLM_CONFIG" ] && SMOKE_ARGS+=(--llm-config "$LLM_CONFIG")
-        if (cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+        if (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
                 "$PF_PY" "$PF_SMOKE" "${SMOKE_ARGS[@]}"); then
             pf_pass "R9 LLM burst reachable (8/8; p95 + per-call detail above; NOT a quota guarantee)"
         else
             pf_fail "R9 LLM burst failed (see per-call errors above; report ${SCRATCH}/llm_smoke.json)"
         fi
+    fi
+
+    if [ "$GOLD_TERMINAL_EVAL_POLICY" = "out_of_scope_multi_workspace_provenance" ]; then
+        pf_info "R10 terminal evaluation OUT OF SCOPE: Strict Best spans four provenance workspaces and TerminalChampion records one; Composed Best and Strict Best are the campaign results"
+    else
+        pf_fail "R10 unknown terminal-evaluation policy: $GOLD_TERMINAL_EVAL_POLICY"
     fi
 
     # ---- summary -----------------------------------------------------------

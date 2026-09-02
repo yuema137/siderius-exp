@@ -224,6 +224,14 @@ GOLD_CAMPAIGN_ID="v015"
 #: with no declaration is still `false`, so nothing is authorized by omission.
 GOLD_STAGE2_AUTHORIZED="${GOLD_STAGE2_AUTHORIZED:-false}"
 
+# Terminal evaluation is deliberately OUT OF SCOPE for this campaign.
+# Strict Best pools four independently attributable band workspaces, while
+# TerminalChampion currently records one provenance workspace. Collapsing
+# those four authorities into one would fabricate provenance. Composed Best
+# and Strict Best remain the campaign's full-scope reported results; changing
+# this policy requires a provenance contract that represents all four roots.
+GOLD_TERMINAL_EVAL_POLICY="out_of_scope_multi_workspace_provenance"
+
 #: v0.1.4 operator ruling — the regression task DEFINITION, bound through the
 #: narrow --task_config transport on the PROVEN NON-COMPOSED path.
 #:

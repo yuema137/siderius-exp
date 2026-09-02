@@ -174,6 +174,16 @@ polls; absence == unit not done; partial dirs without it are ignored):
   is reserved by this contract: any future consumer adding a read from it
   is making a CONTRACT change here first.
 
+**Campaign scope ruling (operator, 2026-09-01):** the terminal-evaluation
+writer remains a reusable isolated mechanism but is not invoked by this Gold
+campaign. A Strict Best design combines four independently attributable band
+workspaces, while the current `TerminalChampion` schema records one provenance
+workspace. Mapping the former into the latter would fabricate provenance.
+Composed Best and Strict Best are therefore the campaign's full-scope reported
+results. Any future activation requires a real multi-workspace provenance
+contract; first-wins, majority selection, warning-only mismatch handling, and
+fallback to one workspace are prohibited.
+
 ---
 
 ## 4. The shared compose-and-score interface (ONE wrapper, reused 3×)
