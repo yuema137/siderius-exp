@@ -342,18 +342,19 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
     assert len(commands) == 30
     for command in commands:
         expected_values = {
-            "--run_name": "cancer_mtg_campaign_v4_lit_on",
+            "--run_name": "cancer_mtg_campaign_v5_lit_on",
             "--max_rounds": "2",
-            "--trial_time_budget_minutes": "5",
+            "--trial_time_budget_minutes": "10",
             "--formal_time_budget_minutes": "15",
+            "--runtime_verification_max_wall_seconds": "420",
             "--trial_vram_budget_gb": "20",
             "--formal_vram_budget_gb": "20",
             "--advice_sha256": (
-                "e6957a925e0953fe693afcac6861937c8c3192bf355bc7dfa8c490e51ce47a53"
+                "c180d6a5238ccbabeb800c5c9bb539661a4f66c8bdced1b5cbff1cda14ab673f"
             ),
         }
         for flag, expected in expected_values.items():
             assert command[command.index(flag) + 1] == expected
         assert Path(command[command.index("--advice") + 1]).name == (
-            "mtg_campaign_v4.json"
+            "mtg_campaign_v5.json"
         )

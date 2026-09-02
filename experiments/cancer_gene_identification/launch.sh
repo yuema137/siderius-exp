@@ -124,7 +124,7 @@ case "$PROFILE" in
     campaign)
         [ "$EXPERIMENT" = "mtg_campaign" ] || fail "--profile campaign requires --experiment mtg_campaign"
         PROFILE_ARGS=(
-            --run_name cancer_mtg_campaign_v4_lit_on
+            --run_name cancer_mtg_campaign_v5_lit_on
             --num_iterations 30
             --max_rounds 2
             --max_epochs 50
@@ -137,16 +137,17 @@ case "$PROFILE" in
             --formal_eval_portion 1.0
             --trial_vram_budget_gb 20
             --formal_vram_budget_gb 20
-            --trial_time_budget_minutes 5
+            --trial_time_budget_minutes 10
             --formal_time_budget_minutes 15
+            --runtime_verification_max_wall_seconds 420
         )
         LIT_ARGS=(
             --ml_lit_review_enabled
             --ml_lit_review_config "${PACK_DIR}/framework_configs/lit_review.yaml"
         )
         ADVICE_ARGS=(
-            --advice "${EXPERIMENT_ROOT}/advice/mtg_campaign_v4.json"
-            --advice_sha256 "e6957a925e0953fe693afcac6861937c8c3192bf355bc7dfa8c490e51ce47a53"
+            --advice "${EXPERIMENT_ROOT}/advice/mtg_campaign_v5.json"
+            --advice_sha256 "c180d6a5238ccbabeb800c5c9bb539661a4f66c8bdced1b5cbff1cda14ab673f"
         )
         ;;
     *)

@@ -12,11 +12,13 @@ feedback stable; Formal activates the complete masks
 disjoint and the graph topology is unchanged.
 
 The campaign uses 20 GiB Trial/Formal VRAM ceilings, measured admission, a
-5-minute Trial budget, and a 15-minute Formal budget. The model may choose an
-epoch count in the declared range [5, 50]. Batch size remains task-locked to 1
-because MTG is a variable-size transductive graph. A versioned advice artifact
-states these limits and the complete-graph memory semantics to the proposer and
-tuner; its SHA-256 is pinned by the launcher.
+10-minute Trial budget, and a 15-minute Formal budget. Runtime verification may
+use up to 7 minutes to collect enough measured training steps before admission;
+that calibration window is separate from both training budgets. The model may
+choose an epoch count in the declared range [5, 50]. Batch size remains
+task-locked to 1 because MTG is a variable-size transductive graph. A versioned
+advice artifact states these limits and the complete-graph memory semantics to
+the proposer and tuner; its SHA-256 is pinned by the launcher.
 
 ```bash
 bash experiments/cancer_gene_identification/launch.sh \
