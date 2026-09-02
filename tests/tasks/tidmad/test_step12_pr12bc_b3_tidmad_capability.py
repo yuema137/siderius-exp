@@ -113,6 +113,24 @@ class TestTidmadDeclaresTheCapability:
         assert declares_scope_capability(IMPL) is True
         assert resolve_task_scope_capability(IMPL) is IMPL
 
+    def test_storage_scope_prices_selected_compressed_bytes(self, tmp_path: Path):
+        """Catch composed runs falling back to zero-byte storage provenance."""
+        topology = tidmad_topology(TASK_PROFILE).dataset
+        first = tmp_path / topology.training_file_name(0)
+        second = tmp_path / topology.training_file_name(1)
+        first.write_bytes(b"a" * 1_000)
+        second.write_bytes(b"b" * 2_000)
+        scope = TidmadScope(
+            sample_set={0: list(range(20)), 1: list(range(50))},
+            seg_size=SEG_SIZE,
+            profile=TASK_PROFILE,
+        )
+
+        storage = IMPL.storage_read_scope(str(tmp_path), scope)
+
+        assert storage.file_paths == (str(first.resolve()), str(second.resolve()))
+        assert storage.expected_on_disk_bytes == 600
+
     def test_build_sample_set_remains_the_only_selection_authority(self):
         """Census: the capability RELOCATES the call, it does not copy the
         selection logic. A second implementation of "which segments" is what

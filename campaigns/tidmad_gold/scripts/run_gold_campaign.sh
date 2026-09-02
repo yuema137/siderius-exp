@@ -141,7 +141,7 @@ gold_main() {
     # v0.1.4 operator ruling: the approved per-band FCNet references are
     # bound BY DEFAULT (D-FCNET-REF-1). Unbound, the FCNet+2.0 early stop is
     # not evaluable and every band runs the full 20-iteration horizon.
-    local DESIGN_REGISTRY="" FCNET_REFERENCE_JSON="${GOLD_FCNET_REFERENCE_JSON:-}" ONLY="" STAGGER=60
+    local DESIGN_REGISTRY="" FCNET_REFERENCE_JSON="${GOLD_FCNET_REFERENCE_JSON:-}" ONLY="" DEVICE_INDEX="" STAGGER=60
     local DRY_RUN=0
     local PASSTHROUGH=()
     # F-PROFILE-WIRE-1 — the operator-supplied runtime-profile declaration.
@@ -174,6 +174,7 @@ gold_main() {
             --design_registry)     DESIGN_REGISTRY="$2"; shift 2 ;;
             --fcnet_reference_json) FCNET_REFERENCE_JSON="$2"; shift 2 ;;
             --only)                ONLY="$2"; shift 2 ;;
+            --device-index|--device_index) DEVICE_INDEX="$2"; shift 2 ;;
             --stagger-seconds|--stagger_seconds) STAGGER="$2"; shift 2 ;;
             --dry-run|--dry_run)   DRY_RUN=1; shift ;;
             -h|--help)             gold_usage; return 0 ;;
@@ -303,6 +304,7 @@ gold_main() {
             echo "  \"stage2_num_iterations\": ${GOLD_STAGE2_NUM_ITERATIONS},"
             echo "  \"retention\": \"--no-cleanup_denoised (R-RETENTION-1)\","
             echo "  \"gpu_map\": {\"0-3\": 0, \"4-9\": 1, \"10-14\": 2, \"15-19\": 3},"
+            echo "  \"device_index_override\": $(if [ -n "$DEVICE_INDEX" ]; then printf '%s' "$DEVICE_INDEX"; else printf 'null'; fi),"
             echo "  \"launched_utc\": \"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\""
             echo "}"
         } > "$MANIFEST"
@@ -339,6 +341,7 @@ gold_main() {
         1)
             local S1=("${COMMON[@]}" --stagger-seconds "$STAGGER")
             [ -n "$ONLY" ] && S1+=(--only "$ONLY")
+            [ -n "$DEVICE_INDEX" ] && S1+=(--device-index "$DEVICE_INDEX")
             [ -n "$FCNET_REFERENCE_JSON" ] && S1+=(--fcnet_reference_json "$FCNET_REFERENCE_JSON")
             exec bash "${GOLD_SCRIPT_DIR}/stage1_search.sh" "${S1[@]}" \
                 ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
@@ -358,8 +361,10 @@ gold_main() {
                 echo "  results are reviewed. STAGE 2 HAS NOT STARTED." >&2
                 return 1
             fi
-            exec bash "${GOLD_SCRIPT_DIR}/stage2_strict_retrain.sh" "${COMMON[@]}" \
-                --design_registry "$DESIGN_REGISTRY" \
+            local S2=("${COMMON[@]}" --design_registry "$DESIGN_REGISTRY")
+            [ -n "$ONLY" ] && S2+=(--only "$ONLY")
+            [ -n "$DEVICE_INDEX" ] && S2+=(--device-index "$DEVICE_INDEX")
+            exec bash "${GOLD_SCRIPT_DIR}/stage2_strict_retrain.sh" "${S2[@]}" \
                 ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
             ;;
     esac

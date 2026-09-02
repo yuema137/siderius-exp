@@ -44,12 +44,19 @@ from __future__ import annotations
 
 import math
 import os
+import json
 from collections.abc import Sequence
+from functools import lru_cache
 
 from tasks.tidmad.runtime.anchor_map import load_anchor_map
-from campaigns.tidmad_gold.paths import ANCHOR_MAP_PATH
-from execute_tools.dataset_config import NUM_FILES, SEGMENTS_PER_FILE
-from execute_tools.deliverable_spec import DeliverableNaming
+from campaigns.tidmad_gold.paths import (
+    ANCHOR_MAP_PATH,
+    DATASET_PROFILE_PATH,
+    DELIVERABLE_SPEC_PATH,
+)
+from execute_tools.dataset_config import DatasetProfile, NUM_FILES, SEGMENTS_PER_FILE
+from execute_tools.deliverable_spec import DeliverableNaming, DeliverableSpec, DeliverableStorage
+from execute_tools.hdf5_deliverable import is_complete_hdf5_deliverable
 from execute_tools.evaluation_metric import (
     MetricSpec,
     NotScoreableError,
@@ -58,6 +65,7 @@ from execute_tools.evaluation_metric import (
     ScoreabilityVerdict,
 )
 from tasks.tidmad.runtime.scoring import score_vector
+from tasks.tidmad.runtime.profile import tidmad_topology
 
 #: Contract id stamped on every composition refusal this module raises.
 COMPOSITION_CONTRACT_ID = "stage3_compose_and_score"
@@ -70,6 +78,23 @@ COMPOSITION_CONTRACT_ID = "stage3_compose_and_score"
 TIDMAD_DATA_DIR = os.environ.get("TIDMAD_DATA_DIR")
 
 EXPECTED_S_MAX = 295715680.14248306
+
+
+@lru_cache(maxsize=1)
+def _full_scope_deliverable_contract() -> tuple[int, DeliverableStorage]:
+    """Resolve the Stage-3 HDF5 shape/storage contract from task authority."""
+    profile = DatasetProfile.model_validate(
+        json.loads(DATASET_PROFILE_PATH.read_text(encoding="utf-8"))
+    )
+    topology = tidmad_topology(profile)
+    deliverable = DeliverableSpec.model_validate(
+        json.loads(DELIVERABLE_SPEC_PATH.read_text(encoding="utf-8"))
+    )
+    storage = deliverable.storage
+    expected_samples = (
+        topology.dataset.segments_per_file * topology.dataset.psd_segment_length
+    )
+    return expected_samples, storage
 
 
 def _composition_refusal(
@@ -198,6 +223,29 @@ def resolve_pooled_deliverables(
                     detail=(
                         f"no deliverable for input identity {identity} in any of: "
                         + ", ".join(os.path.abspath(d) for d in deliverable_dirs)
+                    ),
+                )
+            )
+
+    expected_samples, storage = _full_scope_deliverable_contract()
+    for identity, path in sorted(resolved.items()):
+        completion_marker = f"{os.path.realpath(path)}.complete"
+        if not os.path.isfile(completion_marker):
+            failures.append(
+                ScoreabilityFailure(
+                    requirement="atomic_deliverable_completion",
+                    input_identity=identity,
+                    detail=f"deliverable has no completion sentinel: {completion_marker}",
+                )
+            )
+        if not is_complete_hdf5_deliverable(path, expected_samples, storage):
+            failures.append(
+                ScoreabilityFailure(
+                    requirement="full_scope_segment_count_and_storage",
+                    input_identity=identity,
+                    detail=(
+                        f"deliverable is not a complete {SEGMENTS_PER_FILE}-segment "
+                        f"Stage-3 HDF5 artifact: {path}"
                     ),
                 )
             )

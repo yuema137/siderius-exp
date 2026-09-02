@@ -25,6 +25,7 @@ import math
 import os
 from pathlib import Path
 
+import h5py
 import pytest
 
 import campaigns.tidmad_gold.stage3.stage3_common as stage3_common
@@ -62,7 +63,19 @@ def _touch_deliverable(
         model_type=model_type, run_name=run_name, exp_id=exp_id, input_identity=index
     )
     path = directory / name
-    path.write_bytes(f"h5-stub:{exp_id}:{index}".encode())
+    expected_samples, storage = stage3_common._full_scope_deliverable_contract()
+    with h5py.File(path, "w") as handle:
+        timeseries = handle.create_group("timeseries")
+        for channel in (storage.input_channel_group, storage.target_channel_group):
+            group = timeseries.create_group(channel)
+            group.create_dataset(
+                "timeseries",
+                shape=(expected_samples,),
+                dtype=storage.storage_dtype,
+                chunks=(1_000_000,),
+                fillvalue=0,
+            )
+    Path(f"{path}.complete").write_text("complete\n", encoding="utf-8")
     return path
 
 
@@ -140,6 +153,23 @@ def test_one_scoring_call_over_all_20_files(tmp_path, score_stub):
     assert scalar == -2.5
 
 
+def test_unpublished_deliverable_is_refused_before_scoring(tmp_path, score_stub):
+    """A final-looking HDF5 without its atomic success marker is not scoreable."""
+    dir_a, dir_b, paths = _pool_two_dirs(tmp_path)
+    Path(f"{paths[7]}.complete").unlink()
+
+    with pytest.raises(NotScoreableError) as caught:
+        compose_and_score([str(dir_a), str(dir_b)], reconciled_spec=RECONCILED_SPEC)
+
+    failures = caught.value.result.verdict.failures
+    assert any(
+        failure.requirement == "atomic_deliverable_completion"
+        and failure.input_identity == 7
+        for failure in failures
+    )
+    assert score_stub.calls == []
+
+
 def test_missing_index_is_a_named_refusal(tmp_path, score_stub):
     """A missing file index refuses by name — never a silent skip, and the
     scorer is never invoked on the incomplete set."""
@@ -184,6 +214,34 @@ def test_duplicate_index_is_refused_naming_both_paths(tmp_path, score_stub):
     assert len(failures) == 1
     assert str(first) in failures[0].detail
     assert str(second) in failures[0].detail
+    assert score_stub.calls == []
+
+
+def test_partial_formal_deliverable_is_refused_before_scoring(tmp_path, score_stub):
+    """A 20-segment search artifact may not masquerade as full-scope Stage 3."""
+    dir_a, dir_b, paths = _pool_two_dirs(tmp_path)
+    _expected_samples, storage = stage3_common._full_scope_deliverable_contract()
+    partial_samples = 20 * 10_000_000
+    with h5py.File(paths[4], "w") as handle:
+        timeseries = handle.create_group("timeseries")
+        for channel in (storage.input_channel_group, storage.target_channel_group):
+            group = timeseries.create_group(channel)
+            group.create_dataset(
+                "timeseries",
+                shape=(partial_samples,),
+                dtype=storage.storage_dtype,
+                chunks=(1_000_000,),
+                fillvalue=0,
+            )
+
+    with pytest.raises(NotScoreableError) as excinfo:
+        compose_and_score([str(dir_a), str(dir_b)], reconciled_spec=RECONCILED_SPEC)
+
+    assert any(
+        failure.requirement == "full_scope_segment_count_and_storage"
+        and failure.input_identity == 4
+        for failure in excinfo.value.result.verdict.failures
+    )
     assert score_stub.calls == []
 
 

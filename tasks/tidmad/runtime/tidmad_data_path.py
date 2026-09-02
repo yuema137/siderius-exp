@@ -58,6 +58,7 @@ from execute_tools.task_data_path import (
     EvalMaterializationParams,
     EvaluationReadRequest,
     ScopeBuildRequest,
+    StorageReadScope,
     TaskEvaluationPayload,
     ValidationScopeError,
 )
@@ -376,6 +377,31 @@ class TidmadTaskDataPath:
             rng=rng,
             profile=s.profile,
             max_samples=params.max_samples,
+        )
+
+    def storage_read_scope(self, data_dir: str, scope: object) -> StorageReadScope:
+        """Describe compressed source bytes for generic setup provenance."""
+        s = self._scope(scope)
+        profile = s.profile or resolve_dataset_profile()
+        dataset = tidmad_topology(profile).dataset
+        paths = tuple(
+            os.path.abspath(
+                os.path.join(data_dir, dataset.training_file_name(int(file_index)))
+            )
+            for file_index in sorted(s.sample_set, key=int)
+        )
+        expected_bytes = sum(
+            round(
+                os.path.getsize(path)
+                * len(s.sample_set[file_index])
+                / dataset.segments_per_file
+            )
+            for file_index, path in zip(sorted(s.sample_set, key=int), paths, strict=True)
+            if os.path.isfile(path)
+        )
+        return StorageReadScope(
+            file_paths=paths,
+            expected_on_disk_bytes=expected_bytes,
         )
 
     # ------------------------------------------------------------------

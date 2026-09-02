@@ -52,6 +52,7 @@ import json
 import re
 from collections import Counter
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from execute_tools.deliverable_spec import DeliverableNaming
@@ -82,6 +83,7 @@ from .test_strict_best import (
     _write_unit_workspaces,
 )
 from .test_terminal_eval import _valid_record
+from .stage3_adversarial_fixtures import write_placeholder_deliverable
 
 # The strict-selection plant: all NEGATIVE, winner nearest zero. Under the
 # production metric (higher-is-better) wavenetA wins; a min-shaped or
@@ -133,9 +135,9 @@ class _ArithmeticBoundaryStub:
         else:
             design = next(
                 (
-                    d
-                    for d in _STRICT_PLANT
-                    if any(p.startswith(f"{d}_") for p in first.parts)
+                d
+                for d in _STRICT_PLANT
+                if d in first.parts or any(p.startswith(f"{d}_") for p in first.parts)
                 ),
                 None,
             )
@@ -207,22 +209,43 @@ def test_three_mechanisms_end_to_end_against_real_composer(
     stub = _ArithmeticBoundaryStub()
     monkeypatch.setattr(stage3_common, "score_vector", stub)
     import campaigns.tidmad_gold.stage3.stage3_composed_best as composed_best_module
+    import campaigns.tidmad_gold.stage3.stage3_strict_best as strict_best_module
 
-    monkeypatch.setattr(
-        composed_best_module,
-        "run_full_inference",
-        lambda candidate, **_: {
+    def replay(candidate, *, output_root, **_):
+        target = Path(output_root) / f"band_{candidate.band}"
+        naming = DeliverableNaming()
+        return {
             index: str(
-                Path(candidate.source_base_dir)
-                / DeliverableNaming().name(
-                    model_type=candidate.model_type,
-                    run_name=candidate.run_name,
-                    exp_id=candidate.exp_id,
-                    input_identity=index,
+                write_placeholder_deliverable(
+                    target
+                    / naming.name(
+                        model_type=candidate.model_type,
+                        run_name=candidate.run_name,
+                        exp_id=candidate.exp_id,
+                        input_identity=index,
+                    )
                 )
             )
             for index in candidate.file_indices
-        },
+        }
+
+    monkeypatch.setattr(composed_best_module, "run_full_inference", replay)
+    monkeypatch.setattr(strict_best_module, "run_full_inference", replay)
+
+    def select_stage2_workspace(workspace, *, arm, band):
+        assert arm is None
+        design = Path(workspace).parent.name.removesuffix(f"_{band}")
+        candidate = SimpleNamespace(
+            band=band,
+            model_type=design,
+            run_name="iter_001",
+            exp_id=f"{design}_{band}",
+            file_indices=band_file_indices(band),
+        )
+        return SimpleNamespace(inference_candidate=candidate)
+
+    monkeypatch.setattr(
+        strict_best_module, "select_workspace_winner", select_stage2_workspace
     )
 
     # ONE synthetic campaign workspace: Stage-1 (writer C's builder, real
@@ -251,16 +274,27 @@ def test_three_mechanisms_end_to_end_against_real_composer(
 
     # --- strict_best: production CLI, REAL stage3_common resolved lazily ---
     assert (
-        strict_main(["--workspace_root", str(tmp_path), "--designs", ",".join(DESIGNS)])
+        strict_main(
+            [
+                "--workspace_root",
+                str(tmp_path),
+                "--data_dir",
+                str(tmp_path),
+                "--designs",
+                ",".join(DESIGNS),
+            ]
+        )
         == 0
     )
 
     # --- terminal_eval: production CLI; champion = the strict winner's units ---
     champion_path = tmp_path / "champion.json"
-    winner_dirs = [
-        str((tmp_path / "stage2" / f"wavenetA_{band}" / "deliverables").resolve())
-        for band in BANDS
-    ]
+    strict_selection = json.loads(
+        (
+            tmp_path / "stage3" / "strict_best" / "strict_best_selection.json"
+        ).read_text(encoding="utf-8")
+    )
+    winner_dirs = strict_selection["selected_deliverable_dirs"]
     champion_path.write_text(
         json.dumps(
             {

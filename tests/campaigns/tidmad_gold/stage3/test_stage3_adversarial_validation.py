@@ -113,6 +113,7 @@ from .stage3_adversarial_fixtures import (
     TerminalEvalPlant,
     build_stage1_layout,
     build_stage2_tree,
+    write_placeholder_deliverable,
     build_stage3_namespaces,
     install_counting_score_vector,
     is_band_shaped_key,
@@ -401,9 +402,7 @@ def score_counter(monkeypatch: pytest.MonkeyPatch) -> ScoreVectorCallCounter:
                 exp_id=candidate.exp_id,
                 input_identity=index,
             )
-            path.write_bytes(
-                f"full:{candidate.band}:{candidate.exp_id}:{index}".encode()
-            )
+            write_placeholder_deliverable(path)
             paths[index] = str(path)
         return paths
 
@@ -897,7 +896,9 @@ def test_w2d_cli_refusal_exits_two_names_the_unit_and_writes_nothing(
 
 
 def test_w2_healthy_tree_scores_once_per_design(
-    tmp_path: Path, score_counter: ScoreVectorCallCounter
+    tmp_path: Path,
+    score_counter: ScoreVectorCallCounter,
+    compose_and_score: Callable[..., tuple[list[float], float]],
 ) -> None:
     """W2 control: a complete tree finalizes, with ONE composer call per design.
 
@@ -920,7 +921,11 @@ def test_w2_healthy_tree_scores_once_per_design(
     assert tree.failing_units == {}
     assert len(tree.units) == 16, "contract §2: 16 units — 4 designs x 4 target bands"
 
-    selection = finalize_strict_best(tmp_path / "ws", STAGE2_DESIGNS)
+    selection = finalize_strict_best(
+        tmp_path / "ws",
+        STAGE2_DESIGNS,
+        compose_and_score_fn=compose_and_score,
+    )
 
     assert score_counter.call_count == len(STAGE2_DESIGNS) == 4, (
         f"one full-scope composer call per design; got {score_counter.call_count}"

@@ -193,3 +193,41 @@ def test_stage2_runtime_profile_reaches_every_unit(
         assert pairs["--required_runtime_profile_path"] == profile_path, unit
         assert pairs["--required_runtime_profile"] == profile_key, unit
         assert pairs["--required_runtime_profile_sha256"] == profile_sha, unit
+
+
+def test_stage2_single_host_band_uses_explicit_local_device_zero(
+    stage2_inputs: dict[str, Path],
+) -> None:
+    """Catch coupling a scientific band identity back to a physical GPU index."""
+    completed = _dry(
+        stage2_inputs,
+        "--only",
+        "10-14",
+        "--device-index",
+        "0",
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    commands = _unit_commands(completed.stdout)
+    assert len(commands) == 4
+    assert set(commands) == {
+        "wavenetA_10-14",
+        "punetB_10-14",
+        "rnnC_10-14",
+        "fnoD_10-14",
+    }
+    assert completed.stdout.count("gpu=0 run_chain argv:") == 4
+    assert "_0-3" not in commands
+    assert "_4-9" not in commands
+    assert "_15-19" not in commands
+
+
+def test_stage2_device_override_requires_one_selected_band(
+    stage2_inputs: dict[str, Path],
+) -> None:
+    """Catch assigning one local GPU to multiple concurrently selected bands."""
+    completed = _dry(stage2_inputs, "--device-index", "0")
+
+    assert completed.returncode != 0
+    assert "requires exactly one selected band" in completed.stderr
+    assert not _unit_commands(completed.stdout)

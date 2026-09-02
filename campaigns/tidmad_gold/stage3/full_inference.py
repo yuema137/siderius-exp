@@ -6,9 +6,9 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Protocol
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from core.sandbox_executor import (
     TidmadSandbox,
@@ -20,6 +20,7 @@ from core.iteration_manifest import sha256_file
 from execute_tools.dataset_config import DataScope
 from execute_tools.deliverable_spec import DeliverableNaming, DeliverableStorage
 from execute_tools.hdf5_deliverable import is_complete_hdf5_deliverable
+from execute_tools.evaluation_metric import MetricSpec
 from ml_models.loss_models_sandbox import register_loss_in_memory
 from ml_models.plugin_loader import register_model_in_memory
 from workflows.task_composition import (
@@ -34,10 +35,46 @@ class FullInferenceError(RuntimeError):
     """A winner cannot produce a complete full-scope deliverable set."""
 
 
+class _Composer(Protocol):
+    def __call__(
+        self,
+        deliverable_dirs: list[str],
+        *,
+        files: range,
+        sample_set: None,
+        reconciled_spec: MetricSpec,
+        **kwargs: object,
+    ) -> tuple[list[float], float]: ...
+
+
+def bind_full_scope_composer(
+    composer: _Composer, *, raw_data_dir: str
+) -> _Composer:
+    """Bind the existing shared scorer to one explicit raw-data root."""
+
+    def score(
+        deliverable_dirs: list[str],
+        *,
+        files: range,
+        sample_set: None,
+        reconciled_spec: MetricSpec,
+        **_kwargs: object,
+    ) -> tuple[list[float], float]:
+        return composer(
+            deliverable_dirs,
+            files=files,
+            sample_set=sample_set,
+            reconciled_spec=reconciled_spec,
+            raw_data_dir=raw_data_dir,
+        )
+
+    return score
+
+
 class FullInferenceCandidate(BaseModel):
     """Persisted winner state required to replay inference without training."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, populate_by_name=True)
 
     band: str
     source_workspace: str
@@ -46,7 +83,10 @@ class FullInferenceCandidate(BaseModel):
     run_name: str
     model_type: str
     checkpoint_sha256: str
-    model_config: dict
+    resolved_model_config: dict = Field(
+        validation_alias="model_config",
+        serialization_alias="model_config",
+    )
     loss_config: dict
     inference_batch: int | None = None
     file_indices: tuple[int, ...]
@@ -152,7 +192,7 @@ def run_full_inference(
             exp_id=candidate.exp_id,
             run_name=candidate.run_name,
             model_type=candidate.model_type,
-            m_cfg=candidate.model_config,
+            m_cfg=candidate.resolved_model_config,
             l_cfg=candidate.loss_config,
             sample_set=full_sample_set,
             inference_batch=candidate.inference_batch,

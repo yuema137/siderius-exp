@@ -454,10 +454,11 @@ def _eligible_candidates(
     return candidates
 
 
-def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
-    """The band's cumulative best HealthGate-valid FORMAL winner (contract §1)."""
+def select_workspace_winner(
+    workspace: str, *, arm: str | None, band: str
+) -> _BandWinner:
+    """Select one workspace's cumulative formal winner for full-scope replay."""
     indices = band_file_indices(band)
-    workspace = os.path.join(workspace_root, f"{arm}_band{band}")
     if not os.path.isdir(workspace):
         raise Stage3ComposedBestError(f"band workspace does not exist: {workspace}")
 
@@ -466,10 +467,11 @@ def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
         raise Stage3ComposedBestError(
             f"no run_invariants_lock.json in {workspace} — refusing."
         )
-    if lock.experiment_arm != arm:
+    resolved_arm = arm or lock.experiment_arm
+    if lock.experiment_arm != resolved_arm:
         raise Stage3ComposedBestError(
             f"lock experiment_arm {lock.experiment_arm!r} in {workspace} does not match "
-            f"the launch arm {arm!r}."
+            f"the launch arm {resolved_arm!r}."
         )
     if sorted(lock.resolved_data_scope) != indices:
         raise Stage3ComposedBestError(
@@ -492,7 +494,7 @@ def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
     candidates: list[_Candidate] = []
     stamped_specs: list[StampedMetricSpec] = []
     for iter_index, iter_dir in _iteration_dirs(workspace):
-        loaded = _load_completed_iteration(iter_index, iter_dir, arm)
+        loaded = _load_completed_iteration(iter_index, iter_dir, resolved_arm)
         if loaded is None:
             continue
         output, output_path = loaded
@@ -504,7 +506,7 @@ def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
         )
         candidates.extend(
             _eligible_candidates(
-                output, output_path, os.path.basename(iter_dir), required_gate_ids, arm
+                output, output_path, os.path.basename(iter_dir), required_gate_ids, resolved_arm
             )
         )
 
@@ -567,7 +569,7 @@ def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
         exp_id=winner.exp_id,
         model_type=winner.model_type,
         run_name=winner.run_name,
-        experiment_arm=arm,
+        experiment_arm=resolved_arm,
         metric=metric,
         inference_candidate=FullInferenceCandidate(
             band=band,
@@ -583,6 +585,13 @@ def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
             file_indices=tuple(indices),
         ),
         deliverable_paths={},
+    )
+
+
+def select_band_winner(workspace_root: str, arm: str, band: str) -> _BandWinner:
+    """The band's cumulative best HealthGate-valid FORMAL winner (contract §1)."""
+    return select_workspace_winner(
+        os.path.join(workspace_root, f"{arm}_band{band}"), arm=arm, band=band
     )
 
 

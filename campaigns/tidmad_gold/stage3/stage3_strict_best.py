@@ -108,7 +108,14 @@ from campaigns.tidmad_gold.stage3.stage3_composed_best import (
     _load_completed_iteration,
     _stamped_metric_spec,
     band_file_indices,
+    select_workspace_winner,
 )
+from campaigns.tidmad_gold.stage3.full_inference import (
+    FullInferenceError,
+    bind_full_scope_composer,
+    run_full_inference,
+)
+from campaigns.tidmad_gold.paths import GOLD_STAGE3_TASK_COMPOSITION_PATH
 
 # ---------------------------------------------------------------------------
 # Frozen layout constants (contract citations on each)
@@ -480,6 +487,7 @@ def _score_design(
     compose_and_score: ComposeAndScore,
     *,
     reconciled_spec: MetricSpec,
+    deliverable_dirs: list[str] | None = None,
 ) -> DesignScore:
     """StrictScore(design): the ONE full-scope composer call for this design.
 
@@ -489,7 +497,7 @@ def _score_design(
     ``sample_set`` are passed explicitly so the frozen full-scope contract is
     stated at the call, not inherited from a default.
     """
-    pooled_dirs = _pooled_deliverable_dirs(stage2_root, design)
+    pooled_dirs = deliverable_dirs or _pooled_deliverable_dirs(stage2_root, design)
     try:
         file_vector, strict_score = compose_and_score(
             pooled_dirs,
@@ -528,6 +536,8 @@ def finalize_strict_best(
     *,
     compose_and_score_fn: ComposeAndScore | None = None,
     metric: MetricSpec | None = None,
+    data_dir: str | None = None,
+    task_manifest: str | None = None,
 ) -> StrictBestSelection:
     """Verify 4x4 Stage-2 units, score each design ONCE, select by MetricOrder.
 
@@ -594,6 +604,7 @@ def finalize_strict_best(
         # finalization that cannot be completed (module docstring decision).
         raise StrictBestRefusal(refusals)
 
+    production_replay = compose_and_score_fn is None
     compose_and_score = (
         compose_and_score_fn
         if compose_and_score_fn is not None
@@ -616,13 +627,55 @@ def finalize_strict_best(
             )
         declared, order = reconciled, MetricOrder(reconciled)
 
+    replayed_by_design: dict[str, list[str]] = {}
+    if production_replay:
+        if not data_dir:
+            raise StrictBestRefusal(
+                ["Strict Best full-scope replay requires the explicit raw --data_dir."]
+            )
+        manifest = task_manifest or str(GOLD_STAGE3_TASK_COMPOSITION_PATH)
+        inference_root = Path(
+            os.path.join(workspace_root, "stage3", "strict_best", "full_inference")
+        )
+        inference_root.mkdir(parents=True, exist_ok=True)
+        for design in design_list:
+            replayed_dirs: list[str] = []
+            for band in BAND_VOCABULARY:
+                unit_workspace = os.path.join(
+                    stage2_root, f"{design}_{band}", WORKSPACE_DIR_NAME
+                )
+                try:
+                    winner = select_workspace_winner(
+                        unit_workspace, arm=None, band=band
+                    )
+                    paths = run_full_inference(
+                        winner.inference_candidate,
+                        output_root=os.path.join(inference_root, design),
+                        data_dir=data_dir,
+                        task_manifest=manifest,
+                    )
+                except (Stage3ComposedBestError, FullInferenceError) as exc:
+                    raise StrictBestRefusal(
+                        [f"design {design} band {band} full-scope replay refused: {exc}"]
+                    ) from exc
+                replayed_dirs.append(str(Path(next(iter(paths.values()))).parent))
+            replayed_by_design[design] = replayed_dirs
+
+        effective_compose = cast(
+            ComposeAndScore,
+            bind_full_scope_composer(compose_and_score, raw_data_dir=data_dir),
+        )
+    else:
+        effective_compose = compose_and_score
+
     design_scores = [
         _score_design(
             design,
             stage2_root,
             units_by_design[design],
-            compose_and_score,
+            effective_compose,
             reconciled_spec=declared,
+            deliverable_dirs=replayed_by_design.get(design),
         )
         for design in design_list
     ]
@@ -696,6 +749,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Campaign persistent root containing stage2/ (contract Conventions).",
     )
     parser.add_argument(
+        "--data_dir",
+        default=None,
+        help="Caller-owned raw-data root used for full-scope replay and scoring.",
+    )
+    parser.add_argument(
+        "--task_manifest",
+        default=str(GOLD_STAGE3_TASK_COMPOSITION_PATH),
+        help="TIDMAD Stage-3 task composition used by the existing inference path.",
+    )
+    parser.add_argument(
         "--designs",
         required=True,
         help=(
@@ -737,6 +800,8 @@ def main(
             design_list,
             compose_and_score_fn=compose_and_score_fn,
             metric=metric,
+            data_dir=args.data_dir,
+            task_manifest=args.task_manifest,
         )
     except StrictBestRefusal as refusal:
         print(

@@ -109,14 +109,7 @@ from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
 #: clone and a green run then says nothing about the code under test.
 REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[4]
 
-DELIVERABLE_PAYLOAD_NOTE: Final[str] = (
-    "placeholder deliverable: correct name, HDF5 magic signature, no readable "
-    "HDF5 content. Witnesses stub the scoring authority and never open it."
-)
-
-# HDF5 signature, so a magic-byte sniff succeeds while an h5py open honestly
-# fails rather than silently reading zeros.
-_HDF5_MAGIC: Final[bytes] = b"\x89HDF\r\n\x1a\n"
+DELIVERABLE_PAYLOAD_NOTE: Final[str] = "sparse full-scope Stage-3 test deliverable"
 
 # --------------------------------------------------------------------------
 # Band vocabulary — contract "Conventions" line, cross-checked against
@@ -371,12 +364,30 @@ def write_placeholder_deliverable(
 ) -> Path:
     """Write one placeholder deliverable and return its path.
 
-    HDF5 magic signature followed by an ASCII note, so anything that sniffs
-    the magic accepts it and anything that opens it fails loudly instead of
-    reading plausible zeros.
+    The datasets are sparse/chunked, so this exercises the full declared shape
+    without allocating the production payload size.
     """
+    import h5py
+
+    from campaigns.tidmad_gold.stage3.stage3_common import (
+        _full_scope_deliverable_contract,
+    )
+
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(_HDF5_MAGIC + note.encode("ascii"))
+    expected_samples, storage = _full_scope_deliverable_contract()
+    with h5py.File(path, "w") as handle:
+        handle.attrs["test_note"] = note
+        timeseries = handle.create_group("timeseries")
+        for channel in (storage.input_channel_group, storage.target_channel_group):
+            group = timeseries.create_group(channel)
+            group.create_dataset(
+                "timeseries",
+                shape=(expected_samples,),
+                dtype=storage.storage_dtype,
+                chunks=(1_000_000,),
+                fillvalue=0,
+            )
+    Path(f"{path}.complete").write_text("complete\n", encoding="utf-8")
     return path
 
 

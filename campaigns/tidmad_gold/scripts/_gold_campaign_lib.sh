@@ -849,6 +849,24 @@ gold_band_gpu() {
     esac
 }
 
+# gold_resolve_device BAND [OVERRIDE] — keep the legacy four-device map when
+# no override is supplied, or bind one explicitly selected band to a caller-
+# owned physical device.  Band identity and device identity are independent:
+# the override is what permits one single-GPU host per scientific band without
+# removing the existing one-host fan-out topology.
+gold_resolve_device() {
+    local band="$1" override="${2:-}"
+    if [ -z "$override" ]; then
+        gold_band_gpu "$band"
+        return
+    fi
+    if ! [[ "$override" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: --device-index must be a non-negative integer, got '$override'" >&2
+        return 1
+    fi
+    printf '%s\n' "$override"
+}
+
 # gold_band_args BAND — sets GOLD_BAND_ARGS: the DS8-mandatory pair.
 gold_band_args() {
     local band="$1" files

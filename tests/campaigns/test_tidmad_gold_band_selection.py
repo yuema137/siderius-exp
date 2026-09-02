@@ -73,6 +73,62 @@ def test_empty_selection_means_all_bands() -> None:
     assert completed.stdout.split() == ["0-3", "4-9", "10-14", "15-19"]
 
 
+def test_explicit_device_decouples_band_from_legacy_gpu_map() -> None:
+    """A one-GPU host must be able to run any band on physical device zero.
+
+    Fails when the launcher reuses the scientific band ordinal as the CUDA
+    device index, which makes bands 4-9, 10-14 and 15-19 unlaunchable on a
+    single-GPU VM.
+    """
+    completed = subprocess.run(
+        [
+            "bash",
+            "-c",
+            f'source "{LIBRARY}"; gold_resolve_device 15-19 0',
+        ],
+        cwd=EXP_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=60,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert completed.stdout.strip() == "0"
+
+
+def test_device_override_requires_one_selected_band(tmp_path: Path) -> None:
+    """One explicit device may not silently co-locate the four-band fan-out."""
+    workspace = tmp_path / "workspace"
+    generated = tmp_path / "generated"
+    workspace.mkdir()
+    generated.mkdir()
+    env = os.environ.copy()
+    env["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(generated)
+    completed = subprocess.run(
+        [
+            "bash",
+            str(SCRIPTS / "stage1_search.sh"),
+            "--workspace_root",
+            str(workspace),
+            "--data_dir",
+            str(tmp_path),
+            "--arm",
+            "blindpod",
+            "--device-index",
+            "0",
+            "--dry-run",
+        ],
+        cwd=EXP_ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=120,
+    )
+    assert completed.returncode != 0
+    assert "requires exactly one selected band" in completed.stderr
+
+
 @pytest.mark.parametrize(
     ("selection", "reason"),
     [
@@ -117,7 +173,9 @@ def test_entrypoint_only_filter_reaches_exactly_one_band(tmp_path: Path) -> None
             "--fcnet_reference_json",
             str(fcnet_reference),
             "--only",
-            "0-3",
+            "15-19",
+            "--device-index",
+            "0",
             "--stagger-seconds",
             "0",
             "--dry-run",
@@ -138,7 +196,8 @@ def test_entrypoint_only_filter_reaches_exactly_one_band(tmp_path: Path) -> None
     ]
     assert len(command_lines) == 1
     command = shlex.split(command_lines[0])
-    assert command[command.index("--data_scope") + 1] == "0-3"
+    assert "CUDA_VISIBLE_DEVICES=0" in command
+    assert command[command.index("--data_scope") + 1] == "15-19"
 
 
 def test_stage1_dry_run_uses_the_frozen_band_to_gpu_map(tmp_path: Path) -> None:

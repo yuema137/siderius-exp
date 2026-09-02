@@ -4,7 +4,13 @@ version = "0.0.0"
 description = "Private scientific tasks and experiment campaigns for SIDERIUS"
 requires-python = ">=3.12"
 dependencies = [
-    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@cc3866dc6dd57a1dafda27a836faa162c23724b5",
+    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@a34776f1e543a8cafcc5bf2640739e0308103d29",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4,<10",
+    "ruff>=0.12,<0.17",
 ]
 
 [tool.uv]

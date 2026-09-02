@@ -820,6 +820,46 @@ def test_production_boundary_resolves_writer_c_module(
     stub = types.ModuleType("campaigns.tidmad_gold.stage3.stage3_common")
     stub.compose_and_score = spy  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "campaigns.tidmad_gold.stage3.stage3_common", stub)
-    selection = finalize_strict_best(root, DESIGNS)
+    assert strict_best._resolve_compose_and_score() is spy
+
+
+def test_production_path_replays_all_16_units_at_full_scope(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Strict Best must infer from every Stage-2 checkpoint before scoring."""
+    from types import SimpleNamespace
+
+    root = _build_tree(tmp_path / "campaign")
+    _write_unit_workspaces(root)
+    replayed: list[tuple[str, str]] = []
+
+    def select(workspace: str, *, arm: str | None, band: str):
+        assert arm is None
+        return SimpleNamespace(inference_candidate=SimpleNamespace(band=band))
+
+    def infer(candidate, *, output_root: str, data_dir: str, task_manifest: str):
+        replayed.append((Path(output_root).name, candidate.band))
+        directory = Path(output_root) / f"band_{candidate.band}"
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / f"deliverable_{candidate.band}.h5"
+        path.touch()
+        return {0: str(path)}
+
+    class FullScopeComposer(ComposerSpy):
+        def __call__(self, *args, raw_data_dir: str, **kwargs):
+            assert raw_data_dir == str(tmp_path / "data")
+            return super().__call__(*args, **kwargs)
+
+    spy = FullScopeComposer(_uniform_scores())
+    stub = types.ModuleType("campaigns.tidmad_gold.stage3.stage3_common")
+    stub.compose_and_score = spy  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "campaigns.tidmad_gold.stage3.stage3_common", stub)
+    monkeypatch.setattr(strict_best, "select_workspace_winner", select)
+    monkeypatch.setattr(strict_best, "run_full_inference", infer)
+
+    selection = finalize_strict_best(root, DESIGNS, data_dir=str(tmp_path / "data"))
+
     assert isinstance(selection, StrictBestSelection)
+    assert len(replayed) == 16
+    assert set(replayed) == {(design, band) for design in DESIGNS for band in BANDS}
     assert len(spy.calls) == 4

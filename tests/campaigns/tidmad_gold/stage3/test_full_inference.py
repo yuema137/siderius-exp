@@ -106,7 +106,7 @@ def test_winner_checkpoint_runs_exact_full_scope_inference(tmp_path: Path) -> No
     assert call["sample_set"] == {0: list(range(FULL_SEGMENTS))}
     assert call["inference_batch"] == 7
     assert call["model_type"] == candidate.model_type
-    assert call["m_cfg"] == candidate.model_config
+    assert call["m_cfg"] == {"model_type": "wavenet"}
     assert call["l_cfg"] == candidate.loss_config
 
 

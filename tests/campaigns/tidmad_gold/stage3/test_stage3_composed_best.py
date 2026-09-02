@@ -53,6 +53,7 @@ from campaigns.tidmad_gold.stage3.stage3_composed_best import (
     select_band_winner,
 )
 from .metric_fixture import load_declared_tidmad_metric_spec
+from .stage3_adversarial_fixtures import write_placeholder_deliverable
 
 NAMING = DeliverableNaming()
 ARM = "gold"
@@ -80,21 +81,28 @@ class _ScoreVectorStub:
 def score_stub(monkeypatch) -> _ScoreVectorStub:
     stub = _ScoreVectorStub()
     monkeypatch.setattr(stage3_common, "score_vector", stub)
-    monkeypatch.setattr(
-        composed_best,
-        "run_full_inference",
-        lambda candidate, **_: {
+
+    def replay(candidate, *, output_root, **_):
+        target = Path(output_root) / f"band_{candidate.band}"
+        return {
             index: str(
-                Path(candidate.source_base_dir)
-                / NAMING.name(
-                    model_type=candidate.model_type,
-                    run_name=candidate.run_name,
-                    exp_id=candidate.exp_id,
-                    input_identity=index,
+                write_placeholder_deliverable(
+                    target
+                    / NAMING.name(
+                        model_type=candidate.model_type,
+                        run_name=candidate.run_name,
+                        exp_id=candidate.exp_id,
+                        input_identity=index,
+                    )
                 )
             )
             for index in candidate.file_indices
-        },
+        }
+
+    monkeypatch.setattr(
+        composed_best,
+        "run_full_inference",
+        replay,
     )
     return stub
 
@@ -333,9 +341,7 @@ def test_composed_best_end_to_end_selection_pooling_one_call(tmp_path, score_stu
             entry["file_index"] for entry in block["deliverables"]
         ] == band_file_indices(band)
         for entry in block["deliverables"]:
-            expected = hashlib.sha256(
-                _payload(band, block["exp_id"], entry["file_index"])
-            ).hexdigest()
+            expected = hashlib.sha256(Path(entry["source_path"]).read_bytes()).hexdigest()
             assert entry["sha256"] == expected
             assert os.path.isfile(entry["source_path"])
     assert provenance["s_max"] == stage3_common.EXPECTED_S_MAX
