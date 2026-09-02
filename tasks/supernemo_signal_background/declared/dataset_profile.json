@@ -1,0 +1,22 @@
+{
+  "partition_count": 4,
+  "topology": {
+    "modality": "event_plus_variable_tracker_hit_set",
+    "partition_unit": "physical_event",
+    "physical_event_count": 10455204,
+    "identity": "(process, ev_no)",
+    "input_tensor": {
+      "shape": [224, 11],
+      "dtype": "float32"
+    },
+    "target": {
+      "kind": "binary_categorical_scalar",
+      "signal": "0nubb",
+      "background": ["2nubb", "Bi214", "Tl208"]
+    },
+    "split": "deterministic 80/10/10 hash of (process, ev_no)",
+    "training_balance": "equal class counts inside fixed 25-keV E1+E2 bins"
+  },
+  "anchor_selection_files": [0],
+  "health_peek_files": [0]
+}

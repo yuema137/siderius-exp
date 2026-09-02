@@ -31,6 +31,30 @@ Trial/Formal workflow with different approved treatment values.
 
 The active dependency is pinned in `pyproject.toml` and repeated in `SIDERIUS_REVISION`. A scientific run must additionally record both repository commit SHAs in its run provenance.
 
+## Repository identity and linked worktrees
+
+A linked Git worktree may live outside the primary checkout, including under
+`/tmp`. Its filesystem location does not determine repository ownership. Before
+editing, committing, launching, or reporting task work, verify all four values:
+
+```bash
+git rev-parse --show-toplevel
+git rev-parse --git-common-dir
+git branch --show-current
+git remote get-url origin
+```
+
+Task, experiment, campaign, deployment, and scientific-provenance changes must
+resolve to this repository's common Git directory and remote. They must never be
+added to the SIDERIUS framework checkout. A temporary-looking linked-worktree
+path must be described as a linked worktree, not as an unowned temporary output.
+Work is not durably part of `siderius-exp` until it is committed on an identified
+branch and pushed to this repository's remote.
+
+Raw data, generated workspaces, model artifacts, caches, and secrets are runtime
+state rather than repository content. Their configured external paths may be
+temporary or machine-persistent, but they must not be committed here.
+
 ## Migration status
 
 The repository boundary is being established from the SIDERIUS `v0.1.4` release and the unpublished `v0.1.5` Gold repair lineage. See `provenance/MIGRATION.md`. No campaign is authorized to launch merely because its files exist here.

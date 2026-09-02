@@ -1,0 +1,4 @@
+science_domain: >-
+  SuperNEMO signal-background event classification under fixed energy-balanced
+  data loading and energy-matched ROC AUC selection
+continuous_output_phrase: "two-logit binary classification"
