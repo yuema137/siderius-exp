@@ -1,8 +1,8 @@
 # Cancer-gene MTG campaign
 
 This experiment runs the single `mtg` NatureBench graph for 30 iterations with
-one formal training round per iteration. Literature review is enabled and uses
-the task-owned NatureBench root-paper configuration.
+one Trial round followed by one forced Formal round per iteration. Literature
+review is enabled and uses the task-owned NatureBench root-paper configuration.
 
 The complete graph remains visible in both regimes. Trial activates deterministic
 25% of the task-owned training mask (about 929 supervised nodes) while retaining

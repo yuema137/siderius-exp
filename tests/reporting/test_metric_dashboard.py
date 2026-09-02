@@ -45,6 +45,29 @@ def _record(
     )
 
 
+def _run_output(workspace: Path, iteration: int, score: float) -> None:
+    target = (
+        workspace
+        / f"iter_{iteration:03d}"
+        / "iteration"
+        / "model"
+        / f"run_output_iter_{iteration:03d}.json"
+    )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        json.dumps(
+            {
+                "metric_spec": {"id": "auc", "direction": "higher"},
+                "best_valid_formal_denoising_score": score,
+                "best_valid_formal_exp_id": f"formal_iter_{iteration:03d}",
+                "best_valid_trial_denoising_score": score - 0.1,
+                "best_valid_trial_exp_id": f"trial_iter_{iteration:03d}",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_formal_current_and_health_valid_cumulative_best(tmp_path: Path) -> None:
     """A refused high score must not become current or cumulative best."""
     workspace = tmp_path / "run"
@@ -89,3 +112,22 @@ def test_renderer_is_self_contained_and_labels_both_series(tmp_path: Path) -> No
     assert "<svg" in document
     assert 'http-equiv="refresh" content="30"' in document
     assert "https://" not in document
+
+
+def test_iteration_output_is_authority_for_formal_result(tmp_path: Path) -> None:
+    workspace = tmp_path / "run"
+    _record(workspace, 1, "trial", 0.50, is_trial=True)
+    _run_output(workspace, 1, 0.61)
+
+    panel = collect_panel("example", workspace)
+
+    assert panel["points"] == [
+        {
+            "iteration": 1,
+            "current": 0.61,
+            "best": 0.61,
+            "new_best": True,
+            "phase": "formal",
+            "exp_id": "formal_iter_001",
+        }
+    ]

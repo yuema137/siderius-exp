@@ -84,14 +84,55 @@ def _candidate(path: Path, workspace: Path) -> Candidate | None:
     )
 
 
+def _output_candidate(path: Path, workspace: Path) -> Candidate | None:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    metric = payload.get("metric_spec")
+    if not isinstance(metric, dict):
+        return None
+    metric_id = metric.get("id")
+    direction = metric.get("direction")
+    if not isinstance(metric_id, str) or direction not in {"higher", "lower"}:
+        return None
+    iteration = _iteration_from_path(path, workspace)
+    if iteration is None:
+        return None
+    for phase, score_key, exp_key in (
+        ("formal", "best_valid_formal_denoising_score", "best_valid_formal_exp_id"),
+        ("trial", "best_valid_trial_denoising_score", "best_valid_trial_exp_id"),
+    ):
+        scalar = payload.get(score_key)
+        exp_id = payload.get(exp_key)
+        if isinstance(scalar, (int, float)) and math.isfinite(float(scalar)) and exp_id:
+            return Candidate(
+                iteration=iteration,
+                score=float(scalar),
+                metric_id=metric_id,
+                direction=direction,
+                phase=phase,
+                exp_id=str(exp_id),
+            )
+    return None
+
+
 def collect_panel(name: str, workspace: Path) -> dict[str, Any]:
     """Collect one primary-metric trajectory from a SIDERIUS workspace."""
     workspace = workspace.resolve()
-    candidates = [
+    output_candidates = [
+        candidate
+        for path in workspace.glob("iter_*/**/run_output_iter_*.json")
+        if (candidate := _output_candidate(path, workspace)) is not None
+    ]
+    authoritative_iterations = {item.iteration for item in output_candidates}
+    record_candidates = [
         candidate
         for path in workspace.glob("iter_*/**/records/iter_*/*.json")
         if (candidate := _candidate(path, workspace)) is not None
+        and candidate.iteration not in authoritative_iterations
     ]
+    candidates = [*output_candidates, *record_candidates]
     identities = {(item.metric_id, item.direction) for item in candidates}
     if len(identities) > 1:
         raise ValueError(
