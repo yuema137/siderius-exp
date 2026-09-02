@@ -130,7 +130,7 @@ case "$PROFILE" in
             --workflow_parameter_rules '{"train_config.epochs":{"range":{"min":5,"max":50}}}'
             --trial_portion 0.25
             --train_portion 0.25
-            --eval_portion 0.25
+            --eval_portion 1.0
             --formal_portion 1.0
             --formal_train_portion 1.0
             --formal_eval_portion 1.0

@@ -5,8 +5,9 @@ one formal training round per iteration. Literature review is enabled and uses
 the task-owned NatureBench root-paper configuration.
 
 The complete graph remains visible in both regimes. Trial activates deterministic
-25% subsets of the task-owned train and validation masks (about 929 and 103
-supervised nodes for the current MTG file); Formal activates the complete masks
+25% of the task-owned training mask (about 929 supervised nodes) while retaining
+the complete validation mask (414 nodes, including 64 positives) to keep AUPRC
+feedback stable; Formal activates the complete masks
 (3717 train and 414 validation nodes in the current release). The masks are
 disjoint and the graph topology is unchanged.
 
