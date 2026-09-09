@@ -26,6 +26,14 @@ snapshot scopes because this task's external data adapter exposes that one
 selection policy. The lock uses SIDERIUS's generic ``plan_overrides`` contract;
 the adapter still refuses unsupported strategies as defense in depth.
 
+The September 2026 model-demo continuation used larger measured time budgets
+and smaller data scopes than the original `demo` defaults. RunPod was deleted
+before its workspace could be retained. The recoverable launch treatment,
+metric trajectory, and provenance limitations are recorded in
+[`recovered_model_demo_v3_2026-09-03.md`](recovered_model_demo_v3_2026-09-03.md).
+That record does not change the reusable `demo` profile and must not be read as
+a completed campaign.
+
 ```bash
 bash experiments/supernemo_signal_background/launch.sh \
   --profile qualification \

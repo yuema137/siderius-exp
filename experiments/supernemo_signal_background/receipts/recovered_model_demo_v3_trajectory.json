@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "recovered_metric_trajectory",
+  "recovered_at": "2026-09-09",
+  "source": "last locally retained dashboard receipt before RunPod deletion",
+  "run_name": "supernemo_model_demo_v3_lit_on",
+  "siderius_revision": "7568fc54b6bcc00ce6ee5c1e88f3219550a688cb",
+  "siderius_exp_revision": null,
+  "revision_limit": "The deleted workspace did not retain an independently verified siderius-exp revision stamp.",
+  "metric_id": "energy_matched_roc_auc",
+  "direction": "higher",
+  "points": [
+    {"iteration": 1, "current": 0.6118366016224666, "best": 0.6118366016224666, "new_best": true, "phase": "formal", "exp_id": "projected_voxel_lite_resnet_iter_001_005"},
+    {"iteration": 2, "current": 0.7287179570272591, "best": 0.7287179570272591, "new_best": true, "phase": "formal", "exp_id": "masked_abc_point_gnn_iter_002_003"},
+    {"iteration": 3, "current": 0.7098125231345227, "best": 0.7287179570272591, "new_best": false, "phase": "formal", "exp_id": "simple_virtual_point_gnn_iter_003_005"},
+    {"iteration": 4, "current": 0.7111369099199143, "best": 0.7287179570272591, "new_best": false, "phase": "formal", "exp_id": "shared_multiscale_edge_gnn_iter_004_004"},
+    {"iteration": 5, "current": 0.6746863027671364, "best": 0.7287179570272591, "new_best": false, "phase": "formal", "exp_id": "energy_bin_auc_masked_point_gnn_iter_005_005"},
+    {"iteration": 6, "current": 0.7256853069021109, "best": 0.7287179570272591, "new_best": false, "phase": "formal", "exp_id": "edge_pool_abc_point_gnn_iter_006_004"},
+    {"iteration": 7, "current": 0.693550461915349, "best": 0.7287179570272591, "new_best": false, "phase": "formal", "exp_id": "context_gated_abc_point_gnn_iter_007_005"},
+    {"iteration": 8, "current": 0.724694576574699, "best": 0.7287179570272591, "new_best": false, "phase": "formal", "exp_id": "front_lifted_masked_abc_point_gnn_iter_008_006"},
+    {"iteration": 9, "current": 0.7414636954413373, "best": 0.7414636954413373, "new_best": true, "phase": "formal", "exp_id": "content_cluster_readout_abc_point_gnn_iter_009_004"},
+    {"iteration": 10, "current": 0.7430732765673952, "best": 0.7430732765673952, "new_best": true, "phase": "formal", "exp_id": "front_lifted_content_cluster_point_gnn_iter_010_006"},
+    {"iteration": 11, "current": 0.734789983861089, "best": 0.7430732765673952, "new_best": false, "phase": "trial", "exp_id": "induced_global_content_cluster_point_gnn_iter_011_004"}
+  ]
+}
