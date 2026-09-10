@@ -68,6 +68,35 @@ The corresponding `experiments/` launchers keep bounded qualification separate
 from 20-iteration scientific campaigns. Literature ON and OFF runs must use
 fresh workspaces and differ only in the declared literature switch.
 
+## Running the live tests
+
+The live suite includes checks that read framework scripts, so even collection
+requires `SIDERIUS_CHECKOUT`. Point it at an explicit checkout of the pin (not
+at this exp repository or an arbitrary latest framework revision), synchronize
+that checkout's own environment, then run from this exp checkout:
+
+```bash
+uv sync --group dev --frozen
+export SIDERIUS_CHECKOUT=/absolute/path/to/pinned/SIDERIUS
+test "$(git -C "$SIDERIUS_CHECKOUT" rev-parse HEAD)" = "$(tr -d '\n' < SIDERIUS_REVISION)"
+(cd "$SIDERIUS_CHECKOUT" && uv sync --group dev --frozen)
+env -u PYTHONPATH .venv/bin/python -m pytest
+```
+
+Pytest collects `tests/` using importlib mode, so separate tasks can have
+same-named test modules.
+Pytest also adds this exp root to its import path for task plugins; it does not
+add another framework checkout or set the runtime `PYTHONPATH` environment.
+`provenance/legacy_siderius/` is an archive, not a second
+executable test suite. Do not delete or rewrite archived evidence to fix live
+collection. To inspect the selected tests without executing them, append
+`--collect-only -q` to the command above.
+
+The framework checkout must be clean. The installed dependency alone does not
+supply repository scripts. See the
+[Gold qualification command](campaigns/tidmad_gold/README.md) for its exact
+checkout assertion and invocation. This setup does not authorize campaign runs.
+
 ## Migration status
 
 The repository boundary is being established from the SIDERIUS `v0.1.4` release and the unpublished `v0.1.5` Gold repair lineage. See `provenance/MIGRATION.md`. No campaign is authorized to launch merely because its files exist here.
