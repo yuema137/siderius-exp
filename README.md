@@ -80,6 +80,7 @@ uv sync --group dev --frozen
 export SIDERIUS_CHECKOUT=/absolute/path/to/pinned/SIDERIUS
 test "$(git -C "$SIDERIUS_CHECKOUT" rev-parse HEAD)" = "$(tr -d '\n' < SIDERIUS_REVISION)"
 (cd "$SIDERIUS_CHECKOUT" && uv sync --group dev --frozen)
+export MAJORANA_DATA_DIR=/absolute/path/to/verified/MAJORANA
 env -u PYTHONPATH .venv/bin/python -m pytest
 ```
 
@@ -91,6 +92,16 @@ add another framework checkout or set the runtime `PYTHONPATH` environment.
 executable test suite. Do not delete or rewrite archived evidence to fix live
 collection. To inspect the selected tests without executing them, append
 `--collect-only -q` to the command above.
+
+The default suite includes a `real_data` check of the official MAJORANA release's
+Train/Test event IDs (16 Train files and 6 Test files). It reads IDs, not waveform
+training batches, and requires `MAJORANA_DATA_DIR`; missing or incomplete data
+fails rather than silently choosing a developer's directory. Raw files remain
+outside Git. For an explicitly partial, synthetic/code-only run use
+`.venv/bin/python -m pytest -m 'not real_data'`; this does **not** establish the
+real release's split integrity or a full-suite pass. The separate optional
+legacy FCNet oracle checks report skips when their external reference checkout
+is unavailable; retain those skip reasons in validation reports.
 
 The framework checkout must be clean. The installed dependency alone does not
 supply repository scripts. See the

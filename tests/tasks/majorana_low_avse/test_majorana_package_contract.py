@@ -11,6 +11,7 @@ import textwrap
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from tasks.majorana_low_avse.plugins._majorana_data import _balanced_indices
 
@@ -191,8 +192,11 @@ def test_demo_locks_snapshot_scope_and_surfaces_resource_advice(
         )
 
 
+@pytest.mark.real_data
 def test_official_train_and_test_event_ids_do_not_overlap() -> None:
-    data_dir = Path(os.environ.get("MAJORANA_DATA_DIR", "/home/klz/Data/MAJORANA"))
+    configured = os.environ.get("MAJORANA_DATA_DIR")
+    assert configured, "MAJORANA_DATA_DIR must explicitly name the verified official release"
+    data_dir = Path(configured).expanduser()
     if not data_dir.is_dir():
         raise AssertionError(
             "MAJORANA_DATA_DIR must name the verified official release"

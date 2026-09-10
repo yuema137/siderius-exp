@@ -21,3 +21,4 @@ testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "--import-mode=importlib"
 norecursedirs = ["provenance", ".git", ".venv"]
+markers = ["real_data: reads an explicitly configured external scientific dataset"]
