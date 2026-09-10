@@ -89,9 +89,10 @@ records in the band workspace satisfying ALL of:
 | HealthGate-valid | `classify_under_pinned_policy(record, pinned_workspace_gate_ids(workspace))` == `VALID` (`execute_tools/health_checks/candidate_eligibility.py` — the ONE eligibility authority; never re-implement from gate fields). **F-4 correction, 2026-08-27**: the gate set is the one the RUN'S OWN workspace pinned in `health_checks_effective.yaml`, never the repo-current shipped `configs/health_checks.yaml`. The previous wording named `is_valid_candidate(record)`, whose zero-argument default resolves the repo-current config and collapses UNKNOWN to the empty set — so a record whose run-declared blocking gate FAILED was reported valid on the strength of a roster it never ran. A workspace that pinned no roster is UNKNOWN, and UNKNOWN is a refusal, not a pass. `stage3_composed_best.select_band_winner` already resolved it this way; this is the other two consumers matching it. |
 | identity | `exp_id`, `model_type`, `iteration` (dir), `experiment_arm` (lock + manifest) |
 
-Its deliverables are the 20 files named by the `DeliverableNaming`
-authority for (`model_type`, `run_name`, `exp_id`, file 0–19) in that
-iteration's sandbox data dir.
+Its Stage-1 deliverables cover the bounded Stage-1 Formal evaluation scope and
+remain search evidence. They are not Stage-3 final-score inputs. The winner's
+exact checkpoint, completion sentinel, model/loss configuration, inference
+batch, run-scoped plugins, and checkpoint SHA-256 form the replay identity.
 
 ---
 
@@ -142,7 +143,7 @@ polls; absence == unit not done; partial dirs without it are ignored):
 
 ```
 {workspace_root}/stage3/
-  composed_best/        # writer A: pools the 4 Stage-1 winners' SOURCE-BAND deliverables
+  composed_best/        # writer A: full-scope checkpoint replay, then one pooled score
   strict_best/          # writer B: pools Stage-2's 4×4 (per design-quad selection rule, writer-owned)
   terminal_eval/        # writer C: the ISOLATION namespace — see the rule below
     <input>/            # whatever terminal evaluation consumes
@@ -150,9 +151,13 @@ polls; absence == unit not done; partial dirs without it are ignored):
 ```
 
 **FROZEN consumption rules**:
-- `composed_best` reads, for each band, the Stage-1 winner's deliverables
-  for THAT band's files only (winner identified per §1; files outside the
-  winner's source band are never read from it).
+- `composed_best` selects one Stage-1 winner per band using §1, verifies and
+  stages its exact checkpoint and run-scoped plugins, and invokes the existing
+  task-owned inference executor over all 200 segments of each file in that
+  source band. It does not retrain. Every replayed HDF5 deliverable must pass
+  the declared naming, storage, file identity, and complete-sample-count check
+  before it may enter the pooled set. A Stage-1 20-segment deliverable is
+  insufficient by construction and is never consumed as a final result.
 - `strict_best` reads Stage-2 `deliverables/` dirs, only from units whose
   `COMPLETE.json` exists and has `healthgate_valid: true`. §2's "ignored"
   governs the POLLER while it waits; the strict_best FINALIZER fails
@@ -169,6 +174,16 @@ polls; absence == unit not done; partial dirs without it are ignored):
   is reserved by this contract: any future consumer adding a read from it
   is making a CONTRACT change here first.
 
+**Campaign scope ruling (operator, 2026-09-01):** the terminal-evaluation
+writer remains a reusable isolated mechanism but is not invoked by this Gold
+campaign. A Strict Best design combines four independently attributable band
+workspaces, while the current `TerminalChampion` schema records one provenance
+workspace. Mapping the former into the latter would fabricate provenance.
+Composed Best and Strict Best are therefore the campaign's full-scope reported
+results. Any future activation requires a real multi-workspace provenance
+contract; first-wins, majority selection, warning-only mismatch handling, and
+fallback to one workspace are prohibited.
+
 ---
 
 ## 4. The shared compose-and-score interface (ONE wrapper, reused 3×)
@@ -184,6 +199,7 @@ def compose_and_score(
     files: range = range(20),         # the full 0..19 file set — full-scope by contract
     sample_set: None = None,          # None == the FULL sample set; partial scopes are not legal here
     reconciled_spec: MetricSpec,      # §4 amendment (supervisor gate ruling, 2026-08-26): the caller's RECONCILED 09a stamp — identity transport for refusal envelopes, never derived
+    raw_data_dir: str | None = None,  # Composed Best passes its required explicit data root; legacy writers may use TIDMAD_DATA_DIR
 ) -> tuple[list[float], float]:       # (file_vector, scalar) — score_vector's own 2-tuple
 ```
 

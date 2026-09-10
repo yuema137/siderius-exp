@@ -1,0 +1,14 @@
+{
+  "partition_count": 22,
+  "topology": {
+    "modality": "fixed_length_detector_waveform",
+    "partition_unit": "official_hdf5_file",
+    "physical_event_count": 1430000,
+    "input_tensor": {"shape": [1, 3800], "dtype": "float32"},
+    "target": {"kind": "binary_categorical_scalar", "field": "psd_label_low_avse"},
+    "split": "official 16-file Train and 6-file Test; zero overlapping event ids",
+    "training_balance": "equal class counts inside fixed 25-keV energy_label bins"
+  },
+  "anchor_selection_files": [0],
+  "health_peek_files": [0]
+}

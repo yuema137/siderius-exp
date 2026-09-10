@@ -29,7 +29,8 @@ Declarations through the real schemas (design §0.3):
 
 Regenerate::
 
-    .venv/bin/python -m tools.example_packs.davis_future_prediction --db-info /tmp/davis/db_info.yaml
+    .venv/bin/python -m tasks.davis_future_prediction.tools.davis_future_prediction \
+        --db-info /tmp/davis/db_info.yaml
 """
 
 from __future__ import annotations
@@ -44,8 +45,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from agent.schemas.model_io_contract import ModelIOContract
 from execute_tools.evaluation_metric import MetricSpec, PresenceScoreabilityContract
-from tools.example_packs._common import repo_root, write_json, write_sha256sums, write_text
-from tools.example_packs.declarations import (
+from tasks.shared.artifact_io import repo_root, write_json, write_sha256sums, write_text
+from tasks.shared.declarations import (
     batch_axis,
     fixed_axis,
     model_io_contract,

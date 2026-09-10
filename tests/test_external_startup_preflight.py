@@ -11,8 +11,8 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import sys
 import textwrap
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -59,7 +59,7 @@ CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     workspace = Path(sys.argv[3]).resolve()
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
     os.chdir(checkout)
 
     from core.run_invariants import RunHealthMaterialization, build_run_invariants
@@ -142,6 +142,36 @@ def _siderius_checkout() -> Path:
     return checkout
 
 
+def test_dependency_pin_matches_the_checkout_under_qualification() -> None:
+    """Fail when installation, provenance, and executable source name different SHAs.
+
+    Without this check, ``SIDERIUS_REVISION`` can advance while the package
+    dependency still installs an older framework.  Composition tests against a
+    manually selected checkout would then certify code different from a clean
+    installation of the experiment repository.
+    """
+    expected = (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
+    project = tomllib.loads((EXP_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    dependency = next(
+        item
+        for item in project["project"]["dependencies"]
+        if item.startswith("siderius @ ")
+    )
+    dependency_revision = dependency.rsplit("@", maxsplit=1)[1]
+    checkout = _siderius_checkout()
+    checkout_revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=checkout,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+
+    assert len(expected) == 40
+    assert dependency_revision == expected
+    assert checkout_revision == expected
+
+
 @pytest.mark.parametrize("task_id", TASK_MANIFESTS)
 def test_real_task_cold_start_reaches_the_llm_gpu_boundary(
     task_id: str, tmp_path: Path
@@ -156,7 +186,7 @@ def test_real_task_cold_start_reaches_the_llm_gpu_boundary(
     checkout = _siderius_checkout()
     completed = subprocess.run(
         [
-            sys.executable,
+            str(checkout / ".venv/bin/python"),
             "-c",
             CHILD,
             str(checkout),

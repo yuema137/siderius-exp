@@ -1,0 +1,122 @@
+{
+  "approved_by": "operator ruling 2026-08-27 (D-FCNET-REF-1)",
+  "artifact_id": "gold_fcnet_band_references",
+  "artifact_version": "1.0.0",
+  "band_files": {
+    "0-3": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "10-14": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "15-19": [
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "4-9": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "derivation": {
+    "method": "log_5.27(mean of the band's per-file LINEAR values)",
+    "not_derived_from_global_scalar": true,
+    "self_check": "log_5.27(mean of all 20) reproduces the recorded full-scope scalar to 12 significant digits",
+    "validity_premise": "anchor map declares segments_per_file=200 UNIFORMLY for all 20 files (verified: all 20 anchor lists length 200), so the scorer's ratio-of-sums reduces exactly to the mean of per-file values"
+  },
+  "health_gate_validity": {
+    "blocking_gates": [
+      "amplitude_collapse_blocking"
+    ],
+    "evidence": "production-semantics evaluation of all 20 adopted deliverables: amplitude_collapse 20/20 PASS; the two dispersion gates fail 10/20 and are physically unsatisfiable on files 0-4 where the injected ground truth itself falls below threshold",
+    "evidence_artifact_sha256": "58f61c40b4c5360f95cd0a97c252f50cba2b6c91e7063b66673d90e7911e5c32",
+    "record_only_gates": [
+      "output_diversity_blocking",
+      "output_std_blocking"
+    ],
+    "ruling": "D-HEALTH-1 (operator, 2026-08-27)",
+    "thresholds_unchanged": true
+  },
+  "metric": {
+    "direction": "higher",
+    "id": "tidmad_denoising_score",
+    "note": "higher is better; the stop rule moves the reference +2.0 TOWARD BETTER"
+  },
+  "per_band": {
+    "0-3": -4.703584,
+    "10-14": 6.681011,
+    "15-19": 6.983445,
+    "4-9": 3.100642
+  },
+  "per_band_full_precision": {
+    "0-3": -4.703584306648908,
+    "10-14": 6.6810107610336456,
+    "15-19": 6.983445331584829,
+    "4-9": 3.1006420517029594
+  },
+  "provenance": {
+    "anchor_map": "/home/yuema137/SIDERIUS/reference_data/segment_anchors.json",
+    "batch_size": 25,
+    "checkpoint_by_file": {
+      "0": "FCNet_0_4.pth",
+      "1": "FCNet_0_4.pth",
+      "10": "FCNet_10_15.pth",
+      "11": "FCNet_10_15.pth",
+      "12": "FCNet_10_15.pth",
+      "13": "FCNet_10_15.pth",
+      "14": "FCNet_10_15.pth",
+      "15": "FCNet_15_20.pth",
+      "16": "FCNet_15_20.pth",
+      "17": "FCNet_15_20.pth",
+      "18": "FCNet_15_20.pth",
+      "19": "FCNet_15_20.pth",
+      "2": "FCNet_0_4.pth",
+      "3": "FCNet_0_4.pth",
+      "4": "FCNet_4_10.pth",
+      "5": "FCNet_4_10.pth",
+      "6": "FCNet_4_10.pth",
+      "7": "FCNet_4_10.pth",
+      "8": "FCNet_4_10.pth",
+      "9": "FCNet_4_10.pth"
+    },
+    "checkpoint_dir": "/home/klz/Data/SIDEREIS_DATA/tidmad_reproduction/paper_models_archive",
+    "computed_at": "2026-08-01 11:14:29",
+    "data_dir": "/home/klz/Data/TIDMAD",
+    "full_scope": true,
+    "lineage": "tidmad_official_banded (ADOPTED per Q-FCNET-REF-1)",
+    "model": "TIDMAD official band-split FCNet",
+    "model_key": "fcnet",
+    "recorded_full_scope_scalar": 6.434693649697849,
+    "s_max": 295715680.14248306,
+    "seg_size": 40000,
+    "source_artifact": "/home/klz/Data/SIDEREIS_DATA/tidmad_official_banded/tidmad_official_fcnet_banded_score.json",
+    "source_artifact_sha256": "a897c2fd7e9a833ed8fd7ab4ef6c4eefcdb652e2a890a96fcf65b218d3bfa2a2",
+    "superseded_lineages": [
+      {
+        "ref": "reference_data/official_paper_result/fcnet.md",
+        "scalar": 6.434801,
+        "status": "HISTORICAL / STALE \u2014 SUPERSEDED; not investigated further (operator ruling 2026-08-27)"
+      },
+      {
+        "ref": "tidmad_reproduction/fcnet/full_20_files",
+        "status": "NON-ADOPTED lineage"
+      }
+    ]
+  },
+  "purpose": "Frozen band-local FCNet references for the Gold Stage-1 FCNet+2.0 early-stop rule.",
+  "stop_margin": 2.0
+}

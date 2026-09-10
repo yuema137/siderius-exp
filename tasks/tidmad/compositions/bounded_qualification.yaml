@@ -15,8 +15,12 @@ dataset_profile:
 metric:
   declaration: ../resolved/metric_spec.json
   implementation:
-    module: execute_tools.evaluation_metric
+    file: ../runtime/scoring.py
     symbol: TidmadDenoisingMetric
+  scoreability_contracts:
+    tidmad_denoised_h5:
+      file: ../runtime/scoreability.py
+      symbol: TidmadScoreabilityContract
 
 task_health:
   config: ../framework_configs/health.yaml

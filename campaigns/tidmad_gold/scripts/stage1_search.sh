@@ -33,8 +33,8 @@ GOLD_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${GOLD_SCRIPT_DIR}/_gold_campaign_lib.sh"
 
 stage1_main() {
-    local WORKSPACE_ROOT="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" FCNET_REFERENCE_JSON=""
-    local ONLY="" STAGGER=60 DRY_RUN=0
+    local WORKSPACE_ROOT="" DATA_DIR="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" FCNET_REFERENCE_JSON=""
+    local ONLY="" DEVICE_INDEX="" STAGGER=60 DRY_RUN=0
     # F-PROFILE-WIRE-1 — command-line only; never inherited from the shell.
     GOLD_REQUIRED_RUNTIME_PROFILE_PATH=""
     GOLD_REQUIRED_RUNTIME_PROFILE=""
@@ -49,6 +49,7 @@ stage1_main() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
+            --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --arm)                  ARM="$2"; shift 2 ;;
             --gold_advice_file)     ADVICE_FILE="$2"; shift 2 ;;
             --gold_advice_sha256) ADVICE_SHA256="$2"; shift 2 ;;
@@ -59,6 +60,7 @@ stage1_main() {
             --gold_formal_vram_budget_gb) GOLD_FORMAL_VRAM_BUDGET_GB="$2"; shift 2 ;;
             --fcnet_reference_json) FCNET_REFERENCE_JSON="$2"; shift 2 ;;
             --only)                 ONLY="$2"; shift 2 ;;
+            --device-index|--device_index) DEVICE_INDEX="$2"; shift 2 ;;
             --stagger-seconds|--stagger_seconds) STAGGER="$2"; shift 2 ;;
             --dry-run|--dry_run)    DRY_RUN=1; shift ;;
             *)                      PASSTHROUGH+=("$1"); shift ;;
@@ -67,6 +69,7 @@ stage1_main() {
 
     gold_refuse_reserved_passthrough ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"} || return 1
     gold_workspace_root_check "$WORKSPACE_ROOT" || return 1
+    gold_bind_data_dir "$DATA_DIR" || return 1
     # Validates the arm + advice pairing up-front (each band re-derives its
     # own argv from the same lib, so this is a fail-fast, not the binding).
     # The campaign's ONE observed treatment identity (empty when this
@@ -107,6 +110,10 @@ stage1_main() {
         echo "ERROR: band selection resolved empty" >&2
         return 1
     fi
+    if [ -n "$DEVICE_INDEX" ] && [ "${#BANDS[@]}" -ne 1 ]; then
+        echo "ERROR: --device-index requires exactly one selected band via --only" >&2
+        return 1
+    fi
     if [ "$DRY_RUN" -ne 1 ]; then
         gold_refuse_preset_cuda || return 1
     fi
@@ -115,6 +122,7 @@ stage1_main() {
 
     local BAND_ARGS_COMMON=(
         --workspace_root "$WORKSPACE_ROOT"
+        --data_dir "$GOLD_DATA_DIR"
         --arm "$ARM"
     )
     [ -n "$ADVICE_FILE" ] && BAND_ARGS_COMMON+=(--gold_advice_file "$ADVICE_FILE")
@@ -142,6 +150,7 @@ stage1_main() {
         --gold_trial_vram_budget_gb "$GOLD_TRIAL_VRAM_BUDGET_GB"
         --gold_formal_vram_budget_gb "$GOLD_FORMAL_VRAM_BUDGET_GB")
     [ -n "$FCNET_REFERENCE_JSON" ] && BAND_ARGS_COMMON+=(--fcnet_reference_json "$FCNET_REFERENCE_JSON")
+    [ -n "$DEVICE_INDEX" ] && BAND_ARGS_COMMON+=(--device-index "$DEVICE_INDEX")
 
     if [ "$DRY_RUN" -eq 1 ]; then
         local band
@@ -168,7 +177,7 @@ stage1_main() {
             sleep "$STAGGER"
         fi
         first=0
-        gpu="$(gold_band_gpu "$band")" || return 1
+        gpu="$(gold_resolve_device "$band" "$DEVICE_INDEX")" || return 1
         LOG="${LOG_DIR}/${ARM}_band${band}.launch.log"
         CUDA_VISIBLE_DEVICES="$gpu" nohup bash "${GOLD_SCRIPT_DIR}/stage1_run_band.sh" \
             --band "$band" "${BAND_ARGS_COMMON[@]}" \

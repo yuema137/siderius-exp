@@ -38,8 +38,8 @@ GOLD_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${GOLD_SCRIPT_DIR}/_gold_campaign_lib.sh"
 
 stage2_main() {
-    local WORKSPACE_ROOT="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" DESIGN_REGISTRY=""
-    local DRY_RUN=0
+    local WORKSPACE_ROOT="" DATA_DIR="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256="" DESIGN_REGISTRY=""
+    local DRY_RUN=0 ONLY="" DEVICE_INDEX=""
     # F-PROFILE-WIRE-1 — command-line only; never inherited from the shell.
     GOLD_REQUIRED_RUNTIME_PROFILE_PATH=""
     GOLD_REQUIRED_RUNTIME_PROFILE=""
@@ -54,6 +54,7 @@ stage2_main() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
+            --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --arm)               ARM="$2"; shift 2 ;;
             --gold_advice_file)  ADVICE_FILE="$2"; shift 2 ;;
             --gold_advice_sha256) ADVICE_SHA256="$2"; shift 2 ;;
@@ -63,6 +64,8 @@ stage2_main() {
             --gold_trial_vram_budget_gb) GOLD_TRIAL_VRAM_BUDGET_GB="$2"; shift 2 ;;
             --gold_formal_vram_budget_gb) GOLD_FORMAL_VRAM_BUDGET_GB="$2"; shift 2 ;;
             --design_registry)   DESIGN_REGISTRY="$2"; shift 2 ;;
+            --only|--band)       ONLY="$2"; shift 2 ;;
+            --device-index)      DEVICE_INDEX="$2"; shift 2 ;;
             --dry-run|--dry_run) DRY_RUN=1; shift ;;
             *)                   PASSTHROUGH+=("$1"); shift ;;
         esac
@@ -70,6 +73,7 @@ stage2_main() {
 
     gold_refuse_reserved_passthrough ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"} || return 1
     gold_workspace_root_check "$WORKSPACE_ROOT" || return 1
+    gold_bind_data_dir "$DATA_DIR" || return 1
     # NOTE (flagged for supervisor review in the F-LAUNCH-1 PR body): the
     # arm's treatment condition is kept UNIFORM across its own campaign —
     # goldpod Stage-2 units carry the same --advice artifact its Stage-1
@@ -85,6 +89,17 @@ stage2_main() {
     # populated for the dry-run row in this process.
     gold_require_generated_library || return 1
     gold_frozen_chain_args stage2 || return 1
+    local SELECTED
+    SELECTED="$(gold_select_bands "$ONLY")" || return 1
+    local SELECTED_BANDS=()
+    local selected
+    while IFS= read -r selected; do
+        [ -n "$selected" ] && SELECTED_BANDS+=("$selected")
+    done <<< "$SELECTED"
+    if [ -n "$DEVICE_INDEX" ] && [ "${#SELECTED_BANDS[@]}" -ne 1 ]; then
+        echo "ERROR: --device-index requires exactly one selected band (--only BAND)" >&2
+        return 1
+    fi
 
     if [ -z "$DESIGN_REGISTRY" ] || [ ! -d "$DESIGN_REGISTRY" ]; then
         echo "ERROR: --design_registry must be an existing directory of frozen design plans: '${DESIGN_REGISTRY}'" >&2
@@ -134,11 +149,11 @@ stage2_main() {
         echo "[gold-stage2] ==== wave $wave/4: design $design (plan: $plan) ===="
 
         local WAVE_PIDS=() WAVE_BANDS=() WAVE_UNITS=()
-        for band in "${GOLD_BANDS[@]}"; do
+        for band in "${SELECTED_BANDS[@]}"; do
             unit="${STAGE2_ROOT}/${design}_${band}"
             ws="${unit}/workspace"
             run_name="${ARM}_stage2_${design}_${band}"
-            gpu="$(gold_band_gpu "$band")" || return 1
+            gpu="$(gold_resolve_device "$band" "$DEVICE_INDEX")" || return 1
             gold_band_args "$band" || return 1
 
             if [ -f "${unit}/COMPLETE.json" ]; then
@@ -151,6 +166,7 @@ stage2_main() {
                 --mode lilab
                 --workspace "$ws"
                 --run_name "$run_name"
+                --data_dir "$GOLD_DATA_DIR"
                 --validation_fixed_candidate_plan "$plan"
                 "${GOLD_FROZEN_CHAIN_ARGS[@]}"
                 "${GOLD_BAND_ARGS[@]}"

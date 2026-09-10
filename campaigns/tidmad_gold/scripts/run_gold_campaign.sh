@@ -24,7 +24,7 @@
 # Usage:
 #   bash campaigns/tidmad_gold/scripts/run_gold_campaign.sh \
 #       --siderius-checkout DIR \
-#       --workspace_root DIR --stage 1 \
+#       --workspace_root DIR --data_dir DIR --stage 1 \
 #       --gold_advice_file ADVICE.json \
 #       [--arm goldpod|blindpod] [--task_config PATH] \
 #       [--fcnet_reference_json PATH] [--only 0-3,4-9] \
@@ -136,12 +136,12 @@ gold_usage() {
 }
 
 gold_main() {
-    local WORKSPACE_ROOT="" STAGE="" ARM="goldpod" ADVICE_FILE=""
+    local WORKSPACE_ROOT="" DATA_DIR="" STAGE="" ARM="goldpod" ADVICE_FILE=""
     local SIDERIUS_CHECKOUT_ARG="" TASK_CONFIG=""
     # v0.1.4 operator ruling: the approved per-band FCNet references are
     # bound BY DEFAULT (D-FCNET-REF-1). Unbound, the FCNet+2.0 early stop is
     # not evaluable and every band runs the full 20-iteration horizon.
-    local DESIGN_REGISTRY="" FCNET_REFERENCE_JSON="${GOLD_FCNET_REFERENCE_JSON:-}" ONLY="" STAGGER=60
+    local DESIGN_REGISTRY="" FCNET_REFERENCE_JSON="${GOLD_FCNET_REFERENCE_JSON:-}" ONLY="" DEVICE_INDEX="" STAGGER=60
     local DRY_RUN=0
     local PASSTHROUGH=()
     # F-PROFILE-WIRE-1 — the operator-supplied runtime-profile declaration.
@@ -161,6 +161,7 @@ gold_main() {
         case $1 in
             --siderius-checkout)    SIDERIUS_CHECKOUT_ARG="$2"; shift 2 ;;
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
+            --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --stage)               STAGE="$2"; shift 2 ;;
             --arm)                 ARM="$2"; shift 2 ;;
             --gold_advice_file)    ADVICE_FILE="$2"; shift 2 ;;
@@ -173,6 +174,7 @@ gold_main() {
             --design_registry)     DESIGN_REGISTRY="$2"; shift 2 ;;
             --fcnet_reference_json) FCNET_REFERENCE_JSON="$2"; shift 2 ;;
             --only)                ONLY="$2"; shift 2 ;;
+            --device-index|--device_index) DEVICE_INDEX="$2"; shift 2 ;;
             --stagger-seconds|--stagger_seconds) STAGGER="$2"; shift 2 ;;
             --dry-run|--dry_run)   DRY_RUN=1; shift ;;
             -h|--help)             gold_usage; return 0 ;;
@@ -187,6 +189,7 @@ gold_main() {
     # frozen/arm/band-decided flag, by name.
     gold_refuse_reserved_passthrough ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"} || return 1
     gold_workspace_root_check "$WORKSPACE_ROOT" || return 1
+    gold_bind_data_dir "$DATA_DIR" || return 1
     gold_arm_args "$ARM" "$ADVICE_FILE" || return 1
     gold_bind_task_config "$TASK_CONFIG" || return 1
     # D-LLM-1 fail-fast: each stage re-derives its own argv from the same lib
@@ -236,6 +239,7 @@ gold_main() {
     fi
 
     echo "[gold-campaign] arm=$ARM stage=$STAGE workspace_root=$WORKSPACE_ROOT dry_run=$DRY_RUN"
+    echo "[gold-campaign] data_dir=$GOLD_DATA_DIR (explicit caller-owned input)"
     echo "[gold-campaign] BOUND task_config=$GOLD_TASK_CONFIG_ABS sha256=$GOLD_TASK_CONFIG_SHA256 (regression; campaign-owned)"
     echo "[gold-campaign] llm_config=$GOLD_LLM_CONFIG_ABS sha256=$GOLD_LLM_CONFIG_SHA256 (D-LLM-1, every role pinned)"
     if [ "$ARM" = "goldpod" ]; then
@@ -247,6 +251,7 @@ gold_main() {
         echo "[gold-campaign] treatment: advice=EXPLICIT_NONE (blindpod, named absence)"
     fi
     echo "[gold-campaign] lit_review=ON (operator D-LIT-ON-1, supersedes Q-LIT-1; explicit --ml_lit_review_enabled, symmetric; V19 config = shipped default)"
+    echo "[gold-campaign] terminal_eval=$GOLD_TERMINAL_EVAL_POLICY (Composed Best and Strict Best are the full-scope campaign results)"
     gold_print_frozen_table
 
     # The resolved launch manifest — every behaviorally relevant value the
@@ -258,6 +263,7 @@ gold_main() {
             echo "{"
             echo "  \"entrypoint\": \"run_gold_campaign.sh\","
             echo "  \"siderius_checkout\": \"${GOLD_PROJECT_DIR}\","
+            echo "  \"data_dir\": \"${GOLD_DATA_DIR}\","
             echo "  \"stage\": ${STAGE},"
             echo "  \"arm\": \"${ARM}\","
             echo "  \"advice_file\": $(if [ -n "$ADVICE_FILE" ]; then printf '"%s"' "$ADVICE_FILE"; else printf '"EXPLICIT_NONE"'; fi),"
@@ -266,13 +272,14 @@ gold_main() {
             echo "  \"lit_review\": \"ON (D-LIT-ON-1 supersedes Q-LIT-1, explicit --ml_lit_review_enabled, symmetric, V19 config = shipped default)\","
             echo "  \"campaign_id\": \"${GOLD_CAMPAIGN_ID}\","
             echo "  \"stage2_authorized\": ${GOLD_STAGE2_AUTHORIZED},"
+            echo "  \"terminal_eval_policy\": \"${GOLD_TERMINAL_EVAL_POLICY}\","
             echo "  \"bound_task_config\": \"${GOLD_TASK_CONFIG_ABS}\","
             echo "  \"bound_task_config_sha256\": \"${GOLD_TASK_CONFIG_SHA256}\","
             echo "  \"bound_health_checks_config\": \"${GOLD_HEALTH_CHECKS_EFFECTIVE}\","
             echo "  \"subprocess_rlimit_as_gb\": ${GOLD_SUBPROCESS_RLIMIT_AS_GB},"
             echo "  \"task_composition\": null,"
             echo "  \"allowed_output_types\": \"${GOLD_ALLOWED_OUTPUT_TYPES}\","
-            echo "  \"required_segmentation_size\": ${GOLD_REQUIRED_SEGMENTATION_SIZE},"
+            echo "  \"workflow_parameter_rules\": ${GOLD_WORKFLOW_PARAMETER_RULES},"
             echo "  \"order_strategy\": \"sequential\","
             echo "  \"sampling_seed\": ${GOLD_SAMPLING_SEED},"
             echo "  \"llm_config\": \"${GOLD_LLM_CONFIG_ABS}\","
@@ -299,6 +306,7 @@ gold_main() {
             echo "  \"stage2_num_iterations\": ${GOLD_STAGE2_NUM_ITERATIONS},"
             echo "  \"retention\": \"--no-cleanup_denoised (R-RETENTION-1)\","
             echo "  \"gpu_map\": {\"0-3\": 0, \"4-9\": 1, \"10-14\": 2, \"15-19\": 3},"
+            echo "  \"device_index_override\": $(if [ -n "$DEVICE_INDEX" ]; then printf '%s' "$DEVICE_INDEX"; else printf 'null'; fi),"
             echo "  \"launched_utc\": \"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\""
             echo "}"
         } > "$MANIFEST"
@@ -307,6 +315,7 @@ gold_main() {
 
     local COMMON=(
         --workspace_root "$WORKSPACE_ROOT"
+        --data_dir "$GOLD_DATA_DIR"
         --arm "$ARM"
     )
     [ -n "$ADVICE_FILE" ] && COMMON+=(--gold_advice_file "$ADVICE_FILE")
@@ -334,6 +343,7 @@ gold_main() {
         1)
             local S1=("${COMMON[@]}" --stagger-seconds "$STAGGER")
             [ -n "$ONLY" ] && S1+=(--only "$ONLY")
+            [ -n "$DEVICE_INDEX" ] && S1+=(--device-index "$DEVICE_INDEX")
             [ -n "$FCNET_REFERENCE_JSON" ] && S1+=(--fcnet_reference_json "$FCNET_REFERENCE_JSON")
             exec bash "${GOLD_SCRIPT_DIR}/stage1_search.sh" "${S1[@]}" \
                 ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
@@ -353,8 +363,10 @@ gold_main() {
                 echo "  results are reviewed. STAGE 2 HAS NOT STARTED." >&2
                 return 1
             fi
-            exec bash "${GOLD_SCRIPT_DIR}/stage2_strict_retrain.sh" "${COMMON[@]}" \
-                --design_registry "$DESIGN_REGISTRY" \
+            local S2=("${COMMON[@]}" --design_registry "$DESIGN_REGISTRY")
+            [ -n "$ONLY" ] && S2+=(--only "$ONLY")
+            [ -n "$DEVICE_INDEX" ] && S2+=(--device-index "$DEVICE_INDEX")
+            exec bash "${GOLD_SCRIPT_DIR}/stage2_strict_retrain.sh" "${S2[@]}" \
                 ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
             ;;
     esac

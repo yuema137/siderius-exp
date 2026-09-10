@@ -17,9 +17,8 @@ FROZEN TRANSFORM (child design §2.3; task table §22.9a):
             context [3,8,128,224] (start..start+7) + target [3,4,128,224]
             (start+8..start+11)
 
-Manifest parsing lives HERE, not in the pack tooling: production must never
-import `tools.example_packs` (§22.23.9 separability — the D14-2 C7 lesson,
-applied from the start).
+Manifest parsing lives HERE, not in task artifact-generation tooling. Runtime
+execution must not depend on an operator-only generator.
 
 BOUNDARIES (parent Amendment 2): codec only — the global-MSE metric and its
 scoreability belong to the Step-06 authority.
@@ -113,7 +112,9 @@ def load_davis_sequences(path: str | Path) -> tuple[SequenceRow, ...]:
     return tuple(rows)
 
 
-def load_davis_clips(path: str | Path, *, scope: str | None = None) -> tuple[DavisClip, ...]:
+def load_davis_clips(
+    path: str | Path, *, scope: str | None = None
+) -> tuple[DavisClip, ...]:
     """Parse the committed ``clips.csv``, optionally filtered to one scope.
 
     The scope filter is the LEAKAGE guard's reader half: a caller asks for
@@ -132,7 +133,9 @@ def load_davis_clips(path: str | Path, *, scope: str | None = None) -> tuple[Dav
         sequence_name, start_frame, row_scope = line.split(",")
         if scope is not None and row_scope != scope:
             continue
-        rows.append(DavisClip(sequence_name=sequence_name, start_frame=int(start_frame)))
+        rows.append(
+            DavisClip(sequence_name=sequence_name, start_frame=int(start_frame))
+        )
     return tuple(rows)
 
 
@@ -209,10 +212,14 @@ def decode_frame(path: str | Path) -> torch.Tensor:
     return hwc.permute(2, 0, 1).contiguous().to(torch.float32).div_(255.0)
 
 
-def load_window(data_dir: str | Path, clip: DavisClip) -> tuple[torch.Tensor, torch.Tensor]:
+def load_window(
+    data_dir: str | Path, clip: DavisClip
+) -> tuple[torch.Tensor, torch.Tensor]:
     """``(context [3,8,128,224], target [3,4,128,224])`` for one clip."""
     frames = [
-        decode_frame(frame_path(data_dir, clip.sequence_name, clip.start_frame + offset))
+        decode_frame(
+            frame_path(data_dir, clip.sequence_name, clip.start_frame + offset)
+        )
         for offset in range(WINDOW_FRAMES)
     ]
     context = torch.stack(frames[:CONTEXT_FRAMES], dim=1)
@@ -354,7 +361,9 @@ class DavisTaskDataPath:
     # TaskScopeCapability (PR-12bc B8)
     # ------------------------------------------------------------------
 
-    def _select(self, request: ScopeBuildRequest, *, source: str | None = None) -> DavisScope:
+    def _select(
+        self, request: ScopeBuildRequest, *, source: str | None = None
+    ) -> DavisScope:
         source = source or self._clips_path
         if source is None:
             raise ValueError(
@@ -424,7 +433,9 @@ class DavisTaskDataPath:
             )
         return scope
 
-    def training_dataset(self, scope: object, params: EpochSamplingParams) -> Dataset[Any]:
+    def training_dataset(
+        self, scope: object, params: EpochSamplingParams
+    ) -> Dataset[Any]:
         s = self._scope(scope)
         if params.train_portion is not None and params.train_portion < 1.0:
             raise ValueError(
@@ -435,7 +446,9 @@ class DavisTaskDataPath:
         rows = s.rows if params.max_samples is None else s.rows[: params.max_samples]
         return _DavisWindowDataset(rows, Path(params.data_dir))
 
-    def validation_dataset(self, scope: object, params: EvalMaterializationParams) -> Dataset[Any]:
+    def validation_dataset(
+        self, scope: object, params: EvalMaterializationParams
+    ) -> Dataset[Any]:
         s = self._scope(scope)
         return _DavisWindowDataset(s.rows, Path(params.data_dir))
 
@@ -470,8 +483,16 @@ class DavisTaskDataPath:
         with np.load(path) as handle:
             return {key: handle[key] for key in handle.files}
 
+    def evaluation_truth(
+        self, scope: object, data_dir: str | Path
+    ) -> dict[str, np.ndarray]:
+        """Decode evaluation targets through this task's single window reader."""
+        return truth_windows(data_dir, self._scope(scope).rows)
 
-def truth_windows(data_dir: str | Path, clips: Sequence[DavisClip]) -> dict[str, np.ndarray]:
+
+def truth_windows(
+    data_dir: str | Path, clips: Sequence[DavisClip]
+) -> dict[str, np.ndarray]:
     """``{clip_key: target [3,4,128,224]}`` — the evaluation ground truth,
     decoded through the SAME frozen transform the reader uses (one
     authority; the metric never re-derives pixels)."""

@@ -104,4 +104,6 @@ exec bash "$LAUNCHER" \
     --formal_eval_portion 0.02 \
     --trial_time_budget_minutes 20 \
     --formal_time_budget_minutes 60 \
+    --trial_time_admission_source measured \
+    --formal_time_admission_source measured \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

@@ -12,26 +12,25 @@
 #   x9    with-prior-art | without-prior-art. The #255 prior-art contrast
 #         fleet: launch_band_fleet.sh -> launch_prior_baseline_experiment.sh,
 #         FOUR CO-RESIDENT band chains on ONE card (h100_posture.env v3).
-#   gold  goldpod. The official campaign: run_gold_campaign.sh ->
+#   gold  goldpod | blindpod. The official campaign: run_gold_campaign.sh ->
 #         stage1_search.sh -> stage1_run_band.sh, EXCLUSIVE_SINGLE_BAND
-#         residency, ONE band chain per card (operator hardware disposition
-#         2026-08-26, _gold_campaign_lib.sh:gold_band_gpu).
+#         residency, ONE selected scientific band per device. A four-host
+#         deployment selects one band per host and uses local device 0; the
+#         one-host fallback keeps the historical devices 0..3.
 #
-#   Both topologies build the SAME per-band workspace
-#   "{root}/{arm}_band{band}" (launch_prior_baseline_experiment.sh:222 and
-#   stage1_run_band.sh:122), so the machine/environment rows and the
-#   cold-start row are shared verbatim. Rows that INVOKE the X9 launcher
+#   X9 uses "{root}/{arm}_band{band}". Gold uses the campaign-qualified
+#   "{root}/{arm}_{campaign_id}_band{band}". The workspace authority below
+#   resolves the correct shape before the cold-start or resume check. Rows
+#   that INVOKE the X9 launcher
 #   (R6, R7) or that check the X9 CO-RESIDENCY posture (R4) do not describe
 #   the campaign topology: under a gold arm they are SKIPPED BY NAME and
 #   never reported as PASS. The gold launcher's own refusals point HERE for
 #   the mount and library checks (_gold_campaign_lib.sh:326 for R1c,
 #   :626 for R1), so those rows must be reachable with --arm goldpod.
 #
-#   NOT in this script's remit: gold-vs-blind treatment symmetry. R7 is the
-#   #255 X9 arm-symmetry gate (campaign_arm_symmetry.py, whose arm
-#   vocabulary and lit-review expectation are X9's); the campaign's own
-#   Gold<->Blind symmetry is a separate blind-launch prerequisite, and
-#   'blindpod' is therefore refused here by name rather than half-served.
+#   Gold and Blind share every machine, staging, identity, and state check.
+#   The arm authority requires advice for Gold and refuses advice bytes or an
+#   inherited advice identity for Blind. R7 remains an X9-only comparison.
 #
 # Rows:
 #   R1  workspace root exists / writable / on a PERSISTENT mount.
@@ -47,6 +46,10 @@
 #       typically the ephemeral container overlay, so pod loss would
 #       silently destroy the very artifacts H100 qualification produces.
 #       Converts R8's former RETAIN-by-design assumption into a check.
+#   R1d launch-blocking free-space threshold. Gold defaults to 3072 GiB: a
+#       conservative binary-unit ceiling over the approximately 3.0 TB
+#       two-arm retained-volume estimate while remaining below the provisioned
+#       4 TiB shared filesystem. Deployment may raise it explicitly.
 #   R1c generated-capability library root DECLARED and on a PERSISTENT
 #       mount (F-GENLIB-WIRE-1; same fstype logic as R1/R1b). The root is
 #       resolved by CALLING the production authority
@@ -60,17 +63,16 @@
 #       the next arm's proposer surface. R8 cannot see this: it globs the
 #       CHECKOUT dir only and is blind to this root, which is exactly how
 #       the contamination went unnoticed.
-#   R2  authoritative code revision: `git rev-parse HEAD` printed
-#       (launch-packet row `repo_sha=`), compared against --revision
-#       (prefix >= 7 chars accepted); a DIRTY tree FAILS — commit first,
-#       a campaign must be attributable to one SHA.
+#   R2  authoritative revision pair: siderius-exp is compared against
+#       --revision and the explicit SIDERIUS checkout against
+#       --siderius-revision. Either dirty tree or mismatch fails.
 #   R2b import resolution: a neutral-cwd probe proves the PINNED
 #       (PYTHONPATH=this tree) child resolves hyperparam_tuning inside this
 #       tree with the #299-tolerant loss_history, and reports what an
 #       UNPINNED child would resolve (the editable-install E1 trap).
-#   R3  dataset availability: abra_training_NNNN.h5 + abra_validation_NNNN.h5
-#       for every index of every band (0..19) under the resolved data dir
-#       (--data_dir > tidmad_data_config.yaml via execute_tools.data_paths).
+#   R3  selected-band staging integrity: both raw HDF5 splits for the target
+#       band, the scoring ruler, and exact Q3 checksums under explicit
+#       --data_dir. Other bands need not be staged on a single-band host.
 #   R4  X9 ARMS ONLY. Posture arithmetic (sourced from h100_posture.env):
 #       chains x per-chain VRAM + min headroom must fit the card total
 #       (pure function, unit-tested); and H100_CORESIDENCY_FACTOR must be
@@ -79,13 +81,10 @@
 #       CO-RESIDENT chains on one card; the campaign runs one chain per
 #       card and its launcher never reads h100_posture.env, so under a gold
 #       arm this row is SKIPPED rather than asserted about a posture the
-#       campaign does not adopt. The posture file is still SOURCED for
-#       every arm, because R5's host-RAM expectation lives in it.
-#   R5  host-RAM headroom: MemAvailable >= expected 4-chain anon-RSS +
-#       headroom (both posture rows; the 47 GB figure is the recorded
-#       4-chain inspection OOM). Applies to every arm: both topologies fork
-#       FOUR concurrent band chains onto ONE host, and the host has one RAM
-#       pool however the cards are divided.
+#       campaign does not adopt. Gold does not require the X9 posture file.
+#   R5  X9 host-RAM headroom. It is skipped for a selected single-band Gold
+#       host because its only calibrated threshold describes four co-resident
+#       X9 chains and must not be presented as a Gold measurement.
 #   R6  X9 ARMS ONLY. arm+band identity coherence: the band launcher's --dry-run for
 #       EVERY band of --arm resolves rc=0 with the expected
 #       experiment_arm, derived run_name, and the DS8 pair
@@ -150,7 +149,7 @@
 #   R8  cold-start preconditions (#260 checklist, gate_testing_standard.md):
 #       item 1 per-band workspaces absent/empty — resolved through
 #       preflight_band_workspace for the arm ACTUALLY under check, so a
-#       gold preflight inspects goldpod_band<band> and can never report a
+#       gold preflight inspects goldpod_v015_band<band> and can never report a
 #       cleanliness verdict about a different arm's directory; item 3
 #       agent_generated/models/*.py + _capability_index.json absent;
 #       items 4 (workspace plugins/) covered by item 1; items 2/7
@@ -158,18 +157,30 @@
 #       because the campaign's advice file is goldpod's DECLARED treatment
 #       (_gold_campaign_lib.sh:511) and not a contaminant; items 5/6
 #       (root-paper cache, runtime calibration) RETAIN by design — INFO.
+#       --resume replaces the empty-workspace rule with campaign/arm
+#       attribution, run-state integrity checks, and a next-iteration report.
 #   R9  LLM reachability + concurrency smoke (campaign_llm_smoke.py):
 #       a bounded burst of 8 parallel one-word completions through the
 #       repo's own config loading; success count + p95 latency. NOT a
 #       quota guarantee (provider-side limits act on the sustained
 #       pattern) — skip with --skip_llm_smoke for offline rehearsals.
+#   R10 terminal-evaluation campaign scope. The writer remains a reusable
+#       mechanism, but this campaign reports Composed Best and Strict Best.
+#       A Strict Best winner spans four provenance workspaces, while the
+#       current TerminalChampion contract records one; fabricating a single
+#       provenance root is refused by declaring terminal evaluation out of
+#       scope until a genuine multi-root provenance contract exists.
 #
 # Usage (campaign host):
-#   bash sdsc_submission_scripts/campaign_preflight.sh \
+#   bash campaigns/tidmad_gold/scripts/campaign_preflight.sh \
 #       --workspace-root /persist/siderius_campaign \
-#       --arm with-prior-art|without-prior-art|goldpod \
-#       --revision <expected sha> \
-#       [--data_dir DIR] [--llm_config FILE] [--skip_llm_smoke] \
+#       --arm with-prior-art|without-prior-art|goldpod|blindpod \
+#       --revision <expected exp sha> \
+#       --siderius-checkout /path/to/SIDERIUS \
+#       --siderius-revision <expected framework sha> \
+#       [--data_dir DIR] [--only BAND] [--resume] \
+#       [--minimum-free-gib N=3072] [--llm_config FILE] [--skip_llm_smoke] \
+#       [--gold_advice_file FILE] [--gold_advice_sha256 SHA256] \
 #       [--symmetry-band 0-3] \
 #       -- --healthgate_mode blocking --result_authority scientific \
 #          [more chain flags the real launch will pass...]
@@ -191,13 +202,20 @@
 set -euo pipefail
 
 PF_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PF_PROJECT_DIR="$(cd "${PF_SCRIPT_DIR}/.." && pwd)"
+PF_CAMPAIGN_DIR="$(cd "${PF_SCRIPT_DIR}/.." && pwd)"
+PF_EXP_ROOT="$(cd "${PF_CAMPAIGN_DIR}/../.." && pwd)"
+PF_SIDERIUS_ROOT=""
 PF_LAUNCHER="${PF_SCRIPT_DIR}/launch_prior_baseline_experiment.sh"
 PF_POSTURE="${PF_SCRIPT_DIR}/h100_posture.env"
 PF_SYMMETRY="${PF_SCRIPT_DIR}/campaign_arm_symmetry.py"
 PF_SURFACE="${PF_SCRIPT_DIR}/campaign_arm_surface.py"
 PF_SMOKE="${PF_SCRIPT_DIR}/campaign_llm_smoke.py"
 PF_PROBE="${PF_SCRIPT_DIR}/gpu_c_coresidency_probe.sh"
+PF_DATA_MANIFEST="${PF_CAMPAIGN_DIR}/inputs/q3_data_manifest.sha256"
+PF_DATA_MANIFEST_SHA256="39270b4578206db86d3aeb7e31ef1134e65fc1e375ce3f7f00e857fad633ad85"
+GOLD_MINIMUM_FREE_GIB_DEFAULT=3072
+# shellcheck source=_gold_campaign_lib.sh
+source "${PF_SCRIPT_DIR}/_gold_campaign_lib.sh"
 
 PF_BANDS=("0-3" "4-9" "10-14" "15-19")
 # Expected DS8 pairing per band. AUTHORITY: the band launcher's own map —
@@ -210,6 +228,57 @@ pf_band_files() {
         15-19) echo "15,16,17,18,19" ;;
         *)     return 1 ;;
     esac
+}
+
+# Print one diagnostic per missing launch input and return non-zero when the
+# selected band set is incomplete.  This is deliberately separate from row
+# bookkeeping so deployment tests can exercise the exact staging contract
+# without running GPU, LLM or filesystem-posture checks.
+preflight_missing_data_inputs() {
+    local data_dir="$1" require_anchor="$2"
+    shift 2
+    local missing=0 band idx filename
+    for band in "$@"; do
+        for idx in $(echo "$(pf_band_files "$band")" | tr ',' ' '); do
+            for filename in \
+                "abra_training_$(printf '%04d' "$idx").h5" \
+                "abra_validation_$(printf '%04d' "$idx").h5"; do
+                if [ ! -f "${data_dir}/${filename}" ]; then
+                    printf 'band %s missing under %s: %s\n' "$band" "$data_dir" "$filename"
+                    missing=1
+                fi
+            done
+        done
+    done
+    if [ "$require_anchor" = "true" ] && [ ! -f "${data_dir}/segment_anchors.json" ]; then
+        printf 'scoring ruler missing under %s: segment_anchors.json\n' "$data_dir"
+        missing=1
+    fi
+    return "$missing"
+}
+
+preflight_data_checksum_errors() {
+    local data_dir="$1" manifest="$2"
+    shift 2
+    local band idx filename expected actual
+    for band in "$@"; do
+        for idx in $(echo "$(pf_band_files "$band")" | tr ',' ' '); do
+            for filename in \
+                "abra_training_$(printf '%04d' "$idx").h5" \
+                "abra_validation_$(printf '%04d' "$idx").h5"; do
+                expected="$(awk -v name="$filename" '$2 == name {print $1}' "$manifest")"
+                if [ -z "$expected" ]; then
+                    printf 'checksum manifest has no entry for %s\n' "$filename"
+                    continue
+                fi
+                actual="$(sha256sum "${data_dir}/${filename}" | awk '{print $1}')"
+                if [ "$actual" != "$expected" ]; then
+                    printf 'checksum mismatch for %s: expected %s, got %s\n' \
+                        "$filename" "$expected" "$actual"
+                fi
+            done
+        done
+    done
 }
 
 # --- pure, unit-testable check arithmetic ----------------------------------
@@ -232,6 +301,50 @@ preflight_host_ram_check() {
     [ "$memavailable_gib" -ge "$required" ]
 }
 
+# Require the filesystem containing PATH to have at least MINIMUM_GIB free.
+# The caller owns the threshold because qualification, Stage 1, and Stage 3
+# have different retention envelopes; preflight owns only the measurement.
+preflight_free_space_check() {
+    local path="$1" minimum_gib="$2" available_kib available_gib
+    available_kib="$(df -Pk "$path" 2>/dev/null | awk 'NR==2 {print $4}')"
+    if ! [[ "$available_kib" =~ ^[0-9]+$ ]]; then
+        printf 'could not measure available bytes for %s\n' "$path"
+        return 1
+    fi
+    available_gib=$((available_kib / 1024 / 1024))
+    printf 'available=%s GiB required=%s GiB path=%s\n' \
+        "$available_gib" "$minimum_gib" "$path"
+    [ "$available_gib" -ge "$minimum_gib" ]
+}
+
+# Print the exact framework revision pinned by this experiment checkout.
+# The operator-supplied revision is evidence only after it agrees with this
+# repository-owned authority; otherwise two individually clean checkouts can
+# still form a pair the campaign never qualified.
+preflight_pinned_siderius_revision() {
+    local pin_file="${PF_EXP_ROOT}/SIDERIUS_REVISION" pinned
+    if [ ! -f "$pin_file" ]; then
+        printf 'experiment checkout lacks SIDERIUS_REVISION: %s\n' "$pin_file"
+        return 1
+    fi
+    pinned="$(tr -d '[:space:]' < "$pin_file")"
+    if ! [[ "$pinned" =~ ^[0-9a-f]{40}$ ]]; then
+        printf 'experiment SIDERIUS_REVISION is not a full SHA: %s\n' "${pinned:-empty}"
+        return 1
+    fi
+    printf '%s\n' "$pinned"
+}
+
+preflight_siderius_pin_matches() {
+    local supplied_revision="$1" pinned_revision
+    pinned_revision="$(preflight_pinned_siderius_revision)" || return 1
+    if [ "$supplied_revision" != "$pinned_revision" ]; then
+        printf '%s\n' "SIDERIUS pin mismatch: supplied=$supplied_revision exp_pin=$pinned_revision"
+        return 1
+    fi
+    printf '%s\n' "$pinned_revision"
+}
+
 # The per-band chain workspace ROOT/ARM_bandBAND, for the arm actually
 # under check. AUTHORITY: both launchers build this same path — the X9
 # band launcher at launch_prior_baseline_experiment.sh:222 and the campaign
@@ -249,7 +362,49 @@ preflight_host_ram_check() {
 # its resolved value.
 preflight_band_workspace() {
     local root="$1" arm="$2" band="$3"
-    printf '%s\n' "${root%/}/${arm}_band${band}"
+    case "$arm" in
+        goldpod|blindpod)
+            printf '%s\n' "${root%/}/${arm}_${GOLD_CAMPAIGN_ID}_band${band}" ;;
+        *)
+            printf '%s\n' "${root%/}/${arm}_band${band}" ;;
+    esac
+}
+
+preflight_resume_workspace() {
+    local python="$1" inspector="$2" workspace="$3" arm="$4"
+    if [ ! -x "$python" ]; then
+        printf 'resume Python is not executable: %s\n' "$python"
+        return 1
+    fi
+    if [ ! -f "$inspector" ]; then
+        printf 'SIDERIUS run-state inspector is absent: %s\n' "$inspector"
+        return 1
+    fi
+    if [ ! -d "$workspace" ]; then
+        printf 'workspace is absent: %s\n' "$workspace"
+        return 1
+    fi
+
+    local report rc=0 lock next_iter
+    report="$($python "$inspector" --layout chain --workspace "$workspace" 2>&1)" || rc=$?
+    if [ "$rc" -ne 0 ] || echo "$report" | grep -Eq 'CORRUPT=[1-9]|TAMPERED=[1-9]'; then
+        printf 'state integrity refused: %s\n' "$(echo "$report" | tail -3 | tr '\n' ' ')"
+        return 1
+    fi
+
+    lock="${workspace}/run_invariants_lock.json"
+    if [ ! -f "$lock" ] || ! grep -Eq "\"experiment_arm\"[[:space:]]*:[[:space:]]*\"${arm}\"" "$lock"; then
+        printf "workspace does not carry arm %s in %s\n" "$arm" "$lock"
+        return 1
+    fi
+
+    rc=0
+    next_iter="$($python "$inspector" --layout chain --workspace "$workspace" --next-iter 2>/dev/null)" || rc=$?
+    if [ "$rc" -ne 0 ] || ! [[ "$next_iter" =~ ^[0-9]+$ ]]; then
+        printf 'could not resolve a safe next iteration\n'
+        return 1
+    fi
+    printf '%s\n' "$next_iter"
 }
 
 # The arm's baseline_isolation, READ from that arm's own resolved-config
@@ -347,9 +502,9 @@ preflight_evidence_state() {
 # another clone's templates describes prompts this launch will not send.
 pf_capture_surface() {
     local arm="$1" isolation="$2" out="$3"
-    (cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+    (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
         "$PF_PY" "$PF_SURFACE" --arm "$arm" --baseline-isolation "$isolation" \
-        --project-dir "$PF_PROJECT_DIR" --out "$out")
+        --project-dir "$PF_SIDERIUS_ROOT" --out "$out")
 }
 
 # --- row bookkeeping --------------------------------------------------------
@@ -371,17 +526,19 @@ pf_resolve_python() {
         PF_PY="$SIDERIUS_PYTHON"
     elif [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
         PF_PY="$VIRTUAL_ENV/bin/python"
-    elif [ -x "${PF_PROJECT_DIR}/.venv/bin/python" ]; then
-        PF_PY="${PF_PROJECT_DIR}/.venv/bin/python"
+    elif [ -x "${PF_SIDERIUS_ROOT}/.venv/bin/python" ]; then
+        PF_PY="${PF_SIDERIUS_ROOT}/.venv/bin/python"
     else
-        echo "ERROR: no project python (SIDERIUS_PYTHON / \$VIRTUAL_ENV / ${PF_PROJECT_DIR}/.venv)." >&2
+        echo "ERROR: no SIDERIUS checkout python (SIDERIUS_PYTHON / \$VIRTUAL_ENV / ${PF_SIDERIUS_ROOT}/.venv)." >&2
         return 1
     fi
 }
 
 pf_main() {
-    local WORKSPACE_ROOT="" ARM="" REVISION="" DATA_DIR="" LLM_CONFIG=""
-    local SKIP_LLM=0 SYMMETRY_BAND="0-3"
+    local WORKSPACE_ROOT="" ARM="" REVISION="" SIDERIUS_REVISION="" DATA_DIR="" LLM_CONFIG="" ONLY=""
+    local SIDERIUS_CHECKOUT_ARG="" MINIMUM_FREE_GIB="$GOLD_MINIMUM_FREE_GIB_DEFAULT"
+    local ADVICE_FILE="" ADVICE_SHA256=""
+    local SKIP_LLM=0 RESUME_MODE=0 SYMMETRY_BAND="0-3"
     local PASSTHROUGH=()
 
     while [[ $# -gt 0 ]]; do
@@ -389,9 +546,16 @@ pf_main() {
             --workspace-root|--workspace_root) WORKSPACE_ROOT="$2"; shift 2 ;;
             --arm)            ARM="$2"; shift 2 ;;
             --revision)       REVISION="$2"; shift 2 ;;
+            --siderius-revision) SIDERIUS_REVISION="$2"; shift 2 ;;
+            --siderius-checkout) SIDERIUS_CHECKOUT_ARG="$2"; shift 2 ;;
             --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
+            --only|--band)    ONLY="$2"; shift 2 ;;
+            --gold_advice_file) ADVICE_FILE="$2"; shift 2 ;;
+            --gold_advice_sha256) ADVICE_SHA256="$2"; shift 2 ;;
             --llm_config|--llm-config) LLM_CONFIG="$2"; shift 2 ;;
             --skip_llm_smoke|--skip-llm-smoke) SKIP_LLM=1; shift ;;
+            --resume)          RESUME_MODE=1; shift ;;
+            --minimum-free-gib) MINIMUM_FREE_GIB="$2"; shift 2 ;;
             --symmetry-band|--symmetry_band) SYMMETRY_BAND="$2"; shift 2 ;;
             # Print the whole header block: from line 2 until the first
             # line that is not a comment. A hardcoded end line silently
@@ -404,8 +568,21 @@ pf_main() {
         esac
     done
 
-    if [ -z "$WORKSPACE_ROOT" ] || [ -z "$ARM" ] || [ -z "$REVISION" ]; then
-        echo "Required: --workspace-root DIR --arm ARM --revision SHA (see --help)" >&2
+    if [ -z "$WORKSPACE_ROOT" ] || [ -z "$ARM" ] || [ -z "$REVISION" ] \
+        || [ -z "$SIDERIUS_REVISION" ] || [ -z "$SIDERIUS_CHECKOUT_ARG" ]; then
+        echo "Required: --workspace-root DIR --arm ARM --revision EXP_SHA --siderius-checkout DIR --siderius-revision SHA (see --help)" >&2
+        return 1
+    fi
+    PF_SIDERIUS_ROOT="$(cd "$SIDERIUS_CHECKOUT_ARG" 2>/dev/null && pwd)" || {
+        echo "ERROR: --siderius-checkout is not an existing directory: $SIDERIUS_CHECKOUT_ARG" >&2
+        return 1
+    }
+    if [ ! -f "${PF_SIDERIUS_ROOT}/sdsc_submission_scripts/_import_resolution_probe.py" ]; then
+        echo "ERROR: --siderius-checkout lacks the import-resolution probe: ${PF_SIDERIUS_ROOT}" >&2
+        return 1
+    fi
+    if [ -n "$MINIMUM_FREE_GIB" ] && ! [[ "$MINIMUM_FREE_GIB" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: --minimum-free-gib must be a nonnegative integer" >&2
         return 1
     fi
     # ARM_KIND selects the TOPOLOGY, never a per-arm special case: the
@@ -414,21 +591,23 @@ pf_main() {
     local ARM_KIND=""
     case "$ARM" in
         with-prior-art|without-prior-art) ARM_KIND="x9" ;;
-        goldpod)                          ARM_KIND="gold" ;;
-        blindpod)
-            echo "ERROR: --arm 'blindpod' is not accepted here yet." >&2
-            echo "  The campaign arm vocabulary is goldpod|blindpod" >&2
-            echo "  (_gold_campaign_lib.sh GOLD_ARMS), but a blind launch is gated on the" >&2
-            echo "  separate Gold<->Blind treatment-symmetry prerequisite, which this" >&2
-            echo "  preflight does not check and R7 cannot be repointed at (see the header" >&2
-            echo "  'NOT in this script's remit'). Accepting the label here would report a" >&2
-            echo "  blind launch as preflighted while the check that conditions it does not" >&2
-            echo "  exist. Run the goldpod preflight for the machine-level rows." >&2
-            return 1 ;;
+        goldpod|blindpod)                 ARM_KIND="gold" ;;
         *)
-            echo "ERROR: unknown --arm '$ARM' (accepted: with-prior-art, without-prior-art, goldpod)" >&2
+            echo "ERROR: unknown --arm '$ARM' (accepted: with-prior-art, without-prior-art, goldpod, blindpod)" >&2
             return 1 ;;
     esac
+    if [ "$ARM_KIND" = "gold" ]; then
+        gold_arm_args "$ARM" "$ADVICE_FILE" "$ADVICE_SHA256" || return 1
+        local SELECTED
+        SELECTED="$(gold_select_bands "$ONLY")" || return 1
+        PF_BANDS=()
+        while IFS= read -r tok; do
+            [ -n "$tok" ] && PF_BANDS+=("$tok")
+        done <<< "$SELECTED"
+    elif [ -n "$ONLY" ]; then
+        echo "ERROR: --only/--band is supported only for goldpod or blindpod preflight" >&2
+        return 1
+    fi
     # The X9 symmetry partner. EMPTY for a gold arm: there is no second arm
     # this script compares against, and inventing one is how a campaign
     # preflight ends up reporting on a fleet it is not launching.
@@ -481,6 +660,13 @@ pf_main() {
         esac
     fi
 
+    local CAPACITY
+    if CAPACITY="$(preflight_free_space_check "$WORKSPACE_ROOT" "$MINIMUM_FREE_GIB")"; then
+        pf_pass "R1d workspace capacity: $CAPACITY"
+    else
+        pf_fail "R1d workspace capacity insufficient or unmeasurable: $CAPACITY"
+    fi
+
     # ---- R1b: calibration store persistence (H100-prep finding) ------------
     # R1's fstype logic applied to the per-device calibration directory —
     # the resolution mirrors calibration_dir() in
@@ -518,7 +704,7 @@ pf_main() {
     # itself REFUSED the value (a relative override), which is a FAIL here
     # rather than a silent fallback.
     local GENLIB_RAW GENLIB_SOURCE GENLIB_ROOT
-    if GENLIB_RAW="$(cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+    if GENLIB_RAW="$(cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
         "$PF_PY" -c 'from core.generated_library import resolve_generated_library as r; x = r(); print(x.source + "\t" + x.root)' \
         2>/dev/null | tail -1)" && [ -n "$GENLIB_RAW" ]; then
         GENLIB_SOURCE="${GENLIB_RAW%%$'\t'*}"
@@ -552,11 +738,11 @@ pf_main() {
 
     # ---- R2: authoritative revision ----------------------------------------
     local REPO_SHA DIRTY
-    REPO_SHA="$(git -C "$PF_PROJECT_DIR" rev-parse HEAD 2>/dev/null || echo unknown)"
-    DIRTY="$(git -C "$PF_PROJECT_DIR" status --porcelain 2>/dev/null || true)"
+    REPO_SHA="$(git -C "$PF_EXP_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+    DIRTY="$(git -C "$PF_EXP_ROOT" status --porcelain 2>/dev/null || true)"
     echo "[preflight] repo_sha=${REPO_SHA}"
     if [ "$REPO_SHA" = "unknown" ]; then
-        pf_fail "R2 not a git checkout: $PF_PROJECT_DIR"
+        pf_fail "R2 siderius-exp root is not a git checkout: $PF_EXP_ROOT"
     elif [ "${#REVISION}" -lt 7 ]; then
         pf_fail "R2 --revision '$REVISION' too short (>= 7 hex chars)"
     elif [[ "$REPO_SHA" != "$REVISION"* ]]; then
@@ -564,7 +750,22 @@ pf_main() {
     elif [ -n "$DIRTY" ]; then
         pf_fail "R2 dirty tree — a campaign must be attributable to one SHA; commit first: $(echo "$DIRTY" | head -3 | tr '\n' ' ')"
     else
-        pf_pass "R2 revision $REPO_SHA matches --revision and the tree is clean"
+        pf_pass "R2 siderius-exp revision $REPO_SHA matches --revision and the tree is clean"
+    fi
+
+    local SIDERIUS_SHA SIDERIUS_DIRTY PINNED_SIDERIUS_REVISION=""
+    SIDERIUS_SHA="$(git -C "$PF_SIDERIUS_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+    SIDERIUS_DIRTY="$(git -C "$PF_SIDERIUS_ROOT" status --porcelain 2>/dev/null || true)"
+    if ! PINNED_SIDERIUS_REVISION="$(preflight_siderius_pin_matches "$SIDERIUS_REVISION")"; then
+        pf_fail "R2 SIDERIUS pin unavailable or invalid: $PINNED_SIDERIUS_REVISION"
+    elif [ "$SIDERIUS_SHA" = "unknown" ]; then
+        pf_fail "R2 framework root is not a git checkout: $PF_SIDERIUS_ROOT"
+    elif [ "$SIDERIUS_SHA" != "$PINNED_SIDERIUS_REVISION" ]; then
+        pf_fail "R2 SIDERIUS revision mismatch: HEAD=$SIDERIUS_SHA exp_pin=$PINNED_SIDERIUS_REVISION"
+    elif [ -n "$SIDERIUS_DIRTY" ]; then
+        pf_fail "R2 SIDERIUS tree is dirty: $(echo "$SIDERIUS_DIRTY" | head -3 | tr '\n' ' ')"
+    else
+        pf_pass "R2 SIDERIUS revision $SIDERIUS_SHA matches --siderius-revision and the tree is clean"
     fi
 
     # ---- R2b: import resolution (P0 launch blocker, supervisor 2026-08-25) --
@@ -572,86 +773,90 @@ pf_main() {
     # whose cwd leaves this tree silently imports THAT tree's code (the E1
     # trap — concretely, a campaign without #299's divergence repair while
     # its git SHA says otherwise). The launchers export
-    # PYTHONPATH=$PF_PROJECT_DIR; this row PROVES the pinned resolution from
+    # PYTHONPATH=$PF_SIDERIUS_ROOT; this row PROVES the pinned resolution from
     # a NEUTRAL cwd (a copied probe file — `-c` is blind, cwd sits on
     # sys.path) and REPORTS what an unpinned child would resolve.
     local PROBE_TMP
     PROBE_TMP="$(mktemp -d)"
-    cp "${PF_SCRIPT_DIR}/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
+    cp "${PF_SIDERIUS_ROOT}/sdsc_submission_scripts/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
     local UNPINNED
-    UNPINNED="$(cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_PROJECT_DIR" 2>/dev/null | head -1 || true)"
+    UNPINNED="$(cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" 2>/dev/null | head -1 || true)"
     echo "[preflight] R2b unpinned child would resolve: ${UNPINNED#*-> }"
-    if (cd "$PROBE_TMP" && PYTHONPATH="$PF_PROJECT_DIR" "$PF_PY" probe.py "$PF_PROJECT_DIR" >/dev/null 2>&1); then
+    if (cd "$PROBE_TMP" && PYTHONPATH="$PF_SIDERIUS_ROOT" "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" >/dev/null 2>&1); then
         pf_pass "R2b pinned import resolution: hyperparam_tuning resolves in this tree with the #299-tolerant loss_history"
     else
-        (cd "$PROBE_TMP" && PYTHONPATH="$PF_PROJECT_DIR" "$PF_PY" probe.py "$PF_PROJECT_DIR") 2>&1 | tail -3 >&2 || true
+        (cd "$PROBE_TMP" && PYTHONPATH="$PF_SIDERIUS_ROOT" "$PF_PY" probe.py "$PF_SIDERIUS_ROOT") 2>&1 | tail -3 >&2 || true
         pf_fail "R2b import resolution: the PINNED probe failed — chains would execute another tree's code (see [import-probe] lines)"
     fi
     rm -rf "$PROBE_TMP"
 
     # ---- R3: dataset availability ------------------------------------------
-    if [ -z "$DATA_DIR" ]; then
-        DATA_DIR="$(cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
-            "$PF_PY" -c 'from execute_tools.data_paths import TIDMAD_DATA_DIR; print(TIDMAD_DATA_DIR)' \
-            2>/dev/null | tail -1 || true)"
-    fi
     if [ -z "$DATA_DIR" ] || [ ! -d "$DATA_DIR" ]; then
-        pf_fail "R3 dataset dir unresolved or missing (--data_dir / tidmad_data_config.yaml): '${DATA_DIR:-}'"
+        pf_fail "R3 dataset dir unresolved or missing: pass --data_dir <existing-directory>"
     else
-        local MISSING=0 band f idx
-        for band in "${PF_BANDS[@]}"; do
-            local BAND_MISSING=()
-            for idx in $(echo "$(pf_band_files "$band")" | tr ',' ' '); do
-                for f in "abra_training_$(printf '%04d' "$idx").h5" "abra_validation_$(printf '%04d' "$idx").h5"; do
-                    [ -f "${DATA_DIR}/${f}" ] || BAND_MISSING+=("$f")
-                done
-            done
-            if [ "${#BAND_MISSING[@]}" -gt 0 ]; then
-                pf_fail "R3 band $band missing under $DATA_DIR: ${BAND_MISSING[*]}"
-                MISSING=1
+        local REQUIRE_ANCHOR=false INPUT_ERRORS=""
+        [ "$ARM_KIND" = "gold" ] && REQUIRE_ANCHOR=true
+        if INPUT_ERRORS="$(preflight_missing_data_inputs "$DATA_DIR" "$REQUIRE_ANCHOR" "${PF_BANDS[@]}")"; then
+            local MANIFEST_DIGEST CHECKSUM_ERRORS
+            MANIFEST_DIGEST="$(sha256sum "$PF_DATA_MANIFEST" 2>/dev/null | awk '{print $1}')"
+            if [ "$MANIFEST_DIGEST" != "$PF_DATA_MANIFEST_SHA256" ]; then
+                pf_fail "R3 Q3 manifest identity mismatch: expected $PF_DATA_MANIFEST_SHA256, got ${MANIFEST_DIGEST:-missing}"
+            else
+                CHECKSUM_ERRORS="$(preflight_data_checksum_errors "$DATA_DIR" "$PF_DATA_MANIFEST" "${PF_BANDS[@]}")"
+                if [ -n "$CHECKSUM_ERRORS" ]; then
+                    while IFS= read -r tok; do
+                        [ -n "$tok" ] && pf_fail "R3 $tok"
+                    done <<< "$CHECKSUM_ERRORS"
+                else
+                    pf_pass "R3 selected band inputs match the authoritative Q3 checksums and the scoring ruler is present under $DATA_DIR"
+                fi
             fi
-        done
-        [ "$MISSING" -eq 0 ] && pf_pass "R3 all 20 file indices (training+validation pairs) present under $DATA_DIR"
+        else
+            while IFS= read -r tok; do
+                [ -n "$tok" ] && pf_fail "R3 $tok"
+            done <<< "$INPUT_ERRORS"
+        fi
     fi
 
     # ---- R4: posture arithmetic + coresidency factor -----------------------
-    # The posture file is SOURCED for every arm — R5's host-RAM expectation
-    # lives in it, and a gold arm that skipped the source would silently fall
-    # back to R5's hardcoded defaults and stop tracking a posture bump. Only
-    # R4's own two verdicts are X9 co-residency claims.
-    if [ ! -f "$PF_POSTURE" ]; then
+    # This posture belongs only to the X9 co-residency experiment. Applying
+    # its four-chain thresholds to a one-band Gold host would be a false
+    # launch refusal, not conservative validation.
+    if [ "$ARM_KIND" = "gold" ]; then
+        pf_skip "R4 X9 co-residency posture is not applicable to the one-band-per-device Gold campaign"
+    elif [ ! -f "$PF_POSTURE" ]; then
         pf_fail "R4 posture file missing: $PF_POSTURE"
     else
         # shellcheck disable=SC1090
         source "$PF_POSTURE"
-        if [ "$ARM_KIND" = "gold" ]; then
-            pf_skip "R4 co-residency posture NOT APPLICABLE to arm $ARM — both halves of this row describe ${H100_CORESIDENT_CHAINS:-4} chains sharing ONE card (h100_posture.env v${H100_POSTURE_VERSION:-?}); the campaign runs EXCLUSIVE_SINGLE_BAND, one band chain per card (_gold_campaign_lib.sh:gold_band_gpu), and its launcher never reads h100_posture.env, so neither the aggregate VRAM arithmetic nor the H100_CORESIDENCY_FACTOR refusal it predicts applies. R5's host-RAM row DOES apply and reads this file"
+        local ARITH
+        if ARITH="$(preflight_admission_arithmetic \
+                "${H100_CORESIDENT_CHAINS:-4}" "${H100_PER_CHAIN_VRAM_GB:-18}" \
+                "${H100_CARD_TOTAL_VRAM_GB:-80}" "${H100_MIN_CARD_VRAM_HEADROOM_GB:-6}")"; then
+            pf_pass "R4 admission arithmetic fits: $ARITH"
         else
-            local ARITH
-            if ARITH="$(preflight_admission_arithmetic \
-                    "${H100_CORESIDENT_CHAINS:-4}" "${H100_PER_CHAIN_VRAM_GB:-18}" \
-                    "${H100_CARD_TOTAL_VRAM_GB:-80}" "${H100_MIN_CARD_VRAM_HEADROOM_GB:-6}")"; then
-                pf_pass "R4 admission arithmetic fits: $ARITH"
-            else
-                pf_fail "R4 admission arithmetic does NOT fit: $ARITH"
-            fi
-            if [ -n "${H100_CORESIDENCY_FACTOR:-}" ]; then
-                pf_pass "R4 coresidency factor filled: H100_CORESIDENCY_FACTOR=${H100_CORESIDENCY_FACTOR} (posture v${H100_POSTURE_VERSION:-?})"
-            else
-                pf_fail "R4 H100_CORESIDENCY_FACTOR is EMPTY — the band launcher will refuse --h100 campaign launches; run: bash $PF_PROBE"
-            fi
+            pf_fail "R4 admission arithmetic does NOT fit: $ARITH"
+        fi
+        if [ -n "${H100_CORESIDENCY_FACTOR:-}" ]; then
+            pf_pass "R4 coresidency factor filled: H100_CORESIDENCY_FACTOR=${H100_CORESIDENCY_FACTOR} (posture v${H100_POSTURE_VERSION:-?})"
+        else
+            pf_fail "R4 H100_CORESIDENCY_FACTOR is EMPTY — the band launcher will refuse --h100 campaign launches; run: bash $PF_PROBE"
         fi
     fi
 
     # ---- R5: host-RAM headroom ---------------------------------------------
-    local MEM_KIB MEM_GIB RAMCHK
-    MEM_KIB="$(awk '/MemAvailable:/ {print $2}' /proc/meminfo)"
-    MEM_GIB=$((MEM_KIB / 1024 / 1024))
-    if RAMCHK="$(preflight_host_ram_check "$MEM_GIB" \
-            "${H100_EXPECTED_QUAD_HOST_ANON_RSS_GB:-47}" "${H100_HOST_RAM_HEADROOM_GB:-16}")"; then
-        pf_pass "R5 host RAM: $RAMCHK GiB"
+    if [ "$ARM_KIND" = "gold" ]; then
+        pf_skip "R5 X9 four-chain host-RAM threshold is not applicable to a selected single-band Gold host"
     else
-        pf_fail "R5 host RAM short of the 4-chain expectation: $RAMCHK GiB (recorded 4-chain inspection OOM at ~47 GB anon-RSS)"
+        local MEM_KIB MEM_GIB RAMCHK
+        MEM_KIB="$(awk '/MemAvailable:/ {print $2}' /proc/meminfo)"
+        MEM_GIB=$((MEM_KIB / 1024 / 1024))
+        if RAMCHK="$(preflight_host_ram_check "$MEM_GIB" \
+                "${H100_EXPECTED_QUAD_HOST_ANON_RSS_GB:-47}" "${H100_HOST_RAM_HEADROOM_GB:-16}")"; then
+            pf_pass "R5 host RAM: $RAMCHK GiB"
+        else
+            pf_fail "R5 host RAM short of the 4-chain expectation: $RAMCHK GiB (recorded 4-chain inspection OOM at ~47 GB anon-RSS)"
+        fi
     fi
 
     # ---- R6: arm+band identity coherence (dry-runs, this arm) --------------
@@ -777,7 +982,7 @@ pf_main() {
                 # it back is what keeps this script from forming a second
                 # opinion about how strong its own evidence is.
                 local SYM_REPORT="${SCRATCH}/arm_symmetry_report.txt" SYM_RC=0
-                (cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+                (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
                         "$PF_PY" "$PF_SYMMETRY" --with-output "$WITH_CAP" --without-output "$WITHOUT_CAP" \
                         --workspace-root "$WORKSPACE_ROOT" --band "$SYMMETRY_BAND" \
                         --with-surface "$WITH_SURF" --without-surface "$WITHOUT_SURF" \
@@ -811,14 +1016,23 @@ pf_main() {
         # The workspace of the arm ACTUALLY under check — never a surrogate.
         local WS
         WS="$(preflight_band_workspace "$WORKSPACE_ROOT" "$ARM" "$band")"
-        if [ ! -d "$WS" ] || [ -z "$(ls -A "$WS" 2>/dev/null)" ]; then
+        if [ "$RESUME_MODE" -eq 1 ]; then
+            local INSPECTOR="${SIDERIUS_CHECKOUT:-}/scripts/inspect_run_state.py"
+            local RESUME_REPORT NEXT_ITER
+            if RESUME_REPORT="$(preflight_resume_workspace "$PF_PY" "$INSPECTOR" "$WS" "$ARM")"; then
+                NEXT_ITER="$(echo "$RESUME_REPORT" | tail -1)"
+                pf_pass "R8 resume band $band state is attributable and replay-safe ($WS; next iteration $NEXT_ITER)"
+            else
+                pf_fail "R8 resume band $band refused ($WS): $(echo "$RESUME_REPORT" | tail -3 | tr '\n' ' ')"
+            fi
+        elif [ ! -d "$WS" ] || [ -z "$(ls -A "$WS" 2>/dev/null)" ]; then
             pf_pass "R8 item1 band $band workspace absent/empty ($WS)"
         else
             pf_fail "R8 item1 band $band workspace NOT empty ($WS) — a reused workspace resumes, it does not start cold"
         fi
     done
-    local GEN_MODELS="${PF_PROJECT_DIR}/agent_generated/models"
-    local GEN_INDEX="${PF_PROJECT_DIR}/agent_generated/_capability_index.json"
+    local GEN_MODELS="${PF_SIDERIUS_ROOT}/agent_generated/models"
+    local GEN_INDEX="${PF_SIDERIUS_ROOT}/agent_generated/_capability_index.json"
     local LEFTOVER
     LEFTOVER="$(find "$GEN_MODELS" -maxdepth 1 -name '*.py' 2>/dev/null | head -5 || true)"
     if [ -n "$LEFTOVER" ]; then
@@ -851,12 +1065,18 @@ pf_main() {
     else
         local SMOKE_ARGS=(--out "${SCRATCH}/llm_smoke.json")
         [ -n "$LLM_CONFIG" ] && SMOKE_ARGS+=(--llm-config "$LLM_CONFIG")
-        if (cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+        if (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
                 "$PF_PY" "$PF_SMOKE" "${SMOKE_ARGS[@]}"); then
             pf_pass "R9 LLM burst reachable (8/8; p95 + per-call detail above; NOT a quota guarantee)"
         else
             pf_fail "R9 LLM burst failed (see per-call errors above; report ${SCRATCH}/llm_smoke.json)"
         fi
+    fi
+
+    if [ "$GOLD_TERMINAL_EVAL_POLICY" = "out_of_scope_multi_workspace_provenance" ]; then
+        pf_info "R10 terminal evaluation OUT OF SCOPE: Strict Best spans four provenance workspaces and TerminalChampion records one; Composed Best and Strict Best are the campaign results"
+    else
+        pf_fail "R10 unknown terminal-evaluation policy: $GOLD_TERMINAL_EVAL_POLICY"
     fi
 
     # ---- summary -----------------------------------------------------------

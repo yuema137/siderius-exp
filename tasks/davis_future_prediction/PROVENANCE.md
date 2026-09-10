@@ -97,7 +97,8 @@ regeneration commit.
 curl -sSL -o /tmp/davis/db_info.yaml \
   https://raw.githubusercontent.com/davisvideochallenge/davis-2017/97d08bf8b6201abf15509a67a985db3745a75ccd/data/db_info.yaml
 sha256sum /tmp/davis/db_info.yaml   # must equal the SHA-256 above
-.venv/bin/python -m tools.example_packs.davis_future_prediction --db-info /tmp/davis/db_info.yaml
+.venv/bin/python -m tasks.davis_future_prediction.tools.davis_future_prediction \
+  --db-info /tmp/davis/db_info.yaml
 # alternatively: --lists train.txt val.txt (official one-name-per-line files)
 ```
 

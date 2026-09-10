@@ -1,0 +1,45 @@
+task_data_path:
+  file: ../plugins/_supernemo_task.py
+  symbol: SuperNemoTaskDataPath
+  id: supernemo_signal_background
+
+dataset_profile:
+  config: ../declared/dataset_profile.json
+
+metric:
+  declaration: ../declared/metric_energy_matched_auc.json
+  implementation:
+    file: ../plugins/_supernemo_metrics.py
+    symbol: SuperNemoEnergyMatchedAuc
+
+secondary_metrics:
+  - declaration: ../declared/metric_ordinary_auc.json
+    implementation:
+      file: ../plugins/_supernemo_metrics.py
+      symbol: SuperNemoOrdinaryAuc
+
+objective:
+  config:
+    loss_type: ce
+    reduction: mean
+
+task_health:
+  none: true
+
+interpretation_blocks:
+  none: true
+proposal_blocks:
+  config: ../declared/proposal_blocks.yaml
+implementor_blocks:
+  config: ../declared/implementor_blocks.yaml
+
+task_config:
+  config: ../declared/task_config.yaml
+
+model_plugins:
+  dir: ../plugins
+  require: [supernemo_reference_pointnet]
+
+parameter_rules:
+  model_config.segmentation_size:
+    exact: 224

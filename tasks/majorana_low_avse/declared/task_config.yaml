@@ -1,0 +1,24 @@
+task_description: |
+  Binary waveform classification on the Majorana Demonstrator Zenodo partial
+  release. The input is raw_waveform only; class 1 passes the Low-AvsE cut and
+  class 0 is rejected. The golden metric is fixed 25-keV energy-matched ROC
+  AUC, higher is better. energy_label is task-owned matching metadata and is
+  forbidden as model input, together with every other label and identifier.
+forward_contract:
+  model_io:
+    input:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {dimension: {fixed: 1}}
+        - {dimension: {fixed: 3800}}
+      dtype: {admissible: ["float32"]}
+    output:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {role: class, dimension: {fixed: 2}}
+      dtype: {admissible: ["float32"]}
+  input_description: "baseline-subtracted raw waveform divided by baseline standard deviation; shape [B,1,3800]"
+  output_description: "two raw logits ordered [rejected, accepted]"
+  task_type: classification
+  output_head_note: "Return exactly [B,2] raw logits; do not apply softmax."
+  task_note: "Do not use energy_label, tp0, metadata, target, or other PSD labels as inputs."

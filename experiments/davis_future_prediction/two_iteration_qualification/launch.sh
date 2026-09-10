@@ -87,6 +87,8 @@ exec bash "$LAUNCHER" \
     --num_iterations 2 \
     --max_rounds 2 \
     --max_epochs 1 \
+    --trial_time_admission_source measured \
+    --formal_time_admission_source measured \
     --allowed_output_types regressor \
     --min_formal_batch_size 1 \
     --trial_portion 1.0 \
@@ -97,4 +99,5 @@ exec bash "$LAUNCHER" \
     --validation_max_samples 15 \
     --trial_vram_budget_gb 10 \
     --formal_vram_budget_gb 16 \
+    --vram_preflight_host_memory_limit_gb 32 \
     ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

@@ -4,8 +4,21 @@ version = "0.0.0"
 description = "Private scientific tasks and experiment campaigns for SIDERIUS"
 requires-python = ">=3.12"
 dependencies = [
-    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@2406dadd8dc3e80d87733cdc1a68494d3d8cead7",
+    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@66d3edf2b2045eaf037fb5cc9ecb3dffee94523b",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4,<10",
+    "ruff>=0.12,<0.17",
 ]
 
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--import-mode=importlib"
+norecursedirs = ["provenance", ".git", ".venv"]
+markers = ["real_data: reads an explicitly configured external scientific dataset"]

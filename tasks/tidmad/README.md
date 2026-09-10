@@ -35,7 +35,9 @@ data is, and none ever will be.
 | resolved declarations | `resolved/*.json` | dataset profile, model I/O contract, deliverable spec, metric spec, file identity |
 | scoring anchor map | `reference_data/segment_anchors.json` | the metric's normalisation constants — **nothing to precompute** |
 | reference artifacts | `reference_data/raw_baseline/`, `reference_data/ground_truth/`, `reference_data/official_paper_result/` | metric floor, metric ceiling, paper-comparable scores |
-| paper-spec baselines | `ml_models/legacy_baseline_configs.json` | the TIDMAD paper's hyperparameters |
+| reference loader | `runtime/reference_scores.py` | task-owned loading and validation of the frozen floor, ceiling, and ruler |
+| reference and calibration tools | `tools/compute_raw_baseline.py`, `tools/compute_ground_truth.py`, `tools/legacy_fcnet_timing.py`, `tools/fcnet_full_file_scan.py`, `tools/fcnet_health_metrics_scan.py`, `tools/fcnet_diversity_pearson_scan.py`, `tools/investigate_pearson_feasibility.py`, `tools/official_paper_health_scan.py`, `tools/score_tidmad_official_wavenet.py`, `tools/score_tidmad_official_banded.py`, `tools/render_official_paper_result.py` | task-owned regeneration of the reference ruler, bounded timing and scoring of official sources, calibrated Health scans, and deterministic paper-result rendering |
+| paper-spec baselines | `reference_data/legacy_baseline_configs.json` | the TIDMAD paper's hyperparameters |
 | the qualification entrypoint | `../../experiments/tidmad/two_iteration_qualification/launch.sh` | experiment-owned workflow treatment |
 
 ### 2. The external data dependency
@@ -69,19 +71,17 @@ abra_validation_0000.h5 … abra_validation_0019.h5
 ```
 
 Full staging is ~50 GB. `resolved/identity.json` lists every expected filename;
-the naming patterns themselves are owned by
-`execute_tools/dataset_config.py`, not by this pack.
+the naming patterns themselves are declared by this pack in
+`resolved/dataset_profile.json`.
 
-There are two ways to name that directory, and they are the same value:
+The caller names that directory explicitly:
 
 | mechanism | scope | use it when |
 |---|---|---|
 | `--data_dir <dir>` on the command below | this run | always — a published command should carry its own inputs |
-| `tidmad_data_dir:` in `tidmad_data_config.yaml` | this machine, every run | you have set the machine up permanently (`cp tidmad_data_config.example.yaml tidmad_data_config.yaml`) |
 
-Both resolve through `execute_tools/data_paths.py`, which validates the
-directory at launch — before any LLM call or GPU minute is spent. See
-`data/README.md`.
+The framework validates the directory at launch — before any LLM call or GPU
+minute is spent. See `data/README.md`.
 
 ### 4. Preview the run
 
@@ -159,16 +159,14 @@ the complete evaluation scope. Leaving that default in a bounded quickstart
 would make its advertised data and time bounds inconsistent. These ordinary
 task-agnostic knobs bound the run without silently dropping files.
 
-**Why the time budgets are here.** Passing a time budget switches on the
-wall-time pre-flight, which prices the training workload through **TIDMAD's
-dataset topology** (`psd_segment_length // segmentation_size`). TIDMAD declares
-that topology, so the estimate is meaningful, and the flags earn their place:
-a planner-chosen portion can otherwise produce a multi-hour round.
-
-A task that declares no such topology now takes a **named inapplicable path** —
-the pre-flight is skipped with a stated reason and the run continues, rather
-than failing before training. So the other packs simply have no use for these
-two flags, not a hazard from them.
+**Why the time budgets are here.** The two flags declare the Trial and Formal
+execution ceilings. The legacy advance wall-time forecast additionally needs
+the complete physical TIDMAD ``SampleSet`` consumed by all three of its phase
+estimators. This composed qualification carries an opaque task-owned scope, so
+it takes the named inapplicable forecast path rather than partially pricing
+only training. Formal execution still receives the declared ceiling through
+the measured in-subprocess runtime policy. The flags therefore remain useful
+without pretending that a legacy forecast can understand an opaque scope.
 
 You also need at least one LLM API key in the selected SIDERIUS checkout's
 `.env` and a CUDA GPU.
@@ -225,31 +223,22 @@ Full-spectrum 1-D time-series denoising of SQUID dark-matter detector data
 | model I/O contract | `[B, T] int64 → [B, 256, T] float32`, `class` axis fixed 256 → categorical | `resolved/model_io_contract.json`, bound by the task composition |
 | dataset profile | 20 validation files, 200 × 10 000 000-sample segments per file, 10 MS/s, `channel0001` input / `channel0002` truth, int8 storage +128 offset, 256 classes | `resolved/dataset_profile.json` |
 | deliverable | per-file HDF5 `abra_validation_denoised_{file_index:04d}.h5` | `compositions/bounded_qualification.yaml` and `runtime/tidmad_data_path.py` |
-| golden metric | `tidmad_denoising_score` · direction **higher** · anchor-normalised linear grand mean, log base 5.27 (frozen paper-comparable formula) | `resolved/metric_spec.json`, implemented by the pinned framework metric plugin |
+| golden metric | `tidmad_denoising_score` · direction **higher** · anchor-normalised linear grand mean, log base 5.27 (frozen paper-comparable formula) | `resolved/metric_spec.json` and `runtime/scoring.py`, composed through the framework metric interface |
 | health policy | HealthGate checks at tuner round boundaries | `framework_configs/health.yaml` |
 | training observation (Step 07a) | **R1** = the run-resolved training objective (`loss_config.loss_type` — a loss family is a run choice, not task semantics; identified on the record by `objective_kind` + `objective_config_fingerprint`); **R2** = per-epoch mean training objective (`loss_history`); **R3** = the SAME computation on the run-bound validation scope (the tuner's `eval_sample_set`, VALIDATION file family `abra_validation_*`), no backprop — **production-backed from 07a**; optional checkpointed observations: none declared. Persisted as `ExperimentRecord.training_history` / `.training_diagnosis` (per-run evidence, not task config — no `resolved/` snapshot); hidden from the planner / reflector until 07b | `execute_tools/train_engine_sandbox.py` (R3 pass), `execute_tools/training_history.py`, `agent/schemas/training_diagnosis.py` |
-| data root | machine-local, gitignored `tidmad_data_config.yaml` | `execute_tools/data_paths.py` — see `data/README.md` |
+| data root | explicit `--data_dir` argument | caller-owned; see `data/README.md` |
 | reference artifacts | anchors, raw baseline, ground truth, official paper scores | `reference_data/` |
 
 ## What this pack demonstrates at PR0
 
-`resolved/` holds **READ-ONLY resolved snapshots** of the five contracts above
-(`dataset_profile`, `model_io_contract`, `deliverable_spec`, `metric_spec`,
-`identity`), **GENERATED** from the production authorities by
-`tools/example_packs/projection.py`. **DO NOT EDIT them — the runtime does not
-read these files as an authoring surface.** To change the task, edit the owning
-path in the table;
-CI (`tests/unit/examples/test_tidmad_projection.py`) regenerates every
-snapshot and deep-compares it, so a drift is a red test resolved by
-regenerating in the same commit as the authority change
-(`.venv/bin/python -m tools.example_packs.projection`).
-
-One nuance worth knowing before you edit anything here: since the shipped
-composition manifest exists, `configs/task_composition/tidmad.yaml` *binds*
-`resolved/dataset_profile.json` and `resolved/metric_spec.json` as its
-declaration references, so a composed run does load those two. That does not
-make them an editing surface — it is precisely why a hand edit is caught as a
-red test rather than being harmless.
+`resolved/` carries the five frozen task declarations above: dataset profile,
+model-I/O contract, deliverable specification, metric specification, and
+identity. They were imported from the reviewed pre-separation projection and
+now have one owner in this task package. The composition reads its declared
+dataset and metric files at runtime; an intentional edit therefore changes
+task identity and must update provenance and external qualification evidence
+in the same commit. There is no framework-side regeneration tool or duplicate
+scientific authority.
 
 The task description, forward-contract prose and health config are
 **referenced**, not copied: their owning YAML files are the authority and a

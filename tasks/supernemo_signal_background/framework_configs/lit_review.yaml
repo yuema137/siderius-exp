@@ -1,0 +1,33 @@
+enabled: false
+
+root_papers:
+  - source_type: doi
+    identifier: "10.5281/zenodo.20698789"
+    verbosity: 1
+
+dynamic_search:
+  enabled: true
+  max_rounds: 2
+  initial_verbosity: 0
+  escalation_allowed: true
+  results_per_query: 8
+  max_escalations_per_round: 1
+
+findings_verbosity: 1
+
+synthesis:
+  transfer_tolerance: moderate
+
+confidence_rubric:
+  omit_below: 0.40
+  abstract_only_ceiling: 0.79
+  bands:
+    - lower: 0.80
+      upper: 1.00
+      criteria: "deep-read and directly applicable to event-level detector classification or unordered tracker-hit sets"
+    - lower: 0.60
+      upper: 0.79
+      criteria: "deep-read with a clear transferable mechanism, or an on-domain abstract with specific evidence"
+    - lower: 0.40
+      upper: 0.59
+      criteria: "abstract-only or cross-domain evidence with a plausible but unvalidated transfer rationale"

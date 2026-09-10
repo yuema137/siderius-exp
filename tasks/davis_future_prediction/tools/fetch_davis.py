@@ -13,7 +13,7 @@ challenge ANNOTATIONS are not consumed by this task (RGB frames only).
 
 Usage::
 
-    .venv/bin/python -m tools.example_packs.fetch_davis \
+    .venv/bin/python -m tasks.davis_future_prediction.tools.fetch_davis \
         --dest /home/klz/Data/DAVIS_2017 --extract
 """
 
@@ -23,7 +23,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from tools.example_packs._fetch_common import (
+from tasks.shared.archive_fetch import (
     ArchiveSpec,
     extract_archive,
     require_out_of_tree,
@@ -82,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.extract:
         extract_archive(dest, DAVIS_TRAINVAL_480P)
     if args.check_layout:
-        from execute_tools.davis_data_path import load_davis_sequences
+        from tasks.davis_future_prediction.runtime.davis_data_path import load_davis_sequences
 
         manifest = repo / "examples" / "davis_future_prediction" / "data" / "manifests"
         check_layout(

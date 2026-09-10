@@ -20,7 +20,9 @@ EXPERIMENT = (
     EXP_ROOT / "experiments" / "davis_future_prediction" / "two_iteration_qualification"
 )
 LAUNCHER = EXPERIMENT / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = "2406dadd8dc3e80d87733cdc1a68494d3d8cead7"
+EXPECTED_FRAMEWORK_REVISION = (
+    (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
+)
 
 COMPOSE_CHILD = textwrap.dedent(
     """
@@ -31,7 +33,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -75,6 +77,38 @@ COMPOSE_CHILD = textwrap.dedent(
     """
 )
 
+ISOLATED_METRIC_CHILD = textwrap.dedent(
+    """
+    import json
+    import sys
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    checkout = Path(sys.argv[1]).resolve()
+    manifest = Path(sys.argv[2]).resolve()
+    deliverable = Path(sys.argv[3]).resolve()
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
+
+    import numpy as np
+    from execute_tools.task_data_path import bind_task_data_path
+    from workflows.task_composition import compose_run_task_bindings
+
+    composition = compose_run_task_bindings(str(manifest))
+    implementation = composition.task_data_path
+    implementation.evaluation_truth = lambda scope, data_dir: {
+        "clip": np.zeros((1,), dtype=np.float32)
+    }
+    with bind_task_data_path(implementation):
+        outcome = composition.metric.evaluate(
+            {0: str(deliverable)},
+            evaluation_payload={"clip": np.zeros((1,), dtype=np.float32)},
+            task_scope=SimpleNamespace(rows=("clip",)),
+            data_dir=str(deliverable.parent),
+        )
+    print(json.dumps({"metric_id": outcome.metric_id, "scalar": outcome.scalar}))
+    """
+)
+
 
 def _siderius_checkout() -> Path:
     configured = os.environ.get("SIDERIUS_CHECKOUT")
@@ -102,7 +136,10 @@ def test_composition_resolves_only_task_owned_science() -> None:
     """The external package must own its task semantics and plugin sources."""
     checkout = _siderius_checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", COMPOSE_CHILD, str(checkout), str(COMPOSITION)],
+        [
+            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
+            str(checkout), str(COMPOSITION),
+        ],
         cwd=checkout,
         text=True,
         capture_output=True,
@@ -120,6 +157,43 @@ def test_composition_resolves_only_task_owned_science() -> None:
         "secondaries": [["psnr", "higher"], ["mae", "lower"]],
         "task_data_path_id": "davis_future_prediction",
         "task_type": "regression",
+    }
+
+
+def test_metric_reuses_the_bound_data_path_without_importing_this_repository(
+    tmp_path: Path,
+) -> None:
+    """The isolated scoring child must not need ``siderius-exp`` on sys.path.
+
+    The production failure imported ``tasks.davis_future_prediction`` from a
+    file-bound metric.  A clean scoring child deliberately has only SIDERIUS
+    on its import path, so that hidden repository dependency failed after two
+    successful training rounds.  This subprocess reproduces that boundary;
+    it fails with ``ModuleNotFoundError: tasks`` if the ambient import returns.
+    """
+    checkout = _siderius_checkout()
+    deliverable = tmp_path / "prediction.npz"
+    deliverable.touch()
+    completed = subprocess.run(
+        [
+            str(checkout / ".venv/bin/python"),
+            "-I",
+            "-c",
+            ISOLATED_METRIC_CHILD,
+            str(checkout),
+            str(COMPOSITION),
+            str(deliverable),
+        ],
+        cwd=checkout,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout.splitlines()[-1]) == {
+        "metric_id": "mse",
+        "scalar": 0.0,
     }
 
 
@@ -212,6 +286,7 @@ def test_experiment_dry_run_preserves_the_qualification_treatment(
         "--allowed_output_types": "regressor",
         "--trial_vram_budget_gb": "10",
         "--formal_vram_budget_gb": "16",
+        "--vram_preflight_host_memory_limit_gb": "32",
     }
     for index, command in enumerate(commands, start=1):
         assert command[command.index("--start_iteration") + 1] == str(index)

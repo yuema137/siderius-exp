@@ -109,6 +109,8 @@ GOLD_FROZEN_ROWS=(
     # campaign number. The dry-run frozen table prints the EFFECTIVE value
     # verbatim, so an externally supplied budget stays observable.
     "formal_time_budget_minutes=${GOLD_FORMAL_TIME_BUDGET_MINUTES:-180}"
+    "trial_time_admission_source=measured"
+    "formal_time_admission_source=measured"
     # v0.1.5 operator ruling (2026-08-29): Gold Trial and Formal use the same
     # already-proven batch feasibility boundary. The generic chain default of
     # 4 is a provisional V18 incident guard, not a Gold scientific-treatment
@@ -222,6 +224,14 @@ GOLD_CAMPAIGN_ID="v015"
 #: with no declaration is still `false`, so nothing is authorized by omission.
 GOLD_STAGE2_AUTHORIZED="${GOLD_STAGE2_AUTHORIZED:-false}"
 
+# Terminal evaluation is deliberately OUT OF SCOPE for this campaign.
+# Strict Best pools four independently attributable band workspaces, while
+# TerminalChampion currently records one provenance workspace. Collapsing
+# those four authorities into one would fabricate provenance. Composed Best
+# and Strict Best remain the campaign's full-scope reported results; changing
+# this policy requires a provenance contract that represents all four roots.
+GOLD_TERMINAL_EVAL_POLICY="out_of_scope_multi_workspace_provenance"
+
 #: v0.1.4 operator ruling — the regression task DEFINITION, bound through the
 #: narrow --task_config transport on the PROVEN NON-COMPOSED path.
 #:
@@ -284,11 +294,12 @@ GOLD_FCNET_REFERENCE_JSON="${GOLD_FCNET_REFERENCE_JSON:-}"
 #: output_type (OutputTypeName = classifier|regressor), so it is not listed —
 #: fcnet still participates as a built-in.
 GOLD_ALLOWED_OUTPUT_TYPES="regressor"
-#: fcnet.model_cfg.segmentation_size in ml_models/legacy_baseline_configs.json,
+#: fcnet.model_cfg.segmentation_size in
+#: tasks/tidmad/reference_data/legacy_baseline_configs.json,
 #: the paper-spec source of truth. NOT a universal value — transformer's
 #: paper-spec row is 20000 — which is why it is pinned to the reference this
 #: campaign is measured against rather than assumed.
-GOLD_REQUIRED_SEGMENTATION_SIZE=40000
+GOLD_WORKFLOW_PARAMETER_RULES='{"model_config.segmentation_size":{"exact":40000}}'
 #: Fixed so every round is reproducible and the seed is persisted with the run.
 #: v0.1.3 recorded none, so no round could be replayed.
 GOLD_SAMPLING_SEED=20260828
@@ -658,6 +669,7 @@ gold_frozen_chain_args() {
         formal_portion formal_train_portion formal_eval_portion \
         trial_max_epochs formal_max_epochs \
         trial_time_budget_minutes formal_time_budget_minutes \
+        trial_time_admission_source formal_time_admission_source \
         min_formal_batch_size \
         skip_formal_min_delta bypass_formal_time_budget_min_delta \
         max_rounds attempts_per_round attempts_per_formal_round \
@@ -800,9 +812,11 @@ gold_frozen_chain_args() {
     GOLD_FROZEN_CHAIN_ARGS+=(--allowed_output_types "$GOLD_ALLOWED_OUTPUT_TYPES")
     # Comparability against the FCNet reference, whose paper-spec value is
     # recorded as fcnet.model_cfg.segmentation_size in
-    # ml_models/legacy_baseline_configs.json. REJECTS a mismatch; never
-    # rewrites it, so the persisted record cannot disagree with what ran.
-    GOLD_FROZEN_CHAIN_ARGS+=(--required_segmentation_size "$GOLD_REQUIRED_SEGMENTATION_SIZE")
+    # tasks/tidmad/reference_data/legacy_baseline_configs.json. This uses the
+    # generic workflow rule surface: exact deterministically owns the executed
+    # value, and the canonical rule set joins the workspace run identity.
+    # It is a Gold workflow treatment, not a TIDMAD task default.
+    GOLD_FROZEN_CHAIN_ARGS+=(--workflow_parameter_rules "$GOLD_WORKFLOW_PARAMETER_RULES")
     # v0.1.3 resolved ordering to `shuffle` from the chain default — nothing
     # declared it. Stated explicitly now; the per-band ascending file order is
     # bound in gold_band_args, where the band's own file list already lives.
@@ -841,6 +855,24 @@ gold_band_gpu() {
             echo "ERROR: unknown band '$1' (expected 0-3, 4-9, 10-14 or 15-19)" >&2
             return 1 ;;
     esac
+}
+
+# gold_resolve_device BAND [OVERRIDE] — keep the legacy four-device map when
+# no override is supplied, or bind one explicitly selected band to a caller-
+# owned physical device.  Band identity and device identity are independent:
+# the override is what permits one single-GPU host per scientific band without
+# removing the existing one-host fan-out topology.
+gold_resolve_device() {
+    local band="$1" override="${2:-}"
+    if [ -z "$override" ]; then
+        gold_band_gpu "$band"
+        return
+    fi
+    if ! [[ "$override" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: --device-index must be a non-negative integer, got '$override'" >&2
+        return 1
+    fi
+    printf '%s\n' "$override"
 }
 
 # gold_band_args BAND — sets GOLD_BAND_ARGS: the DS8-mandatory pair.
@@ -1095,6 +1127,7 @@ GOLD_RESERVED_PASSTHROUGH=(
     --formal_portion --formal_train_portion --formal_eval_portion
     --max_epochs --trial_max_epochs --formal_max_epochs
     --trial_time_budget_minutes --formal_time_budget_minutes
+    --trial_time_admission_source --formal_time_admission_source
     --skip_formal_min_delta --bypass_formal_time_budget_min_delta
     --bypass_formal_time_budget_minutes
     --enable_chain_incumbent_formal_gates
@@ -1110,7 +1143,7 @@ GOLD_RESERVED_PASSTHROUGH=(
     # value the launch manifest reports -- a pin the manifest misreports
     # is worse than no pin.
     --advice --advice_sha256 --human_advice_file
-    --data_scope --health_gate_files --band --workspace --run_name
+    --data_dir --data_scope --health_gate_files --band --workspace --run_name
     --mode --seed_paths --start_iter
     --auto_resume --no_auto_resume --force_fresh
     --validation_fixed_candidate_plan
@@ -1124,6 +1157,15 @@ GOLD_RESERVED_PASSTHROUGH=(
     --max_rounds --attempts_per_round --attempts_per_formal_round
     --max_fail_rounds --max_proposal_attempts --max_impl_attempts
 )
+
+gold_bind_data_dir() {
+    local supplied="${1:-}"
+    if [ -z "$supplied" ] || [ ! -d "$supplied" ]; then
+        echo "ERROR: --data_dir must name an existing caller-owned dataset directory: '$supplied'" >&2
+        return 1
+    fi
+    GOLD_DATA_DIR="$(cd "$supplied" && pwd)"
+}
 
 # gold_refuse_reserved_passthrough TOKEN... — refuse any reserved token,
 # naming it and the authority that owns it. --cleanup_denoised gets the

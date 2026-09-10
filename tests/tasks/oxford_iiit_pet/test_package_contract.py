@@ -22,7 +22,9 @@ EXPERIMENT = (
     EXP_ROOT / "experiments" / "oxford_iiit_pet" / "two_iteration_qualification"
 )
 LAUNCHER = EXPERIMENT / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = "2406dadd8dc3e80d87733cdc1a68494d3d8cead7"
+EXPECTED_FRAMEWORK_REVISION = (
+    (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
+)
 
 COMPOSE_CHILD = textwrap.dedent(
     """
@@ -33,7 +35,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -113,7 +115,10 @@ def test_composition_resolves_only_task_owned_science() -> None:
     """The external package must own its task semantics and plugin sources."""
     checkout = _siderius_checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", COMPOSE_CHILD, str(checkout), str(COMPOSITION)],
+        [
+            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
+            str(checkout), str(COMPOSITION),
+        ],
         cwd=checkout,
         text=True,
         capture_output=True,

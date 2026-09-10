@@ -32,7 +32,8 @@ SHA-256 pins are tracked (design §0.4).
 
 Regenerate::
 
-    .venv/bin/python -m tools.example_packs.oxford_iiit_pet --annotations-dir /tmp/x/annotations
+    .venv/bin/python -m tasks.oxford_iiit_pet.tools.oxford_iiit_pet \
+        --annotations-dir /tmp/x/annotations
 """
 
 from __future__ import annotations
@@ -47,8 +48,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from agent.schemas.model_io_contract import AxisRole, ModelIOContract
 from execute_tools.evaluation_metric import MetricSpec, PresenceScoreabilityContract
-from tools.example_packs._common import repo_root, write_json, write_sha256sums, write_text
-from tools.example_packs.declarations import (
+from tasks.shared.artifact_io import repo_root, write_json, write_sha256sums, write_text
+from tasks.shared.declarations import (
     batch_axis,
     fixed_axis,
     model_io_contract,

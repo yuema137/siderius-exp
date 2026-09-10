@@ -1,0 +1,50 @@
+# configs/health_checks.yaml
+#
+# FRAMEWORK HealthGate policy. Step 08b C5 slimmed this file to policy only.
+#
+# What lives here: what a gate DOES. Role, cadence, short-circuit, the
+# actions taken on pass and on fail, and the per-check policy keys the
+# framework injects (`aggregation`).
+#
+# What NO LONGER lives here: the gate roster, thresholds, check parameters,
+# the health-peek file set, the millivolt value scale, and the scientific
+# reason prose. All of that is TASK-owned and moved, unchanged, to
+# `configs/task_health/tidmad.yaml`. The framework config must never become
+# `tidmad: … / pets: … / <user task>: …` — that would move task branching
+# out of Python and into YAML while still requiring a SIDERIUS edit per task
+# (Step-08 parent §6a.4).
+#
+# A task selects a `disposition` key per gate; the framework answers with
+# the block below. There is exactly one definition of each field, so a task
+# and the framework cannot disagree and no precedence rule is needed.
+#
+# The observe-mode sibling (`health_checks_baseline_observe_mode.yaml`) is
+# now a two-line difference rather than a duplicated six-gate roster: it
+# differs ONLY in `blocking.on_fail`. That was always the only difference —
+# the duplication was an artifact of the roster living here.
+
+health_policy:
+  blocking:
+    # Decides whether a round's record is a valid candidate.
+    gate_role: blocking
+    after_round: every                # every round is gated — no round may
+                                      # slip through and score a phantom
+                                      # output as `success` (M8 §3.1)
+    short_circuit: true               # stop at the first real failure
+    on_pass: continue
+    on_fail: invalidate_round         # the score is discarded, chain continues
+    check_config:
+      aggregation: any_pass           # M9: pass if ANY peeked file clears the
+                                      # threshold; collapse fails only when
+                                      # every peeked file degrades
+
+  recording:
+    # Measures and records only; never invalidates anything. The measured
+    # value lives in HealthCheckResult.metrics and is persisted via
+    # GateResult.check_results into the round's record.
+    gate_role: observational
+    after_round: every
+    short_circuit: false              # run every check for full diagnostics
+    on_pass: continue
+    on_fail: continue
+    check_config: {}

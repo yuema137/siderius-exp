@@ -44,6 +44,8 @@ def _run(tmp_path: Path, *extra: str) -> subprocess.CompletedProcess[str]:
             str(_siderius_checkout()),
             "--workspace_root",
             str(workspace),
+            "--data_dir",
+            str(tmp_path),
             "--stage",
             "1",
             "--arm",

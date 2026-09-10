@@ -1,0 +1,12 @@
+{
+  "propose": [
+    "This workflow enforces a 10 GiB VRAM ceiling in both Trial and Formal, a 10-minute Trial training budget, and a 20-minute Formal training budget.",
+    "Design candidates to fit these limits before tuning. Prefer compact raw-waveform MLP or convolutional models first; use attention only when token count and width keep the measured full-run estimate within budget.",
+    "The epoch count is deterministically constrained to the inclusive range [5, 50]. Start near the lower end unless measured throughput justifies more epochs.",
+    "Trial uses 5% of the official training data and 5% of the official labeled test data; Formal uses 10% of each. Data selection is locked to deterministic snapshot scopes. Explore model design, not split or sampling strategy.",
+    "Target at least 20% VRAM headroom and avoid proposals whose estimated runtime is already close to the phase limit before validation and persistence overhead."
+  ],
+  "tune": [
+    "Respect the enforced 10 GiB VRAM ceiling, 10-minute Trial budget, 20-minute Formal budget, snapshot scope, and [5, 50] epoch range. Begin with the smallest viable epoch count and increase capacity only after measured admission succeeds."
+  ]
+}

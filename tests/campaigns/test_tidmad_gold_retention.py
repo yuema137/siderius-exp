@@ -39,6 +39,8 @@ def _stage1_dry_run(tmp_path: Path, *extra: str) -> subprocess.CompletedProcess[
             str(_siderius_checkout()),
             "--workspace_root",
             str(workspace),
+            "--data_dir",
+            str(tmp_path),
             "--stage",
             "1",
             "--arm",

@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import sys
 import textwrap
 from pathlib import Path
 
@@ -44,13 +43,14 @@ EXPECTED = {
 CHILD = textwrap.dedent(
     """
     import json
+    import inspect
     import os
     import sys
     from pathlib import Path
 
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
     os.chdir(checkout)
 
     from workflows import task_composition as composition_module
@@ -72,6 +72,7 @@ CHILD = textwrap.dedent(
         json.dumps(
             {
                 "primary": [composition.metric.spec.id, composition.metric.spec.direction],
+                "primary_source": inspect.getsourcefile(type(composition.metric)),
                 "secondaries": [
                     [metric.spec.id, metric.spec.direction]
                     for metric in composition.secondary_metrics
@@ -103,7 +104,10 @@ def test_real_task_secondary_metric_declarations(task_id: str) -> None:
     """Fail when a migrated task's scientific metric roster or order drifts."""
     checkout = _siderius_checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", CHILD, str(checkout), str(TASK_MANIFESTS[task_id])],
+        [
+            str(checkout / ".venv/bin/python"), "-c", CHILD,
+            str(checkout), str(TASK_MANIFESTS[task_id]),
+        ],
         cwd=checkout,
         text=True,
         capture_output=True,
@@ -118,3 +122,7 @@ def test_real_task_secondary_metric_declarations(task_id: str) -> None:
     assert len(receipt["declaration_paths"]) == len(receipt["secondaries"])
     assert all(Path(path).is_file() for path in receipt["declaration_paths"])
     assert Path(receipt["source_checkout"]) == checkout
+    if task_id == "tidmad":
+        assert Path(receipt["primary_source"]).resolve() == (
+            EXP_ROOT / "tasks/tidmad/runtime/scoring.py"
+        ).resolve()

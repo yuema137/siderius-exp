@@ -80,6 +80,31 @@ def test_campaign_library_refuses_direct_execution() -> None:
     assert "source it" in completed.stderr
 
 
+def test_campaign_launch_refuses_an_implicit_data_root(tmp_path: Path) -> None:
+    """A launch cannot pass preflight and later depend on ambient task data."""
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+
+    completed = _bash(
+        str(SCRIPTS / "run_gold_campaign.sh"),
+        "--siderius-checkout",
+        str(_siderius_checkout()),
+        "--workspace_root",
+        str(workspace),
+        "--stage",
+        "1",
+        "--arm",
+        "blindpod",
+        "--dry-run",
+    )
+
+    assert completed.returncode != 0
+    assert (
+        "--data_dir must name an existing caller-owned dataset directory"
+        in completed.stderr
+    )
+
+
 def test_missing_frozen_row_refuses_the_real_external_dry_run(tmp_path: Path) -> None:
     """Deleting one required row must fail by name before band dispatch."""
     isolated_campaign = tmp_path / "campaign"
@@ -94,6 +119,8 @@ def test_missing_frozen_row_refuses_the_real_external_dry_run(tmp_path: Path) ->
     generated = tmp_path / "generated"
     workspace.mkdir()
     generated.mkdir()
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
     fcnet_reference = tmp_path / "fcnet.json"
     fcnet_reference.write_text("{}\n", encoding="utf-8")
     env = os.environ.copy()
@@ -105,6 +132,8 @@ def test_missing_frozen_row_refuses_the_real_external_dry_run(tmp_path: Path) ->
         str(_siderius_checkout()),
         "--workspace_root",
         str(workspace),
+        "--data_dir",
+        str(data_dir),
         "--stage",
         "1",
         "--arm",

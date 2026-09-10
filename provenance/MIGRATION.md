@@ -19,6 +19,12 @@
 
 ## Batches
 
+Latest bounded test-ownership pin checkpoint:
+[`2026-09-09_pr422_candidate_pin.md`](validation/2026-09-09_pr422_candidate_pin.md).
+The record includes the exact framework revision, isolated-environment commands,
+40 migrated regression tests, 37 pin/task-contract checks, and the explicit
+pytest import-mode requirement. It does not authorize campaign launch.
+
 | Batch | Source | Destination | Source revision | Status | Evidence |
 |---|---|---|---|---|---|
 | Bootstrap | repository boundary and dependency pin | repository root | `98610b8ded2277598749cc05ab567e1b92902bde` | complete | commit `108dea0` |
@@ -27,7 +33,9 @@
 | Cancer Gene import | Cancer Gene Identification package | `tasks/cancer_gene_identification` | `41c030721` | imported, not yet portable | byte equality plus `real_task_import_sha256.txt` |
 | Composition portability | four real task manifests | imported task packages | current migration head | composition-only validation passed | `validation/2026-08-29_external_composition.md` |
 | Cancer real-data checkpoint | complete NatureBench task plus bounded workflow | external data root and `tasks/cancer_gene_identification/workflows/**` | NatureBench `9e6a69f10865dd56f4991b49d1c974e2006b6b18`; SIDERIUS `8be2874d536a30e20a202e7d36568b596439e392` | 5090 data identity and materialization passed; GPU chain pending | `validation/2026-08-29_cancer_real_data_acquisition.md` |
-| Pets package-test ownership | Oxford-IIIT Pet composition, provenance pins, split isolation, and external quickstart boundary | `tests/tasks/oxford_iiit_pet/test_package_contract.py` | SIDERIUS `2406dadd8dc3e80d87733cdc1a68494d3d8cead7` | external task-owned checks pass; SIDERIUS source deletion remains pending responsibility-level comparison with the historical test modules | focused local pytest against the exact checkout |
+| Pets package-test ownership | Oxford-IIIT Pet composition, provenance pins, split isolation, and external quickstart boundary | `tests/tasks/oxford_iiit_pet/test_package_contract.py` | SIDERIUS `63b98b58bd18b91ee840b8d1326bb292ef8cd893` | external task-owned checks pass after SIDERIUS removes the duplicated real-task package and runtime implementation | focused local pytest against the exact checkout |
+| TIDMAD Stage-3 and reference ownership | Stage-3 writers, campaign-owned scorer and anchor resolution, adversarial witnesses, task-owned reference loader, and 54 frozen reference artifacts | `campaigns/tidmad_gold/stage3`, `tasks/tidmad/runtime`, `tests/campaigns/tidmad_gold/stage3`, `tasks/tidmad/reference_data` | SIDERIUS separation worktree after `63b98b58bd18b91ee840b8d1326bb292ef8cd893` | external ownership complete; SIDERIUS no longer loads TIDMAD evidence for an undeclared reference source and removes 52 duplicated reference/result files; its legacy scoring CLI retains one anchor-map copy until both migrate together | exact frozen values pass through the external loader; the reference and complete Gold campaign suite passes against the edited framework checkout |
+| Literature ownership checkpoint | TIDMAD literature settings remain in the task package while SIDERIUS requires explicit caller settings and writes the cache under the run workspace | `tasks/tidmad/framework_configs/lit_review.yaml` plus the exact dependency pin | SIDERIUS `97523a99df436179c673db0abcfaa0ce8d8042e4` | qualified | 53 external task/boundary tests and 116 Gold campaign tests pass against the exact checkout; Ruff passes |
 
 ## Framework blockers discovered during separation
 
@@ -43,6 +51,7 @@
 
 | Boundary | Current evidence | Required next decision |
 |---|---|---|
+| Legacy reference retirement | the external task loader reproduces the exact floor, ceiling, and ruler values; SIDERIUS returns a named absence when no reference source is declared | complete; future generic reference evidence requires a typed caller-owned declaration rather than an implicit compatibility path |
 | TIDMAD Gold launcher portability | the entrypoint now requires an exact SIDERIUS checkout, executes that checkout's existing chain, and binds campaign-owned task and Health files; Stage-1 external dry-run and Stage-2 refusal pass | reconcile the broader imported deployment preflight and complete release/H100 qualification without changing frozen treatment or adding a second execution mechanism |
 
 ## Portability changes

@@ -29,12 +29,14 @@ def _siderius_checkout() -> Path:
     return Path(configured).resolve()
 
 
-def _base_args(workspace: Path, fcnet_reference: Path) -> list[str]:
+def _base_args(workspace: Path, fcnet_reference: Path, data_dir: Path) -> list[str]:
     return [
         "--siderius-checkout",
         str(_siderius_checkout()),
         "--workspace_root",
         str(workspace),
+        "--data_dir",
+        str(data_dir),
         "--stage",
         "1",
         "--arm",
@@ -60,7 +62,11 @@ def _run(
     fcnet_reference.write_text("{}\n", encoding="utf-8")
     env = os.environ.copy()
     env["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(generated)
-    command = ["bash", str(launcher), *_base_args(workspace, fcnet_reference)]
+    command = [
+        "bash",
+        str(launcher),
+        *_base_args(workspace, fcnet_reference, tmp_path),
+    ]
     if dry_run:
         command.append("--dry-run")
     command.extend(extra)

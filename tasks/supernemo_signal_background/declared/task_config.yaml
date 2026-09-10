@@ -1,0 +1,30 @@
+task_description: |
+  Binary event-level classification of simulated SuperNEMO Demonstrator
+  events. Class 1 is neutrinoless double-beta decay (0nubb); class 0 combines
+  2nubb, Bi214, and Tl208 backgrounds. One sample is one physical event, never
+  one tracker-hit row. The golden metric is fixed-bin energy-matched ROC AUC,
+  higher is better. theta, phiS, and ev_no are forbidden model inputs.
+
+forward_contract:
+  model_io:
+    input:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {dimension: {fixed: 224}}
+        - {dimension: {fixed: 11}}
+      dtype: {admissible: ["float32"]}
+    output:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {role: class, dimension: {fixed: 2}}
+      dtype: {admissible: ["float32"]}
+  input_description: >-
+    [B,224,11] padded event tensors: valid-hit marker; normalized tX, tY,
+    tZ, imputed tR; tR-missing marker; and normalized E1, E2, dY, dZ, phiR
+  output_description: "two raw class logits ordered [background, signal]"
+  task_type: classification
+  output_head_note: >-
+    Return exactly [B,2] raw logits. Do not apply softmax inside the model.
+  task_note: >-
+    Tracker rows form an unordered variable-length hit collection. Padding is
+    marked by channel 0. The event features are repeated on valid rows.

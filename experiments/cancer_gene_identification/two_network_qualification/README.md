@@ -9,6 +9,11 @@ It uses the shared SIDERIUS Trial/Formal workflow for two research iterations,
 two tuner rounds, one epoch, regressor output, batch size one, 0.25 training and
 evaluation exposure, and 10/16 GiB Trial/Formal VRAM ceilings. The workflow
 owns Trial/Formal semantics; this experiment supplies those treatment values.
+Because one complete graph batch is substantially more expensive to inspect
+than the image and short-sequence qualification batches, this workflow gives
+one footprint forward 600 seconds and the complete isolated preflight 1,800
+seconds. These are measurement watchdogs, not training exposure or capacity
+ceilings.
 
 ```bash
 bash experiments/cancer_gene_identification/launch.sh \

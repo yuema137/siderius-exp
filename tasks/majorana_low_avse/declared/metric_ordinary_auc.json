@@ -1,0 +1,9 @@
+{
+  "aggregation": "ordinary_event_level_roc_auc_observational_only",
+  "direction": "higher",
+  "id": "ordinary_roc_auc",
+  "references": [],
+  "scoreability": {"contract_id": "deliverable_presence"},
+  "transform": null,
+  "transform_params": {}
+}

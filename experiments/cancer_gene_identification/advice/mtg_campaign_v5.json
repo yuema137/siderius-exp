@@ -1,0 +1,13 @@
+{
+  "propose": [
+    "This MTG workflow enforces a 20 GiB VRAM ceiling in both Trial and Formal, a 10-minute Trial training budget, and a 15-minute Formal training budget.",
+    "One sample is the complete transductive MTG graph. Trial and Formal both materialize the complete topology; Trial activates 25% of the training mask with the complete validation mask, while Formal activates the complete training and validation masks.",
+    "Because reducing supervised-node exposure does not remove graph edges, do not assume Trial memory scales with the 25% training fraction. Prefer sparse message passing and never materialize a dense adjacency tensor on the GPU.",
+    "Batch size is deterministically locked to 1 and epochs are constrained to [5, 50]. Start near the lower end and choose graph width and message-passing depth so measured runtime leaves room for validation and persistence.",
+    "Runtime verification may use up to 7 minutes to collect enough measured training steps before admission. This calibration window is separate from the Trial and Formal training budgets.",
+    "Target at least 20% VRAM headroom. Treat a proposal estimated above either phase time budget as infeasible before tuning rather than relying on admission rejection for discovery."
+  ],
+  "tune": [
+    "Respect the enforced 20 GiB VRAM ceiling, 10-minute Trial budget, 15-minute Formal budget, batch size 1, complete-graph materialization, and [5, 50] epoch range. Runtime verification may use up to 7 minutes before admission. Scale epochs, hidden width, and message steps only after measured admission succeeds."
+  ]
+}

@@ -75,7 +75,8 @@ gold_status_field() {  # file key -> raw scalar (quotes stripped)
 }
 
 stage1_band_main() {
-    local BAND="" WORKSPACE_ROOT="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256=""
+    local BAND="" WORKSPACE_ROOT="" DATA_DIR="" ARM="goldpod" ADVICE_FILE="" ADVICE_SHA256=""
+    local DEVICE_INDEX=""
     local FCNET_REFERENCE_JSON="" DRY_RUN=0
     # F-PROFILE-WIRE-1 — command-line only; never inherited from the shell.
     GOLD_REQUIRED_RUNTIME_PROFILE_PATH=""
@@ -92,6 +93,7 @@ stage1_band_main() {
         case $1 in
             --band)                 BAND="$2"; shift 2 ;;
             --workspace_root|--workspace-root) WORKSPACE_ROOT="$2"; shift 2 ;;
+            --data_dir|--data-dir) DATA_DIR="$2"; shift 2 ;;
             --arm)                  ARM="$2"; shift 2 ;;
             --gold_advice_file)     ADVICE_FILE="$2"; shift 2 ;;
             --gold_advice_sha256) ADVICE_SHA256="$2"; shift 2 ;;
@@ -101,6 +103,7 @@ stage1_band_main() {
             --gold_trial_vram_budget_gb) GOLD_TRIAL_VRAM_BUDGET_GB="$2"; shift 2 ;;
             --gold_formal_vram_budget_gb) GOLD_FORMAL_VRAM_BUDGET_GB="$2"; shift 2 ;;
             --fcnet_reference_json) FCNET_REFERENCE_JSON="$2"; shift 2 ;;
+            --device-index|--device_index) DEVICE_INDEX="$2"; shift 2 ;;
             --dry-run|--dry_run)    DRY_RUN=1; shift ;;
             *)                      PASSTHROUGH+=("$1"); shift ;;
         esac
@@ -112,8 +115,9 @@ stage1_band_main() {
         return 1
     fi
     local GPU
-    GPU="$(gold_band_gpu "$BAND")" || return 1
+    GPU="$(gold_resolve_device "$BAND" "$DEVICE_INDEX")" || return 1
     gold_workspace_root_check "$WORKSPACE_ROOT" || return 1
+    gold_bind_data_dir "$DATA_DIR" || return 1
     # The campaign's ONE observed treatment identity (empty when this
     # script was invoked directly): gold_arm_args refuses when its own
     # read of the artifact disagrees.
@@ -162,6 +166,7 @@ stage1_band_main() {
         --mode lilab
         --workspace "$WORKSPACE"
         --run_name "$RUN_NAME"
+        --data_dir "$GOLD_DATA_DIR"
         "${GOLD_FROZEN_CHAIN_ARGS[@]}"
         "${GOLD_BAND_ARGS[@]}"
         "${GOLD_ARM_ARGS[@]}"
