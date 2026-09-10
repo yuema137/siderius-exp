@@ -41,8 +41,14 @@ def test_real_inference_child_writes_exact_scoped_artifact(tmp_path):
         handle["timeseries/channel0002/timeseries"][:] = target
 
     adapter = compose_task_data_path_from_manifest(str(MANIFEST))
-    scope_type = sys.modules[type(adapter).__module__].TidmadScope
-    scope = scope_type(sample_set={0: [1]}, seg_size=1000, profile=fixture.profile)
+    # The registry retains its same-content implementation across compositions;
+    # a newly loaded sys.modules class need not belong to that instance.
+    scope = adapter.deserialize_scope(json.dumps({
+        "kind": "tidmad_scope_v1",
+        "sample_set": {"0": [1]},
+        "seg_size": 1000,
+        "profile": fixture.profile.to_wire(),
+    }))
     scope_path = tmp_path / "eval_scope.json"
     digest = write_scope_artifact(str(scope_path), adapter.serialize_scope(scope))
     profile_path = tmp_path / "profile.json"

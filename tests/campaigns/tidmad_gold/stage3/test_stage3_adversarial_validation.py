@@ -54,7 +54,6 @@ from __future__ import annotations
 
 import inspect
 import json
-import os
 import shutil
 import sys
 from collections.abc import Callable, Mapping, Sequence
@@ -440,27 +439,33 @@ def reference_compose_and_score(tmp_path: Path) -> _ReferenceComposeAndScore:
 
 
 def test_authorities_resolve_from_this_checkout() -> None:
-    """Framework authorities resolve from the explicitly selected checkout.
+    """Installed authorities belong to exp's own environment and exact source pin.
 
-    Defect caught: this harness silently validating a DIFFERENT clone.
-    ``execute_tools`` is a namespace package whose ``__path__`` in a
-    worktree contains both the worktree and the editable install's root, so
-    an authority missing from the worktree resolves from the other tree and
-    a green run says nothing about the code under test — the exact failure
-    CLAUDE.md's portability section names.
-
-    Fails as: an assertion naming the module and the foreign path it came
-    from.
+    This retains the foreign-clone regression after separation: a dependency
+    belongs in this consumer's installation, not necessarily in a source root.
+    Provenance alone is insufficient; each imported authority's bytes must also
+    equal the pinned checkout, so a mutated or mixed import still fails.
     """
+    import importlib.metadata
+
     import execute_tools.deliverable_spec as spec_module
     import execute_tools.health_checks.candidate_eligibility as eligibility_module
 
-    framework_root = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
+    from tests.helpers.framework_checkout import EXP_ROOT, pinned_framework_checkout
+
+    framework_root = pinned_framework_checkout()
+    distribution = importlib.metadata.distribution("siderius")
+    provenance = json.loads(distribution.read_text("direct_url.json") or "{}")
+    assert provenance.get("vcs_info", {}).get("commit_id") == (
+        EXP_ROOT / "SIDERIUS_REVISION"
+    ).read_text().strip()
     for module in (spec_module, eligibility_module):
         resolved = Path(module.__file__ or "").resolve()
-        assert resolved.is_relative_to(framework_root), (
-            f"{module.__name__} resolved to {resolved}, which is outside the checkout "
-            f"under test ({framework_root}). This harness would be validating another clone."
+        relative = Path(*module.__name__.split(".")).with_suffix(".py")
+        assert resolved == Path(distribution.locate_file(relative)).resolve()
+        assert resolved.is_relative_to(EXP_ROOT / ".venv"), str(resolved)
+        assert resolved.read_bytes() == (framework_root / relative).read_bytes(), (
+            f"{module.__name__} differs from the pinned source: {resolved}"
         )
 
 

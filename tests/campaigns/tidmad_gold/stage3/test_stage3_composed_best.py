@@ -42,9 +42,9 @@ from execute_tools.health_checks.candidate_eligibility import (
     resolve_scientific_gate_ids,
 )
 from execute_tools.health_checks.config import (
-    _DEFAULT_CONFIG_PATH,
     materialize_effective_config,
 )
+from tests.helpers.framework_checkout import framework_health_policy
 from campaigns.tidmad_gold.stage3.stage3_composed_best import (
     BAND_LABELS,
     Stage3ComposedBestError,
@@ -168,7 +168,7 @@ def _make_band_workspace(
     workspace = root / f"{arm}_band{band}"
     workspace.mkdir(parents=True)
     _, config_sha = materialize_effective_config(
-        _DEFAULT_CONFIG_PATH,
+        framework_health_policy(),
         indices,
         str(workspace),
         resolved_scope=indices,

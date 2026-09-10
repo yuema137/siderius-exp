@@ -93,9 +93,9 @@ from execute_tools.health_checks.candidate_eligibility import (
 )
 from .metric_fixture import load_declared_tidmad_metric_spec
 from execute_tools.health_checks.config import (
-    _DEFAULT_CONFIG_PATH,
     materialize_effective_config,
 )
+from tests.helpers.framework_checkout import framework_health_policy
 from execute_tools.health_checks.schemas import PersistedHealthGateResult
 from execute_tools.metric_order import MetricOrder
 from campaigns.tidmad_gold.stage3.stage3_terminal_eval import (
@@ -628,7 +628,7 @@ def build_stage1_layout(
         # materializer. `files=` is the DS8 twin rule: under a partial
         # scope the monitored-file list must lie inside the scope.
         _effective_path, health_sha = materialize_effective_config(
-            _DEFAULT_CONFIG_PATH,
+            framework_health_policy(),
             list(files),
             str(workspace),
             resolved_scope=list(files),
