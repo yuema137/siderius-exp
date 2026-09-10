@@ -19,6 +19,12 @@
 
 ## Batches
 
+Latest bounded test-ownership pin checkpoint:
+[`2026-09-09_pr422_candidate_pin.md`](validation/2026-09-09_pr422_candidate_pin.md).
+The record includes the exact framework revision, isolated-environment commands,
+40 migrated regression tests, 37 pin/task-contract checks, and the explicit
+pytest import-mode requirement. It does not authorize campaign launch.
+
 | Batch | Source | Destination | Source revision | Status | Evidence |
 |---|---|---|---|---|---|
 | Bootstrap | repository boundary and dependency pin | repository root | `98610b8ded2277598749cc05ab567e1b92902bde` | complete | commit `108dea0` |
