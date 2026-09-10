@@ -66,7 +66,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
 
     from execute_tools.task_data_path import (
         ScopeBuildRequest,
@@ -144,7 +144,7 @@ def test_compositions_share_science_and_vary_only_task_scope(experiment: str) ->
     checkout = _siderius_checkout()
     completed = subprocess.run(
         [
-            sys.executable,
+            str(checkout / ".venv/bin/python"),
             "-c",
             COMPOSE_CHILD,
             str(checkout),

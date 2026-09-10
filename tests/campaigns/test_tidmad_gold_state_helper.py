@@ -329,9 +329,6 @@ def test_incumbent_validity_uses_the_workspaces_pinned_health_roster(
 
 
 def _deliverable_name(run_name: str, index: int) -> str:
-    checkout = str(_siderius_checkout())
-    if checkout not in sys.path:
-        sys.path.insert(0, checkout)
     from execute_tools.deliverable_spec import default_deliverable_naming
 
     return default_deliverable_naming().name(

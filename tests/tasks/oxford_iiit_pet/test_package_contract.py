@@ -35,7 +35,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -115,7 +115,10 @@ def test_composition_resolves_only_task_owned_science() -> None:
     """The external package must own its task semantics and plugin sources."""
     checkout = _siderius_checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", COMPOSE_CHILD, str(checkout), str(COMPOSITION)],
+        [
+            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
+            str(checkout), str(COMPOSITION),
+        ],
         cwd=checkout,
         text=True,
         capture_output=True,

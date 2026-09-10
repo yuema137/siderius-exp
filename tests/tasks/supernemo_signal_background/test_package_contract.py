@@ -6,7 +6,6 @@ import json
 import os
 import shlex
 import subprocess
-import sys
 import textwrap
 from pathlib import Path
 
@@ -31,7 +30,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -83,7 +82,10 @@ def test_composition_loads_once_and_owns_its_science() -> None:
     """Metric reuse must not register a second task-data implementation."""
     checkout = _siderius_checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", COMPOSE_CHILD, str(checkout), str(COMPOSITION)],
+        [
+            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
+            str(checkout), str(COMPOSITION),
+        ],
         cwd=checkout,
         text=True,
         capture_output=True,

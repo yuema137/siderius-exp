@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import sys
 import textwrap
 import tomllib
 from pathlib import Path
@@ -60,7 +59,7 @@ CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     workspace = Path(sys.argv[3]).resolve()
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
     os.chdir(checkout)
 
     from core.run_invariants import RunHealthMaterialization, build_run_invariants
@@ -187,7 +186,7 @@ def test_real_task_cold_start_reaches_the_llm_gpu_boundary(
     checkout = _siderius_checkout()
     completed = subprocess.run(
         [
-            sys.executable,
+            str(checkout / ".venv/bin/python"),
             "-c",
             CHILD,
             str(checkout),

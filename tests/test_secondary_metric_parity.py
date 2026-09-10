@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import sys
 import textwrap
 from pathlib import Path
 
@@ -51,7 +50,7 @@ CHILD = textwrap.dedent(
 
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
     os.chdir(checkout)
 
     from workflows import task_composition as composition_module
@@ -105,7 +104,10 @@ def test_real_task_secondary_metric_declarations(task_id: str) -> None:
     """Fail when a migrated task's scientific metric roster or order drifts."""
     checkout = _siderius_checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", CHILD, str(checkout), str(TASK_MANIFESTS[task_id])],
+        [
+            str(checkout / ".venv/bin/python"), "-c", CHILD,
+            str(checkout), str(TASK_MANIFESTS[task_id]),
+        ],
         cwd=checkout,
         text=True,
         capture_output=True,

@@ -6,7 +6,6 @@ import json
 import os
 import shlex
 import subprocess
-import sys
 import textwrap
 from pathlib import Path
 
@@ -27,7 +26,7 @@ COMPOSE_CHILD = textwrap.dedent(
     from pathlib import Path
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
     from workflows.task_composition import compose_run_task_bindings
     composition = compose_run_task_bindings(str(manifest))
     print(json.dumps({
@@ -56,8 +55,13 @@ def _checkout() -> Path:
 
 
 def test_composition_loads_against_exact_framework_pin() -> None:
+    checkout = _checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", COMPOSE_CHILD, str(_checkout()), str(COMPOSITION)],
+        [
+            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
+            str(checkout), str(COMPOSITION),
+        ],
+        cwd=checkout,
         text=True,
         capture_output=True,
         check=False,

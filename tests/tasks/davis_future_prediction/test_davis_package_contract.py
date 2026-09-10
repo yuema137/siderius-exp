@@ -33,7 +33,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    sys.path.insert(0, str(checkout))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -87,9 +87,7 @@ ISOLATED_METRIC_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     deliverable = Path(sys.argv[3]).resolve()
-    dependency_root = Path(sys.argv[4]).resolve()
-    sys.path.insert(0, str(checkout))
-    sys.path.insert(1, str(dependency_root))
+    assert Path(sys.prefix).resolve() == checkout / ".venv"
 
     import numpy as np
     from execute_tools.task_data_path import bind_task_data_path
@@ -138,7 +136,10 @@ def test_composition_resolves_only_task_owned_science() -> None:
     """The external package must own its task semantics and plugin sources."""
     checkout = _siderius_checkout()
     completed = subprocess.run(
-        [sys.executable, "-c", COMPOSE_CHILD, str(checkout), str(COMPOSITION)],
+        [
+            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
+            str(checkout), str(COMPOSITION),
+        ],
         cwd=checkout,
         text=True,
         capture_output=True,
@@ -171,21 +172,17 @@ def test_metric_reuses_the_bound_data_path_without_importing_this_repository(
     it fails with ``ModuleNotFoundError: tasks`` if the ambient import returns.
     """
     checkout = _siderius_checkout()
-    import numpy as np
-
-    dependency_root = Path(np.__file__).resolve().parents[1]
     deliverable = tmp_path / "prediction.npz"
     deliverable.touch()
     completed = subprocess.run(
         [
-            sys.executable,
+            str(checkout / ".venv/bin/python"),
             "-I",
             "-c",
             ISOLATED_METRIC_CHILD,
             str(checkout),
             str(COMPOSITION),
             str(deliverable),
-            str(dependency_root),
         ],
         cwd=checkout,
         text=True,
