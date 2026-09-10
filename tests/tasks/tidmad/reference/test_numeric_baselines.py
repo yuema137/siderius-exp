@@ -36,6 +36,8 @@ import pytest
 import execute_tools.scoring_utils as scoring_utils
 from execute_tools.scoring_helpers import _grand_mean_log_scalar
 
+pytestmark = pytest.mark.usefixtures("bound_tidmad_profile")
+
 EXP_ROOT = Path(__file__).resolve().parents[4]
 REFERENCE = EXP_ROOT / "tasks" / "tidmad" / "reference_data"
 GOLDENS = Path(__file__).parent / "goldens"

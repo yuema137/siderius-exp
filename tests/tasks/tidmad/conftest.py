@@ -2,9 +2,27 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import h5py
 import numpy as np
 import pytest
+from execute_tools.dataset_config import DatasetProfile, bind_dataset_profile
+
+
+@pytest.fixture
+def tidmad_profile():
+    """Read this task's declaration; never rely on a framework default."""
+    root = Path(__file__).resolve().parents[3]
+    declaration = root / "tasks/tidmad/resolved/dataset_profile.json"
+    return DatasetProfile.model_validate_json(declaration.read_text())
+
+
+@pytest.fixture
+def bound_tidmad_profile(tidmad_profile):
+    """Opt-in binding, restored after each task-owned witness."""
+    with bind_dataset_profile(tidmad_profile):
+        yield tidmad_profile
 
 
 @pytest.fixture

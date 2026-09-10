@@ -55,6 +55,8 @@ from execute_tools.sample_set_builder import build_sample_set
 from execute_tools.scoring_utils import validate_sample_set
 from tasks.tidmad.runtime.tidmad_data_path import TIDMADEpochDataset
 
+pytestmark = pytest.mark.usefixtures("bound_tidmad_profile")
+
 # Mirrors tests/unit/core/test_sandbox_scope.py — minimal configs that pass
 # Pydantic validation without a GPU or real data.
 MODEL_CFG = {"model_type": "fcnet", "segmentation_size": 10000, "latent_dims": [100, 10]}

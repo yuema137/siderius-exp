@@ -231,7 +231,7 @@ class TestF12d34StorageProvenanceWithoutLegacySampleSet:
         assert provenance["file_count"] == 0
         assert provenance["dataset_root"] == str(tmp_path)
 
-    def test_legacy_sample_set_still_reports_scoped_files(self, tmp_path):
+    def test_missing_scoped_file_does_not_invent_disk_bytes(self, tmp_path):
         provenance = tes._setup_storage_provenance(
             str(tmp_path), {"4": [0, 1]}, TIDMAD_PROFILE
         )
@@ -239,7 +239,21 @@ class TestF12d34StorageProvenanceWithoutLegacySampleSet:
         assert provenance["file_count"] == 1
         assert provenance["files_present"] == 0
         assert provenance["total_file_bytes"] == 0
-        assert provenance["expected_raw_bytes"] > 0
+        assert provenance["expected_raw_bytes"] == 0
+
+    def test_present_scoped_file_uses_on_disk_not_logical_bytes(self, tmp_path):
+        # This provenance boundary stats the file; it does not decode HDF5.
+        file = tmp_path / "abra_training_0004.h5"
+        file.write_bytes(b"synthetic storage extent" * 200)
+        provenance = tes._setup_storage_provenance(
+            str(tmp_path), {"4": [0, 1]}, TIDMAD_PROFILE
+        )
+        assert provenance["file_count"] == provenance["files_present"] == 1
+        assert provenance["total_file_bytes"] == file.stat().st_size
+        expected = round(
+            file.stat().st_size * 2 / tidmad_topology(TIDMAD_PROFILE).dataset.segments_per_file
+        )
+        assert provenance["expected_raw_bytes"] == expected > 0
 
 
 class TestMainArgvWiring:
@@ -297,6 +311,8 @@ class TestMainArgvWiring:
                 _composed_task_identity(),
                 "--task_manifest",
                 TASK_MANIFEST,
+                "--dataset_profile_json",
+                str(Path(TASK_MANIFEST).parents[1] / "resolved/dataset_profile.json"),
                 *extra_argv,
             ],
         )
