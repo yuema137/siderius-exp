@@ -81,8 +81,13 @@ import subprocess
 import sys
 import time
 from collections.abc import Iterable, Mapping, Sequence
+from contextlib import ExitStack
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from workflows.task_composition import RunTaskComposition
 
 #: Artifact schema. The comparator refuses a surface it does not know how
 #: to read rather than silently comparing two shapes.
@@ -339,7 +344,32 @@ def capture_provenance(
     }
 
 
-def render_prompt_surfaces(*, baseline_isolation: bool) -> dict[str, str]:
+def render_prompt_surfaces(
+    *, baseline_isolation: bool, task_composition: RunTaskComposition | None
+) -> dict[str, str]:
+    """Render task declarations and plugin visibility without executing a run."""
+    from ml_models.plugin_binding import (
+        bind_run_loss_plugin_roots,
+        bind_run_model_plugins,
+    )
+
+    if task_composition is None:
+        raise ValueError("arm-surface capture requires an explicit task composition")
+    # A full run binding rightly requires a physical data root. Prompt capture
+    # reads no dataset: activate only the plugin views its renderers consume.
+    with ExitStack() as stack:
+        if task_composition.model_plugins is not None:
+            stack.enter_context(bind_run_model_plugins(task_composition.model_plugins))
+        if task_composition.loss_plugins is not None:
+            stack.enter_context(bind_run_loss_plugin_roots(task_composition.loss_plugins))
+        return _render_bound_prompt_surfaces(
+            baseline_isolation=baseline_isolation, task_composition=task_composition
+        )
+
+
+def _render_bound_prompt_surfaces(
+    *, baseline_isolation: bool, task_composition: RunTaskComposition
+) -> dict[str, str]:
     """Every cold-start prompt surface, rendered by the PRODUCTION renderers.
 
     Imports are local: this module is also imported by the comparator's
@@ -351,11 +381,10 @@ def render_prompt_surfaces(*, baseline_isolation: bool) -> dict[str, str]:
         render_available_models,
     )
     from agent.schemas.task_config import ForwardContract
-    from agent_generated._registry import CapabilityRegistry
+    from core.capability_registry import CapabilityRegistry
     from workflows.model_exploration import resolve_run_proposal_blocks
     from workflows.task_config import (
         get_task_description,
-        load_task_config,
         render_forward_contract,
     )
 
@@ -363,8 +392,8 @@ def render_prompt_surfaces(*, baseline_isolation: bool) -> dict[str, str]:
     models_block = render_available_models(registry, baseline_isolation=baseline_isolation)
     losses_block = render_available_losses(registry)
 
-    task_config = load_task_config()
-    blocks = resolve_run_proposal_blocks(None)
+    task_config = task_composition.task_config_values()
+    blocks = resolve_run_proposal_blocks(task_composition)
 
     surfaces: dict[str, str] = {
         "proposal.available_models_block": models_block,
@@ -405,6 +434,7 @@ def build_surface(
     environ: Mapping[str, str],
     stores: Mapping[str, Sequence[tuple[str, str]]],
     provenance: Mapping[str, object],
+    task_composition: RunTaskComposition | None = None,
 ) -> dict:
     """The complete arm surface artifact.
 
@@ -430,8 +460,12 @@ def build_surface(
     if missing_provenance:
         raise ValueError(f"provenance key(s) not captured: {missing_provenance}")
 
-    arm_render = render_prompt_surfaces(baseline_isolation=baseline_isolation)
-    neutral_render = render_prompt_surfaces(baseline_isolation=False)
+    arm_render = render_prompt_surfaces(
+        baseline_isolation=baseline_isolation, task_composition=task_composition
+    )
+    neutral_render = render_prompt_surfaces(
+        baseline_isolation=False, task_composition=task_composition
+    )
     prompt_bytes = {
         surface_id: {
             "arm": digest_text(text),
@@ -484,6 +518,23 @@ def resolve_stores(
     }
 
 
+def _selected_composition(args: argparse.Namespace) -> RunTaskComposition:
+    """Use the launcher's selected manifest, never a default scientific task."""
+    from workflows.task_composition import compose_run_task_bindings
+
+    manifest = args.task_composition
+    if args.resolved_launch:
+        from campaign_arm_symmetry import extract_resolved_config
+
+        config = extract_resolved_config(Path(args.resolved_launch).read_text())
+        manifest = config.get("task_composition")
+    if not isinstance(manifest, str) or not manifest.strip():
+        raise ValueError("arm-surface capture requires a nonempty task_composition")
+    if not Path(manifest).is_absolute():
+        raise ValueError("arm-surface task_composition must be an absolute manifest path")
+    return compose_run_task_bindings(manifest)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--arm", required=True, choices=list(ARMS))
@@ -497,13 +548,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
     )
     parser.add_argument("--project-dir", required=True, help="the checkout the run will execute")
+    task_source = parser.add_mutually_exclusive_group(required=True)
+    task_source.add_argument("--task-composition", help="explicit absolute task manifest")
+    task_source.add_argument(
+        "--resolved-launch", help="launcher dry-run capture containing task_composition"
+    )
     parser.add_argument("--out", required=True, help="path to write the surface JSON")
     args = parser.parse_args(argv)
 
     project_dir = os.path.abspath(args.project_dir)
     try:
+        composition = _selected_composition(args)
         revision, revision_dirty = resolve_revision(project_dir)
         surface = build_surface(
+            task_composition=composition,
             arm=args.arm,
             baseline_isolation=args.baseline_isolation == "true",
             environ=os.environ,

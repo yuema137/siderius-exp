@@ -152,14 +152,13 @@ preflight_evidence_state() {
 }
 
 # Capture ONE arm's surface (rendered prompt bytes / environment /
-# machine-local stores) through the production renderers. PYTHONPATH-pinned
-# to this checkout for the same reason R2b exists: a surface rendered by
-# another clone's templates describes prompts this launch will not send.
+# machine-local stores) through the production renderers and the task chosen
+# by that arm's real launcher. The exact checkout owns its own environment.
 pf_capture_surface() {
-    local arm="$1" isolation="$2" out="$3"
-    (cd "$PF_PROJECT_DIR" && PYTHONPATH="${PF_PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+    local arm="$1" isolation="$2" out="$3" launch_capture="$4"
+    (cd "$PF_PROJECT_DIR" && env -u PYTHONPATH \
         "$PF_PY" "$PF_SURFACE" --arm "$arm" --baseline-isolation "$isolation" \
-        --project-dir "$PF_PROJECT_DIR" --out "$out")
+        --project-dir "$PF_PROJECT_DIR" --resolved-launch "$launch_capture" --out "$out")
 }
 
 # --- row bookkeeping --------------------------------------------------------
@@ -497,7 +496,7 @@ pf_main() {
                 OTHER_ISO="$(pf_isolation_for_arm "$OTHER_ARM" "$WITH_ISO" "$WITHOUT_ISO")" || SURF_RC=$?
         fi
             if [ "$SURF_RC" -eq 0 ]; then
-                pf_capture_surface "$ARM" "$SELF_ISO" "${SCRATCH}/surface_${ARM}.json" || SURF_RC=$?
+                pf_capture_surface "$ARM" "$SELF_ISO" "${SCRATCH}/surface_${ARM}.json" "$ARM_CAPTURE" || SURF_RC=$?
         fi
             # PUBLISH into the shared campaign root. This is what makes the
             # comparison CROSS-POD: the arm that preflights second reads the
@@ -524,7 +523,7 @@ pf_main() {
                 else
                     OTHER_SURFACE="${SCRATCH}/surface_${OTHER_ARM}.json"
                     SIBLING_SOURCE="local"
-                    pf_capture_surface "$OTHER_ARM" "$OTHER_ISO" "$OTHER_SURFACE" || SURF_RC=$?
+                    pf_capture_surface "$OTHER_ARM" "$OTHER_ISO" "$OTHER_SURFACE" "$OTHER_OUT" || SURF_RC=$?
                 fi
         fi
             # ONE verdict for the whole surface layer. Two pf_fail calls for

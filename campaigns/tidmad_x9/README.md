@@ -40,7 +40,21 @@ and Formal time budgets are the runaway bound.
 Run the campaign-owned checks against an explicit framework checkout:
 
 ```bash
-SIDERIUS_CHECKOUT=/path/to/SIDERIUS \
-PYTHONPATH=/path/to/siderius-exp:/path/to/SIDERIUS \
-/path/to/SIDERIUS/.venv/bin/python -m pytest tests/campaigns/tidmad_x9
+uv sync --group dev --frozen
+export SIDERIUS_CHECKOUT=/absolute/path/to/pinned/SIDERIUS
+test "$(git -C "$SIDERIUS_CHECKOUT" rev-parse HEAD)" = "$(tr -d '\n' < SIDERIUS_REVISION)"
+(cd "$SIDERIUS_CHECKOUT" && uv sync --group dev --frozen)
+env -u PYTHONPATH .venv/bin/python -m pytest tests/campaigns/tidmad_x9
 ```
+
+Run this from the exp root. The real prompt-capture child uses the framework
+checkout's own interpreter and template resources; the installed exp dependency
+alone is not a substitute for those checkout assets.
+
+R7 captures the task declared in each arm's real resolved-launch output, using
+`--resolved-launch`. A manual `campaign_arm_surface.py` call must instead supply
+an absolute `--task-composition` manifest (the two inputs are mutually exclusive).
+Missing, empty or relative task declarations refuse before a surface is written.
+Capture reads task declarations and plugin visibility, not scientific datasets;
+it does not start a run or require a fabricated data directory. Arm isolation,
+comparison rules and scientific treatment are unchanged.

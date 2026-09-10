@@ -655,18 +655,22 @@ class TestProductionWitness:
     def _capture(tmp_path: Path, arm: str, isolation: str, library: Path) -> Path:
         out = tmp_path / f"surface_{arm}.json"
         env = dict(os.environ)
-        env["PYTHONPATH"] = str(REPO_ROOT)
+        env.pop("PYTHONPATH", None)
         env["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(library)
+        env["SIDERIUS_CALIBRATION_DIR"] = str(tmp_path / "calibration")
+        framework = Path(os.environ["SIDERIUS_CHECKOUT"])
         result = subprocess.run(
             [
-                sys.executable,
+                str(framework / ".venv/bin/python"),
                 str(SURFACE_SCRIPT),
                 "--arm",
                 arm,
                 "--baseline-isolation",
                 isolation,
                 "--project-dir",
-                str(REPO_ROOT),
+                os.environ["SIDERIUS_CHECKOUT"],
+                "--task-composition",
+                str(REPO_ROOT / "tasks/tidmad/compositions/bounded_qualification.yaml"),
                 "--out",
                 str(out),
             ],
