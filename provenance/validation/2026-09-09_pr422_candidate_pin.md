@@ -83,3 +83,26 @@ goldens were not regenerated; test inputs/outputs, secrets, checkpoints, and raw
 data are not committed. No scientific config changed and no task was launched.
 Existing tracked framework/package and external-scope issues remain separate;
 these focused passes do not replace final framework CI or release qualification.
+
+## Final test-only candidate alignment
+
+The final replay advances the exact pin from
+`655bcd258f6a54f5052b83bbb48a1dabd7845f0b` to
+`66d3edf2b2045eaf037fb5cc9ecb3dffee94523b`. Independent `git diff --name-only`
+inspection confirms the intervening framework changes contain only three test
+files and its separation ledger: no production source, package definition, or
+scientific treatment changes. The tests repair stale Health fixture signatures
+and isolate Quickstart manifest variants from inherited task registrations.
+
+The same two exact command blocks above were rerun with the same checkout paths,
+now at the new pin, after `env -u VIRTUAL_ENV uv lock` and
+`env -u VIRTUAL_ENV uv sync --group dev --frozen`:
+
+- Migration cohort: **40 passed in 4.24 seconds**.
+- Pin and six external-task contracts: **37 passed in 20.56 seconds**.
+- Installed `direct_url.json`, `SIDERIUS_REVISION`, `uv.lock`, and the own-venv
+  interpreter prefix agree; only the framework revision changed in the lock.
+
+No GPU/LLM workload was launched. No historical oracle, experiment configuration,
+raw data, or runtime output changed. Final framework CI remains a separate
+acceptance gate; this record certifies the synchronized external-consumer pair.
