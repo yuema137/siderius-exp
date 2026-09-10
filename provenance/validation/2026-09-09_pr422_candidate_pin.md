@@ -106,3 +106,36 @@ now at the new pin, after `env -u VIRTUAL_ENV uv lock` and
 No GPU/LLM workload was launched. No historical oracle, experiment configuration,
 raw data, or runtime output changed. Final framework CI remains a separate
 acceptance gate; this record certifies the synchronized external-consumer pair.
+
+## Framework PR closure and final complete CI
+
+SIDERIUS [PR #422](https://github.com/Galileo-Sandbox/SIDERIUS/pull/422) merged
+as `2091acdfcb24eb9c8d3953ee7ba1e3ba99926aa0`, preserving its commit history.
+The experiment pin remains `66d3edf2b2045eaf037fb5cc9ecb3dffee94523b`:
+`git merge-base --is-ancestor` succeeds and `git diff` from that pin to the
+merge is empty. This is the qualified code now on framework master, not an
+outdated implementation; no dependency or environment change is needed merely
+to replace the exact tested ancestor with a merge commit containing the same tree.
+
+The final [complete CI run](https://github.com/Galileo-Sandbox/SIDERIUS/actions/runs/34436551662)
+finished **SUCCESS**. The primary implementing agent verified the actual CI merge
+commit `2682a254` has the same tree as the candidate, with all 697 selected files
+accounted for:
+
+| Suite | Passed | Skipped | Failed | Errors |
+| --- | ---: | ---: | ---: | ---: |
+| Bulk | 11,573 | 21 | 0 | 0 |
+| Sensitive | 184 | 0 | 0 | 0 |
+| Total | 11,757 | 21 | 0 | 0 |
+
+This completes the PR's framework CI gate in addition to the external 40 + 37
+checks above. It is not a release or authorization to launch a scientific
+campaign. Framework issues
+[#423](https://github.com/Galileo-Sandbox/SIDERIUS/issues/423) and
+[#424](https://github.com/Galileo-Sandbox/SIDERIUS/issues/424), and experiment issues
+[#30](https://github.com/Galileo-Sandbox/siderius-exp/issues/30) and
+[#31](https://github.com/Galileo-Sandbox/siderius-exp/issues/31) remain open;
+this closure does not claim those deferred boundaries are fixed.
+
+This final update changes only this validation record. The pin, lock, scientific
+configuration, datasets, workspaces, and all runtime artifacts remain unchanged.
