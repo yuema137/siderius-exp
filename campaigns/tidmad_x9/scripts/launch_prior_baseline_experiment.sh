@@ -111,8 +111,21 @@ if [ ! -x "$PROJECT_PYTHON" ]; then
     echo "ERROR: exact-checkout virtualenv is missing: ${PROJECT_DIR}/.venv" >&2
     exit 1
 fi
+python_environment_root() {
+    local executable="$1" bin_dir
+    bin_dir="$(cd "$(dirname "$executable")" 2>/dev/null && pwd -P)" || return 1
+    [ "$(basename "$bin_dir")" = "bin" ] || return 1
+    (cd "${bin_dir}/.." 2>/dev/null && pwd -P)
+}
+python_matches_environment() {
+    local executable="$1" expected_environment="$2"
+    local actual_environment canonical_expected
+    actual_environment="$(python_environment_root "$executable")" || return 1
+    canonical_expected="$(cd "$expected_environment" 2>/dev/null && pwd -P)" || return 1
+    [ "$actual_environment" = "$canonical_expected" ]
+}
 if [ -n "${SIDERIUS_PYTHON:-}" ] \
-    && [ "$(readlink -f "$SIDERIUS_PYTHON")" != "$(readlink -f "$PROJECT_PYTHON")" ]; then
+    && ! python_matches_environment "$SIDERIUS_PYTHON" "${PROJECT_DIR}/.venv"; then
     echo "ERROR: SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout: $SIDERIUS_PYTHON" >&2
     exit 1
 fi

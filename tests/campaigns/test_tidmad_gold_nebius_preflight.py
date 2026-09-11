@@ -128,18 +128,45 @@ def test_preflight_refuses_a_framework_revision_other_than_the_exp_pin() -> None
     assert f"exp_pin={pinned}" in refused.stdout
 
 
-def test_preflight_refuses_conflicting_explicit_framework_python() -> None:
-    """An explicit foreign interpreter must fail before any campaign row runs."""
+def _shared_base_foreign_python(tmp_path: Path) -> Path:
     checkout = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
+    foreign = tmp_path / "foreign-venv" / "bin" / "python"
+    foreign.parent.mkdir(parents=True)
+    foreign.symlink_to(checkout / ".venv" / "bin" / "python")
+    assert foreign.resolve() == (checkout / ".venv" / "bin" / "python").resolve()
+    assert foreign.parent.parent.resolve() != (checkout / ".venv").resolve()
+    return foreign
+
+
+def test_preflight_refuses_shared_base_python_from_another_venv(
+    tmp_path: Path,
+) -> None:
+    """A shared base executable must not erase the explicit venv identity."""
+    checkout = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
+    foreign = _shared_base_foreign_python(tmp_path)
     result = _call(
         f'PF_SIDERIUS_ROOT="{checkout}"; '
-        'SIDERIUS_PYTHON="/definitely/foreign/python"; pf_resolve_python'
+        f'SIDERIUS_PYTHON="{foreign}"; pf_resolve_python'
     )
 
     assert result.returncode != 0
     assert (
         "SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout" in result.stderr
     )
+
+
+def test_gold_binder_refuses_shared_base_python_from_another_venv(
+    tmp_path: Path,
+) -> None:
+    """The launcher binder owns the same venv-identity refusal as preflight."""
+    checkout = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
+    foreign = _shared_base_foreign_python(tmp_path)
+    result = _call(
+        f'SIDERIUS_PYTHON="{foreign}"; gold_bind_siderius_checkout "{checkout}"'
+    )
+
+    assert result.returncode != 0
+    assert "SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout" in result.stderr
 
 
 def test_preflight_ignores_ambient_virtualenv_and_selects_exact_checkout() -> None:

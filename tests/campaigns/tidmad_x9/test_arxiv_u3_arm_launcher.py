@@ -197,9 +197,16 @@ class TestLauncherRefusals:
         assert "--workspace" in r.stderr
 
     def test_a_foreign_explicit_framework_python_is_refused(self, tmp_path):
-        """A caller must not replace the selected checkout's interpreter."""
+        """A shared base executable must not erase the explicit venv identity."""
+        foreign = tmp_path / "foreign-venv" / "bin" / "python"
+        foreign.parent.mkdir(parents=True)
+        foreign.symlink_to(_FRAMEWORK / ".venv" / "bin" / "python")
+        assert foreign.resolve() == (
+            _FRAMEWORK / ".venv" / "bin" / "python"
+        ).resolve()
+        assert foreign.parent.parent.resolve() != (_FRAMEWORK / ".venv").resolve()
         environment = _env()
-        environment["SIDERIUS_PYTHON"] = "/definitely/foreign/python"
+        environment["SIDERIUS_PYTHON"] = str(foreign)
         r = subprocess.run(
             [
                 "bash",

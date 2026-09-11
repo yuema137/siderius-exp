@@ -527,7 +527,7 @@ pf_resolve_python() {
         return 1
     fi
     if [ -n "${SIDERIUS_PYTHON:-}" ] \
-        && [ "$(readlink -f "$SIDERIUS_PYTHON")" != "$(readlink -f "$expected")" ]; then
+        && ! gold_python_matches_environment "$SIDERIUS_PYTHON" "${PF_SIDERIUS_ROOT}/.venv"; then
         echo "ERROR: SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout: $SIDERIUS_PYTHON" >&2
         return 1
     fi
