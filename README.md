@@ -142,9 +142,9 @@ the canonical ruler remains
 [`tasks/tidmad/reference_data/segment_anchors.json`](tasks/tidmad/reference_data/segment_anchors.json).
 Routine use has nothing to precompute. The module's `python -m` builder is
 retained only for an explicitly reviewed reconstruction with caller-supplied
-data and output paths. The duplicate framework assets and their remaining
-source/test/CI readers are unchanged until a later separately approved removal
-PR. No campaign is authorized to launch merely because its files exist here.
+data and output paths. The #430 cleanup removed 44 duplicated originals plus
+the root anchor from the framework; two live Slurm files remain until 03C2.
+No campaign is authorized to launch merely because its files exist here.
 
 The current pinned framework (`50a563521e8578d2b18eeb5d71f78b1e11e86257`)
 still exposes launch scripts under

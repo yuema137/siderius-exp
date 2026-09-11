@@ -34,6 +34,7 @@ while the archived `reports/health_metrics_scan.md` has SHA-256
 That mismatch is historical evidence. Neither digest, report, measurement, nor
 threshold has been repaired, regenerated, or adopted by a current workflow.
 
-This preservation checkpoint does not remove anything from SIDERIUS. The
-duplicate framework assets and their live source/test/CI readers remain until a
-separately designed and approved cleanup PR.
+This preservation checkpoint records the pre-cleanup state. The #430 cleanup
+has since removed 44 duplicated originals plus the root anchor; two live Slurm
+files remain for the separately approved 03C2 migration. The 46 archived files
+and this manifest remain unchanged historical evidence.
