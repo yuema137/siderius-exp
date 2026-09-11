@@ -1,0 +1,342 @@
+{
+  "status": "PRESERVED_NON_LIVE_HISTORY",
+  "preserved_on": "2026-09-11",
+  "preserved_at_exp_base": "0a03628684c6dfeea87abcdb421406ca7a70a23a",
+  "archive_root": "provenance/legacy_siderius/p0_03c1",
+  "active_runtime_or_test_registration": false,
+  "infra_revision": "95c81b7d9e2d56114bda1cdedf882f8ac4e25243",
+  "exp_base": "0a03628684c6dfeea87abcdb421406ca7a70a23a",
+  "files": [
+    {
+      "source": "configs/v17_pregate_threshold_review.json",
+      "destination": "provenance/legacy_siderius/p0_03c1/configs/v17_pregate_threshold_review.json",
+      "bytes": 4775,
+      "sha256": "b727f948204c31e495fbddedbeed6a4fab08e5d7243b2eff8ce8ec868c6245ee",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/coverage_zoo_onboarding.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/coverage_zoo_onboarding.md",
+      "bytes": 27919,
+      "sha256": "a075647463cb80a1c7cbc24f182e48311e893325e3f9956ed0464835ea2956fb",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/health_metrics_scan.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/health_metrics_scan.md",
+      "bytes": 26907,
+      "sha256": "e631c5883e7672ff7636096735f227406a8be2cba1153ab0c4090f1a98176892",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v17_20260717.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v17_20260717.md",
+      "bytes": 18924,
+      "sha256": "4b65f3a9807e91912061cde60b3f597f4c3f2736b3e4c147b34a7c996464c5c5",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v17_readiness_report.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v17_readiness_report.md",
+      "bytes": 7794,
+      "sha256": "9a18117445c079d89ee43790d35bbc1bd875ee57dee5cc5480c7a6bd4c2ece0a",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v18_20260723.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v18_20260723.md",
+      "bytes": 14246,
+      "sha256": "6de4a481d0ae2a46979a1d345b1c012bf89f57c4c70cf06afa712a42765cb0ee",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v18_20260724.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v18_20260724.md",
+      "bytes": 53136,
+      "sha256": "3bd52a794bb9b8fe78be12b7813f22bf39a40ecb7b8ddd01ef559ff6a582425a",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v18r_campaign_audit_20260725.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v18r_campaign_audit_20260725.md",
+      "bytes": 34734,
+      "sha256": "058e739933befc1f97577138fe6edb93c2ae8e510104abc37f000eb0e36cda54",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v21_pr_f_inspection_cost/measurements_pilot.json",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v21_pr_f_inspection_cost/measurements_pilot.json",
+      "bytes": 22636,
+      "sha256": "c13091ef4dab062883aa448cb70c42db351afc1d74742cd2960c9ee6bfdfccd5",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v21_pr_f_inspection_cost/measurements_pilot_rerun.json",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v21_pr_f_inspection_cost/measurements_pilot_rerun.json",
+      "bytes": 22636,
+      "sha256": "fef6c54ec6f472e8d326225b874424e864389ab573a934747e2e65ea15d9575e",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v21_pr_f_inspection_cost/measurements_subset.json",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v21_pr_f_inspection_cost/measurements_subset.json",
+      "bytes": 45596,
+      "sha256": "a6f758fe2739687f151f39c166f803472e28a5115ce3be439bfe2bb521be2c0b",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v21_pr_f_inspection_cost/measurements_subset_b.json",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v21_pr_f_inspection_cost/measurements_subset_b.json",
+      "bytes": 9551,
+      "sha256": "ef131ad575764376a4396f864cf14c468e38b7b2584f0199cfe506257ccc8fc4",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "reports/v21_pr_f_inspection_cost/report.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/reports/v21_pr_f_inspection_cost/report.md",
+      "bytes": 18285,
+      "sha256": "1f50ab3902379c738077410a98966303ab4992f3f89c9b64b73a53bd4e71030a",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/c12_stamp_failure_class.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/c12_stamp_failure_class.py",
+      "bytes": 4697,
+      "sha256": "7a6d3440ae2d7471ade334894df3038647c47dad87ae8986df8acb4b240b6bb0",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/inspection_cost_study/classify.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/inspection_cost_study/classify.py",
+      "bytes": 4929,
+      "sha256": "a8149bea70701603ea77fcaffce8fe2887356bd549834c81549a941a8d15b66e",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/inspection_cost_study/harness.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/inspection_cost_study/harness.py",
+      "bytes": 17140,
+      "sha256": "1566ba2fb6a460c381707c996b1b7ef139a2b0cfabdcaa354d827657fba73f0b",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/inspection_cost_study/manifest.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/inspection_cost_study/manifest.py",
+      "bytes": 10319,
+      "sha256": "d07aad459a29d70b895a50cd2b1e3f96e13988f25a12e92b3d2477df71c616c4",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/inspection_cost_study/report.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/inspection_cost_study/report.py",
+      "bytes": 4634,
+      "sha256": "908dfa8ba60f8449943d533ae3daed36acae5637b211274879f23a5bf587fb11",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/inspection_cost_study/schemas.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/inspection_cost_study/schemas.py",
+      "bytes": 5962,
+      "sha256": "d4e02095dd87ec47a943aaea8f4dccbfe0faa91a3f85c36dcf8c4708a812fedb",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/phase2_diagnostic_no_dynamic_search.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/phase2_diagnostic_no_dynamic_search.py",
+      "bytes": 6785,
+      "sha256": "2f0a2ffd4b40afd3905758ae5eb055c1afd25e5cc5e543ef854091cda44d55cf",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/__init__.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/__init__.py",
+      "bytes": 263,
+      "sha256": "b22b527241ee54135874b18fd858417fef5a9fd09e3ef3b09caaa7136f0acf15",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/analyze.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/analyze.py",
+      "bytes": 5317,
+      "sha256": "d4bd7f0319266e609ea4e9a494fed22eb29ef82fba7ab9226dbff13e0448eda5",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/analyze_full.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/analyze_full.py",
+      "bytes": 9846,
+      "sha256": "b5b7a87a96b945ed1944b64d1bec80ed083813cd3bf47032ea2c7a44924cedaf",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/blind.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/blind.py",
+      "bytes": 2114,
+      "sha256": "246aa3bbc9686f9363c762b7f17e763d4794a5be1fc5163eb81f13200ef58521",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/fixtures.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/fixtures.py",
+      "bytes": 19325,
+      "sha256": "e747827e42ba576f2d791b247fc02ffe789fc34dd380a62886f4e1e8a2d1accc",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/gate_rev4.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/gate_rev4.py",
+      "bytes": 8360,
+      "sha256": "11eba2ec6287a86699f0bb519ee7280e75fbb0535ee2ae8dc72a7aad7d4d934a",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/launch_pilot.sh",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/launch_pilot.sh",
+      "bytes": 1385,
+      "sha256": "4eff6b4ec25d24bdecfd9dad7bb5af205a64b6e26c5de5e63fa423d19c6f1196",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/order.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/order.py",
+      "bytes": 1867,
+      "sha256": "b62302c1d33fdf37d8cd4de3515c01eb1744ada096b4aa4aa24ae597a6908e1d",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/preflight.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/preflight.py",
+      "bytes": 18344,
+      "sha256": "470345ed8a20c46f914a9d80366fde96fd4e58211b3ad18a403b4999aea41b8e",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/rubric_form.md",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/rubric_form.md",
+      "bytes": 1015,
+      "sha256": "d683dc50fbd47c54b679c2cb5c8df2c5258fac65a8a218bb25aecafe50b1784a",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/runner.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/runner.py",
+      "bytes": 22009,
+      "sha256": "8e1bb034d4b1edc9a22b86d57f266d9ca09fba685feb5b97becfc326925c3fd1",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/pr3_l2_calibration/scorer.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/pr3_l2_calibration/scorer.py",
+      "bytes": 8038,
+      "sha256": "4780095ef28ed888f27807349d3deb9731b3526455d1a23c1c68db43b6ba26e6",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/step12_pr12a_gate2_evaluate.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/step12_pr12a_gate2_evaluate.py",
+      "bytes": 11540,
+      "sha256": "fd6f5f927dbc8fb2ec5cad7f9d5cef70bdba44a267028849ec2b49f1ed8b5594",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "scripts/verify_iter005_estimator.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/scripts/verify_iter005_estimator.py",
+      "bytes": 8607,
+      "sha256": "e979ce2ee003e3a1a8227ede6100f508866149e37c1de677daaee57e0d162e71",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "sdsc_submission_scripts/run_exploration_test.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/sdsc_submission_scripts/run_exploration_test.py",
+      "bytes": 7913,
+      "sha256": "a85635365719005f001c49ce8f87b483c8dc7e79fb32ef33dd2f0774823d46f4",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "sdsc_submission_scripts/submit_exploration_test.slurm",
+      "destination": "provenance/legacy_siderius/p0_03c1/sdsc_submission_scripts/submit_exploration_test.slurm",
+      "bytes": 5081,
+      "sha256": "5dfb64c8412987c08c76e13484b3ad75d723e10b77261574aba5fd4f527de059",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "sdsc_submission_scripts/submit_hpt_agent.slurm",
+      "destination": "provenance/legacy_siderius/p0_03c1/sdsc_submission_scripts/submit_hpt_agent.slurm",
+      "bytes": 5947,
+      "sha256": "b76032b91b9e9679a19f0c69467fc6429a5b3ddaea379c86da7e48fa7833fc27",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "sdsc_submission_scripts/submit_one_iteration.slurm",
+      "destination": "provenance/legacy_siderius/p0_03c1/sdsc_submission_scripts/submit_one_iteration.slurm",
+      "bytes": 7881,
+      "sha256": "9c348488ba3ff624628effc53f2b1b563beb7823ccb1d951b11c3ea35a640d96",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "src/execute_tools/build_anchor_map.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/src/execute_tools/build_anchor_map.py",
+      "bytes": 7618,
+      "sha256": "5019f33cb06afcfe2c6207350e95de41d969deea5b7feb8ab138e87b822198e0",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "tests/integration/scoring/test_anchor_map_consistency.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/tests/integration/scoring/test_anchor_map_consistency.py",
+      "bytes": 4152,
+      "sha256": "034840029af1f89fd898734967f64ef9e5206b1501392f6a246043945c2ea1fc",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "tests/unit/execute_tools/test_build_anchor_map.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/tests/unit/execute_tools/test_build_anchor_map.py",
+      "bytes": 5116,
+      "sha256": "81cf9a42c2630721f08291cd982d82da53508ff072e2e0b9a84e6d1717a917cf",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "tests/unit/scripts/test_inspection_cost_study.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/tests/unit/scripts/test_inspection_cost_study.py",
+      "bytes": 25263,
+      "sha256": "218fb966ce656dd0a60822f7c676a6e9fa5ede1c207d359dab6b78583bf0f179",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "tests/unit/scripts/test_pr3_l2_full_campaign.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/tests/unit/scripts/test_pr3_l2_full_campaign.py",
+      "bytes": 6963,
+      "sha256": "5eb6162ff0e0463352c5b5f581332c29d3276883181fc8843073baaef086c396",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "tests/unit/scripts/test_pr3_l2p_preflight.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/tests/unit/scripts/test_pr3_l2p_preflight.py",
+      "bytes": 3542,
+      "sha256": "56f578ebbffc0d66f6d4686c23b088e32e3686675e392095b7a7844a7553cf0d",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "tests/unit/scripts/test_pr3_l2p_runner_status.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/tests/unit/scripts/test_pr3_l2p_runner_status.py",
+      "bytes": 9048,
+      "sha256": "9ae66a21b5441cd8942451e6770188ff24e28eded01676dcc6aca3ff4cea4961",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    },
+    {
+      "source": "tests/unit/scripts/test_sdsc_argument_forwarding.py",
+      "destination": "provenance/legacy_siderius/p0_03c1/tests/unit/scripts/test_sdsc_argument_forwarding.py",
+      "bytes": 12566,
+      "sha256": "5d793de6f4c9bb82ab5783e1d16515824b2aa1498cced34f9bc6cdee7af95e72",
+      "role": "immutable_snapshot_not_live_test_or_launcher"
+    }
+  ],
+  "total_bytes": 580725,
+  "existing_anchor": {
+    "source": "reference_data/segment_anchors.json",
+    "destination": "tasks/tidmad/reference_data/segment_anchors.json",
+    "sha256": "0c44b6084dc8afc4dc2fa34f5253bc8d780b4e8ae086945e7051d8bf7928ba90",
+    "copy_required": false
+  },
+  "loader_ast_equal": true,
+  "historical_threshold_report_hash_matches_current_report": false
+}

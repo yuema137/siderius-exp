@@ -48,7 +48,6 @@ from core.run_invariants import (
     validate_stamped_invariants,
 )
 from core.sandbox_executor import LocalRecorder, TidmadSandbox, sandbox_records_dir
-from execute_tools.build_anchor_map import load_anchor_map
 from execute_tools.data_paths import DatasetDirectoryUnavailable, resolve_dataset_dir
 from execute_tools.dataset_config import (
     NUM_FILES,
@@ -63,6 +62,7 @@ from execute_tools.health_checks.schemas import GateAction, HealthCheckContext
 from execute_tools.sample_set_builder import build_sample_set
 from execute_tools.scoring_utils import score_vector
 
+from tasks.tidmad.runtime.anchor_map import load_anchor_map
 from tasks.tidmad.runtime.campaign_artifacts import (
     decide_phase1_reuse,
     sha256_file,
