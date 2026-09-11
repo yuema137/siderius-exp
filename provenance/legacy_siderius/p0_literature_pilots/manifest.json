@@ -1,0 +1,12 @@
+{
+  "status": "PRESERVED_NON_LIVE_HISTORY",
+  "preserved_on": "2026-09-11",
+  "infra_revision": "95c81b7d9e2d56114bda1cdedf882f8ac4e25243",
+  "archive_root": "provenance/legacy_siderius/p0_literature_pilots",
+  "active_runtime_or_test_registration": false,
+  "files": [
+    {"source": "tests/integration/nodes/test_ml_literature_review_phase1_pilot.py", "destination": "provenance/legacy_siderius/p0_literature_pilots/tests/integration/nodes/test_ml_literature_review_phase1_pilot.py", "mode": "100644", "bytes": 17108, "sha256": "0f09cf7f38719bece5069cb7774f3f88b99dcf9aaaa14bfe984105c0a221abe5"},
+    {"source": "tests/integration/nodes/test_ml_literature_review_phase2_pilot.py", "destination": "provenance/legacy_siderius/p0_literature_pilots/tests/integration/nodes/test_ml_literature_review_phase2_pilot.py", "mode": "100644", "bytes": 27920, "sha256": "0a928416b9887e9aaf0cbb4a029015d0a343615d936c1dac24d7d960944f65ac"},
+    {"source": "tests/integration/nodes/test_ml_literature_review_phase2_full.py", "destination": "provenance/legacy_siderius/p0_literature_pilots/tests/integration/nodes/test_ml_literature_review_phase2_full.py", "mode": "100644", "bytes": 13094, "sha256": "f01b634bc6289ca6bc27e637cb518a2b2d3c7e7dc045966b2e44d72dd83950fa"}
+  ]
+}

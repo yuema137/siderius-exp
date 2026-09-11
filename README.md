@@ -93,6 +93,9 @@ export MAJORANA_DATA_DIR=/absolute/path/to/verified/MAJORANA
 env -u PYTHONPATH .venv/bin/python -m pytest
 ```
 
+For the qualified local pair, the verified invocation is:
+`env -u PYTHONPATH SIDERIUS_CHECKOUT=/home/yuema137/SIDERIUS MAJORANA_DATA_DIR=/home/klz/Data/MAJORANA .venv/bin/python -m pytest -q`.
+
 Pytest collects `tests/` using importlib mode, so separate tasks can have
 same-named test modules.
 Pytest also adds this exp root to its import path for task plugins; it does not
@@ -131,17 +134,23 @@ release and the unpublished `v0.1.5` Gold repair lineage. See the
 framework history; those scripts, tests, reports, and configurations are not
 live entrypoints or current experiment inputs.
 
+The three additional literature pilot/full test sources are preserved in the
+[P0 03C1c archive](provenance/legacy_siderius/p0_literature_pilots/README.md)
+as fixed-corpus, non-live history. They are not collected by the live suite;
+the active copies remain pending the separately approved 03C2 retirement.
+
 The live TIDMAD anchor authority is
 [`tasks/tidmad/runtime/anchor_map.py`](tasks/tidmad/runtime/anchor_map.py), and
 the canonical ruler remains
 [`tasks/tidmad/reference_data/segment_anchors.json`](tasks/tidmad/reference_data/segment_anchors.json).
 Routine use has nothing to precompute. The module's `python -m` builder is
 retained only for an explicitly reviewed reconstruction with caller-supplied
-data and output paths. The duplicate framework assets and their remaining
-source/test/CI readers are unchanged until a later separately approved removal
-PR. No campaign is authorized to launch merely because its files exist here.
+data and output paths. The #430 cleanup removed 44 duplicated originals plus
+the root anchor from the framework; two live Slurm files remain until 03C2.
+No campaign is authorized to launch merely because its files exist here.
 
-The current pinned framework still exposes launch scripts under
+The current pinned framework (`50a563521e8578d2b18eeb5d71f78b1e11e86257`)
+still exposes launch scripts under
 `sdsc_submission_scripts/` and current framework configuration under
 `configs/` and `llm_configs/`. This compatibility update does not relocate
 those surfaces; that is later 03C work. It changes no task declaration,
