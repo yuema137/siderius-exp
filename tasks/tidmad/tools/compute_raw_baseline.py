@@ -49,11 +49,11 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
-from tqdm import tqdm
-
-from execute_tools.build_anchor_map import load_anchor_map
 from execute_tools.dataset_config import DatasetProfile, load_dataset_profile
 from execute_tools.scoring_utils import coerce_nonfinite_to_none, process_segment
+from tqdm import tqdm
+
+from tasks.tidmad.runtime.anchor_map import load_anchor_map
 from tasks.tidmad.runtime.profile import tidmad_topology
 
 # ---------------------------------------------------------------------------

@@ -18,9 +18,12 @@ Output format (segment_anchors.json):
         }
     }
 
-Usage:
-    python execute_tools/build_anchor_map.py --data_dir /home/klz/Data/TIDMAD/
-    python execute_tools/build_anchor_map.py --data_dir /home/klz/Data/TIDMAD/ --parallel -n 8
+The task package already ships the canonical output. For an explicitly reviewed
+reconstruction, invoke the task-owned module and choose the output path:
+
+    python -m tasks.tidmad.runtime.anchor_map \
+        --data_dir /path/to/TIDMAD \
+        --output tasks/tidmad/reference_data/segment_anchors.json
 """
 
 import argparse
@@ -73,15 +76,21 @@ def build_anchor_map(
         and ``"anchors"`` (file_index → list of 200 SNR floats).
     """
     # Initialize: 20 files × 200 segments
-    anchors: dict[int, list[float]] = {i: [0.0] * SEGMENTS_PER_FILE for i in range(NUM_FILES)}
+    anchors: dict[int, list[float]] = {
+        i: [0.0] * SEGMENTS_PER_FILE for i in range(NUM_FILES)
+    }
 
     # Build task list: (file_index, segment_index)
     tasks = [(fi, si) for fi in range(NUM_FILES) for si in range(SEGMENTS_PER_FILE)]
     total = len(tasks)
 
     if parallel:
-        with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
-            futures = [executor.submit(_compute_ch2_snr, fi, si, data_dir) for fi, si in tasks]
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=num_workers
+        ) as executor:
+            futures = [
+                executor.submit(_compute_ch2_snr, fi, si, data_dir) for fi, si in tasks
+            ]
             for future in tqdm(
                 concurrent.futures.as_completed(futures),
                 total=total,
@@ -110,7 +119,7 @@ def default_anchor_map_path() -> str:
 
     The anchor map is a fixed reference artifact uniquely determined by the
     TIDMAD dataset, committed at ``reference_data/segment_anchors.json``. The
-    path is resolved from this module's package location (the repo root),
+    path is resolved from this module's task-package location,
     independent of the caller's current working directory, so the committed
     artifact is used automatically regardless of where a process is launched.
     """
@@ -152,7 +161,9 @@ def load_anchor_map(path: str) -> dict:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError as e:
-        raise ValueError(f"segment anchor map at {path!r} is malformed JSON: {e}") from e
+        raise ValueError(
+            f"segment anchor map at {path!r} is malformed JSON: {e}"
+        ) from e
     if not isinstance(data, dict) or "s_max" not in data or "anchors" not in data:
         found = sorted(data) if isinstance(data, dict) else type(data).__name__
         raise ValueError(
