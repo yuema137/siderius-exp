@@ -106,13 +106,20 @@ if [ -z "$PROJECT_DIR" ] || [ ! -f "$PROJECT_DIR/sdsc_submission_scripts/run_cha
     exit 1
 fi
 PROJECT_DIR="$(cd "$PROJECT_DIR" && pwd)"
-# P0 launch blocker (supervisor 2026-08-25, E1 trap): the venv's editable
-# install maps packages to the MAIN checkout; a child whose cwd leaves this
-# tree silently imports THAT tree's code. Pin resolution to THIS tree for
-# every process this launcher spawns. Identical for both arms by
-# construction (derived from the script's own location) — preflight R2b
-# proves it live, R7 sees it symmetric.
-export PYTHONPATH="${PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
+PROJECT_PYTHON="${PROJECT_DIR}/.venv/bin/python"
+if [ ! -x "$PROJECT_PYTHON" ]; then
+    echo "ERROR: exact-checkout virtualenv is missing: ${PROJECT_DIR}/.venv" >&2
+    exit 1
+fi
+if [ -n "${SIDERIUS_PYTHON:-}" ] \
+    && [ "$(readlink -f "$SIDERIUS_PYTHON")" != "$(readlink -f "$PROJECT_PYTHON")" ]; then
+    echo "ERROR: SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout: $SIDERIUS_PYTHON" >&2
+    exit 1
+fi
+export SIDERIUS_PYTHON="$PROJECT_PYTHON"
+export VIRTUAL_ENV="${PROJECT_DIR}/.venv"
+export PATH="${PROJECT_DIR}/.venv/bin${PATH:+:${PATH}}"
+unset PYTHONPATH
 RUN_CHAIN="${PROJECT_DIR}/sdsc_submission_scripts/run_chain.sh"
 RUNNER="${PROJECT_DIR}/sdsc_submission_scripts/run_one_iteration.py"
 H100_POSTURE_ENV="${SCRIPT_DIR}/h100_posture.env"
@@ -330,15 +337,7 @@ fi
 
 # --- Python for the resolved-config print (dry-run only) --------------------
 resolve_python() {
-    if [ -n "${SIDERIUS_PYTHON:-}" ]; then
-        PY="$SIDERIUS_PYTHON"
-    elif [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
-        PY="$VIRTUAL_ENV/bin/python"
-    elif [ -x "${PROJECT_DIR}/.venv/bin/python" ]; then
-        PY="${PROJECT_DIR}/.venv/bin/python"
-    else
-        PY="python3"
-    fi
+    PY="$PROJECT_PYTHON"
 }
 
 # The identity-relevant subset of the chain flags, forwarded to the print so
@@ -362,19 +361,15 @@ identity_flags() {
 }
 
 echo "[prior-baseline] arm=$ARM workspace=$WORKSPACE run_name=$RUN_NAME mode=$MODE h100=$H100 dry_run=$DRY_RUN${BAND:+ band=$BAND}${FIXED_CANDIDATE:+ fixed_candidate=$FIXED_CANDIDATE}"
-echo "[prior-baseline] pythonpath_pin=${PROJECT_DIR}"
+echo "[prior-baseline] python_pin=${PROJECT_PYTHON}"
 
 if [ "$DRY_RUN" -eq 1 ]; then
     resolve_python
     identity_flags ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"} ${H100_CHAIN_ARGS[@]+"${H100_CHAIN_ARGS[@]}"}
     echo "[prior-baseline] resolved launch configuration:"
-    # PYTHONPATH pins THIS checkout: with a shared venv whose editable
-    # install points at another clone, a bare script invocation would
-    # import that clone's modules — the CLAUDE.md portability failure —
-    # and the printed configuration would describe code this launcher is
-    # not launching.
-    (cd "$PROJECT_DIR" && \
-        PYTHONPATH="${PROJECT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+    # The selected checkout's own interpreter resolves its installed src
+    # package; a source overlay could hide a foreign editable installation.
+    (cd "$PROJECT_DIR" && env -u PYTHONPATH \
         "$PY" "$RUNNER" --print_resolved_launch_config \
         --workspace "$WORKSPACE" --run_name "$RUN_NAME" --start_iteration 1 \
         --task_composition "$TASK_COMPOSITION" \

@@ -49,7 +49,10 @@ env -u PYTHONPATH .venv/bin/python -m pytest tests/campaigns/tidmad_x9
 
 Run this from the exp root. The real prompt-capture child uses the framework
 checkout's own interpreter and template resources; the installed exp dependency
-alone is not a substitute for those checkout assets.
+alone is not a substitute for those checkout assets. The arm launcher likewise
+rejects a conflicting explicit `SIDERIUS_PYTHON`, ignores an ambient exp
+`VIRTUAL_ENV`, and clears `PYTHONPATH` before selecting
+`$SIDERIUS_CHECKOUT/.venv/bin/python`.
 
 R7 captures the task declared in each arm's real resolved-launch output, using
 `--resolved-launch`. A manual `campaign_arm_surface.py` call must instead supply

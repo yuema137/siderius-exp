@@ -94,7 +94,7 @@ def _siderius_checkout() -> Path:
             "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
         )
     checkout = Path(configured).resolve()
-    if not (checkout / "workflows/task_composition.py").is_file():
+    if not (checkout / "src/workflows/task_composition.py").is_file():
         pytest.fail(f"SIDERIUS_CHECKOUT is not a SIDERIUS checkout: {checkout}")
     return checkout
 
