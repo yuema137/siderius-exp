@@ -123,7 +123,23 @@ checkout assertion and invocation. This setup does not authorize campaign runs.
 
 ## Migration status
 
-The repository boundary is being established from the SIDERIUS `v0.1.4` release and the unpublished `v0.1.5` Gold repair lineage. See `provenance/MIGRATION.md`. No campaign is authorized to launch merely because its files exist here.
+The repository boundary is being established from the SIDERIUS `v0.1.4`
+release and the unpublished `v0.1.5` Gold repair lineage. See the
+[migration index](provenance/MIGRATION.md). The P0 03C1
+[source manifest](provenance/legacy_siderius/p0_03c1/manifest.json) and
+[archive guide](provenance/legacy_siderius/p0_03c1/README.md) preserve selected
+framework history; those scripts, tests, reports, and configurations are not
+live entrypoints or current experiment inputs.
+
+The live TIDMAD anchor authority is
+[`tasks/tidmad/runtime/anchor_map.py`](tasks/tidmad/runtime/anchor_map.py), and
+the canonical ruler remains
+[`tasks/tidmad/reference_data/segment_anchors.json`](tasks/tidmad/reference_data/segment_anchors.json).
+Routine use has nothing to precompute. The module's `python -m` builder is
+retained only for an explicitly reviewed reconstruction with caller-supplied
+data and output paths. The duplicate framework assets and their remaining
+source/test/CI readers are unchanged until a later separately approved removal
+PR. No campaign is authorized to launch merely because its files exist here.
 
 The current pinned framework still exposes launch scripts under
 `sdsc_submission_scripts/` and current framework configuration under
