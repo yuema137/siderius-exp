@@ -37,7 +37,6 @@ import json
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -58,13 +57,10 @@ _spec.loader.exec_module(roi)
 
 def _env() -> dict:
     env = dict(os.environ)
-    env["SIDERIUS_PYTHON"] = sys.executable
+    env["SIDERIUS_PYTHON"] = str(_FRAMEWORK / ".venv" / "bin" / "python")
     env["SIDERIUS_CHECKOUT"] = str(_FRAMEWORK)
-    env["VIRTUAL_ENV"] = str(Path(sys.executable).parents[1])
-    # THIS checkout must win over the shared venv's editable install (which
-    # points at whatever clone it was installed from) — the portability rule:
-    # a test must never validate another clone's code.
-    env["PYTHONPATH"] = os.pathsep.join((str(_FRAMEWORK), str(_REPO)))
+    env["VIRTUAL_ENV"] = str(_FRAMEWORK / ".venv")
+    env.pop("PYTHONPATH", None)
     return env
 
 
@@ -199,6 +195,34 @@ class TestLauncherRefusals:
         )
         assert r.returncode == 1
         assert "--workspace" in r.stderr
+
+    def test_a_foreign_explicit_framework_python_is_refused(self, tmp_path):
+        """A shared base executable must not erase the explicit venv identity."""
+        foreign = tmp_path / "foreign-venv" / "bin" / "python"
+        foreign.parent.mkdir(parents=True)
+        foreign.symlink_to(_FRAMEWORK / ".venv" / "bin" / "python")
+        assert foreign.resolve() == (
+            _FRAMEWORK / ".venv" / "bin" / "python"
+        ).resolve()
+        assert foreign.parent.parent.resolve() != (_FRAMEWORK / ".venv").resolve()
+        environment = _env()
+        environment["SIDERIUS_PYTHON"] = str(foreign)
+        r = subprocess.run(
+            [
+                "bash",
+                str(_LAUNCHER),
+                "--arm",
+                "with-prior-art",
+                "--workspace",
+                str(tmp_path / "w"),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            env=environment,
+        )
+        assert r.returncode == 1
+        assert "SIDERIUS_PYTHON conflicts" in r.stderr
 
 
 class TestH100Posture:
@@ -336,7 +360,7 @@ class TestPrintResolvedLaunchConfig:
         ws = tmp_path / "ws_never_created"
         r = subprocess.run(
             [
-                sys.executable,
+                str(_FRAMEWORK / ".venv" / "bin" / "python"),
                 str(_ROI),
                 "--workspace",
                 str(ws),

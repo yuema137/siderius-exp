@@ -111,8 +111,8 @@ ARMS = ("with-prior-art", "without-prior-art")
 ENVIRONMENT_PREFIXES = ("SIDERIUS_", "TIDMAD_", "H100_", "VALIDATION_")
 
 #: Names outside those prefixes that reach a run. Each is here for a reason:
-#: PYTHONPATH selects WHICH CHECKOUT's framework executes (the E1 trap that
-#: preflight R2b exists for); CUDA_VISIBLE_DEVICES selects the card;
+#: PYTHONPATH is captured as forbidden source-overlay contamination (the E1
+#: trap that preflight R2b exists for); CUDA_VISIBLE_DEVICES selects the card;
 #: OMP_NUM_THREADS and PYTORCH_CUDA_ALLOC_CONF change execution behaviour;
 #: CHAIN_STOP_FILE redirects the chain's stop check (F-SCANI-2's declared
 #: environment input, captured here precisely BECAUSE it is a legal one).
@@ -135,18 +135,12 @@ SECRET_PLACEHOLDER = "<set:value-withheld>"
 #: What an occurrence of this surface's own checkout root is rewritten to in
 #: every captured environment VALUE (N-9).
 #:
-#: WHY THIS IS NOT A HOLE. ``PYTHONPATH`` is captured precisely because it
-#: selects WHICH CHECKOUT executes (preflight R2b's E1 trap) and it is NOT
-#: on the comparator's arm-local allowlist, so a difference FAILS. But the
-#: preflight INJECTS it as an ABSOLUTE path to its own checkout, and two
-#: pods legitimately hold that checkout at two different absolute paths —
-#: the cross-pod comparison would then be red for a reason that is not an
-#: asymmetry, and a gate that cannot pass on two real pods gets switched
-#: off. This is the SAME portability argument ``digest_paths`` already
-#: makes for the stores, applied to the environment: the identity of the
-#: checkout is compared as the surface's recorded ``revision``, and its
-#: mount point is normalised away. Anything else on the path — a second
-#: clone injected on one pod only — still differs and still fails.
+#: WHY THIS IS NOT A HOLE. ``PYTHONPATH`` remains captured because any caller
+#: that reintroduces a source overlay must be visible and cannot differ between
+#: arms. Current preflight removes it before framework children execute. Root
+#: normalization remains for old or independently captured surfaces: checkout
+#: identity is compared through the recorded revision, while another injected
+#: clone remains different and fails symmetry.
 PROJECT_DIR_TOKEN = "<project_dir>"
 
 # --- machine-local stores: what is CONTENT and what is DERIVED -------------

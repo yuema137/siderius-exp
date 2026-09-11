@@ -27,22 +27,19 @@ Usage:
 import argparse
 import glob
 import hashlib
+import importlib.metadata
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from datetime import UTC
 from pathlib import Path
 from typing import cast
 
-from tasks.tidmad.runtime.campaign_artifacts import (
-    decide_phase1_reuse,
-    sha256_file,
-    validate_phase1_baseline,
-    write_campaign_manifest,
-)
 from core.run_invariants import (
     build_run_invariants,
     ensure_run_invariants,
@@ -65,6 +62,13 @@ from execute_tools.health_checks.evaluation import evaluate_and_persist_health_g
 from execute_tools.health_checks.schemas import GateAction, HealthCheckContext
 from execute_tools.sample_set_builder import build_sample_set
 from execute_tools.scoring_utils import score_vector
+
+from tasks.tidmad.runtime.campaign_artifacts import (
+    decide_phase1_reuse,
+    sha256_file,
+    validate_phase1_baseline,
+    write_campaign_manifest,
+)
 
 SIDERIUS_ROOT = os.environ.get("SIDERIUS_CHECKOUT", "")
 ROOT_DATA_DIR = ""
@@ -175,20 +179,84 @@ def _write_diagnostic_metadata(
     return path
 
 
-def _agent_env() -> dict:
-    """
-    Build a subprocess environment with all SIDERIUS paths on PYTHONPATH
-    so that flat imports in nodes/ml_hyperparameter_tune_agent/ml_hyperparameter_tune_agent.py, train_engine_sandbox.py, etc. resolve.
-    """
-    extra = [
-        SIDERIUS_ROOT,
-        os.path.join(SIDERIUS_ROOT, "ml_models"),
-        os.path.join(SIDERIUS_ROOT, "execute_tools"),
-    ]
+def _agent_env() -> dict[str, str]:
+    """Bind descendants to the selected checkout's own installed environment."""
     env = os.environ.copy()
-    existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = os.pathsep.join(extra + ([existing] if existing else []))
+    venv = str(Path(SIDERIUS_ROOT, ".venv").resolve())
+    env.pop("PYTHONPATH", None)
+    env["VIRTUAL_ENV"] = venv
+    env["PATH"] = os.pathsep.join(
+        value for value in (str(Path(venv, "bin")), env.get("PATH")) if value
+    )
     return env
+
+
+def _installed_siderius_revision() -> str | None:
+    """Return the VCS commit recorded by exp's installed framework dependency."""
+    distribution = importlib.metadata.distribution("siderius")
+    provenance = json.loads(distribution.read_text("direct_url.json") or "{}")
+    commit = provenance.get("vcs_info", {}).get("commit_id")
+    return commit if isinstance(commit, str) else None
+
+
+def _validate_siderius_binding() -> None:
+    """Refuse a source/package mismatch before data, training, or LLM work."""
+    root = Path(SIDERIUS_ROOT).resolve()
+    expected = (
+        (Path(__file__).resolve().parents[3] / "SIDERIUS_REVISION")
+        .read_text(encoding="utf-8")
+        .strip()
+    )
+    required = (
+        root / "src" / "core" / "layout.py",
+        root
+        / "src"
+        / "nodes"
+        / "ml_hyperparameter_tune_agent"
+        / "ml_hyperparameter_tune_agent.py",
+        root / "sdsc_submission_scripts" / "_import_resolution_probe.py",
+        root / ".venv" / "bin" / "python",
+    )
+    missing = [str(path) for path in required if not path.is_file()]
+    if missing:
+        raise SystemExit(
+            "[ERROR] SIDERIUS_CHECKOUT is missing required src-layout files: "
+            + ", ".join(missing)
+        )
+    actual = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if actual.returncode != 0 or actual.stdout.strip() != expected:
+        found = actual.stdout.strip() or "unavailable"
+        raise SystemExit(
+            f"[ERROR] SIDERIUS_CHECKOUT revision mismatch: HEAD={found} exp_pin={expected}"
+        )
+    installed = _installed_siderius_revision()
+    if installed != expected:
+        raise SystemExit(
+            "[ERROR] exp installed SIDERIUS revision mismatch: "
+            f"installed={installed or 'unavailable'} exp_pin={expected}"
+        )
+    with tempfile.TemporaryDirectory(prefix="siderius-comparison-probe-") as neutral:
+        probe = Path(neutral) / "probe.py"
+        shutil.copy2(required[2], probe)
+        checked = subprocess.run(
+            [str(required[3]), str(probe), str(root), "--tree-only"],
+            cwd=neutral,
+            capture_output=True,
+            text=True,
+            check=False,
+            env=_agent_env(),
+        )
+    if checked.returncode != 0:
+        detail = (checked.stderr or checked.stdout).strip()
+        raise SystemExit(
+            "[ERROR] selected SIDERIUS interpreter failed source-authority probe: "
+            f"exit={checked.returncode} {detail}"
+        )
 
 
 # ==========================================
@@ -777,9 +845,10 @@ def run_agent(
     )
 
     cmd = [
-        sys.executable,
+        str(Path(SIDERIUS_ROOT, ".venv", "bin", "python")),
         os.path.join(
             SIDERIUS_ROOT,
+            "src",
             "nodes",
             "ml_hyperparameter_tune_agent",
             "ml_hyperparameter_tune_agent.py",
@@ -1268,6 +1337,8 @@ def main():
         raise SystemExit(
             "[ERROR] SIDERIUS_CHECKOUT must name the exact framework checkout."
         )
+    SIDERIUS_ROOT = str(Path(SIDERIUS_ROOT).resolve())
+    _validate_siderius_binding()
     ROOT_DATA_DIR = os.path.abspath(args.workspace_root)
     DATA_DIR = resolve_dataset_dir(args.data_dir, purpose="TIDMAD comparison")
 

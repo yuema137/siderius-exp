@@ -59,20 +59,32 @@ binding, dataset availability, and the final release revision remain pending.
 
 The reachability witness deliberately fails when `SIDERIUS_CHECKOUT` is not
 set. Use an absolute checkout path, verify that it is the revision pinned by
-this experiment repository, and run the tests with that checkout's own virtual
-environment:
+this experiment repository, prepare both frozen environments, and run the
+consumer tests with this repository's own virtual environment:
 
 ```bash
 export SIDERIUS_CHECKOUT=/absolute/path/to/SIDERIUS
 test "$(git -C "$SIDERIUS_CHECKOUT" rev-parse HEAD)" = \
   "$(tr -d '[:space:]' < SIDERIUS_REVISION)"
-"$SIDERIUS_CHECKOUT/.venv/bin/python" -m pytest -q \
+(cd "$SIDERIUS_CHECKOUT" && uv sync --group dev --frozen)
+uv sync --group dev --frozen
+env -u PYTHONPATH .venv/bin/python -m pytest -q \
   tests/campaigns/test_capability_policy.py \
   tests/campaigns/test_tidmad_gold_nebius_preflight.py \
   tests/campaigns/tidmad_gold/stage3/test_terminal_eval.py \
   tests/campaigns/tidmad_gold/stage3/test_stage3_integration_witness.py
 ```
 
-Prepare the framework environment in that exact checkout with
-`uv sync --group dev --frozen`. Do not substitute another checkout's virtual
-environment or use `PYTHONPATH` to mix revisions.
+The tests import the pinned dependency installed in the exp `.venv`; Gold
+framework children use `$SIDERIUS_CHECKOUT/.venv/bin/python`. Preflight R2
+checks both repository revisions and R2b copies the framework's real probe to a
+neutral working directory, then verifies the selected framework interpreter
+without `PYTHONPATH`. Do not substitute another checkout's virtual environment.
+An explicit conflicting `SIDERIUS_PYTHON` is rejected before campaign rows run;
+an already activated exp `VIRTUAL_ENV` is ignored when choosing framework
+Python.
+
+The pinned revision still keeps its chain scripts in
+`sdsc_submission_scripts/` and its current configuration in `configs/` and
+`llm_configs/`. Their relocation belongs to later 03C work. These instructions
+do not authorize Gold, Stage 2, an LLM smoke, or any scientific workload.

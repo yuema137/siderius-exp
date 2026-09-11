@@ -29,7 +29,16 @@ Trial/Formal workflow with different approved treatment values.
 
 ## Framework revision
 
-The active dependency is pinned in `pyproject.toml` and repeated in `SIDERIUS_REVISION`. A scientific run must additionally record both repository commit SHAs in its run provenance.
+The active dependency is pinned in `pyproject.toml`, repeated in
+`SIDERIUS_REVISION`, and resolved to the same VCS commit in `uv.lock`. A
+scientific run must additionally record both repository commit SHAs in its run
+provenance.
+
+There are deliberately two environments. This repository's `.venv` owns the
+installed SIDERIUS dependency used by task plugins and tests. An explicitly
+selected SIDERIUS checkout owns the interpreter used for framework scripts and
+node children. Both must resolve the commit in `SIDERIUS_REVISION`; neither may
+borrow the other's environment or use `PYTHONPATH` to overlay framework source.
 
 ## Repository identity and linked worktrees
 
@@ -104,10 +113,21 @@ legacy FCNet oracle checks report skips when their external reference checkout
 is unavailable; retain those skip reasons in validation reports.
 
 The framework checkout must be clean. The installed dependency alone does not
-supply repository scripts. See the
+supply repository scripts. Comparison and Gold launch helpers validate the
+selected checkout's HEAD, src layout, own `.venv`, and neutral-working-directory
+import resolution before effectful work. An explicit `SIDERIUS_PYTHON` that
+points elsewhere is a refusal; an ambient `VIRTUAL_ENV` is not a fallback.
+See the
 [Gold qualification command](campaigns/tidmad_gold/README.md) for its exact
 checkout assertion and invocation. This setup does not authorize campaign runs.
 
 ## Migration status
 
 The repository boundary is being established from the SIDERIUS `v0.1.4` release and the unpublished `v0.1.5` Gold repair lineage. See `provenance/MIGRATION.md`. No campaign is authorized to launch merely because its files exist here.
+
+The current pinned framework still exposes launch scripts under
+`sdsc_submission_scripts/` and current framework configuration under
+`configs/` and `llm_configs/`. This compatibility update does not relocate
+those surfaces; that is later 03C work. It changes no task declaration,
+scientific treatment, metric, Health policy, budget, advice, or campaign
+authorization.

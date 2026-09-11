@@ -9,7 +9,10 @@ See docs/design/enable_partial_file_list.md (Commit DS6).
 
 from __future__ import annotations
 
+import os
 import sys
+from contextlib import suppress
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -56,15 +59,50 @@ class TestMainStartupGuards:
                 ]
             )
 
+    def test_wrong_checkout_revision_refuses_before_dataset_resolution(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A directory with the right files must not substitute for the pinned SHA."""
+        from tasks.tidmad.tools import run_comparison
+
+        monkeypatch.setenv("SIDERIUS_CHECKOUT", os.environ["SIDERIUS_CHECKOUT"])
+        wrong = SimpleNamespace(returncode=0, stdout="0" * 40 + "\n")
+        with (
+            patch.object(run_comparison.subprocess, "run", return_value=wrong),
+            patch.object(run_comparison, "resolve_dataset_dir") as resolve_data,
+            pytest.raises(SystemExit, match="revision mismatch"),
+        ):
+            _main(["--model", "punet"])
+        resolve_data.assert_not_called()
+
+    def test_missing_probe_refuses_without_falling_back(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A src-shaped directory without the real probe is not a checkout authority."""
+        root = tmp_path / "framework"
+        for relative in (
+            "src/core/layout.py",
+            "src/nodes/ml_hyperparameter_tune_agent/ml_hyperparameter_tune_agent.py",
+            ".venv/bin/python",
+        ):
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.touch()
+        monkeypatch.setenv("SIDERIUS_CHECKOUT", str(root))
+
+        with pytest.raises(SystemExit, match="_import_resolution_probe.py"):
+            _main(["--model", "punet"])
+
 
 class TestRunAgentForwarding:
-    def _cmd(self, **kwargs) -> list[str]:
+    def _call(self, **kwargs):
         with patch("tasks.tidmad.tools.run_comparison.subprocess.run") as mock_run:
             mock_run.return_value = SimpleNamespace(returncode=0)
             with patch(
-                "tasks.tidmad.tools.run_comparison._verify_agent_completion", create=True
+                "tasks.tidmad.tools.run_comparison._verify_agent_completion",
+                create=True,
             ):
-                try:
+                with suppress(SystemExit):
                     run_agent(
                         model_type="punet",
                         agent_workspace="/tmp/ws",
@@ -74,17 +112,20 @@ class TestRunAgentForwarding:
                         max_rounds=1,
                         **kwargs,
                     )
-                except BaseException:
-                    # Post-subprocess completion verification sys.exit(2)s on
-                    # the empty workspace (PR #121 partial-exit contract) —
-                    # the launched cmd is all this test needs.
-                    pass
-            return mock_run.call_args.args[0]
+                    # Post-subprocess completion verification exits on the empty
+                    # workspace; the launched command is all this test needs.
+            return mock_run.call_args
+
+    def _cmd(self, **kwargs) -> list[str]:
+        return self._call(**kwargs).args[0]
 
     def test_specs_forwarded_verbatim(self):
         cmd = self._cmd(data_scope_spec="4-9", health_gate_files_spec="4,7,9")
         assert "--data_scope" in cmd and cmd[cmd.index("--data_scope") + 1] == "4-9"
-        assert "--health_gate_files" in cmd and cmd[cmd.index("--health_gate_files") + 1] == "4,7,9"
+        assert (
+            "--health_gate_files" in cmd
+            and cmd[cmd.index("--health_gate_files") + 1] == "4,7,9"
+        )
         assert "--no-health_gate_enabled" not in cmd
 
     def test_disabled_gates_forwarded(self):
@@ -97,3 +138,23 @@ class TestRunAgentForwarding:
         assert "--data_scope" not in cmd
         assert "--health_gate_files" not in cmd
         assert "--no-health_gate_enabled" not in cmd
+
+    def test_child_uses_selected_src_checkout_environment_without_pythonpath(self):
+        """The comparison child must not execute exp Python or root-layout source."""
+        from tasks.tidmad.tools import run_comparison
+
+        call = self._call()
+        command = call.args[0]
+        environment = call.kwargs["env"]
+        checkout = Path(run_comparison.SIDERIUS_ROOT)
+
+        assert Path(command[0]) == checkout / ".venv" / "bin" / "python"
+        assert Path(command[1]) == (
+            checkout
+            / "src"
+            / "nodes"
+            / "ml_hyperparameter_tune_agent"
+            / "ml_hyperparameter_tune_agent.py"
+        )
+        assert "PYTHONPATH" not in environment
+        assert Path(environment["VIRTUAL_ENV"]) == checkout / ".venv"

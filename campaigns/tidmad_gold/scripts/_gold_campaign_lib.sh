@@ -39,6 +39,21 @@ GOLD_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GOLD_CAMPAIGN_DIR="$(cd "${GOLD_LIB_DIR}/.." && pwd)"
 GOLD_PROJECT_DIR="${SIDERIUS_CHECKOUT:-}"
 
+gold_python_environment_root() {
+    local executable="$1" bin_dir
+    bin_dir="$(cd "$(dirname "$executable")" 2>/dev/null && pwd -P)" || return 1
+    [ "$(basename "$bin_dir")" = "bin" ] || return 1
+    (cd "${bin_dir}/.." 2>/dev/null && pwd -P)
+}
+
+gold_python_matches_environment() {
+    local executable="$1" expected_environment="$2"
+    local actual_environment canonical_expected
+    actual_environment="$(gold_python_environment_root "$executable")" || return 1
+    canonical_expected="$(cd "$expected_environment" 2>/dev/null && pwd -P)" || return 1
+    [ "$actual_environment" = "$canonical_expected" ]
+}
+
 gold_bind_siderius_checkout() {
     local checkout="$1"
     if [ -z "$checkout" ] || [ ! -d "$checkout" ]; then
@@ -47,12 +62,28 @@ gold_bind_siderius_checkout() {
     fi
     checkout="$(cd "$checkout" && pwd)"
     if [ ! -f "${checkout}/sdsc_submission_scripts/run_chain.sh" ] \
-        || [ ! -f "${checkout}/sdsc_submission_scripts/run_one_iteration.py" ]; then
+        || [ ! -f "${checkout}/sdsc_submission_scripts/run_one_iteration.py" ] \
+        || [ ! -f "${checkout}/src/core/layout.py" ]; then
         echo "ERROR: --siderius-checkout is not an executable SIDERIUS checkout: $checkout" >&2
         return 1
     fi
+    local checkout_python="${checkout}/.venv/bin/python"
+    if [ ! -x "$checkout_python" ]; then
+        echo "ERROR: exact-checkout virtualenv is missing: ${checkout}/.venv" >&2
+        return 1
+    fi
+    if [ -n "${SIDERIUS_PYTHON:-}" ] \
+        && ! gold_python_matches_environment "$SIDERIUS_PYTHON" "${checkout}/.venv"; then
+        echo "ERROR: SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout: $SIDERIUS_PYTHON" >&2
+        return 1
+    fi
     GOLD_PROJECT_DIR="$checkout"
+    GOLD_PY=("$checkout_python")
     export SIDERIUS_CHECKOUT="$checkout"
+    export SIDERIUS_PYTHON="$checkout_python"
+    export VIRTUAL_ENV="${checkout}/.venv"
+    export PATH="${checkout}/.venv/bin${PATH:+:${PATH}}"
+    unset PYTHONPATH
 }
 
 # ---------------------------------------------------------------------------

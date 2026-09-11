@@ -83,6 +83,10 @@ def _fixture_tree(tmp_path: Path, posture_text: str | None = None) -> Path:
     fake_chain = tree / "run_chain.sh"
     fake_chain.write_text('#!/bin/bash\nprintf "%s\\n" "$@"\n')
     fake_chain.chmod(0o755)
+    (tree.parent / ".venv").symlink_to(
+        Path(os.environ["SIDERIUS_CHECKOUT"]).resolve() / ".venv",
+        target_is_directory=True,
+    )
     if posture_text is not None:
         (tree / "h100_posture.env").write_text(posture_text)
     return tree
@@ -116,25 +120,25 @@ class TestBandMapping:
         j = argv.index("--health_gate_files")
         assert argv[j + 1] == EXPECTED_BAND_MAP[band]
 
-    def test_dry_run_prints_the_pythonpath_pin(self, tmp_path):
-        """P0 launch blocker (supervisor 2026-08-25, E1 trap): the launcher
-        must export PYTHONPATH=<its own tree> so spawned children resolve
-        THIS tree, not the venv's editable-install target (the main
-        checkout — which can sit on an unrelated branch missing #299's
-        divergence repair). The dry-run prints the pin so R7 symmetry sees
-        it and an operator reads it. Defect only this catches: the export
-        silently dropped — children then import another checkout's code
-        while every git-SHA check stays green. Fails by: pin line absent
-        or pointing outside the launcher's own tree."""
+    def test_dry_run_prints_the_checkout_python_pin(self, tmp_path):
+        """The launcher must expose the selected checkout's own interpreter.
+
+        This fails if an ambient exp/system Python replaces the framework
+        checkout's `.venv/bin/python`, even when the fake chain itself succeeds.
+        """
         tree = _fixture_tree(tmp_path)
         root = tmp_path / "root"
         root.mkdir()
         r = _launch(tree, "--arm", "with-prior-art", "--band", "0-3", "--workspace-root", str(root))
         assert r.returncode == 0, r.stderr
-        pin_lines = [ln for ln in (r.stdout + r.stderr).splitlines() if "pythonpath_pin=" in ln]
-        assert pin_lines, "dry-run must print the pythonpath_pin line"
-        pinned = pin_lines[0].split("pythonpath_pin=", 1)[1].strip()
-        assert pinned == str(tree.parent), (pinned, str(tree.parent))
+        pin_lines = [
+            line
+            for line in (r.stdout + r.stderr).splitlines()
+            if "python_pin=" in line
+        ]
+        assert pin_lines, "dry-run must print the python_pin line"
+        pinned = pin_lines[0].split("python_pin=", 1)[1].strip()
+        assert Path(pinned) == tree.parent / ".venv" / "bin" / "python"
 
     def test_band_mode_pins_the_regressor_constraint(self, tmp_path):
         """arXiv #259 (fleet ruling): campaign-band mode MUST pass

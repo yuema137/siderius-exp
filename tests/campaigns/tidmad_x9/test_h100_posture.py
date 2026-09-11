@@ -152,7 +152,7 @@ def _production_string_constants() -> set[str]:
     `$NAME` / `${NAME` reads in the chain scripts."""
     names: set[str] = set()
     for root in PRODUCTION_PY_ROOTS:
-        for path in (FRAMEWORK_ROOT / root).rglob("*.py"):
+        for path in (FRAMEWORK_ROOT / "src" / root).rglob("*.py"):
             try:
                 tree = ast.parse(path.read_text(encoding="utf-8"))
             except SyntaxError:  # pragma: no cover - a broken module fails elsewhere

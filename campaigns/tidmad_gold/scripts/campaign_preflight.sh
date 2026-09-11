@@ -66,8 +66,8 @@
 #   R2  authoritative revision pair: siderius-exp is compared against
 #       --revision and the explicit SIDERIUS checkout against
 #       --siderius-revision. Either dirty tree or mismatch fails.
-#   R2b import resolution: a neutral-cwd probe proves the PINNED
-#       (PYTHONPATH=this tree) child resolves hyperparam_tuning inside this
+#   R2b import resolution: a neutral-cwd probe proves the exact-checkout
+#       virtualenv resolves hyperparam_tuning inside this
 #       tree with the #299-tolerant loss_history, and reports what an
 #       UNPINNED child would resolve (the editable-install E1 trap).
 #   R3  selected-band staging integrity: both raw HDF5 splits for the target
@@ -497,13 +497,12 @@ preflight_evidence_state() {
 }
 
 # Capture ONE arm's surface (rendered prompt bytes / environment /
-# machine-local stores) through the production renderers. PYTHONPATH-pinned
-# to this checkout for the same reason R2b exists: a surface rendered by
-# another clone's templates describes prompts this launch will not send.
+# machine-local stores) through the production renderers. The selected
+# checkout's own interpreter supplies the installed framework authorities.
 pf_capture_surface() {
     local arm="$1" isolation="$2" out="$3"
-    (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
-        "$PF_PY" "$PF_SURFACE" --arm "$arm" --baseline-isolation "$isolation" \
+    (cd "$PF_EXP_ROOT" && env -u PYTHONPATH "$PF_PY" "$PF_SURFACE" \
+        --arm "$arm" --baseline-isolation "$isolation" \
         --project-dir "$PF_SIDERIUS_ROOT" --out "$out")
 }
 
@@ -522,16 +521,17 @@ pf_info() { PF_ROWS+=("INFO  $1"); echo "[preflight] INFO  $1"; }
 pf_skip() { PF_ROWS+=("SKIP  $1"); echo "[preflight] SKIP  $1"; }
 
 pf_resolve_python() {
-    if [ -n "${SIDERIUS_PYTHON:-}" ]; then
-        PF_PY="$SIDERIUS_PYTHON"
-    elif [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
-        PF_PY="$VIRTUAL_ENV/bin/python"
-    elif [ -x "${PF_SIDERIUS_ROOT}/.venv/bin/python" ]; then
-        PF_PY="${PF_SIDERIUS_ROOT}/.venv/bin/python"
-    else
-        echo "ERROR: no SIDERIUS checkout python (SIDERIUS_PYTHON / \$VIRTUAL_ENV / ${PF_SIDERIUS_ROOT}/.venv)." >&2
+    local expected="${PF_SIDERIUS_ROOT}/.venv/bin/python"
+    if [ ! -x "$expected" ]; then
+        echo "ERROR: exact-checkout virtualenv is missing: ${PF_SIDERIUS_ROOT}/.venv" >&2
         return 1
     fi
+    if [ -n "${SIDERIUS_PYTHON:-}" ] \
+        && ! gold_python_matches_environment "$SIDERIUS_PYTHON" "${PF_SIDERIUS_ROOT}/.venv"; then
+        echo "ERROR: SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout: $SIDERIUS_PYTHON" >&2
+        return 1
+    fi
+    PF_PY="$expected"
 }
 
 pf_main() {
@@ -704,7 +704,7 @@ pf_main() {
     # itself REFUSED the value (a relative override), which is a FAIL here
     # rather than a silent fallback.
     local GENLIB_RAW GENLIB_SOURCE GENLIB_ROOT
-    if GENLIB_RAW="$(cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
+    if GENLIB_RAW="$(cd "$PF_EXP_ROOT" && env -u PYTHONPATH \
         "$PF_PY" -c 'from core.generated_library import resolve_generated_library as r; x = r(); print(x.source + "\t" + x.root)' \
         2>/dev/null | tail -1)" && [ -n "$GENLIB_RAW" ]; then
         GENLIB_SOURCE="${GENLIB_RAW%%$'\t'*}"
@@ -769,24 +769,20 @@ pf_main() {
     fi
 
     # ---- R2b: import resolution (P0 launch blocker, supervisor 2026-08-25) --
-    # The venv's editable install maps packages to the MAIN checkout; a child
-    # whose cwd leaves this tree silently imports THAT tree's code (the E1
-    # trap — concretely, a campaign without #299's divergence repair while
-    # its git SHA says otherwise). The launchers export
-    # PYTHONPATH=$PF_SIDERIUS_ROOT; this row PROVES the pinned resolution from
-    # a NEUTRAL cwd (a copied probe file — `-c` is blind, cwd sits on
-    # sys.path) and REPORTS what an unpinned child would resolve.
+    # The selected checkout's own frozen venv must resolve its installed
+    # framework back to this tree. Prove that from a NEUTRAL cwd without a
+    # source-path override; `-c` is blind because cwd itself sits on sys.path.
     local PROBE_TMP
     PROBE_TMP="$(mktemp -d)"
     cp "${PF_SIDERIUS_ROOT}/sdsc_submission_scripts/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
     local UNPINNED
     UNPINNED="$(cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" 2>/dev/null | head -1 || true)"
-    echo "[preflight] R2b unpinned child would resolve: ${UNPINNED#*-> }"
-    if (cd "$PROBE_TMP" && PYTHONPATH="$PF_SIDERIUS_ROOT" "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" >/dev/null 2>&1); then
+    echo "[preflight] R2b exact-venv child resolves: ${UNPINNED#*-> }"
+    if (cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" >/dev/null 2>&1); then
         pf_pass "R2b pinned import resolution: hyperparam_tuning resolves in this tree with the #299-tolerant loss_history"
     else
-        (cd "$PROBE_TMP" && PYTHONPATH="$PF_SIDERIUS_ROOT" "$PF_PY" probe.py "$PF_SIDERIUS_ROOT") 2>&1 | tail -3 >&2 || true
-        pf_fail "R2b import resolution: the PINNED probe failed — chains would execute another tree's code (see [import-probe] lines)"
+        (cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_SIDERIUS_ROOT") 2>&1 | tail -3 >&2 || true
+        pf_fail "R2b import resolution: the exact-venv probe failed — chains would execute another tree's code (see [import-probe] lines)"
     fi
     rm -rf "$PROBE_TMP"
 
@@ -982,8 +978,8 @@ pf_main() {
                 # it back is what keeps this script from forming a second
                 # opinion about how strong its own evidence is.
                 local SYM_REPORT="${SCRATCH}/arm_symmetry_report.txt" SYM_RC=0
-                (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
-                        "$PF_PY" "$PF_SYMMETRY" --with-output "$WITH_CAP" --without-output "$WITHOUT_CAP" \
+                (cd "$PF_EXP_ROOT" && env -u PYTHONPATH "$PF_PY" "$PF_SYMMETRY" \
+                        --with-output "$WITH_CAP" --without-output "$WITHOUT_CAP" \
                         --workspace-root "$WORKSPACE_ROOT" --band "$SYMMETRY_BAND" \
                         --with-surface "$WITH_SURF" --without-surface "$WITHOUT_SURF" \
                         --sibling-source "$SIBLING_SOURCE") > "$SYM_REPORT" 2>&1 || SYM_RC=$?
@@ -1065,8 +1061,7 @@ pf_main() {
     else
         local SMOKE_ARGS=(--out "${SCRATCH}/llm_smoke.json")
         [ -n "$LLM_CONFIG" ] && SMOKE_ARGS+=(--llm-config "$LLM_CONFIG")
-        if (cd "$PF_SIDERIUS_ROOT" && PYTHONPATH="${PF_SIDERIUS_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
-                "$PF_PY" "$PF_SMOKE" "${SMOKE_ARGS[@]}"); then
+        if (cd "$PF_EXP_ROOT" && env -u PYTHONPATH "$PF_PY" "$PF_SMOKE" "${SMOKE_ARGS[@]}"); then
             pf_pass "R9 LLM burst reachable (8/8; p95 + per-call detail above; NOT a quota guarantee)"
         else
             pf_fail "R9 LLM burst failed (see per-call errors above; report ${SCRATCH}/llm_smoke.json)"

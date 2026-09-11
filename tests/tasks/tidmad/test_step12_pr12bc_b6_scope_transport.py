@@ -33,7 +33,6 @@ from __future__ import annotations
 
 import json
 import os
-import pathlib
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -45,11 +44,9 @@ from core.sandbox_executor import TidmadSandbox
 from execute_tools.scope_artifact import ScopeArtifactError, scope_digest
 from execute_tools.scope_artifact import task_scope_argv as _task_scope_argv
 from execute_tools.task_data_path import bind_task_data_path
-from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
 from nodes.ml_hyperparameter_tune_agent.scope_acquisition import AttemptScopes
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
-ENGINE = REPO_ROOT / "execute_tools" / "train_engine_sandbox.py"
+from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
 
 MODEL_CFG = {"model_type": "fcnet", "segmentation_size": 10000, "latent_dims": [100, 10]}
 TRAIN_CFG = {"lr": 1e-4, "epochs": 1, "batch_size": 1, "device": "cpu"}

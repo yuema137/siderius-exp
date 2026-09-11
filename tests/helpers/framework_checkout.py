@@ -15,7 +15,9 @@ def pinned_framework_checkout() -> Path:
     expected = (EXP_ROOT / "SIDERIUS_REVISION").read_text().strip()
     actual = subprocess.run(
         ["git", "-C", str(root), "rev-parse", "HEAD"],
-        capture_output=True, text=True, check=True,
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout.strip()
     assert actual == expected, "SIDERIUS_CHECKOUT disagrees with the exp pin"
     return root
@@ -26,3 +28,11 @@ def framework_health_policy() -> str:
     path = pinned_framework_checkout() / "configs" / "health_checks.yaml"
     assert path.is_file(), f"pinned framework Health policy missing: {path}"
     return str(path)
+
+
+def framework_source_path(module_name: str) -> Path:
+    """Resolve an independently selected module source under the pinned src tree."""
+    relative = Path(*module_name.split(".")).with_suffix(".py")
+    path = pinned_framework_checkout() / "src" / relative
+    assert path.is_file(), f"pinned framework module source missing: {path}"
+    return path
