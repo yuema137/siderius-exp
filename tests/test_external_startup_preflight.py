@@ -8,6 +8,7 @@ selected SIDERIUS checkout.
 
 from __future__ import annotations
 
+import importlib.metadata
 import json
 import os
 import subprocess
@@ -16,7 +17,6 @@ import tomllib
 from pathlib import Path
 
 import pytest
-
 
 EXP_ROOT = Path(__file__).resolve().parents[1]
 TASK_MANIFESTS = {
@@ -137,7 +137,7 @@ def _siderius_checkout() -> Path:
             "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
         )
     checkout = Path(configured).resolve()
-    if not (checkout / "core/run_invariants.py").is_file():
+    if not (checkout / "src/core/run_invariants.py").is_file():
         pytest.fail(f"SIDERIUS_CHECKOUT is not a SIDERIUS checkout: {checkout}")
     return checkout
 
@@ -158,6 +158,10 @@ def test_dependency_pin_matches_the_checkout_under_qualification() -> None:
         if item.startswith("siderius @ ")
     )
     dependency_revision = dependency.rsplit("@", maxsplit=1)[1]
+    lock = (EXP_ROOT / "uv.lock").read_text(encoding="utf-8")
+    distribution = importlib.metadata.distribution("siderius")
+    direct_url = json.loads(distribution.read_text("direct_url.json") or "{}")
+    installed_revision = direct_url.get("vcs_info", {}).get("commit_id")
     checkout = _siderius_checkout()
     checkout_revision = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -169,6 +173,8 @@ def test_dependency_pin_matches_the_checkout_under_qualification() -> None:
 
     assert len(expected) == 40
     assert dependency_revision == expected
+    assert f"?rev={expected}#{expected}" in lock
+    assert installed_revision == expected
     assert checkout_revision == expected
 
 

@@ -47,21 +47,9 @@ source "${GOLD_SCRIPT_DIR}/_gold_campaign_lib.sh"
 
 # --- helpers ----------------------------------------------------------------
 
-# Minimal python resolution for the STATE HELPER only (run_chain.sh resolves
-# its own interpreter + source-tree authority for the chain itself).
-# Precedence mirrors run_chain.sh: activated venv > project .venv > python3.
+# The shared checkout binding already selected the exact checkout's own Python.
 gold_resolve_python() {
-    if [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
-        GOLD_PY=("$VIRTUAL_ENV/bin/python")
-    elif [ -x "${GOLD_PROJECT_DIR}/.venv/bin/python" ]; then
-        GOLD_PY=("${GOLD_PROJECT_DIR}/.venv/bin/python")
-    elif command -v python3 >/dev/null 2>&1; then
-        GOLD_PY=(python3)
-        echo "[gold-band] WARNING: no venv found — state helper uses system python3" >&2
-    else
-        echo "ERROR: no python interpreter for the state helper" >&2
-        return 1
-    fi
+    GOLD_PY=("${GOLD_PROJECT_DIR}/.venv/bin/python")
 }
 
 # Extract one TOP-LEVEL scalar field from the status JSON. Same head-1
@@ -152,10 +140,6 @@ stage1_band_main() {
         echo "  band->GPU map (band $BAND -> $GPU, single_resident). Unset it and relaunch." >&2
         return 1
     fi
-
-    # E1 pin: the helper must import THIS checkout's framework code even
-    # under a shared venv whose editable install points elsewhere.
-    export PYTHONPATH="${GOLD_PROJECT_DIR}${PYTHONPATH:+:$PYTHONPATH}"
 
     # The fully-resolved chain invocation — the effective-resolution witness
     # surface. Every frozen value is typed here; nothing is left to a

@@ -72,6 +72,19 @@ from pathlib import Path
 from shutil import copy2
 from typing import Any
 
+from core.record_role import RecordRoleError, is_formal_role
+from execute_tools.dataset_config import DataScope
+from execute_tools.deliverable_spec import default_deliverable_naming
+from execute_tools.evaluation_metric import (
+    MetricSpec,
+    metric_spec_from_persisted_record,
+)
+from execute_tools.health_checks.candidate_eligibility import (
+    CandidateHealthValidity,
+    classify_under_pinned_policy,
+    pinned_workspace_gate_ids,
+)
+from execute_tools.metric_order import MetricOrder
 from pydantic import BaseModel
 
 _configured_checkout = os.environ.get("SIDERIUS_CHECKOUT")
@@ -85,22 +98,6 @@ if not (REPO_ROOT / "scripts" / "inspect_run_state.py").is_file():
         "SIDERIUS_CHECKOUT is not an executable SIDERIUS checkout: "
         f"{REPO_ROOT} (missing scripts/inspect_run_state.py)"
     )
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-from core.record_role import RecordRoleError, is_formal_role  # noqa: E402
-from execute_tools.dataset_config import DataScope  # noqa: E402
-from execute_tools.deliverable_spec import default_deliverable_naming  # noqa: E402
-from execute_tools.evaluation_metric import (  # noqa: E402
-    MetricSpec,
-    metric_spec_from_persisted_record,
-)
-from execute_tools.health_checks.candidate_eligibility import (  # noqa: E402
-    CandidateHealthValidity,
-    classify_under_pinned_policy,
-    pinned_workspace_gate_ids,
-)
-from execute_tools.metric_order import MetricOrder  # noqa: E402
 
 
 def _load_inspect_run_state():

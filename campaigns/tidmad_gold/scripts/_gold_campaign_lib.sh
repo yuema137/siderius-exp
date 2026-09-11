@@ -47,12 +47,28 @@ gold_bind_siderius_checkout() {
     fi
     checkout="$(cd "$checkout" && pwd)"
     if [ ! -f "${checkout}/sdsc_submission_scripts/run_chain.sh" ] \
-        || [ ! -f "${checkout}/sdsc_submission_scripts/run_one_iteration.py" ]; then
+        || [ ! -f "${checkout}/sdsc_submission_scripts/run_one_iteration.py" ] \
+        || [ ! -f "${checkout}/src/core/layout.py" ]; then
         echo "ERROR: --siderius-checkout is not an executable SIDERIUS checkout: $checkout" >&2
         return 1
     fi
+    local checkout_python="${checkout}/.venv/bin/python"
+    if [ ! -x "$checkout_python" ]; then
+        echo "ERROR: exact-checkout virtualenv is missing: ${checkout}/.venv" >&2
+        return 1
+    fi
+    if [ -n "${SIDERIUS_PYTHON:-}" ] \
+        && [ "$(readlink -f "$SIDERIUS_PYTHON")" != "$(readlink -f "$checkout_python")" ]; then
+        echo "ERROR: SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout: $SIDERIUS_PYTHON" >&2
+        return 1
+    fi
     GOLD_PROJECT_DIR="$checkout"
+    GOLD_PY=("$checkout_python")
     export SIDERIUS_CHECKOUT="$checkout"
+    export SIDERIUS_PYTHON="$checkout_python"
+    export VIRTUAL_ENV="${checkout}/.venv"
+    export PATH="${checkout}/.venv/bin${PATH:+:${PATH}}"
+    unset PYTHONPATH
 }
 
 # ---------------------------------------------------------------------------

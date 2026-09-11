@@ -128,6 +128,32 @@ def test_preflight_refuses_a_framework_revision_other_than_the_exp_pin() -> None
     assert f"exp_pin={pinned}" in refused.stdout
 
 
+def test_preflight_refuses_conflicting_explicit_framework_python() -> None:
+    """An explicit foreign interpreter must fail before any campaign row runs."""
+    checkout = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
+    result = _call(
+        f'PF_SIDERIUS_ROOT="{checkout}"; '
+        'SIDERIUS_PYTHON="/definitely/foreign/python"; pf_resolve_python'
+    )
+
+    assert result.returncode != 0
+    assert (
+        "SIDERIUS_PYTHON conflicts with the selected SIDERIUS checkout" in result.stderr
+    )
+
+
+def test_preflight_ignores_ambient_virtualenv_and_selects_exact_checkout() -> None:
+    """An activated exp environment must not become the framework interpreter."""
+    checkout = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
+    result = _call(
+        f'PF_SIDERIUS_ROOT="{checkout}"; unset SIDERIUS_PYTHON; '
+        'VIRTUAL_ENV="/ambient/exp/.venv"; pf_resolve_python; printf "%s\\n" "$PF_PY"'
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert Path(result.stdout.strip()) == checkout / ".venv" / "bin" / "python"
+
+
 def test_resume_requires_attributable_noncorrupt_state(tmp_path: Path) -> None:
     """Resume must reject wrong-arm state even when the inspector reports clean."""
     workspace = tmp_path / "workspace"
@@ -217,6 +243,7 @@ def test_preflight_main_reaches_the_summary_without_llm_or_gpu(tmp_path: Path) -
             **os.environ,
             "SIDERIUS_CHECKOUT": str(framework_root),
             "SIDERIUS_PYTHON": str(framework_root / ".venv" / "bin" / "python"),
+            "VIRTUAL_ENV": str(framework_root / ".venv"),
             "SIDERIUS_GENERATED_LIBRARY_DIR": str(generated),
         },
         text=True,

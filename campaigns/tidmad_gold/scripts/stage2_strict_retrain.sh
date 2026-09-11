@@ -248,21 +248,9 @@ stage2_main() {
     return 1
 }
 
-# Python resolution for the finalizer (same precedence as the band loop's
-# helper resolution; run_chain resolves its own interpreter for the chains).
+# The shared checkout binding already selected the exact checkout's own Python.
 gold_resolve_python_stage2() {
-    if [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
-        GOLD_PY=("$VIRTUAL_ENV/bin/python")
-    elif [ -x "${GOLD_PROJECT_DIR}/.venv/bin/python" ]; then
-        GOLD_PY=("${GOLD_PROJECT_DIR}/.venv/bin/python")
-    elif command -v python3 >/dev/null 2>&1; then
-        GOLD_PY=(python3)
-        echo "[gold-stage2] WARNING: no venv found — finalizer uses system python3" >&2
-    else
-        echo "ERROR: no python interpreter for the stage-2 finalizer" >&2
-        return 1
-    fi
-    export PYTHONPATH="${GOLD_PROJECT_DIR}${PYTHONPATH:+:$PYTHONPATH}"
+    GOLD_PY=("${GOLD_PROJECT_DIR}/.venv/bin/python")
 }
 
 # Source-safe entry guard (house convention; see

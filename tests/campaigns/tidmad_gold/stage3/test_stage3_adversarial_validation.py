@@ -451,22 +451,22 @@ def test_authorities_resolve_from_this_checkout() -> None:
     import execute_tools.deliverable_spec as spec_module
     import execute_tools.health_checks.candidate_eligibility as eligibility_module
 
-    from tests.helpers.framework_checkout import EXP_ROOT, pinned_framework_checkout
+    from tests.helpers.framework_checkout import EXP_ROOT, framework_source_path
 
-    framework_root = pinned_framework_checkout()
     distribution = importlib.metadata.distribution("siderius")
     provenance = json.loads(distribution.read_text("direct_url.json") or "{}")
-    assert provenance.get("vcs_info", {}).get("commit_id") == (
-        EXP_ROOT / "SIDERIUS_REVISION"
-    ).read_text().strip()
+    assert (
+        provenance.get("vcs_info", {}).get("commit_id")
+        == (EXP_ROOT / "SIDERIUS_REVISION").read_text().strip()
+    )
     for module in (spec_module, eligibility_module):
         resolved = Path(module.__file__ or "").resolve()
         relative = Path(*module.__name__.split(".")).with_suffix(".py")
         assert resolved == Path(distribution.locate_file(relative)).resolve()
         assert resolved.is_relative_to(EXP_ROOT / ".venv"), str(resolved)
-        assert resolved.read_bytes() == (framework_root / relative).read_bytes(), (
-            f"{module.__name__} differs from the pinned source: {resolved}"
-        )
+        assert (
+            resolved.read_bytes() == framework_source_path(module.__name__).read_bytes()
+        ), f"{module.__name__} differs from the pinned source: {resolved}"
 
 
 # ==========================================================================
