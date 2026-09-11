@@ -131,6 +131,11 @@ release and the unpublished `v0.1.5` Gold repair lineage. See the
 framework history; those scripts, tests, reports, and configurations are not
 live entrypoints or current experiment inputs.
 
+The three additional literature pilot/full test sources are preserved in the
+[P0 03C1c archive](provenance/legacy_siderius/p0_literature_pilots/README.md)
+as fixed-corpus, non-live history. They are not collected by the live suite;
+the active copies remain pending the separately approved 03C2 retirement.
+
 The live TIDMAD anchor authority is
 [`tasks/tidmad/runtime/anchor_map.py`](tasks/tidmad/runtime/anchor_map.py), and
 the canonical ruler remains
@@ -141,7 +146,8 @@ data and output paths. The duplicate framework assets and their remaining
 source/test/CI readers are unchanged until a later separately approved removal
 PR. No campaign is authorized to launch merely because its files exist here.
 
-The current pinned framework still exposes launch scripts under
+The current pinned framework (`50a563521e8578d2b18eeb5d71f78b1e11e86257`)
+still exposes launch scripts under
 `sdsc_submission_scripts/` and current framework configuration under
 `configs/` and `llm_configs/`. This compatibility update does not relocate
 those surfaces; that is later 03C work. It changes no task declaration,
