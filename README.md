@@ -93,6 +93,9 @@ export MAJORANA_DATA_DIR=/absolute/path/to/verified/MAJORANA
 env -u PYTHONPATH .venv/bin/python -m pytest
 ```
 
+For the qualified local pair, the verified invocation is:
+`env -u PYTHONPATH SIDERIUS_CHECKOUT=/home/yuema137/SIDERIUS MAJORANA_DATA_DIR=/home/klz/Data/MAJORANA .venv/bin/python -m pytest -q`.
+
 Pytest collects `tests/` using importlib mode, so separate tasks can have
 same-named test modules.
 Pytest also adds this exp root to its import path for task plugins; it does not
