@@ -43,7 +43,7 @@
 #
 # Usage (on the H100 box, GPU C pinned):
 #   CUDA_VISIBLE_DEVICES=<gpu_c_index> \
-#   bash sdsc_submission_scripts/gpu_c_coresidency_probe.sh \
+#   bash campaigns/tidmad_x9/scripts/gpu_c_coresidency_probe.sh \
 #       [--work-dir DIR] [--model wavenet] [--train-portion 0.05] \
 #       [--solo-cap-seconds 1200] [--quad-cap-seconds 2100] [--out FILE]
 #

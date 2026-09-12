@@ -35,7 +35,7 @@
 #          ("band pid logfile" rows) for monitoring and shutdown.
 #
 # Usage:
-#   bash sdsc_submission_scripts/launch_band_fleet.sh \
+#   bash campaigns/tidmad_x9/scripts/launch_band_fleet.sh \
 #       (--arm with-prior-art|without-prior-art | --card A|B) \
 #       --workspace-root DIR [--gpu N] [--fixed-candidate PLAN.json] \
 #       [--stagger-seconds S] [--no-h100] [--dry-run] \

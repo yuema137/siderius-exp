@@ -21,7 +21,7 @@
 #          negative lit-review flag is forwarded to the child argv rather
 #          than inherited from the YAML's default.
 #
-# Wraps   : sdsc_submission_scripts/run_chain.sh — NEVER the tuner node CLI
+# Wraps   : selected-checkout scripts/launch/run_chain.sh — NEVER the tuner node CLI
 #          (on the node CLI, omitting --is_trial silently falls into legacy
 #          single-file mode; the chain path defaults --is_trial correctly).
 #
@@ -75,7 +75,7 @@
 #                refused: on this launcher the mode has ONE spelling.
 #
 # Usage:
-#   bash sdsc_submission_scripts/launch_prior_baseline_experiment.sh \
+#   bash campaigns/tidmad_x9/scripts/launch_prior_baseline_experiment.sh \
 #       --arm with-prior-art|without-prior-art \
 #       (--workspace DIR | --band B --workspace-root DIR) \
 #       [--run_name NAME] [--mode lilab|sdsc] [--fixed-candidate PLAN.json] \
@@ -86,7 +86,7 @@
 #   child argv, no side effects) AND prints the resolved launch
 #   configuration as one JSON object
 #   (run_one_iteration.py --print_resolved_launch_config). --h100 sources
-#   sdsc_submission_scripts/h100_posture.env (owned by the H100 posture
+#   campaigns/tidmad_x9/scripts/h100_posture.env (owned by the H100 posture
 #   stream), which exports production env vars and defines the bash array
 #   H100_CHAIN_ARGS that this launcher splats AFTER its own arguments; a
 #   missing file is refused by name.
