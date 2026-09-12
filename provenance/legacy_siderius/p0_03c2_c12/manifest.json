@@ -1,0 +1,12 @@
+{
+  "purpose": "non-live preservation of the historical fixed C12 driver",
+  "source_checkout": "/home/yuema137/SIDERIUS",
+  "source_revision": "8ce8366f5d9149cddb05e83eee5da41641789cc7",
+  "source_path": "scripts/runtime_campaign.py",
+  "archive_path": "provenance/legacy_siderius/p0_03c2_c12/runtime_campaign.py",
+  "mode": "100644",
+  "size_bytes": 19499,
+  "git_blob": "3c93a9bfa13e868a3346a1f58ae34b29855780c8",
+  "sha256": "1ab2eee13cb5089c72a39b3937f0ef91283f8015d80fa63ffc3e95917d1c7343",
+  "live_authority": false
+}

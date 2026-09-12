@@ -192,7 +192,7 @@ def test_entrypoint_only_filter_reaches_exactly_one_band(tmp_path: Path) -> None
     command_lines = [
         line
         for line in completed.stdout.splitlines()
-        if "sdsc_submission_scripts/run_chain.sh" in line
+        if "scripts/launch/run_chain.sh" in line
     ]
     assert len(command_lines) == 1
     command = shlex.split(command_lines[0])
@@ -243,7 +243,7 @@ def test_stage1_dry_run_uses_the_frozen_band_to_gpu_map(tmp_path: Path) -> None:
     assert completed.returncode == 0, completed.stdout + completed.stderr
     observed: dict[str, str] = {}
     for line in completed.stdout.splitlines():
-        if "sdsc_submission_scripts/run_chain.sh" not in line:
+        if "scripts/launch/run_chain.sh" not in line:
             continue
         command = shlex.split(line)
         band = command[command.index("--data_scope") + 1]

@@ -85,6 +85,9 @@ an already activated exp `VIRTUAL_ENV` is ignored when choosing framework
 Python.
 
 The pinned revision still keeps its chain scripts in
-`sdsc_submission_scripts/` and its current configuration in `configs/` and
-`llm_configs/`. Their relocation belongs to later 03C work. These instructions
+the selected framework's `scripts/launch/` and `src/workflows/` owners, with
+framework configuration under `configs/{llm,health,...}`. Gold retains its
+campaign-owned `config/llm_routing.json` and declared policy paths; nothing is
+redirected to framework defaults. The relocation is bound by this compatibility
+checkpoint. These instructions
 do not authorize Gold, Stage 2, an LLM smoke, or any scientific workload.

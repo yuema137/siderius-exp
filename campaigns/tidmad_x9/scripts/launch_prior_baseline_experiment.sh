@@ -21,7 +21,7 @@
 #          negative lit-review flag is forwarded to the child argv rather
 #          than inherited from the YAML's default.
 #
-# Wraps   : sdsc_submission_scripts/run_chain.sh — NEVER the tuner node CLI
+# Wraps   : selected-checkout scripts/launch/run_chain.sh — NEVER the tuner node CLI
 #          (on the node CLI, omitting --is_trial silently falls into legacy
 #          single-file mode; the chain path defaults --is_trial correctly).
 #
@@ -75,7 +75,7 @@
 #                refused: on this launcher the mode has ONE spelling.
 #
 # Usage:
-#   bash sdsc_submission_scripts/launch_prior_baseline_experiment.sh \
+#   bash campaigns/tidmad_x9/scripts/launch_prior_baseline_experiment.sh \
 #       --arm with-prior-art|without-prior-art \
 #       (--workspace DIR | --band B --workspace-root DIR) \
 #       [--run_name NAME] [--mode lilab|sdsc] [--fixed-candidate PLAN.json] \
@@ -86,7 +86,7 @@
 #   child argv, no side effects) AND prints the resolved launch
 #   configuration as one JSON object
 #   (run_one_iteration.py --print_resolved_launch_config). --h100 sources
-#   sdsc_submission_scripts/h100_posture.env (owned by the H100 posture
+#   campaigns/tidmad_x9/scripts/h100_posture.env (owned by the H100 posture
 #   stream), which exports production env vars and defines the bash array
 #   H100_CHAIN_ARGS that this launcher splats AFTER its own arguments; a
 #   missing file is refused by name.
@@ -101,7 +101,7 @@ set -o pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 EXP_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 PROJECT_DIR="${SIDERIUS_CHECKOUT:-}"
-if [ -z "$PROJECT_DIR" ] || [ ! -f "$PROJECT_DIR/sdsc_submission_scripts/run_chain.sh" ]; then
+if [ -z "$PROJECT_DIR" ] || [ ! -f "$PROJECT_DIR/scripts/launch/run_chain.sh" ]; then
     echo "ERROR: SIDERIUS_CHECKOUT must name the exact framework checkout" >&2
     exit 1
 fi
@@ -133,8 +133,8 @@ export SIDERIUS_PYTHON="$PROJECT_PYTHON"
 export VIRTUAL_ENV="${PROJECT_DIR}/.venv"
 export PATH="${PROJECT_DIR}/.venv/bin${PATH:+:${PATH}}"
 unset PYTHONPATH
-RUN_CHAIN="${PROJECT_DIR}/sdsc_submission_scripts/run_chain.sh"
-RUNNER="${PROJECT_DIR}/sdsc_submission_scripts/run_one_iteration.py"
+RUN_CHAIN="${PROJECT_DIR}/scripts/launch/run_chain.sh"
+RUNNER="${PROJECT_DIR}/src/workflows/run_one_iteration.py"
 H100_POSTURE_ENV="${SCRIPT_DIR}/h100_posture.env"
 CORESIDENCY_PROBE="${SCRIPT_DIR}/gpu_c_coresidency_probe.sh"
 TASK_COMPOSITION="${EXP_ROOT}/tasks/tidmad/compositions/bounded_qualification.yaml"

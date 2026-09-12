@@ -91,12 +91,12 @@ fi
 mkdir -p "$WORKSPACE"
 export SIDERIUS_GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
 cd "$EXP_ROOT"
-exec bash "${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh" \
+    exec bash "${SIDERIUS_CHECKOUT}/scripts/launch/run_chain.sh" \
     --mode lilab \
     --task_composition "${PACK_DIR}/compositions/low_avse.yaml" \
     --workspace "$WORKSPACE" \
     --data_dir "$DATA_DIR" \
-    --llm_config "${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json" \
+    --llm_config "${SIDERIUS_CHECKOUT}/configs/llm/openai_tiered_pro.json" \
     --start_iter 1 \
     --plan_overrides '{"trial_strategy":"snapshot","eval_strategy":"snapshot"}' \
     --allowed_output_types classifier \

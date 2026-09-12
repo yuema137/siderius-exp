@@ -44,9 +44,9 @@ import pytest
 _REPO = Path(__file__).resolve().parents[3]
 _SDSC = _REPO / "campaigns" / "tidmad_x9" / "scripts"
 _FRAMEWORK = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
-_FRAMEWORK_SDSC = _FRAMEWORK / "sdsc_submission_scripts"
+_FRAMEWORK_SDSC = _FRAMEWORK / "scripts" / "launch"
 _LAUNCHER = _SDSC / "launch_prior_baseline_experiment.sh"
-_ROI = _FRAMEWORK_SDSC / "run_one_iteration.py"
+_ROI = _FRAMEWORK / "src" / "workflows" / "run_one_iteration.py"
 _CHAIN_COMMON = _FRAMEWORK_SDSC / "_chain_common.sh"
 _TASK_COMPOSITION = _REPO / "tasks" / "tidmad" / "compositions" / "bounded_qualification.yaml"
 
@@ -381,8 +381,8 @@ class TestPrintResolvedLaunchConfig:
             ],
             capture_output=True,
             text=True,
-            timeout=240,
-            cwd=str(_REPO),
+            timeout=120,
+            cwd=tmp_path,
             env=_env(),
         )
         return r, ws

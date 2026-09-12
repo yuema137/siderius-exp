@@ -53,7 +53,8 @@ def pf_tree(tmp_path: Path) -> Path:
         shutil.copy2(_SDSC / name, sdsc / name)
     shutil.copy2(
         Path(os.environ["SIDERIUS_CHECKOUT"])
-        / "sdsc_submission_scripts"
+        / "scripts"
+        / "launch"
         / "_import_resolution_probe.py",
         sdsc / "_import_resolution_probe.py",
     )

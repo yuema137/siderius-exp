@@ -146,7 +146,7 @@ stage1_band_main() {
     # default (_chain_common's defaults are documented as NOT campaign
     # values — decisions F-LAUNCH-1).
     local CHAIN_CMD=(
-        bash "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/run_chain.sh"
+        bash "${GOLD_PROJECT_DIR}/scripts/launch/run_chain.sh"
         --mode lilab
         --workspace "$WORKSPACE"
         --run_name "$RUN_NAME"

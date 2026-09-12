@@ -68,7 +68,7 @@ def test_every_gold_band_retains_its_deliverables(tmp_path: Path) -> None:
     commands = [
         shlex.split(line)
         for line in completed.stdout.splitlines()
-        if "sdsc_submission_scripts/run_chain.sh" in line
+        if "scripts/launch/run_chain.sh" in line
     ]
     assert len(commands) == 4
     for command in commands:

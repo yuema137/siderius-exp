@@ -25,7 +25,7 @@ def pinned_framework_checkout() -> Path:
 
 def framework_health_policy() -> str:
     """Use the real pinned policy; never a synthetic replacement for Gold."""
-    path = pinned_framework_checkout() / "configs" / "health_checks.yaml"
+    path = pinned_framework_checkout() / "configs" / "health" / "health_checks.yaml"
     assert path.is_file(), f"pinned framework Health policy missing: {path}"
     return str(path)
 

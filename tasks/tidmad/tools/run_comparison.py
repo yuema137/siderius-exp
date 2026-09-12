@@ -19,9 +19,7 @@ Output structure:
           └── agent/         ← isolated agent workspace per run_name
 
 Usage:
-  python scripts/run_comparison.py --model punet
-  python scripts/run_comparison.py --model punet --run_name v2 --max_rounds 50
-  python scripts/run_comparison.py --model rnn --provider openai --model_id gpt-4o
+  SIDERIUS_CHECKOUT=/path/to/SIDERIUS .venv/bin/python -m tasks.tidmad.tools.run_comparison --model punet --workspace_root /path/to/workspace --data_dir /path/to/TIDMAD
 """
 
 import argparse
@@ -78,7 +76,9 @@ LEGACY_CONFIGS_PATH = str(
     / "reference_data"
     / "legacy_baseline_configs.json"
 )
-HEALTH_CHECKS_PATH = os.path.join(SIDERIUS_ROOT, "configs", "health_checks.yaml")
+HEALTH_CHECKS_PATH = os.path.join(
+    SIDERIUS_ROOT, "configs", "health", "health_checks.yaml"
+)
 
 
 def _sha256(path: str) -> str:
@@ -214,7 +214,7 @@ def _validate_siderius_binding() -> None:
         / "nodes"
         / "ml_hyperparameter_tune_agent"
         / "ml_hyperparameter_tune_agent.py",
-        root / "sdsc_submission_scripts" / "_import_resolution_probe.py",
+        root / "scripts" / "launch" / "_import_resolution_probe.py",
         root / ".venv" / "bin" / "python",
     )
     missing = [str(path) for path in required if not path.is_file()]
@@ -879,7 +879,7 @@ def run_agent(
     #   unarmed time budget  -> gpu_measurement_worker_main.py
     #                                                     "dataset directory
     #                                                      unavailable ...: None"
-    # `sdsc_submission_scripts/run_one_iteration.py` already resolved and
+    # `src/workflows/run_one_iteration.py` already resolved and
     # forwarded it; this is the SAME authority applied at the second launch
     # boundary, never a second convention and never a default path.
     if data_dir:
@@ -1372,7 +1372,7 @@ def main():
 
     # C12-P — resolve the physical dataset root ONCE, at the launch boundary,
     # through the same authority and precedence (explicit override >
-    # machine-local config) that `sdsc_submission_scripts/run_one_iteration.py`
+    # machine-local config) that `src/workflows/run_one_iteration.py`
     # already applies. It FAILS CLOSED: an unresolvable root refuses here,
     # before any expensive work, rather than after a real LLM has generated and
     # registered a candidate — the cost PR-04a paid once and PR-12d's TIDMAD

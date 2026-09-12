@@ -9,7 +9,7 @@ existing verifiers:
     (D-ARCH-1 invariant: resume from persisted state, never shell memory):
 
     * next incomplete iteration + committed count via the SAME functions
-      ``run_chain.sh`` auto-resume uses (``scripts/inspect_run_state.py`` —
+      ``run_chain.sh`` auto-resume uses (``scripts/launch/inspect_run_state.py`` —
       gap / tamper refusals included, fail closed);
     * the cumulative HealthGate-valid FORMAL incumbent per the FROZEN
       winner-field table of ``docs/campaign/stage_artifact_contract.md``
@@ -93,21 +93,21 @@ if not _configured_checkout:
         "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout used by the campaign"
     )
 REPO_ROOT = Path(_configured_checkout).resolve()
-if not (REPO_ROOT / "scripts" / "inspect_run_state.py").is_file():
+if not (REPO_ROOT / "scripts" / "launch" / "inspect_run_state.py").is_file():
     raise RuntimeError(
         "SIDERIUS_CHECKOUT is not an executable SIDERIUS checkout: "
-        f"{REPO_ROOT} (missing scripts/inspect_run_state.py)"
+        f"{REPO_ROOT} (missing scripts/launch/inspect_run_state.py)"
     )
 
 
 def _load_inspect_run_state():
-    """Import ``scripts/inspect_run_state.py`` from THIS checkout.
+    """Import ``scripts/launch/inspect_run_state.py`` from THIS checkout.
 
     ``scripts/`` is not a package, so the module is loaded by path — from
-    the repository root derived from this file's own location (CLAUDE.md
-    portability rule: the current checkout, never another clone).
+    the explicitly selected framework checkout named by ``SIDERIUS_CHECKOUT``
+    (never inferred from this external campaign file or another clone).
     """
-    path = REPO_ROOT / "scripts" / "inspect_run_state.py"
+    path = REPO_ROOT / "scripts" / "launch" / "inspect_run_state.py"
     spec = importlib.util.spec_from_file_location("gold_inspect_run_state", path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load inspector module: {path}")
@@ -180,7 +180,7 @@ def _scan_formal_candidates(
 
     **F-4 — validity is judged against THIS RUN'S pinned policy.** Eligibility
     used to be asked as ``is_valid_candidate(rec)``, whose zero-argument
-    default resolves the REPO-CURRENT ``configs/health_checks.yaml`` and
+    default resolves the REPO-CURRENT ``configs/health/health_checks.yaml`` and
     collapses UNKNOWN to the empty set on the way. A record whose own run
     declared a different roster was therefore judged against a roster it never
     ran: a record whose run-declared blocking gate FAILED came back valid,

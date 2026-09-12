@@ -107,12 +107,12 @@ def test_stage1_dry_run_binds_external_campaign_to_selected_framework(
     command_lines = [
         line
         for line in completed.stdout.splitlines()
-        if "sdsc_submission_scripts/run_chain.sh" in line
+        if "scripts/launch/run_chain.sh" in line
     ]
     commands = [shlex.split(line) for line in command_lines]
     assert len(commands) == 4
     command = commands[0]
-    assert str(checkout / "sdsc_submission_scripts" / "run_chain.sh") in command
+    assert str(checkout / "scripts" / "launch" / "run_chain.sh") in command
     assert command[command.index("--task_config") + 1] == str(
         CAMPAIGN / "task" / "task_config_regression.yaml"
     )

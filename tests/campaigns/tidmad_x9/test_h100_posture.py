@@ -42,7 +42,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[3]
 FRAMEWORK_ROOT = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
 POSTURE_FILE = REPO_ROOT / "campaigns" / "tidmad_x9" / "scripts" / "h100_posture.env"
-CHAIN_COMMON = FRAMEWORK_ROOT / "sdsc_submission_scripts" / "_chain_common.sh"
+CHAIN_COMMON = FRAMEWORK_ROOT / "scripts" / "launch" / "_chain_common.sh"
 RUNBOOK = REPO_ROOT / "campaigns" / "tidmad_x9" / "README.md"
 
 TABLE_BEGIN = "<!-- h100-posture-table:begin -->"
@@ -51,7 +51,7 @@ TABLE_END = "<!-- h100-posture-table:end -->"
 #: Where the runtime lives. `tools/` and `tests/` are deliberately absent: a
 #: name read only by tooling or by a test is not one a campaign executes under.
 PRODUCTION_PY_ROOTS = ("core", "agent", "execute_tools", "nodes", "workflows")
-PRODUCTION_SH_ROOT = "sdsc_submission_scripts"
+PRODUCTION_SH_ROOT = "scripts/launch"
 
 _BASH = ["env", "-i", "PATH=/usr/bin:/bin", "bash", "-c"]
 

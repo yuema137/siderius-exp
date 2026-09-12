@@ -61,8 +61,8 @@ gold_bind_siderius_checkout() {
         return 1
     fi
     checkout="$(cd "$checkout" && pwd)"
-    if [ ! -f "${checkout}/sdsc_submission_scripts/run_chain.sh" ] \
-        || [ ! -f "${checkout}/sdsc_submission_scripts/run_one_iteration.py" ] \
+    if [ ! -f "${checkout}/scripts/launch/run_chain.sh" ] \
+        || [ ! -f "${checkout}/src/workflows/run_one_iteration.py" ] \
         || [ ! -f "${checkout}/src/core/layout.py" ]; then
         echo "ERROR: --siderius-checkout is not an executable SIDERIUS checkout: $checkout" >&2
         return 1
@@ -408,8 +408,8 @@ gold_print_frozen_table() {
 # emission enables itself; the integration witness runs then.
 gold_bypass_ceiling_args() {
     GOLD_BYPASS_CEILING_ARGS=()
-    if grep -q -- "--bypass_formal_time_budget_minutes)" "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/_chain_common.sh" \
-        && grep -q -- '"--bypass_formal_time_budget_minutes"' "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/run_one_iteration.py"; then
+    if grep -q -- "--bypass_formal_time_budget_minutes)" "${GOLD_PROJECT_DIR}/scripts/launch/_chain_common.sh" \
+        && grep -q -- '"--bypass_formal_time_budget_minutes"' "${GOLD_PROJECT_DIR}/src/workflows/run_one_iteration.py"; then
         GOLD_BYPASS_CEILING_ARGS=(--bypass_formal_time_budget_minutes "$GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES")
     else
         echo "[gold-campaign] NOTE: --bypass_formal_time_budget_minutes ${GOLD_BYPASS_FORMAL_TIME_BUDGET_MINUTES} NOT emitted:" >&2

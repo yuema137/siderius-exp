@@ -427,7 +427,7 @@ def assemble(args: argparse.Namespace) -> int:
         if missing:
             print(f"  LEGS WITH NO RECORD: {missing} — these wrote no result JSON")
     else:
-        print("  Copy the factor into sdsc_submission_scripts/h100_posture.env:")
+        print("  Copy the factor into campaigns/tidmad_x9/scripts/h100_posture.env:")
         print(f"    H100_CORESIDENCY_FACTOR={factor}   (+ bump H100_POSTURE_VERSION)")
     print(f"  Full result: {out}")
     # An uncomputable factor is a failed probe even when every leg claimed

@@ -80,7 +80,11 @@ def _fixture_tree(tmp_path: Path, posture_text: str | None = None) -> Path:
     tree = tmp_path / "sdsc_submission_scripts"
     tree.mkdir()
     shutil.copy2(_LAUNCHER, tree / _LAUNCHER.name)
-    fake_chain = tree / "run_chain.sh"
+    # The campaign launcher is external to the selected framework checkout;
+    # the real chain belongs to the framework's relocated launch owner.
+    framework_launch = tree.parent / "scripts" / "launch"
+    framework_launch.mkdir(parents=True)
+    fake_chain = framework_launch / "run_chain.sh"
     fake_chain.write_text('#!/bin/bash\nprintf "%s\\n" "$@"\n')
     fake_chain.chmod(0o755)
     (tree.parent / ".venv").symlink_to(
@@ -491,7 +495,7 @@ def _capture(arm: str, root: str = "/persist/camp", band: str = "0-3", **argv_ov
         "[prior-baseline] resolved launch configuration:\n"
         + json.dumps(cfg, indent=2, sort_keys=True)
         + "\n  [DRY-RUN] would exec from /repo:\n"
-        + "    /venv/bin/python /repo/sdsc_submission_scripts/run_one_iteration.py "
+        + "    /venv/bin/python /repo/src/workflows/run_one_iteration.py "
         + f"{flat} {arm_tokens} --cleanup_denoised \n"
     )
 

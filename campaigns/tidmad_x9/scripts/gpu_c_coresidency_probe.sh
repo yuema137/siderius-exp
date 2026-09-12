@@ -43,7 +43,7 @@
 #
 # Usage (on the H100 box, GPU C pinned):
 #   CUDA_VISIBLE_DEVICES=<gpu_c_index> \
-#   bash sdsc_submission_scripts/gpu_c_coresidency_probe.sh \
+#   bash campaigns/tidmad_x9/scripts/gpu_c_coresidency_probe.sh \
 #       [--work-dir DIR] [--model wavenet] [--train-portion 0.05] \
 #       [--solo-cap-seconds 1200] [--quad-cap-seconds 2100] [--out FILE]
 #
@@ -56,7 +56,7 @@ set -euo pipefail
 
 PROBE_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROBE_PROJECT_DIR="${SIDERIUS_CHECKOUT:-}"
-if [ -z "$PROBE_PROJECT_DIR" ] || [ ! -f "$PROBE_PROJECT_DIR/sdsc_submission_scripts/run_chain.sh" ]; then
+if [ -z "$PROBE_PROJECT_DIR" ] || [ ! -f "$PROBE_PROJECT_DIR/scripts/launch/run_chain.sh" ]; then
     echo "ERROR: SIDERIUS_CHECKOUT must name the exact framework checkout" >&2
     exit 1
 fi

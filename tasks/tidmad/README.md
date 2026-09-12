@@ -118,8 +118,8 @@ then executes that checkout's normal production launcher:
 
 ```text
 experiments/tidmad/two_iteration_qualification/launch.sh
-  → <siderius-checkout>/sdsc_submission_scripts/run_chain.sh --task_composition <siderius-exp>/tasks/tidmad/compositions/bounded_qualification.yaml
-  → sdsc_submission_scripts/run_one_iteration.py
+  → <siderius-checkout>/scripts/launch/run_chain.sh --task_composition <siderius-exp>/tasks/tidmad/compositions/bounded_qualification.yaml
+  → <siderius-checkout>/src/workflows/run_one_iteration.py
   → the same workflow, declarations and plugins that CI and the Gates exercise
 ```
 
@@ -133,7 +133,7 @@ experiments/tidmad/two_iteration_qualification/launch.sh --help` prints the cont
 | `--mode lilab` | foreground subprocess |
 | `--task_composition <siderius-exp>/tasks/tidmad/compositions/bounded_qualification.yaml` | binds the reusable task-owned qualification scope, not a Gold campaign |
 | `--run_name tidmad_quickstart` | pins the run id |
-| `--llm_config <repo>/llm_configs/openai_tiered_pro.json` | per-node model routing. Without it the run falls back to a single default model with no routing. Override with `--llm_config llm_configs/deepseek_tiered_pro.json` or your own file |
+| `--llm_config <siderius-checkout>/configs/llm/openai_tiered_pro.json` | per-node model routing. Without it the run falls back to a single default model with no routing. Override with `--llm_config <siderius-checkout>/configs/llm/deepseek_tiered_pro.json` or your own file |
 | `--ml_lit_review_config <siderius-exp>/tasks/tidmad/framework_configs/lit_review.yaml` | keeps TIDMAD-specific literature framing in the experiment repository even when the CLI enables or disables the advisor |
 | `--start_iter 1` | **not cosmetic — see below** |
 | `--num_iterations 2` · `--max_rounds 2` · `--max_epochs 1` | proves iteration-state continuity and executes one Trial plus one Formal round per iteration |

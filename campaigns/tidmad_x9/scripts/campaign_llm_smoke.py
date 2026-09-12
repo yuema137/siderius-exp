@@ -66,7 +66,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
         "--llm-config",
-        default=str(REPO_ROOT / "llm_configs" / "openai_tiered_pro.json"),
+        default=str(REPO_ROOT / "configs" / "llm" / "openai_tiered_pro.json"),
         help="WorkflowLLMConfig JSON (default: the campaign-standard openai_tiered_pro.json)",
     )
     parser.add_argument("--n", type=int, default=8, help="burst size (default 8 = 2 fleets x 4)")

@@ -215,7 +215,7 @@ def test_experiment_dry_run_reaches_the_selected_framework_checkout(
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "[DRY-RUN] would exec" in completed.stdout
     assert (
-        str((checkout / "sdsc_submission_scripts" / "run_one_iteration.py").resolve())
+        str((checkout / "src" / "workflows" / "run_one_iteration.py").resolve())
         in completed.stdout
     )
     assert str(COMPOSITION.resolve()) in completed.stdout

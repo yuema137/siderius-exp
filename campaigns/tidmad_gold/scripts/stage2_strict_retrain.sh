@@ -162,7 +162,7 @@ stage2_main() {
             fi
 
             local UNIT_CMD=(
-                bash "${GOLD_PROJECT_DIR}/sdsc_submission_scripts/run_chain.sh"
+                bash "${GOLD_PROJECT_DIR}/scripts/launch/run_chain.sh"
                 --mode lilab
                 --workspace "$ws"
                 --run_name "$run_name"
