@@ -86,6 +86,8 @@ Python.
 
 The pinned revision still keeps its chain scripts in
 the selected framework's `scripts/launch/` and `src/workflows/` owners, with
-campaign configuration remaining in `configs/` and `configs/llm/`. The
-relocation is bound by this compatibility checkpoint. These instructions
+framework configuration under `configs/{llm,health,...}`. Gold retains its
+campaign-owned `config/llm_routing.json` and declared policy paths; nothing is
+redirected to framework defaults. The relocation is bound by this compatibility
+checkpoint. These instructions
 do not authorize Gold, Stage 2, an LLM smoke, or any scientific workload.

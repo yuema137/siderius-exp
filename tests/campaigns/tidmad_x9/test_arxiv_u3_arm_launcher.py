@@ -109,7 +109,8 @@ class TestArmDryRun:
             capture_output=True,
             text=True,
             env=_env(),
-            timeout=300,
+            cwd=tmp_path,
+            timeout=120,
         )
         assert r.returncode == 0, f"stdout:\n{r.stdout}\nstderr:\n{r.stderr}"
         return r.stdout, ws
