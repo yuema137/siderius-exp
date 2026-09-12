@@ -56,7 +56,7 @@ set -euo pipefail
 
 PROBE_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROBE_PROJECT_DIR="${SIDERIUS_CHECKOUT:-}"
-if [ -z "$PROBE_PROJECT_DIR" ] || [ ! -f "$PROBE_PROJECT_DIR/sdsc_submission_scripts/run_chain.sh" ]; then
+if [ -z "$PROBE_PROJECT_DIR" ] || [ ! -f "$PROBE_PROJECT_DIR/scripts/launch/run_chain.sh" ]; then
     echo "ERROR: SIDERIUS_CHECKOUT must name the exact framework checkout" >&2
     exit 1
 fi

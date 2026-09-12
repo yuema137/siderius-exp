@@ -10,7 +10,7 @@ set -euo pipefail
 
 PF_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PF_PROJECT_DIR="${SIDERIUS_CHECKOUT:-}"
-if [ -z "$PF_PROJECT_DIR" ] || [ ! -f "$PF_PROJECT_DIR/sdsc_submission_scripts/run_chain.sh" ]; then
+if [ -z "$PF_PROJECT_DIR" ] || [ ! -f "$PF_PROJECT_DIR/scripts/launch/run_chain.sh" ]; then
     echo "ERROR: SIDERIUS_CHECKOUT must name the exact framework checkout" >&2
     exit 1
 fi
@@ -369,7 +369,7 @@ pf_main() {
     # sys.path) and REPORTS what an unpinned child would resolve.
     local PROBE_TMP
     PROBE_TMP="$(mktemp -d)"
-    cp "${PF_PROJECT_DIR}/sdsc_submission_scripts/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
+    cp "${PF_PROJECT_DIR}/scripts/launch/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
     local UNPINNED
     UNPINNED="$(cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_PROJECT_DIR" 2>/dev/null | head -1 || true)"
     echo "[preflight] R2b unpinned child would resolve: ${UNPINNED#*-> }"

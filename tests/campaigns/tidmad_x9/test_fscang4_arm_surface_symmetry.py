@@ -641,7 +641,7 @@ def _dry_run_capture(arm: str) -> str:
         "[prior-baseline] resolved launch configuration:\n"
         + json.dumps(cfg, indent=2, sort_keys=True)
         + "\n  [DRY-RUN] would exec from /repo:\n"
-        + "    /venv/bin/python /repo/sdsc_submission_scripts/run_one_iteration.py "
+        + "    /venv/bin/python /repo/src/workflows/run_one_iteration.py "
         + f"--workspace {root}/{arm}_band{band} --run_name {arm}_band{band} "
         + f"--data_scope {band} --formal_portion 0.1 {arm_tokens}\n"
     )

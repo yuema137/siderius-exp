@@ -101,7 +101,7 @@ set -o pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 EXP_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 PROJECT_DIR="${SIDERIUS_CHECKOUT:-}"
-if [ -z "$PROJECT_DIR" ] || [ ! -f "$PROJECT_DIR/sdsc_submission_scripts/run_chain.sh" ]; then
+if [ -z "$PROJECT_DIR" ] || [ ! -f "$PROJECT_DIR/scripts/launch/run_chain.sh" ]; then
     echo "ERROR: SIDERIUS_CHECKOUT must name the exact framework checkout" >&2
     exit 1
 fi
@@ -133,8 +133,8 @@ export SIDERIUS_PYTHON="$PROJECT_PYTHON"
 export VIRTUAL_ENV="${PROJECT_DIR}/.venv"
 export PATH="${PROJECT_DIR}/.venv/bin${PATH:+:${PATH}}"
 unset PYTHONPATH
-RUN_CHAIN="${PROJECT_DIR}/sdsc_submission_scripts/run_chain.sh"
-RUNNER="${PROJECT_DIR}/sdsc_submission_scripts/run_one_iteration.py"
+RUN_CHAIN="${PROJECT_DIR}/scripts/launch/run_chain.sh"
+RUNNER="${PROJECT_DIR}/src/workflows/run_one_iteration.py"
 H100_POSTURE_ENV="${SCRIPT_DIR}/h100_posture.env"
 CORESIDENCY_PROBE="${SCRIPT_DIR}/gpu_c_coresidency_probe.sh"
 TASK_COMPOSITION="${EXP_ROOT}/tasks/tidmad/compositions/bounded_qualification.yaml"
