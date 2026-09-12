@@ -32,7 +32,7 @@ remain external.
 | DAVIS (~18m29s; 30 min bound) | 3 train / 3 eval sequences; Trial/Formal × 2; sequence-disjoint scopes | Formal1 MSE `0.03889419312898538` → Formal2 `0.031130119241262407` (lower); Health passed | 2 complete iterations; incumbent restored and improved; original rc not captured | `/home/klz/Data/SIDERIUS/step04_davis_restored_zfYsP1.raw.log` and workspace |
 | Cancer MTG (~15 min; 75 min bound) | full MTG graph; 3,717 train / 414 val masks; Trial/Formal × 2 | Formal1 AUPRC `0.26879417873942524` → Formal2 `0.18760729305813223` (higher direction); Health `EXPLICIT_NONE` | 2 complete iterations; prior Formal incumbent restored; best retained; original rc not captured | managed session `32429` stdout; `/home/klz/Data/SIDERIUS/step04_cancer_restored_5Lm7vl/workspace` (no raw log fabricated) |
 
-CPU format witnesses (run earlier against the prior pin, with identical
+CPU format witnesses (run earlier against infra `894a1dd4`, with identical
 executable source): SuperNEMO and MAJORANA each ran isolated real
 train/inference/scoring on synthetic task-format data, with disjoint
 train/evaluation IDs, both classes, persisted histories/checkpoints, and
@@ -65,8 +65,7 @@ only placeholders; do not put secrets, raw outputs, or runtime paths in Git:
 set -euo pipefail
 # Follow README.md#api-backed-launch-preparation before this command.
 unset PYTHONPATH
-timeout --signal=TERM --kill-after=60s 1800s \
-  exec timeout --signal=TERM --kill-after=60s 1800s \
+exec timeout --signal=TERM --kill-after=60s 1800s \
   bash experiments/oxford_iiit_pet/p0_final_pair_qualification/launch.sh \
   --siderius-checkout /path/to/SIDERIUS \
   --workspace /path/to/fresh/external/workspace \
@@ -75,11 +74,12 @@ timeout --signal=TERM --kill-after=60s 1800s \
 ```
 
 Substitute the selected wrapper and its bound from the table; wrapper-specific
-data roots and budgets are authoritative in each script. The `pipefail`/
-The managed foreground session preserves the launcher's true exit status;
+data roots and budgets are authoritative in each script. The managed
+foreground session preserves the launcher's true exit status;
 select the timeout from the table for each wrapper.
 
-Evidence reviewed on 2026-09-12 covers the six task-package contracts, the
+Evidence reviewed on 2026-09-12 covers 32 checks across the six task-package
+contract families, the
 earlier CPU pair, and these four real workflows. The old-pin runtime receipts
 remain valid source-execution evidence because the infra update was
 docs-only; they are not rerun results for the new pin. Known limits remain:
