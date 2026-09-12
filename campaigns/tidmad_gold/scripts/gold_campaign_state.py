@@ -104,8 +104,8 @@ def _load_inspect_run_state():
     """Import ``scripts/launch/inspect_run_state.py`` from THIS checkout.
 
     ``scripts/`` is not a package, so the module is loaded by path — from
-    the repository root derived from this file's own location (CLAUDE.md
-    portability rule: the current checkout, never another clone).
+    the explicitly selected framework checkout named by ``SIDERIUS_CHECKOUT``
+    (never inferred from this external campaign file or another clone).
     """
     path = REPO_ROOT / "scripts" / "launch" / "inspect_run_state.py"
     spec = importlib.util.spec_from_file_location("gold_inspect_run_state", path)
