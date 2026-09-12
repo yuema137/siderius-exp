@@ -12,11 +12,21 @@ def posture_module():
     return importlib.import_module("tests.campaigns.tidmad_x9.test_h100_posture")
 
 
-def test_production_shell_census_discovers_chain_flag(posture_module) -> None:
-    # This is a shell-only discovery: the flag is read from _chain_common's
-    # case parser, not invented by the Python posture census.
-    accepted = posture_module._chain_parser_flags()
-    assert "--data_scope" in accepted
+def test_production_shell_census_discovers_shell_only_export(
+    posture_module, monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    # Exercise the census' shell branch directly.  The token exists only in
+    # this temporary shell reader, not in any Python source; a wrong
+    # PRODUCTION_SH_ROOT would make this fail.
+    launch = tmp_path / "scripts" / "launch"
+    launch.mkdir(parents=True)
+    (launch / "inert.sh").write_text(
+        "#!/bin/sh\nvalue=${SIDERIUS_COUNTERFACTUAL_SHELL_ONLY}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(posture_module, "FRAMEWORK_ROOT", tmp_path)
+    names = posture_module._production_string_constants()
+    assert "SIDERIUS_COUNTERFACTUAL_SHELL_ONLY" in names
 
 
 def test_unknown_export_is_refused_by_existing_census(posture_module) -> None:
