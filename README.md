@@ -137,7 +137,7 @@ live entrypoints or current experiment inputs.
 The three additional literature pilot/full test sources are preserved in the
 [P0 03C1c archive](provenance/legacy_siderius/p0_literature_pilots/README.md)
 as fixed-corpus, non-live history. They are not collected by the live suite;
-the active copies remain pending the separately approved 03C2 retirement.
+the fixed pilot originals were retired by infra #434.
 
 The live TIDMAD anchor authority is
 [`tasks/tidmad/runtime/anchor_map.py`](tasks/tidmad/runtime/anchor_map.py), and
@@ -146,13 +146,16 @@ the canonical ruler remains
 Routine use has nothing to precompute. The module's `python -m` builder is
 retained only for an explicitly reviewed reconstruction with caller-supplied
 data and output paths. The #430 cleanup removed 44 duplicated originals plus
-the root anchor from the framework; two live Slurm files remain until 03C2.
+the root anchor from the framework; current launch readers now use the
+relocated framework owners.
 No campaign is authorized to launch merely because its files exist here.
 
-The current pinned framework (`50a563521e8578d2b18eeb5d71f78b1e11e86257`)
-still exposes launch scripts under
-`sdsc_submission_scripts/` and current framework configuration under
-`configs/` and `llm_configs/`. This compatibility update does not relocate
-those surfaces; that is later 03C work. It changes no task declaration,
+The current pinned framework (`8ce8366f5d9149cddb05e83eee5da41641789cc7`)
+exposes launch scripts under `scripts/launch/`, the workflow entry under
+`src/workflows/`, and framework configuration under `configs/` (including
+`configs/llm/` and `configs/health/`). This compatibility update changes no
+task declaration,
 scientific treatment, metric, Health policy, budget, advice, or campaign
-authorization.
+authorization. The historical C12 driver is preserved non-live in the
+[03C2 archive](provenance/legacy_siderius/p0_03c2_c12/README.md) pending final
+infra retirement.

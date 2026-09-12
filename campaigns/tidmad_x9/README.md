@@ -5,6 +5,12 @@ topology, preflight, resource posture, and campaign-specific validation.
 Every launcher requires `SIDERIUS_CHECKOUT` and delegates execution to that
 exact framework checkout.
 
+The selected framework owns `scripts/launch/` and `src/workflows/`; campaign
+posture and routing remain owned here. Exp issue #36 (default-config gap)
+remains deferred; the explicit `--llm-config` routing path is the required
+workaround. Exp issue #32 (environment/provenance), including the preflight and
+co-residency `PYTHONPATH` behavior, also remains deferred.
+
 ## H100 posture
 
 The posture runs four co-resident band chains per card. One card runs the

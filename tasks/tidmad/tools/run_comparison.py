@@ -19,9 +19,7 @@ Output structure:
           └── agent/         ← isolated agent workspace per run_name
 
 Usage:
-  python scripts/run_comparison.py --model punet
-  python scripts/run_comparison.py --model punet --run_name v2 --max_rounds 50
-  python scripts/run_comparison.py --model rnn --provider openai --model_id gpt-4o
+  SIDERIUS_CHECKOUT=/path/to/SIDERIUS .venv/bin/python -m tasks.tidmad.tools.run_comparison --model punet --workspace_root /path/to/workspace --data_dir /path/to/TIDMAD
 """
 
 import argparse
