@@ -39,6 +39,7 @@ p0_qualification_main() {
     [[ -f "$siderius_checkout/scripts/launch/run_chain.sh" && -f "$siderius_checkout/configs/llm/openai_tiered_pro.json" ]] || { echo "required SIDERIUS launch resources are missing" >&2; return 2; }
     [[ -f "$exp_root/$legacy_launcher" ]] || { echo "legacy launcher not found" >&2; return 2; }
     [[ -e "$workspace" ]] || mkdir -p "$workspace"
+    mkdir -p "$workspace/generated_library"
     unset SIDERIUS_PLUGIN_DIRS AGENT_GENERATED_DIR SIDERIUS_MODEL_PLUGIN_PATH SIDERIUS_LOSS_PLUGIN_PATH SIDERIUS_LOSS_DIRS
     export SIDERIUS_GENERATED_LIBRARY_DIR="$workspace/generated_library"
     local -a args=(--siderius-checkout "$siderius_checkout" --workspace "$workspace" --data_dir "$data_dir" "${fixed_args[@]}" )
