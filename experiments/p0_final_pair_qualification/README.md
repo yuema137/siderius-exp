@@ -11,5 +11,25 @@ remain in each task wrapper so their effective argv is visible and reviewable.
 | DAVIS | .05/.05; eval .20 | 3/3 | 1 | 10/16 | 60/240 | 32 |
 | Cancer MTG | 1/1 | full graph | 1 | 10/16 | 180/600 | 32 |
 
-Every wrapper runs two iterations with two rounds each, one epoch, measured
+Every wrapper requests two iterations with two rounds each, one epoch, measured
 Trial/Formal admission, and keeps runtime outputs outside this repository.
+Actual stages require fresh runtime evidence; configuration alone is not a
+qualification result.
+
+## CPU task-format witnesses
+
+The bounded SuperNEMO and MAJORANA witnesses exercise real CPU training,
+inference, and scoring with synthetic task-format fixtures (no agent/API,
+GPU, original data, or scientific claim):
+
+```bash
+cd /path/to/exact/siderius-exp-current
+uv sync --group dev --frozen
+.venv/bin/python -m pytest -q \
+  --basetemp=/path/to/fresh/external/step04-basetemp \
+  tests/test_step04_cpu_lifecycle.py -s
+```
+
+Use the exact pinned exp checkout and choose a new external basetemp for each
+run. Pytest may clear that directory; never point it at original data,
+existing results, or a shared repository location.
