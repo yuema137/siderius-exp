@@ -1,8 +1,8 @@
 """C1 regression for Comparison's production Health policy path."""
 
-from pathlib import Path
-import os
 import importlib
+import os
+from pathlib import Path
 
 import pytest
 
@@ -10,9 +10,10 @@ import pytest
 def test_baseline_trial_calls_real_loader_with_production_path(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    from tasks.tidmad.tools import run_comparison as comparison
     from execute_tools.health_checks import config as health_config
     from execute_tools.health_checks import evaluation as health_evaluation
+
+    from tasks.tidmad.tools import run_comparison as comparison
 
     # Earlier startup tests call comparison._main, which intentionally updates
     # its module globals while checking a foreign checkout. Reload from the
