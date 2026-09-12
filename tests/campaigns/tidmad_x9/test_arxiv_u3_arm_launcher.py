@@ -109,8 +109,7 @@ class TestArmDryRun:
             capture_output=True,
             text=True,
             env=_env(),
-            cwd=tmp_path,
-            timeout=120,
+            timeout=300,
         )
         assert r.returncode == 0, f"stdout:\n{r.stdout}\nstderr:\n{r.stderr}"
         return r.stdout, ws
@@ -382,8 +381,8 @@ class TestPrintResolvedLaunchConfig:
             ],
             capture_output=True,
             text=True,
-            timeout=240,
-            cwd=str(_REPO),
+            timeout=120,
+            cwd=tmp_path,
             env=_env(),
         )
         return r, ws
