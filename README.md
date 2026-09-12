@@ -150,7 +150,7 @@ the root anchor from the framework; current launch readers now use the
 relocated framework owners.
 No campaign is authorized to launch merely because its files exist here.
 
-The current pinned framework (`8ce8366f5d9149cddb05e83eee5da41641789cc7`)
+The pinned framework (see `SIDERIUS_REVISION` for the exact revision)
 exposes launch scripts under `scripts/launch/`, the workflow entry under
 `src/workflows/`, and framework configuration under `configs/` (including
 `configs/llm/` and `configs/health/`). This compatibility update changes no

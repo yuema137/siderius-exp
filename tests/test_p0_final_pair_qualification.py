@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-SIDERIUS_REVISION = "894a1dd4ca0132d2e12b0629170527349b1a732a"
+SIDERIUS_REVISION = "0dcec9c8e58a41f5aac4c62753dec54138d4d190"
 CASES = {
     "tidmad": (
         ("abra_training_0004.h5", "abra_validation_0004.h5"),
