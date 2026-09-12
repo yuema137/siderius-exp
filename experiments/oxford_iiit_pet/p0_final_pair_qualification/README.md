@@ -4,4 +4,4 @@
 bash experiments/oxford_iiit_pet/p0_final_pair_qualification/launch.sh --siderius-checkout /path/to/SIDERIUS --workspace /path/to/fresh/workspace --data_dir /path/to/OXFORD_IIIT_PET
 ```
 
-This bounded Step04 wrapper requires an empty external workspace and supports `--dry-run`.
+Uses all 370/74 manifest rows, one epoch, batch 16, 2/3-minute budgets, 60/180-second probes and two iterations × two rounds. Results stay in the external workspace; `--dry-run` inspects argv.

@@ -3,7 +3,7 @@ set -euo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/p0_final_pair_qualification/common.sh"
 tidmad_check() { [[ -f "$1/abra_training_0004.h5" && -f "$1/abra_validation_0004.h5" ]]; }
 export SIDERIUS_PREFLIGHT_WORKER_MEM_GIB=24 SIDERIUS_SUBPROCESS_RSS_GB='training=40,inference=60,scoring=24'
-TIDMAD_ARGS=(--formal_round_strategy full_clone --workflow_parameter_rules '{"train_config.epochs":{"exact":1},"train_config.batch_size":{"exact":16}}' --validation_max_train_samples 1024 --validation_max_samples 1024 --vram_probe_step_timeout_seconds 60 --vram_preflight_total_timeout_seconds 240)
+TIDMAD_ARGS=(--formal_round_strategy full_clone --workflow_parameter_rules '{"train_config.epochs":{"exact":1},"train_config.batch_size":{"exact":16}}' --validation_max_train_samples 1024 --vram_probe_step_timeout_seconds 60 --vram_preflight_total_timeout_seconds 240 --vram_preflight_host_memory_limit_gb 24)
 p0_qualification_main tidmad experiments/tidmad/two_iteration_qualification/launch.sh tidmad_check "${TIDMAD_ARGS[@]}" \
   --run_name tidmad_p0_final --force_fresh --no_auto_resume --no-runtime_watchdog --no-ml_lit_review_enabled --num_iterations 2 --max_rounds 2 --max_epochs 1 --trial_max_epochs 1 --formal_max_epochs 1 \
   --trial_portion .01 --train_portion 1 --eval_portion .01 --formal_portion .01 --formal_train_portion 1 --formal_eval_portion .01 \
