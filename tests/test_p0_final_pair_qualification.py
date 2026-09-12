@@ -100,6 +100,7 @@ def fake_checkout(tmp_path: Path) -> tuple[Path, Path]:
         "#!/usr/bin/env bash\nset -eu\n"
         '{ for arg in "$@"; do printf "ARG\\t%s\\n" "$arg"; done; '
         'printf "ENV\\tSIDERIUS_GENERATED_LIBRARY_DIR=%s\\n" "${SIDERIUS_GENERATED_LIBRARY_DIR-}"; '
+        'printf "ENV\\tSIDERIUS_CHAIN_WORKSPACE=%s\\n" "${SIDERIUS_CHAIN_WORKSPACE-}"; '
         'printf "ENV\\tSIDERIUS_PLUGIN_DIRS=%s\\n" "${SIDERIUS_PLUGIN_DIRS-}"; '
         'printf "ENV\\tSIDERIUS_LOSS_DIRS=%s\\n" "${SIDERIUS_LOSS_DIRS-}"; '
         'printf "ENV\\tSIDERIUS_PREFLIGHT_WORKER_MEM_GIB=%s\\n" "${SIDERIUS_PREFLIGHT_WORKER_MEM_GIB-}"; '
@@ -135,6 +136,7 @@ def _run(
     env["PATH"] = f"{bindir}:{env['PATH']}"
     env["SIDERIUS_PLUGIN_DIRS"] = "/ambient/models"
     env["SIDERIUS_LOSS_DIRS"] = "/ambient/losses"
+    env["SIDERIUS_CHAIN_WORKSPACE"] = "/ambient/workspace"
     wrapper = ROOT / "experiments" / task / "p0_final_pair_qualification" / "launch.sh"
     return subprocess.run(
         [
@@ -247,6 +249,7 @@ def test_delegated_argv_has_frozen_controls(
         f"SIDERIUS_GENERATED_LIBRARY_DIR={tmp_path / 'workspace' / 'generated_library'}"
         in env_rows
     )
+    assert f"SIDERIUS_CHAIN_WORKSPACE={tmp_path / 'workspace'}" in env_rows
     assert "SIDERIUS_PLUGIN_DIRS=" in env_rows and "SIDERIUS_LOSS_DIRS=" in env_rows
     assert "SIDERIUS_PLUGIN_DIRS=/ambient/models" not in env_rows
     assert "SIDERIUS_LOSS_DIRS=/ambient/losses" not in env_rows
