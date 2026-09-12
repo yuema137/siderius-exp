@@ -32,8 +32,9 @@ remain external.
 | DAVIS (~18m29s; 30 min bound) | 3 train / 3 eval sequences; Trial/Formal × 2; sequence-disjoint scopes | Formal1 MSE `0.03889419312898538` → Formal2 `0.031130119241262407` (lower); Health passed | 2 complete iterations; incumbent restored and improved; original rc not captured | `/home/klz/Data/SIDERIUS/step04_davis_restored_zfYsP1.raw.log` and workspace |
 | Cancer MTG (~15 min; 75 min bound) | full MTG graph; 3,717 train / 414 val masks; Trial/Formal × 2 | Formal1 AUPRC `0.26879417873942524` → Formal2 `0.18760729305813223` (higher direction); Health `EXPLICIT_NONE` | 2 complete iterations; prior Formal incumbent restored; best retained; original rc not captured | managed session `32429` stdout; `/home/klz/Data/SIDERIUS/step04_cancer_restored_5Lm7vl/workspace` (no raw log fabricated) |
 
-CPU format witnesses (run earlier against infra `894a1dd4`, with identical
-executable source): SuperNEMO and MAJORANA each ran isolated real
+CPU format witnesses have an earlier receipt against infra `894a1dd4` (with
+identical executable source) and were also re-executed by the final full suite
+under current pin `3eb6d3d8`: SuperNEMO and MAJORANA each ran isolated real
 train/inference/scoring on synthetic task-format data, with disjoint
 train/evaluation IDs, both classes, persisted histories/checkpoints, and
 independent `energy_matched_roc_auc` checks. They make no original-data or
