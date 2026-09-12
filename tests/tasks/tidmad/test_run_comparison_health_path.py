@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import os
+import importlib
 
 import pytest
 
@@ -13,13 +14,13 @@ def test_baseline_trial_calls_real_loader_with_production_path(
     from execute_tools.health_checks import config as health_config
     from execute_tools.health_checks import evaluation as health_evaluation
 
+    # Earlier startup tests call comparison._main, which intentionally updates
+    # its module globals while checking a foreign checkout. Reload from the
+    # explicit environment so this regression observes the production constant
+    # assembled by the real module import, without patching that path.
+    comparison = importlib.reload(comparison)
     selected_checkout = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
-    monkeypatch.setattr(comparison, "SIDERIUS_ROOT", str(selected_checkout))
-    monkeypatch.setattr(
-        comparison,
-        "HEALTH_CHECKS_PATH",
-        str(selected_checkout / "configs" / "health" / "health_checks.yaml"),
-    )
+    assert Path(comparison.SIDERIUS_ROOT) == selected_checkout
     monkeypatch.setattr(health_config, "SIDERIUS_ROOT", str(selected_checkout))
     runtime_config = tmp_path / "runtime-health.yaml"
     runtime_config.write_text("health_gates: []\n", encoding="utf-8")

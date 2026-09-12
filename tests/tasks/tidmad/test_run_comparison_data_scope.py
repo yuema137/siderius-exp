@@ -79,6 +79,8 @@ class TestMainStartupGuards:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """A src-shaped directory without the real probe is not a checkout authority."""
+        from tasks.tidmad.tools import run_comparison
+
         root = tmp_path / "framework"
         for relative in (
             "src/core/layout.py",
@@ -90,8 +92,17 @@ class TestMainStartupGuards:
             path.touch()
         monkeypatch.setenv("SIDERIUS_CHECKOUT", str(root))
 
-        with pytest.raises(SystemExit, match="_import_resolution_probe.py"):
-            _main(["--model", "punet"])
+        # `_main` validates the selected checkout by assigning module globals
+        # before the probe refusal. Restore them so later tests in this process
+        # cannot inherit this intentionally foreign fixture root.
+        original_root = run_comparison.SIDERIUS_ROOT
+        original_health_path = run_comparison.HEALTH_CHECKS_PATH
+        try:
+            with pytest.raises(SystemExit, match="_import_resolution_probe.py"):
+                _main(["--model", "punet"])
+        finally:
+            run_comparison.SIDERIUS_ROOT = original_root
+            run_comparison.HEALTH_CHECKS_PATH = original_health_path
 
 
 class TestRunAgentForwarding:
