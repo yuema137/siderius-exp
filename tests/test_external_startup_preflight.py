@@ -28,12 +28,22 @@ TASK_MANIFESTS = {
     "cancer_gene_identification": (
         EXP_ROOT / "tasks/cancer_gene_identification/compositions/two_network.yaml"
     ),
+    "cancer_gene_identification_mtg": (
+        EXP_ROOT / "tasks/cancer_gene_identification/compositions/mtg_size.yaml"
+    ),
+    "supernemo_signal_background": (
+        EXP_ROOT / "tasks/supernemo_signal_background/compositions/signal_background.yaml"
+    ),
+    "majorana_low_avse": EXP_ROOT / "tasks/majorana_low_avse/compositions/low_avse.yaml",
 }
 EXPECTED_OBJECTIVES = {
     "tidmad": None,
     "oxford_iiit_pet": ("ce", None),
     "davis_future_prediction": ("custom", "davis_exact_l1"),
     "cancer_gene_identification": ("custom", "cancer_gene_masked_bce"),
+    "cancer_gene_identification_mtg": ("custom", "cancer_gene_masked_bce"),
+    "supernemo_signal_background": ("ce", None),
+    "majorana_low_avse": ("ce", None),
 }
 EXPECTED_HEALTH_GATES = {
     "tidmad": {
@@ -47,6 +57,9 @@ EXPECTED_HEALTH_GATES = {
     },
     "davis_future_prediction": {"davis_dispersion_blocking"},
     "cancer_gene_identification": set(),
+    "cancer_gene_identification_mtg": set(),
+    "supernemo_signal_background": set(),
+    "majorana_low_avse": set(),
 }
 
 CHILD = textwrap.dedent(

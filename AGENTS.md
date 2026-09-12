@@ -22,3 +22,9 @@ outside both repositories.
 Use the exact SIDERIUS revision in `SIDERIUS_REVISION` and the checkout's own
 `.venv/bin/python`. Do not borrow another checkout's virtual environment or use
 `PYTHONPATH` to mix revisions.
+
+For API-backed launches, follow the credential-preparation and secret-handling
+boundary in [`README.md`](README.md#api-backed-launch-preparation), including
+pre-effect failure for missing required keys and the distinction between key
+presence and usable provider access. Preserve explicitly reviewed bindings;
+clear only inherited conflicting overlays.

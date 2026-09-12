@@ -40,6 +40,28 @@ selected SIDERIUS checkout owns the interpreter used for framework scripts and
 node children. Both must resolve the commit in `SIDERIUS_REVISION`; neither may
 borrow the other's environment or use `PYTHONPATH` to overlay framework source.
 
+## API-backed launch preparation
+
+Before an API-backed experiment, prepare credentials in the same shell that
+will own the launcher. Follow the pinned framework's detailed installation
+procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/3eb6d3d8529d4404b57d74422d3f0589669434b3/docs/getting-started/installation.md),
+using either a trusted external file with mode `600` or managed secret
+injection. Enable shell export only around the source step (`set -a`, source,
+`set +a`), and before any effectful launch verify that every key required by
+the enabled providers/services is non-empty in the selected checkout's
+`.venv/bin/python`. A missing file, source failure, whitespace-only value, or
+missing required key aborts before effects. Offline and dry-run commands do
+not require provider keys.
+
+Presence is not proof of validity, quota, or network reachability. Never print
+or persist credential values, and do not rely on an environment prepared by
+another shell or process. Clear only inherited conflicting `PYTHONPATH` and
+plugin/loss path overrides; retain explicitly reviewed workspace plugin
+bindings. Use a fresh workspace for each new run identity (an explicitly
+validated resume may use its existing workspace), external logs, and datasets
+outside both repositories. Record exact checkout revisions and managed
+process exit status.
+
 ## Repository identity and linked worktrees
 
 A linked Git worktree may live outside the primary checkout, including under
@@ -150,7 +172,7 @@ the root anchor from the framework; current launch readers now use the
 relocated framework owners.
 No campaign is authorized to launch merely because its files exist here.
 
-The current pinned framework (`8ce8366f5d9149cddb05e83eee5da41641789cc7`)
+The pinned framework (see `SIDERIUS_REVISION` for the exact revision)
 exposes launch scripts under `scripts/launch/`, the workflow entry under
 `src/workflows/`, and framework configuration under `configs/` (including
 `configs/llm/` and `configs/health/`). This compatibility update changes no
