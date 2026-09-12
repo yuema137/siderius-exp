@@ -41,7 +41,8 @@ scientific claim.
 
 All four pairs used infra `0dcec9c8e58a41f5aac4c62753dec54138d4d190` and exp
 `f0be873a626becd54c3b949c2a4a2d4f5b28609f`; the CPU witnesses ran earlier
-against identical executable source under that prior infra pin. Current
+against identical executable source under explicit infra `894a1dd4` stated
+above. Current
 reproduction uses infra `3eb6d3d8529d4404b57d74422d3f0589669434b3`, recorded in
 `SIDERIUS_REVISION` and the lockfile. Scientific Health rejection and
 framework execution are reported separately; `no_records` is not silently
