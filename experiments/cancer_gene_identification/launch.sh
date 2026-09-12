@@ -158,9 +158,9 @@ for network in "${NETWORKS[@]}"; do
     [ -f "${DATA_DIR}/${network}/data.h5" ] || fail "missing ${network}/data.h5 under '$DATA_DIR'"
 done
 
-LAUNCHER="${SIDERIUS_CHECKOUT}/sdsc_submission_scripts/run_chain.sh"
+LAUNCHER="${SIDERIUS_CHECKOUT}/scripts/launch/run_chain.sh"
 COMPOSITION="${PACK_DIR}/compositions/${COMPOSITION_NAME}.yaml"
-LLM_CONFIG="${SIDERIUS_CHECKOUT}/llm_configs/openai_tiered_pro.json"
+LLM_CONFIG="${SIDERIUS_CHECKOUT}/configs/llm/openai_tiered_pro.json"
 GENERATED_LIBRARY_DIR="${WORKSPACE}/generated_library"
 [ -f "$LAUNCHER" ] || fail "production launcher not found at '$LAUNCHER'"
 [ -f "$COMPOSITION" ] || fail "task composition not found at '$COMPOSITION'"

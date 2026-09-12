@@ -577,7 +577,7 @@ pf_main() {
         echo "ERROR: --siderius-checkout is not an existing directory: $SIDERIUS_CHECKOUT_ARG" >&2
         return 1
     }
-    if [ ! -f "${PF_SIDERIUS_ROOT}/sdsc_submission_scripts/_import_resolution_probe.py" ]; then
+    if [ ! -f "${PF_SIDERIUS_ROOT}/scripts/launch/_import_resolution_probe.py" ]; then
         echo "ERROR: --siderius-checkout lacks the import-resolution probe: ${PF_SIDERIUS_ROOT}" >&2
         return 1
     fi
@@ -774,7 +774,7 @@ pf_main() {
     # source-path override; `-c` is blind because cwd itself sits on sys.path.
     local PROBE_TMP
     PROBE_TMP="$(mktemp -d)"
-    cp "${PF_SIDERIUS_ROOT}/sdsc_submission_scripts/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
+    cp "${PF_SIDERIUS_ROOT}/scripts/launch/_import_resolution_probe.py" "$PROBE_TMP/probe.py"
     local UNPINNED
     UNPINNED="$(cd "$PROBE_TMP" && env -u PYTHONPATH "$PF_PY" probe.py "$PF_SIDERIUS_ROOT" 2>/dev/null | head -1 || true)"
     echo "[preflight] R2b exact-venv child resolves: ${UNPINNED#*-> }"

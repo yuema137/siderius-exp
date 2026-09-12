@@ -70,7 +70,7 @@ def _band_commands(stdout: str) -> list[list[str]]:
     return [
         shlex.split(line)
         for line in stdout.splitlines()
-        if "sdsc_submission_scripts/run_chain.sh" in line
+        if "scripts/launch/run_chain.sh" in line
     ]
 
 

@@ -23,7 +23,7 @@ def _siderius_checkout() -> Path:
             "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
         )
     checkout = Path(configured).resolve()
-    assert (checkout / "sdsc_submission_scripts" / "run_chain.sh").is_file()
+    assert (checkout / "scripts" / "launch" / "run_chain.sh").is_file()
     return checkout
 
 
