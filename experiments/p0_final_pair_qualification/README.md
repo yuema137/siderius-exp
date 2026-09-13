@@ -52,7 +52,7 @@ converted into a qualification score.
 ## Current reviewed dependency and launch boundary
 
 The live wrapper now requires infra
-`644975846ff95cb68aa07eacb1a49d63d54ef85c`, matching the root pin, installed
+`5995055e4544262cd52996fc89b705e94128e48c`, matching the root pin, installed
 dependency and selected source checkout. Both checks remain: the root pin must
 equal this reviewed literal, and the selected checkout must equal the root pin.
 Task treatment arguments are unchanged. Comparison and Gold policy consumers
@@ -66,6 +66,14 @@ retired; unknown roles cannot be replaced with an empty roster, and stored-valid
 resume fields cannot replace independently valid effective-policy evidence.
 Explicit no-Health and disabled-Health paths remain supported. See the
 [current Health contract](../../README.md#declared-health-roles-and-historical-inputs).
+The pin also includes executable PR448–451 changes: selected ordering remains
+recorded on post-resolution errors (not proof of completed traversal), the
+standalone literature CLI binds explicit task/data/workspace inputs, iteration
+registry imports occur after workspace binding, and finite local-code packages
+retain and verify captured source identities across child execution and reuse.
+Workflow literature flags still belong to the normal workflow launcher; these
+wrappers do not invoke the standalone literature CLI. SuperNEMO and MAJORANA
+now use the [declared local-code route](../../README.md#declared-task-local-code).
 The old docs-only equivalence argument below applies only to the historical final-P0
 reconciliation, not this update. No new real-data multi-iteration campaign is
 qualified by those old receipts. Fresh bounded consumer tests and synthetic CPU
@@ -73,6 +81,11 @@ lifecycle evidence are distinct from scientific qualification; see the
 [root test instructions](../../README.md#running-the-live-tests).
 
 ## Sanitized reproduction
+
+For TIDMAD, first follow [canonical anchor staging and byte comparison](../../tasks/tidmad/data/README.md#stage-the-approved-anchor).
+The wrapper's required-file checks and Gold's anchor-presence preflight do not
+establish canonical anchor equality. Preserved raw/GT tables are not currently
+declared tuner inputs; see the [task input boundary](../../tasks/tidmad/README.md#preserved-reference-inputs-and-live-consumption).
 
 From this exact checkout, follow the complete root credential procedure and
 use the checkout's frozen `.venv`. Select one wrapper at a time, with its

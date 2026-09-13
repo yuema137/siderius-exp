@@ -85,6 +85,11 @@ minute is spent. See `data/README.md`.
 
 ### 4. Preview the run
 
+Before an affected fresh run, also follow the
+[approved anchor staging and byte comparison](data/README.md#stage-the-approved-anchor).
+Composed scoring and Trial anchoring expect `data_dir/segment_anchors.json`;
+the committed ruler's existence alone does not populate or verify that path.
+
 `--dry-run` walks the chain and prints the exact child command without
 executing anything. Do this first.
 
@@ -243,6 +248,33 @@ scientific authority.
 The task description, forward-contract prose and health config are
 **referenced**, not copied: their owning YAML files are the authority and a
 copy here would be the parallel authority roadmap §22.23.1 forbids.
+
+## Preserved reference inputs and live consumption
+
+The committed `reference_data/` inventory retains the canonical anchor, all
+42 raw/ground-truth JSON tables, official paper reports, and paper-spec baseline
+configuration. The task-local `runtime/reference_scores.py` loader still reads
+and validates the raw/GT tables. Their consumption by the production tuner is
+currently **NOT DECLARED**: no live composition or launcher injects that evidence,
+and the generic tuner omits comparison tables without an explicit input. File
+preservation and loader availability are not proof that a run displays or uses
+those references. This update does not restore an implicit framework source.
+
+Gold's approved per-band FCNet reference remains
+`campaigns/tidmad_gold/fcnet_band_references.json` (SHA-256
+`f15ed7a5995dc86678a991ac26b76212361038d58d2cea96205a216f74f6d5a5`),
+and approved v6 advice remains
+`campaigns/tidmad_gold/gold_advice_v6_regression.json` (SHA-256
+`e621e1a5aa7ee87eab6978cb125a6e1b4aa944669a4761cccac908175ad23eae`).
+Launchers require explicit selection of these campaign inputs. Do not replace
+the approved per-band reference with the preserved, superseded paper Markdown
+scalar or rewrite historical provenance paths. Archived advice remains non-live
+history under `provenance/legacy_siderius/advice/`.
+
+External FCNet checkpoints, source-result/Health artifacts, raw data, and ignored
+paper caches are not supplied by this clone. Their current availability remains
+unverified, not established recovery or loss. Existing results retain their
+original framework/experiment pair; the new pin is not new scientific evidence.
 
 ## Other ways to run
 

@@ -20,6 +20,12 @@ owns selecting that composition and the treatment values above.
 
 ## Launch
 
+First [stage and byte-compare the approved anchor](../../../tasks/tidmad/data/README.md#stage-the-approved-anchor)
+at `data_dir/segment_anchors.json`. Both composed scoring and Trial anchoring
+read that caller-staged file; an existing committed anchor or a presence-only
+preflight is not proof of equality. Preserve the canonical ruler and reference
+assets; [raw/GT tuner consumption remains undeclared](../../../tasks/tidmad/README.md#preserved-reference-inputs-and-live-consumption).
+
 ```bash
 bash experiments/tidmad/two_iteration_qualification/launch.sh \
     --siderius-checkout /path/to/pinned/SIDERIUS \

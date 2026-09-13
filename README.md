@@ -40,11 +40,32 @@ selected SIDERIUS checkout owns the interpreter used for framework scripts and
 node children. Both must resolve the commit in `SIDERIUS_REVISION`; neither may
 borrow the other's environment or use `PYTHONPATH` to overlay framework source.
 
+## Declared task-local code
+
+SuperNEMO and MAJORANA declare a finite `code_package` in their compositions.
+Its `root: ../plugins` is relative to the manifest; `files` lists every selected
+Python entry, helper, and required model. Sibling code uses relative imports,
+for example `from ._majorana_data import MajoranaScope`. Data and both metrics
+therefore share the same captured scope class. Other single-file tasks may omit
+this optional declaration; datasets, outputs, and third-party dependencies are
+not package members.
+
+Every declared member contributes to implementation identity. Moving unchanged
+code retains semantic identity; changing a helper does not. Children verify the
+captured member hashes before executing task code. Restore the pinned source
+after an accidental edit, or use a fresh workspace for an intentional new code
+identity. Never edit old locks/results or add `PYTHONPATH` to force a resume.
+Ordinary Python imports and captured imports have separate namespaces; identity
+is shared within one capture, not between those independent loading modes.
+This integrity check is not a security sandbox for arbitrary Python.
+
+See the pinned framework's [task-composition contract](https://github.com/Galileo-Sandbox/SIDERIUS/blob/5995055e4544262cd52996fc89b705e94128e48c/docs/reference/task-composition.md).
+
 ## API-backed launch preparation
 
 Before an API-backed experiment, prepare credentials in the same shell that
 will own the launcher. Follow the pinned framework's detailed installation
-procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/644975846ff95cb68aa07eacb1a49d63d54ef85c/docs/getting-started/installation.md),
+procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/5995055e4544262cd52996fc89b705e94128e48c/docs/getting-started/installation.md),
 using either a trusted external file with mode `600` or managed secret
 injection. Enable shell export only around the source step (`set -a`, source,
 `set +a`), and before any effectful launch verify that every key required by
@@ -186,6 +207,12 @@ retained only for an explicitly reviewed reconstruction with caller-supplied
 data and output paths. The #430 cleanup removed 44 duplicated originals plus
 the root anchor from the framework; current launch readers now use the
 relocated framework owners.
+Composed TIDMAD scoring and Trial anchoring specifically read
+`data_dir/segment_anchors.json`. Before an affected fresh run, stage and compare
+that file byte-for-byte with the committed ruler using the
+[TIDMAD staging instructions](tasks/tidmad/data/README.md#stage-the-approved-anchor).
+Gold pooled Stage3's committed-anchor reader is a different path and does not
+prove the composed run's staged copy is correct.
 No campaign is authorized to launch merely because its files exist here.
 
 The pinned framework (see `SIDERIUS_REVISION` for the exact revision)
