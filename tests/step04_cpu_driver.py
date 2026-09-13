@@ -74,8 +74,10 @@ def run_phases(task: str, exp: Path, workspace: Path, data: Path):
     def audit(event, values):
         if event == "subprocess.Popen":
             exe, argv, cwd, _env = values
-            if len(argv) > 1 and str(argv[1]).endswith(".py"):
+            if list(argv[1:4]) == ["-m", "core.local_code.child", "script"]:
                 assert "PYTHONPATH" not in _env
+                assert _env.get("SIDERIUS_TASK_CODE_MANIFEST")
+                assert _env.get("SIDERIUS_TASK_CODE_SHA256")
                 safe = {
                     k: _env.get(k)
                     for k in (
@@ -87,10 +89,18 @@ def run_phases(task: str, exp: Path, workspace: Path, data: Path):
                         "SIDERIUS_CHAIN_WORKSPACE",
                         "SIDERIUS_PLUGIN_DIRS",
                         "SIDERIUS_LOSS_DIRS",
+                        "SIDERIUS_TASK_CODE_MANIFEST",
+                        "SIDERIUS_TASK_CODE_SHA256",
                     )
                 }
                 commands.append(
-                    {"executable": exe, "argv": argv, "cwd": cwd, "env_safe": safe}
+                    {
+                        "executable": exe,
+                        "argv": argv,
+                        "target_argv": [exe, *argv[4:]],
+                        "cwd": cwd,
+                        "env_safe": safe,
+                    }
                 )
 
     sys.addaudithook(audit)
@@ -141,7 +151,7 @@ def run_phases(task: str, exp: Path, workspace: Path, data: Path):
     core = Path(sys.modules["core"].__file__).resolve()
     assert core.is_relative_to(Path(sys.prefix).resolve())
     for command in commands:
-        argv = command["argv"]
+        argv = command["target_argv"]
         if Path(argv[1]).name == "denoising_score_single.py":
             assert argv[argv.index("--raw_data_dir") + 1] == str(data)
             assert argv[argv.index("--data_dir") + 1] == str(workspace)
@@ -150,7 +160,7 @@ def run_phases(task: str, exp: Path, workspace: Path, data: Path):
     assert metric["metric_id"] == "energy_matched_roc_auc"
     assert (
         len(commands) == 3
-        and [Path(c["argv"][1]).name for c in commands]
+        and [Path(c["target_argv"][1]).name for c in commands]
         == [
             "train_engine_sandbox.py",
             "inference_single.py",
@@ -158,8 +168,10 @@ def run_phases(task: str, exp: Path, workspace: Path, data: Path):
         ]
         and all(
             c["executable"] == sys.executable
-            and Path(c["argv"][1]).resolve().is_relative_to(core.parent.parent)
-            and ("--data_dir" in c["argv"] or "--raw_data_dir" in c["argv"])
+            and Path(c["target_argv"][1]).resolve().is_relative_to(core.parent.parent)
+            and (
+                "--data_dir" in c["target_argv"] or "--raw_data_dir" in c["target_argv"]
+            )
             for c in commands
         )
     )
