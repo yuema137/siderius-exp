@@ -1,3 +1,12 @@
+code_package:
+  root: ../plugins
+  files:
+    - _supernemo_task.py
+    - _supernemo_data.py
+    - _supernemo_metrics.py
+    - energy_matched_auc.py
+    - supernemo_reference_pointnet.py
+
 task_data_path:
   file: ../plugins/_supernemo_task.py
   symbol: SuperNemoTaskDataPath

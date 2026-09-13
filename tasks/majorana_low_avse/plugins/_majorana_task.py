@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import importlib.util
 import json
-import sys
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, ClassVar
@@ -21,26 +19,7 @@ from execute_tools.task_data_path import (
 )
 from torch.utils.data import Dataset
 
-
-def _load_data_module():
-    name = "siderius_exp_majorana_data"
-    if name in sys.modules:
-        return sys.modules[name]
-    spec = importlib.util.spec_from_file_location(
-        name, Path(__file__).with_name("_majorana_data.py")
-    )
-    if spec is None or spec.loader is None:
-        raise ImportError("cannot load Majorana data logic")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-_DATA = _load_data_module()
-MajoranaScope = _DATA.MajoranaScope
-MajoranaWaveformDataset = _DATA.MajoranaWaveformDataset
-materialize_scope = _DATA.materialize_scope
+from ._majorana_data import MajoranaScope, MajoranaWaveformDataset, materialize_scope
 
 
 class MajoranaTaskDataPath:

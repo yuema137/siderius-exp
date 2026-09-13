@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import importlib.util
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -13,26 +11,11 @@ import torch
 from pydantic import BaseModel, ConfigDict, Field
 from torch.utils.data import Dataset
 
-
-def _load_energy_metric_module():
-    module_name = "siderius_exp_supernemo_energy_matched_auc"
-    existing = sys.modules.get(module_name)
-    if existing is not None:
-        return existing
-    path = Path(__file__).with_name("energy_matched_auc.py")
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"cannot load SuperNEMO metric arithmetic from {path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-_ENERGY_METRICS = _load_energy_metric_module()
-energy_balanced_indices = _ENERGY_METRICS.energy_balanced_indices
-energy_matched_roc = _ENERGY_METRICS.energy_matched_roc
-weighted_roc = _ENERGY_METRICS.weighted_roc
+from .energy_matched_auc import (
+    energy_balanced_indices,
+    energy_matched_roc,  # noqa: F401 -- public arithmetic export for metric consumers
+    weighted_roc,  # noqa: F401 -- public arithmetic export for metric consumers
+)
 
 PROCESSES = ("0nubb", "2nubb", "Bi214", "Tl208")
 FILES = {

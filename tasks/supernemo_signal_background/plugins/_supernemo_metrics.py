@@ -2,36 +2,18 @@
 
 from __future__ import annotations
 
-import importlib.util
-import sys
-from pathlib import Path
 from typing import Any, ClassVar
 
 import numpy as np
 from execute_tools.evaluation_metric import EvaluationMetric
 
-
-def _load_data_module():
-    module_name = "siderius_exp_supernemo_data"
-    existing = sys.modules.get(module_name)
-    if existing is not None:
-        return existing
-    path = Path(__file__).with_name("_supernemo_data.py")
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"cannot load SuperNEMO data logic from {path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-_DATA = _load_data_module()
-ENERGY_EDGES = _DATA.ENERGY_EDGES
-SuperNemoScope = _DATA.SuperNemoScope
-materialize_scope = _DATA.materialize_scope
-energy_matched_roc = _DATA.energy_matched_roc
-weighted_roc = _DATA.weighted_roc
+from ._supernemo_data import (
+    ENERGY_EDGES,
+    SuperNemoScope,
+    energy_matched_roc,
+    materialize_scope,
+    weighted_roc,
+)
 
 
 def _values(
