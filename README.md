@@ -44,7 +44,7 @@ borrow the other's environment or use `PYTHONPATH` to overlay framework source.
 
 Before an API-backed experiment, prepare credentials in the same shell that
 will own the launcher. Follow the pinned framework's detailed installation
-procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/d5b653ece1b6f5806f89d8734f97368625ae7492/docs/getting-started/installation.md),
+procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/644975846ff95cb68aa07eacb1a49d63d54ef85c/docs/getting-started/installation.md),
 using either a trusted external file with mode `600` or managed secret
 injection. Enable shell export only around the source step (`set -a`, source,
 `set +a`), and before any effectful launch verify that every key required by
@@ -203,3 +203,28 @@ scientific treatment, metric, Health policy, budget, advice, or campaign
 authorization. The historical C12 driver is preserved non-live in the
 [03C2 archive](provenance/legacy_siderius/p0_03c2_c12/README.md) pending final
 infra retirement.
+
+## Declared Health roles and historical inputs
+
+The pinned framework resolves scientific eligibility only from explicit
+`gate_role` declarations. A missing role is UNKNOWN, not an empty required-gate
+set; gate names, execution actions and historical config hashes cannot supply
+it. Consumers use `resolve_scientific_gate_ids` (or the run/workspace resolver)
+and must distinguish `None` from an explicitly empty set. The deprecated
+`required_blocking_gate_ids` shim and historical SHA-role helpers are removed.
+
+Older materializations containing `peek_file_indices: task_health_peek` or
+another string are unsupported. For new work, declare the task-owned Health
+inputs and use concrete `peek_file_indices` lists where required; every gate in
+an effective roster must declare its role. Explicit no-Health composition and
+explicitly disabled Health remain supported, distinct from missing declarations.
+
+Health-enabled candidates with unknown roles cannot become scientific winners
+or resumed incumbents. For Health-enabled candidates, resume also requires
+independently valid evidence from the effective policy matching the recorded
+hash: stored-valid verdicts and committed-best fields cannot replace a missing
+or mismatched policy artifact.
+Preserve old results and workspaces unchanged; this update provides no historical
+migration and does not qualify a new campaign. Shared summary aggregation's
+separate evidence limitation remains tracked in
+[SIDERIUS #445](https://github.com/Galileo-Sandbox/SIDERIUS/issues/445).
