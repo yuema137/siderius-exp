@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
 
 import campaigns.tidmad_gold.stage3.stage3_terminal_eval as te
 from campaigns.tidmad_gold.paths import GOLD_HEALTH_CONFIG_PATH
@@ -352,11 +353,11 @@ def test_a_champion_failing_its_RUNS_OWN_blocking_gate_is_refused(
 
     The record below carries every gate the REPO-CURRENT shipped roster asks
     for, all passing, PLUS the run's own declared blocking gate, failed. Asked
-    against the repo-current roster — which is what the zero-argument
-    ``is_valid_candidate(record)`` default resolves, collapsing UNKNOWN to the
-    empty set on the way — it is VALID and the champion is terminal-evaluated
-    as a success. Asked against the roster its own workspace PINNED, it is
-    INVALID.
+    against the repo-current roster — which the historical zero-argument
+    ``is_valid_candidate(record)`` default resolved, collapsing UNKNOWN to the
+    empty set on the way — it was VALID and could be terminal-evaluated
+    as a success. That default was retired by infra PR446. Asked against the
+    roster its own workspace PINNED, it is INVALID.
 
     Fails as: no refusal at all, i.e. a champion measured on a run whose own
     blocking gate said no. That boolean is the same one Stage-2 records as
@@ -364,7 +365,7 @@ def test_a_champion_failing_its_RUNS_OWN_blocking_gate_is_refused(
     """
     from execute_tools.health_checks.candidate_eligibility import (
         pinned_workspace_gate_ids,
-        required_blocking_gate_ids,
+        resolve_scientific_gate_ids,
     )
 
     from tests.helpers.health_task_config import write_pinned_effective_config
@@ -374,8 +375,10 @@ def test_a_champion_failing_its_RUNS_OWN_blocking_gate_is_refused(
     band_ws = deliv.parents[1]
 
     write_pinned_effective_config(band_ws, ["witness_run_declared_blocking"])
-    run_declared = pinned_workspace_gate_ids(band_ws) or frozenset()
-    repo_current = required_blocking_gate_ids(str(GOLD_HEALTH_CONFIG_PATH))
+    run_declared = pinned_workspace_gate_ids(band_ws)
+    repo_current = resolve_scientific_gate_ids(str(GOLD_HEALTH_CONFIG_PATH))
+    assert run_declared is not None, "the run's pinned roster is UNKNOWN"
+    assert repo_current is not None, "the Gold roster is UNKNOWN"
     # Vacuity guards: both rosters non-empty and DISJOINT, or a champion
     # satisfying one would satisfy the other and this proves nothing.
     assert run_declared, "the run's pinned roster is empty — the witness is vacuous"
@@ -462,14 +465,14 @@ def test_numerically_excellent_champion_without_gate_evidence_refused(
     effective config, so the run's roster cannot be established, and an
     unestablished roster is a refusal rather than a pass."""
     from execute_tools.health_checks.candidate_eligibility import (
-        required_blocking_gate_ids,
+        resolve_scientific_gate_ids,
     )
 
     # Precondition (keeps this witness non-vacuous): the shipped config
     # declares at least one blocking gate, so gate-less records are UNKNOWN.
-    assert required_blocking_gate_ids(str(GOLD_HEALTH_CONFIG_PATH)), (
-        "campaign blocking-gate roster unexpectedly empty"
-    )
+    required = resolve_scientific_gate_ids(str(GOLD_HEALTH_CONFIG_PATH))
+    assert required is not None, "campaign Health roles are UNKNOWN"
+    assert required, "campaign blocking-gate roster unexpectedly empty"
 
     ws = _make_campaign_workspace(tmp_path)
     deliv = _make_deliverables(ws)
@@ -482,6 +485,47 @@ def test_numerically_excellent_champion_without_gate_evidence_refused(
     with pytest.raises(InvalidChampionError, match="exp_champ"):
         _run_enabled_terminal_eval(
             _champion(deliv, records=[excellent_invalid]),
+            ws,
+            compose_and_score_fn=stub,
+            anchor_map_path=_make_anchor(tmp_path),
+            repo_sha="x",
+        )
+    assert stub.calls == []
+    assert not terminal_namespace(ws).exists()
+
+
+def test_roleless_policy_refuses_passing_champion_before_terminal_effects(
+    tmp_path: Path,
+) -> None:
+    """Catch UNKNOWN becoming an empty roster at the real terminal consumer edge."""
+    from tests.helpers.health_task_config import write_pinned_effective_config
+
+    ws = _make_campaign_workspace(tmp_path)
+    deliv = _make_deliverables(ws)
+    policy = Path(
+        write_pinned_effective_config(deliv.parents[1], ["run_declared_blocking"])
+    )
+    body = yaml.safe_load(policy.read_text())
+    body["health_gates"][0].pop("gate_role")
+    body["health_gates"][0]["checks"][0]["config"]["peek_file_indices"] = [2, 7]
+    policy.write_text(yaml.safe_dump(body), encoding="utf-8")
+    record = {
+        "status": "success",
+        "denoising_score": 9.99,
+        "exp_id": "exp_champ",
+        "health_gate_enabled": True,
+        "health_gate_results": [
+            {
+                "gate_name": "run_declared_blocking",
+                "execution_status": "passed",
+                "check_passed": True,
+            }
+        ],
+    }
+    stub = _ComposeStub()
+    with pytest.raises(InvalidChampionError, match="classified 'unknown'"):
+        _run_enabled_terminal_eval(
+            _champion(deliv, records=[record]),
             ws,
             compose_and_score_fn=stub,
             anchor_map_path=_make_anchor(tmp_path),

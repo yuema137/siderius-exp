@@ -328,6 +328,36 @@ def test_incumbent_validity_uses_the_workspaces_pinned_health_roster(
     assert state["scan"]["healthgate_valid"] == 1
 
 
+def test_roleless_policy_cannot_create_band_incumbent(tmp_path: Path) -> None:
+    """Catch the campaign scanner treating UNKNOWN policy as no required gates."""
+    from tests.helpers.health_task_config import write_pinned_effective_config
+
+    workspace = tmp_path / "band"
+    policy = Path(write_pinned_effective_config(workspace, ["run_declared_blocking"]))
+    body = yaml.safe_load(policy.read_text())
+    body["health_gates"][0].pop("gate_role")
+    body["health_gates"][0]["checks"][0]["config"]["peek_file_indices"] = [2, 7]
+    policy.write_text(yaml.safe_dump(body), encoding="utf-8")
+    record = _record("apparently_passing", 9.9)
+    record["health_gate_enabled"] = True
+    record["health_gate_results"] = [
+        {
+            "gate_name": "run_declared_blocking",
+            "execution_status": "passed",
+            "check_passed": True,
+        }
+    ]
+    _write_iteration(workspace, 1, [record])
+
+    completed, state = _band_state(workspace, tmp_path / "state.json")
+
+    assert completed.returncode == 0, completed.stderr
+    assert state["incumbent"] is None
+    assert state["scan"]["formal_success"] == 1
+    assert state["scan"]["healthgate_valid"] == 0
+    assert state["stop_rule_evaluable"] is False
+
+
 def _deliverable_name(run_name: str, index: int) -> str:
     from execute_tools.deliverable_spec import default_deliverable_naming
 

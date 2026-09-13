@@ -22,7 +22,7 @@ fact                                 authority
 ===================================  ====================================
 deliverable filenames                ``DeliverableNaming`` (``name`` /
                                      ``any_glob`` / ``input_identity_of``)
-which gates a valid candidate needs  ``required_blocking_gate_ids``
+which gates a valid candidate needs  ``resolve_scientific_gate_ids``
 whether a record is a valid          ``is_valid_candidate``
 candidate
 gate-result record shape             ``PersistedHealthGateResult``
@@ -89,7 +89,7 @@ from execute_tools.evaluation_metric import (
 )
 from execute_tools.health_checks.candidate_eligibility import (
     is_valid_candidate,
-    required_blocking_gate_ids,
+    resolve_scientific_gate_ids,
 )
 from .metric_fixture import load_declared_tidmad_metric_spec
 from execute_tools.health_checks.config import (
@@ -414,11 +414,25 @@ def deliverable_name(
     )
 
 
+def _gold_scientific_gate_ids() -> frozenset[str]:
+    """Require a known, nonempty roster for these Gold eligibility fixtures."""
+    gate_ids = resolve_scientific_gate_ids(str(GOLD_HEALTH_CONFIG_PATH))
+    if gate_ids is None:
+        raise RuntimeError("Gold fixture Health roles are UNKNOWN; declare gate_role")
+    if not gate_ids:
+        raise RuntimeError(
+            "the Gold HealthGate config declares no blocking gates, so a fixture "
+            "cannot build a record that genuinely exercises eligibility. This is an "
+            "environment/config problem, not a test expectation to relax."
+        )
+    return gate_ids
+
+
 def build_gate_results(*, all_passed: bool) -> list[dict[str, Any]]:
     """Persisted blocking-gate results for a record, from the live roster.
 
-    The gate ids come from ``required_blocking_gate_ids()`` — the SAME
-    authority ``is_valid_candidate`` consults — so a change to the shipped
+    The gate ids come from ``resolve_scientific_gate_ids()`` against the explicit
+    Gold policy, and are passed to ``is_valid_candidate`` — so a change to that
     roster moves the fixture with it instead of silently making the
     "valid" record invalid.
 
@@ -427,13 +441,7 @@ def build_gate_results(*, all_passed: bool) -> list[dict[str, Any]]:
             False fails exactly ONE blocking gate on its check verdict,
             which is the narrowest way to be invalid rather than unknown.
     """
-    gate_ids = sorted(required_blocking_gate_ids(str(GOLD_HEALTH_CONFIG_PATH)))
-    if not gate_ids:
-        raise RuntimeError(
-            "the shipped HealthGate config declares no blocking gates, so a fixture "
-            "cannot build a record that genuinely exercises eligibility. This is an "
-            "environment/config problem, not a test expectation to relax."
-        )
+    gate_ids = sorted(_gold_scientific_gate_ids())
     results: list[dict[str, Any]] = []
     for index, gate_id in enumerate(gate_ids):
         passed = all_passed or index != 0
@@ -515,7 +523,7 @@ def build_experiment_record(
     )
     actual_valid = is_valid_candidate(
         record,
-        required_gate_ids=required_blocking_gate_ids(str(GOLD_HEALTH_CONFIG_PATH)),
+        required_gate_ids=_gold_scientific_gate_ids(),
     )
     if actual_valid is not expected_valid:
         raise RuntimeError(
@@ -920,9 +928,7 @@ def _assert_planted_winners_are_orderable(layout: Stage1Layout) -> None:
                 continue
             if not is_valid_candidate(
                 record,
-                required_gate_ids=required_blocking_gate_ids(
-                    str(GOLD_HEALTH_CONFIG_PATH)
-                ),
+                required_gate_ids=_gold_scientific_gate_ids(),
             ):
                 continue
             eligible.append((str(record["exp_id"]), score))

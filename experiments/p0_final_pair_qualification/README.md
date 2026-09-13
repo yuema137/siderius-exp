@@ -52,7 +52,7 @@ converted into a qualification score.
 ## Current reviewed dependency and launch boundary
 
 The live wrapper now requires infra
-`d5b653ece1b6f5806f89d8734f97368625ae7492`, matching the root pin, installed
+`644975846ff95cb68aa07eacb1a49d63d54ef85c`, matching the root pin, installed
 dependency and selected source checkout. Both checks remain: the root pin must
 equal this reviewed literal, and the selected checkout must equal the root pin.
 Task treatment arguments are unchanged. Comparison and Gold policy consumers
@@ -60,8 +60,13 @@ use the installed framework's public default-policy accessor; the removed
 `configs/health/health_checks.yaml` is not required.
 
 This dependency update includes executable changes since final P0, including
-builtin loss-offer filtering and installed Health-policy ownership. The old
-docs-only equivalence argument below applies only to the historical final-P0
+builtin loss-offer filtering, installed Health-policy ownership and declared-only
+Health eligibility. Historical role inference and string peek markers are
+retired; unknown roles cannot be replaced with an empty roster, and stored-valid
+resume fields cannot replace independently valid effective-policy evidence.
+Explicit no-Health and disabled-Health paths remain supported. See the
+[current Health contract](../../README.md#declared-health-roles-and-historical-inputs).
+The old docs-only equivalence argument below applies only to the historical final-P0
 reconciliation, not this update. No new real-data multi-iteration campaign is
 qualified by those old receipts. Fresh bounded consumer tests and synthetic CPU
 lifecycle evidence are distinct from scientific qualification; see the

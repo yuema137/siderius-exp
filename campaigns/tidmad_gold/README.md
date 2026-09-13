@@ -55,6 +55,29 @@ is qualified in `provenance/validation/2026-08-30_tidmad_gold_external_dry_run.m
 This does not qualify an H100 launch: deployment preflight, runtime-profile
 binding, dataset availability, and the final release revision remain pending.
 
+## Declared Health eligibility
+
+The framework pin requires declared `gate_role` values; historical config hashes,
+gate-ID suffixes and `on_fail` actions no longer recover missing scientific roles.
+The preserved Gold materialization and current Stage-1 policy already declare
+their roles: only `amplitude_collapse_blocking` is blocking. No policy or threshold
+changes accompany this consumer update.
+
+Composed Best refuses a role-less policy before winner inference/scoring. Band
+state cannot select an UNKNOWN incumbent, and terminal provenance cannot treat
+UNKNOWN as valid. Existing explicit no-Health and disabled-Health declarations
+remain supported; neither is a fallback for unknown roles. New materializations
+use explicit roles and concrete peek-index lists, not `task_health_peek` strings.
+Do not patch old campaign results or workspaces to bypass these refusals.
+
+For Health-enabled candidates, framework resume also refuses scientific incumbency
+without independently valid, hash-matching effective-policy evidence, even if
+stored fields claim validity.
+Raw history remains readable. Shared summary aggregation's separate limitation
+([SIDERIUS #445](https://github.com/Galileo-Sandbox/SIDERIUS/issues/445)) is not
+resolved here. These consumer checks do not enable terminal evaluation for Gold,
+authorize a relaunch or establish new scientific qualification.
+
 ## Local launch-readiness qualification
 
 The reachability witness deliberately fails when `SIDERIUS_CHECKOUT` is not
