@@ -1,8 +1,10 @@
-"""Explicit pinned source resources for installed-package consumer tests."""
+"""Installed policy and explicitly pinned source resources for consumer tests."""
 
 import os
 import subprocess
 from pathlib import Path
+
+from execute_tools.health_checks.config import default_health_policy_path
 
 EXP_ROOT = Path(__file__).resolve().parents[2]
 
@@ -25,7 +27,7 @@ def pinned_framework_checkout() -> Path:
 
 def framework_health_policy() -> str:
     """Use the real pinned policy; never a synthetic replacement for Gold."""
-    path = pinned_framework_checkout() / "configs" / "health" / "health_checks.yaml"
+    path = Path(default_health_policy_path())
     assert path.is_file(), f"pinned framework Health policy missing: {path}"
     return str(path)
 

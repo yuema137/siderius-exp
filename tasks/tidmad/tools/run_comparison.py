@@ -54,7 +54,10 @@ from execute_tools.dataset_config import (
     resolve_dataset_profile,
 )
 from execute_tools.deliverable_spec import default_deliverable_naming
-from execute_tools.health_checks.config import load_health_gates_config
+from execute_tools.health_checks.config import (
+    default_health_policy_path,
+    load_health_gates_config,
+)
 from execute_tools.health_checks.evaluation import evaluate_and_persist_health_gates
 from execute_tools.health_checks.schemas import GateAction, HealthCheckContext
 from execute_tools.sample_set_builder import build_sample_set
@@ -76,9 +79,7 @@ LEGACY_CONFIGS_PATH = str(
     / "reference_data"
     / "legacy_baseline_configs.json"
 )
-HEALTH_CHECKS_PATH = os.path.join(
-    SIDERIUS_ROOT, "configs", "health", "health_checks.yaml"
-)
+HEALTH_CHECKS_PATH = default_health_policy_path()
 
 
 def _sha256(path: str) -> str:
