@@ -16,7 +16,7 @@ Trial/Formal admission, and keeps runtime outputs outside this repository.
 Actual stages require fresh runtime evidence; configuration alone is not a
 qualification result.
 
-## C2 runtime evidence index
+## Historical final-P0 C2 runtime evidence index
 
 The six task-package contract families are covered by the two synthetic CPU
 format witnesses (SuperNEMO and MAJORANA) and four real workflows (TIDMAD,
@@ -34,7 +34,7 @@ remain external.
 
 CPU format witnesses have an earlier receipt against infra `894a1dd4` (with
 identical executable source) and were also re-executed by the final full suite
-under current pin `3eb6d3d8`: SuperNEMO and MAJORANA each ran isolated real
+under the then-current final-P0 pin `3eb6d3d8`: SuperNEMO and MAJORANA each ran isolated real
 train/inference/scoring on synthetic task-format data, with disjoint
 train/evaluation IDs, both classes, persisted histories/checkpoints, and
 independent `energy_matched_roc_auc` checks. They make no original-data or
@@ -43,11 +43,29 @@ scientific claim.
 All four pairs used infra `0dcec9c8e58a41f5aac4c62753dec54138d4d190` and exp
 `f0be873a626becd54c3b949c2a4a2d4f5b28609f`; the CPU witnesses ran earlier
 against identical executable source under explicit infra `894a1dd4` stated
-above. Current
-reproduction uses infra `3eb6d3d8529d4404b57d74422d3f0589669434b3`, recorded in
-`SIDERIUS_REVISION` and the lockfile. Scientific Health rejection and
+above. The historical final-P0 reconciliation selected infra
+`3eb6d3d8529d4404b57d74422d3f0589669434b3` in `SIDERIUS_REVISION` and the
+lockfile at that time. Scientific Health rejection and
 framework execution are reported separately; `no_records` is not silently
 converted into a qualification score.
+
+## Current reviewed dependency and launch boundary
+
+The live wrapper now requires infra
+`d5b653ece1b6f5806f89d8734f97368625ae7492`, matching the root pin, installed
+dependency and selected source checkout. Both checks remain: the root pin must
+equal this reviewed literal, and the selected checkout must equal the root pin.
+Task treatment arguments are unchanged. Comparison and Gold policy consumers
+use the installed framework's public default-policy accessor; the removed
+`configs/health/health_checks.yaml` is not required.
+
+This dependency update includes executable changes since final P0, including
+builtin loss-offer filtering and installed Health-policy ownership. The old
+docs-only equivalence argument below applies only to the historical final-P0
+reconciliation, not this update. No new real-data multi-iteration campaign is
+qualified by those old receipts. Fresh bounded consumer tests and synthetic CPU
+lifecycle evidence are distinct from scientific qualification; see the
+[root test instructions](../../README.md#running-the-live-tests).
 
 ## Sanitized reproduction
 
@@ -80,11 +98,12 @@ data roots and budgets are authoritative in each script. The managed
 foreground session preserves the launcher's true exit status;
 select the timeout from the table for each wrapper.
 
-Evidence reviewed on 2026-09-12 covers 32 checks across the six task-package
+Historical final-P0 evidence reviewed on 2026-09-12 covers 32 checks across the six task-package
 contract families, the
 earlier CPU pair, and these four real workflows. The old-pin runtime receipts
-remain valid source-execution evidence because the infra update was
-docs-only; they are not rerun results for the new pin. Known limits remain:
+remain valid source-execution evidence for that final-P0 reconciliation because
+its infra update was docs-only; they are not rerun results for the current pin
+or evidence of equivalence across later executable changes. Known limits remain:
 Pets, DAVIS, and Cancer original launcher exit codes were not captured, while
 TIDMAD's retry exit code was captured as `1`; scientific Health rejection is
 reported separately from framework execution.

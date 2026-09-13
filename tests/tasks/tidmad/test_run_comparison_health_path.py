@@ -22,7 +22,6 @@ def test_baseline_trial_calls_real_loader_with_production_path(
     comparison = importlib.reload(comparison)
     selected_checkout = Path(os.environ["SIDERIUS_CHECKOUT"]).resolve()
     assert Path(comparison.SIDERIUS_ROOT) == selected_checkout
-    monkeypatch.setattr(health_config, "SIDERIUS_ROOT", str(selected_checkout))
     runtime_config = tmp_path / "runtime-health.yaml"
     runtime_config.write_text("health_gates: []\n", encoding="utf-8")
 
@@ -37,7 +36,11 @@ def test_baseline_trial_calls_real_loader_with_production_path(
             (models / f"model_punet_{exp_id}_agent.pth").write_bytes(b"stub")
             return {
                 "status": "success",
-                "results": {"final_loss": 1.0, "loss_history": [1.0], "model_params": {}},
+                "results": {
+                    "final_loss": 1.0,
+                    "loss_history": [1.0],
+                    "model_params": {},
+                },
             }
 
         def execute_inference(self, **kwargs: object) -> dict:
@@ -76,11 +79,17 @@ def test_baseline_trial_calls_real_loader_with_production_path(
         "punet", str(tmp_path / "workspace"), health_checks_config=str(runtime_config)
     )
 
-    production_path = selected_checkout / "configs" / "health" / "health_checks.yaml"
+    production_path = Path(health_config.default_health_policy_path())
+    assert production_path.is_relative_to(Path(health_config.__file__).parent)
+    assert not production_path.is_relative_to(selected_checkout)
     assert observed["loaded_paths"] == [str(runtime_config), str(production_path)]
     assert record["status"] == "success"
-    monkeypatch.setattr(comparison, "HEALTH_CHECKS_PATH", str(tmp_path / "missing-policy.yaml"))
+    monkeypatch.setattr(
+        comparison, "HEALTH_CHECKS_PATH", str(tmp_path / "missing-policy.yaml")
+    )
     with pytest.raises(FileNotFoundError):
         comparison.run_baseline_trial(
-            "punet", str(tmp_path / "workspace-missing"), health_checks_config=str(runtime_config)
+            "punet",
+            str(tmp_path / "workspace-missing"),
+            health_checks_config=str(runtime_config),
         )
