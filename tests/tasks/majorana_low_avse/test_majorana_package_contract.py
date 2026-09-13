@@ -29,6 +29,40 @@ COMPOSE_CHILD = textwrap.dedent(
     assert Path(sys.prefix).resolve() == checkout / ".venv"
     from workflows.task_composition import compose_run_task_bindings
     composition = compose_run_task_bindings(str(manifest))
+    from types import SimpleNamespace
+    import numpy as np
+    from core.local_code import module_identity
+    from execute_tools.task_data_path import ScopeBuildRequest
+
+    package = composition.code_package
+    assert package is not None
+    assert package.root == manifest.parent.parent / "plugins"
+    assert [pin.member for pin in package.identity.members] == ["_majorana_data.py","_majorana_metrics.py","_majorana_task.py","majorana_reference_cnn.py"]
+    for plugin in composition.provenance.plugins:
+        assert plugin.local_code is not None
+        assert plugin.local_code.package == package.identity
+        assert plugin.local_code.member == Path(plugin.absolute_path).name
+
+    data_module = sys.modules[type(composition.task_data_path).__module__]
+    metrics = [composition.metric, *composition.secondary_metrics]
+    metric_module = sys.modules[type(metrics[0]).__module__]
+    assert sys.modules[type(metrics[1]).__module__] is metric_module
+    assert data_module.MajoranaScope is metric_module.MajoranaScope
+    helper_module = sys.modules[data_module.MajoranaScope.__module__]
+    assert module_identity(helper_module).package == package.identity
+    request = ScopeBuildRequest(round_kind="formal", selection_strategy="snapshot",
+                                portion=1.0, max_samples=20, seed=17)
+    scope = composition.task_data_path.build_eval_scope(request)
+    restored = composition.task_data_path.deserialize_scope(
+        composition.task_data_path.serialize_scope(scope))
+    # Replace only external I/O; both real metric type checks and arithmetic run.
+    events = SimpleNamespace(labels=np.array([0] * 9 + [1] + [0] + [1] * 9),
+                             energies=np.array([10.0] * 10 + [30.0] * 10))
+    metric_module.materialize_scope = lambda selected, root: events
+    aucs = [metric._compute({}, evaluation_payload=np.array([0.0] * 10 + [1.0] * 10),
+                            task_scope=selected, data_dir=".")[0]
+            for selected in (scope, restored) for metric in metrics]
+    assert np.allclose(aucs, [0.5, 0.9, 0.5, 0.9], rtol=0, atol=1e-12)
     print(json.dumps({
         "data_path": composition.task_data_path.task_data_path_id,
         "metric": [composition.metric.spec.id, composition.metric.spec.direction],
@@ -36,6 +70,8 @@ COMPOSE_CHILD = textwrap.dedent(
         "task_type": composition.forward_contract.task_type,
         "classes": composition.forward_contract.num_classes,
         "partitions": composition.dataset_profile.partition_count,
+        "objective": [composition.objective.loss_type, composition.objective.reduction],
+        "health": composition.task_health_binding,
     }, sort_keys=True))
     """
 )
@@ -54,17 +90,23 @@ def _checkout() -> Path:
     return checkout
 
 
-def test_composition_loads_against_exact_framework_pin() -> None:
+def test_composition_loads_against_exact_framework_pin(tmp_path: Path) -> None:
     checkout = _checkout()
     completed = subprocess.run(
         [
-            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
-            str(checkout), str(COMPOSITION),
+            str(checkout / ".venv/bin/python"),
+            "-I",
+            "-c",
+            COMPOSE_CHILD,
+            str(checkout),
+            str(COMPOSITION),
         ],
-        cwd=checkout,
+        cwd=tmp_path,
+        env={key: value for key, value in os.environ.items() if key != "PYTHONPATH"},
         text=True,
         capture_output=True,
         check=False,
+        timeout=120,
     )
     assert completed.returncode == 0, completed.stderr
     assert json.loads(completed.stdout.splitlines()[-1]) == {
@@ -72,6 +114,8 @@ def test_composition_loads_against_exact_framework_pin() -> None:
         "data_path": "majorana_low_avse",
         "metric": ["energy_matched_roc_auc", "higher"],
         "partitions": 22,
+        "objective": ["ce", "mean"],
+        "health": "explicit_none",
         "secondary": ["ordinary_roc_auc"],
         "task_type": "classification",
     }
@@ -199,7 +243,9 @@ def test_demo_locks_snapshot_scope_and_surfaces_resource_advice(
 @pytest.mark.real_data
 def test_official_train_and_test_event_ids_do_not_overlap() -> None:
     configured = os.environ.get("MAJORANA_DATA_DIR")
-    assert configured, "MAJORANA_DATA_DIR must explicitly name the verified official release"
+    assert configured, (
+        "MAJORANA_DATA_DIR must explicitly name the verified official release"
+    )
     data_dir = Path(configured).expanduser()
     if not data_dir.is_dir():
         raise AssertionError(

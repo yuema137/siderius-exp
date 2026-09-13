@@ -14,7 +14,7 @@ within one process file are tracker hits belonging to the same event.
   `ev_no` is an identity field. None may reach a classifier.
 - Target: `0nubb = 1`; every released background process equals `0`.
 - Golden metric: deterministic energy-matched ROC AUC, higher is better.
-- Training objective: binary cross entropy.
+- Training objective: cross entropy on two logits (`ce`, reduction `mean`).
 - Data cuts: no energy-window or TPP-separation cut is introduced implicitly.
 
 The energy-matching ruler uses fixed 25-keV bins from 0 through 3,600 keV.
@@ -40,3 +40,19 @@ model selection.
 
 Raw HDF5 files and generated indexes remain in an operator-supplied data
 directory outside the repository.
+
+## Local-code declaration
+
+[`compositions/signal_background.yaml`](compositions/signal_background.yaml)
+declares `code_package.root: ../plugins` with exactly five Python members:
+`_supernemo_task.py`, `_supernemo_data.py`, `_supernemo_metrics.py`,
+`energy_matched_auc.py`, and `supernemo_reference_pointnet.py`. Relative imports
+share the helper-defined scope between the data path and both metric adapters;
+the required model is part of the same captured identity.
+
+The composition keeps CE/mean, explicit no-Health, the 25-keV energy-matched
+primary AUC, ordinary secondary AUC, and fixed model geometry unchanged.
+Use the [paired environments](../../README.md#framework-revision) and a fresh
+workspace after changing declared code. The framework checks all captured
+members in cold children; a missing or changed helper must be restored to its
+pin, not bypassed with a global module alias or source-path overlay.

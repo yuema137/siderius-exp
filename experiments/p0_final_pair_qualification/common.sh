@@ -33,7 +33,7 @@ p0_qualification_main() {
     "$data_check" "$data_dir" || { echo "required task data is missing" >&2; return 2; }
     local expected_revision actual_revision
     expected_revision="$(tr -d '[:space:]' < "$exp_root/SIDERIUS_REVISION")"
-    [[ "$expected_revision" == "644975846ff95cb68aa07eacb1a49d63d54ef85c" ]] || { echo "unexpected SIDERIUS_REVISION" >&2; return 2; }
+    [[ "$expected_revision" == "5995055e4544262cd52996fc89b705e94128e48c" ]] || { echo "unexpected SIDERIUS_REVISION" >&2; return 2; }
     actual_revision="$(git -C "$siderius_checkout" rev-parse HEAD 2>/dev/null)" || { echo "cannot inspect SIDERIUS checkout" >&2; return 2; }
     [[ "$actual_revision" == "$expected_revision" ]] || { echo "Siderius checkout revision mismatch" >&2; return 2; }
     [[ -f "$siderius_checkout/scripts/launch/run_chain.sh" && -f "$siderius_checkout/configs/llm/openai_tiered_pro.json" ]] || { echo "required SIDERIUS launch resources are missing" >&2; return 2; }

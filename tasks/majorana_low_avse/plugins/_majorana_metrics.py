@@ -2,34 +2,12 @@
 
 from __future__ import annotations
 
-import importlib.util
-import sys
-from pathlib import Path
 from typing import Any, ClassVar
 
 import numpy as np
 from execute_tools.evaluation_metric import EvaluationMetric
 
-
-def _load_data_module():
-    name = "siderius_exp_majorana_data"
-    if name in sys.modules:
-        return sys.modules[name]
-    spec = importlib.util.spec_from_file_location(
-        name, Path(__file__).with_name("_majorana_data.py")
-    )
-    if spec is None or spec.loader is None:
-        raise ImportError("cannot load Majorana data logic")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-_DATA = _load_data_module()
-ENERGY_EDGES = _DATA.ENERGY_EDGES
-MajoranaScope = _DATA.MajoranaScope
-materialize_scope = _DATA.materialize_scope
+from ._majorana_data import ENERGY_EDGES, MajoranaScope, materialize_scope
 
 
 def _values(payload: np.ndarray, task_scope: Any, data_dir: str):

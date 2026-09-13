@@ -1,3 +1,11 @@
+code_package:
+  root: ../plugins
+  files:
+    - _majorana_task.py
+    - _majorana_data.py
+    - _majorana_metrics.py
+    - majorana_reference_cnn.py
+
 task_data_path:
   file: ../plugins/_majorana_task.py
   symbol: MajoranaTaskDataPath
