@@ -44,7 +44,7 @@ borrow the other's environment or use `PYTHONPATH` to overlay framework source.
 
 Before an API-backed experiment, prepare credentials in the same shell that
 will own the launcher. Follow the pinned framework's detailed installation
-procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/3eb6d3d8529d4404b57d74422d3f0589669434b3/docs/getting-started/installation.md),
+procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/d5b653ece1b6f5806f89d8734f97368625ae7492/docs/getting-started/installation.md),
 using either a trusted external file with mode `600` or managed secret
 injection. Enable shell export only around the source step (`set -a`, source,
 `set +a`), and before any effectful launch verify that every key required by
@@ -115,8 +115,24 @@ export MAJORANA_DATA_DIR=/absolute/path/to/verified/MAJORANA
 env -u PYTHONPATH .venv/bin/python -m pytest
 ```
 
-For the qualified local pair, the verified invocation is:
-`env -u PYTHONPATH SIDERIUS_CHECKOUT=/home/yuema137/SIDERIUS MAJORANA_DATA_DIR=/home/klz/Data/MAJORANA .venv/bin/python -m pytest -q`.
+For the explicitly configured local pair, the bounded full-suite invocation is
+below. These absolute paths describe this deployment only; other machines must
+substitute their own verified checkout and dataset. Run from the exact exp
+checkout after both frozen environment syncs above:
+
+```bash
+exp_test_basetemp=$(mktemp -d /tmp/siderius-exp-tests-XXXXXX)
+env -u PYTHONPATH -u VIRTUAL_ENV \
+  SIDERIUS_CHECKOUT=/home/yuema137/SIDERIUS \
+  MAJORANA_DATA_DIR=/home/klz/Data/MAJORANA \
+  CUDA_VISIBLE_DEVICES= OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 \
+  PYTHON_DOTENV_DISABLED=1 timeout --signal=TERM --kill-after=30s 600s \
+  .venv/bin/python -m pytest -q --basetemp="$exp_test_basetemp"
+```
+
+Use a fresh external basetemp each time: pytest may clear it. Never use an
+existing result directory or dataset root. This runs synthetic CPU lifecycle
+witnesses and the read-only official-ID check, not an API-backed campaign.
 
 Pytest collects `tests/` using importlib mode, so separate tasks can have
 same-named test modules.
@@ -173,10 +189,16 @@ relocated framework owners.
 No campaign is authorized to launch merely because its files exist here.
 
 The pinned framework (see `SIDERIUS_REVISION` for the exact revision)
-exposes launch scripts under `scripts/launch/`, the workflow entry under
-`src/workflows/`, and framework configuration under `configs/` (including
-`configs/llm/` and `configs/health/`). This compatibility update changes no
-task declaration,
+exposes launch scripts under `scripts/launch/` and the workflow entry under
+`src/workflows/`. Required generic Health defaults are packaged with the
+installed framework. Consumers use
+`execute_tools.health_checks.config.default_health_policy_path()` when they
+need an explicit default-policy path; omitted overrides use the same default.
+The former `configs/health/health_checks.yaml` path is removed, not a fallback.
+An explicitly missing or invalid override is refused. Optional checkout policy
+variants remain under `configs/health/`, and LLM configuration under `configs/llm/`;
+task-owned Health declarations and thresholds remain in this repository.
+This compatibility update changes no task declaration,
 scientific treatment, metric, Health policy, budget, advice, or campaign
 authorization. The historical C12 driver is preserved non-live in the
 [03C2 archive](provenance/legacy_siderius/p0_03c2_c12/README.md) pending final
