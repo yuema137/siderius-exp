@@ -32,9 +32,11 @@ TASK_MANIFESTS = {
         EXP_ROOT / "tasks/cancer_gene_identification/compositions/mtg_size.yaml"
     ),
     "supernemo_signal_background": (
-        EXP_ROOT / "tasks/supernemo_signal_background/compositions/signal_background.yaml"
+        EXP_ROOT
+        / "tasks/supernemo_signal_background/compositions/signal_background.yaml"
     ),
-    "majorana_low_avse": EXP_ROOT / "tasks/majorana_low_avse/compositions/low_avse.yaml",
+    "majorana_low_avse": EXP_ROOT
+    / "tasks/majorana_low_avse/compositions/low_avse.yaml",
 }
 EXPECTED_OBJECTIVES = {
     "tidmad": None,
@@ -114,6 +116,9 @@ CHILD = textwrap.dedent(
         ),
         task_composition_fingerprint=composition.semantic_fingerprint,
     )
+    health_gate_ids = resolve_run_scientific_gate_ids(composition.task_health_binding)
+    if health_gate_ids is None:
+        raise RuntimeError("declared task Health roles are UNKNOWN; refusing startup receipt")
     print(
         json.dumps(
             {
@@ -130,10 +135,7 @@ CHILD = textwrap.dedent(
                     if composition.objective is not None
                     else None
                 ),
-                "health_gate_ids": sorted(
-                    resolve_run_scientific_gate_ids(composition.task_health_binding)
-                    or []
-                ),
+                "health_gate_ids": sorted(health_gate_ids),
                 "source_checkout": str(checkout),
             },
             sort_keys=True,

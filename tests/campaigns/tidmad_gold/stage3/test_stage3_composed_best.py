@@ -29,6 +29,7 @@ import os
 from pathlib import Path
 
 import pytest
+import yaml
 
 from campaigns.tidmad_gold.paths import GOLD_TASK_HEALTH_CONFIG_PATH
 import campaigns.tidmad_gold.stage3.stage3_common as stage3_common
@@ -297,6 +298,29 @@ def _make_campaign(root: Path) -> None:
         )
 
 
+def test_roleless_policy_refuses_before_winner_inference_or_scoring(
+    tmp_path, score_stub, monkeypatch
+):
+    """Catch UNKNOWN-to-empty laundering at Composed Best's real selection edge."""
+    _make_campaign(tmp_path)
+    policy = tmp_path / f"{ARM}_band0-3" / "health_checks_effective.yaml"
+    body = yaml.safe_load(policy.read_text())
+    for gate in body["health_gates"]:
+        gate.pop("gate_role")
+    policy.write_text(yaml.safe_dump(body), encoding="utf-8")
+    inference_calls = []
+
+    def forbidden_inference(*args, **kwargs):
+        inference_calls.append((args, kwargs))
+        raise AssertionError("role-less candidate reached inference")
+
+    monkeypatch.setattr(composed_best, "run_full_inference", forbidden_inference)
+    with pytest.raises(Stage3ComposedBestError, match="eligibility is UNKNOWN"):
+        run(str(tmp_path), ARM, str(tmp_path))
+    assert inference_calls == []
+    assert score_stub.calls == []
+
+
 def test_composed_best_end_to_end_selection_pooling_one_call(tmp_path, score_stub):
     """The §1 table selects the cumulative best VALID FORMAL record per band,
     the pooled set is the winners' source-band files, the scorer runs ONCE,
@@ -341,7 +365,9 @@ def test_composed_best_end_to_end_selection_pooling_one_call(tmp_path, score_stu
             entry["file_index"] for entry in block["deliverables"]
         ] == band_file_indices(band)
         for entry in block["deliverables"]:
-            expected = hashlib.sha256(Path(entry["source_path"]).read_bytes()).hexdigest()
+            expected = hashlib.sha256(
+                Path(entry["source_path"]).read_bytes()
+            ).hexdigest()
             assert entry["sha256"] == expected
             assert os.path.isfile(entry["source_path"])
     assert provenance["s_max"] == stage3_common.EXPECTED_S_MAX

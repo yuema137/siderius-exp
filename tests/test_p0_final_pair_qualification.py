@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-SIDERIUS_REVISION = "d5b653ece1b6f5806f89d8734f97368625ae7492"
+SIDERIUS_REVISION = "644975846ff95cb68aa07eacb1a49d63d54ef85c"
 CASES = {
     "tidmad": (
         ("abra_training_0004.h5", "abra_validation_0004.h5"),
@@ -321,6 +322,34 @@ def test_wrapper_rejects_nonempty_workspace(
     result = _run(task, checkout, capture, workspace, data)
     assert result.returncode == 2 and "workspace must be empty" in result.stderr
     assert not capture.exists()
+
+
+def test_wrapper_rejects_root_pin_outside_reviewed_literal(
+    fake_checkout, tmp_path: Path, monkeypatch
+) -> None:
+    """Catch removal of the reviewed-pin guard even when checkout and root agree."""
+    copied_root = tmp_path / "exp"
+    for relative in (
+        "experiments/p0_final_pair_qualification/common.sh",
+        "experiments/tidmad/p0_final_pair_qualification/launch.sh",
+    ):
+        destination = copied_root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, destination)
+    wrong_revision = "0" * 40
+    (copied_root / "SIDERIUS_REVISION").write_text(wrong_revision + "\n")
+    monkeypatch.setitem(_run.__globals__, "ROOT", copied_root)
+    monkeypatch.setitem(_run.__globals__, "SIDERIUS_REVISION", wrong_revision)
+    checkout, capture = fake_checkout
+    data = _data(tmp_path, CASES["tidmad"][0])
+    workspace = tmp_path / "workspace"
+
+    result = _run("tidmad", checkout, capture, workspace, data)
+
+    assert result.returncode == 2, result.stderr
+    assert "unexpected SIDERIUS_REVISION" in result.stderr
+    assert not capture.exists()
+    assert not workspace.exists()
 
 
 def test_wrapper_rejects_wrong_framework_pin(fake_checkout, tmp_path: Path) -> None:

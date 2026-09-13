@@ -1,9 +1,4 @@
-"""Historical TIDMAD Health compatibility, not current campaign treatment.
-
-The golden is copied byte-for-byte from the framework's pre-08b evidence.
-The temporary artifact removes only the subsequently added role field, so
-the real resolver must recover membership through the audited SHA map.
-"""
+"""Retired historical Health inputs refuse without rewriting captured evidence."""
 
 from __future__ import annotations
 
@@ -14,50 +9,57 @@ import pytest
 import yaml
 from execute_tools.dataset_config import DatasetProfile, bind_dataset_profile
 from execute_tools.health_checks.candidate_eligibility import (
-    _LEGACY_ROLES_BY_CONFIG_SHA,
-    legacy_config_body_sha,
     resolve_scientific_gate_ids,
 )
 from execute_tools.health_checks.config import load_health_gates_config
 
 GOLDEN = Path(__file__).with_name("goldens") / "pre_08b_shipped_configs.json"
-HISTORICAL_SHAS = {
-    "observe": "d133a12d3133fb20d632383aa010b1a861fe0fdb6fb6436874b2142d6b5ef58d",
-    "blocking": "3b5521180f5460a4a7aa67ad0ff67701633d75ed8fdcac4277c222b713655b74",
-}
-SCIENTIFIC = frozenset(
-    {"output_diversity_blocking", "output_std_blocking", "amplitude_collapse_blocking"}
-)
 
 
 @pytest.mark.parametrize("key", ["observe", "blocking"])
-def test_known_historical_roleless_config_is_recovered_by_sha(tmp_path, key):
+def test_captured_historical_marker_refuses_even_with_bound_profile(tmp_path, key):
+    """Catch restoration of profile-based marker expansion in the actual reader."""
     captured = json.loads(GOLDEN.read_text())[key]
-    body = yaml.safe_load(captured["raw"])
-    for gate in body["health_gates"]:
-        gate.pop("gate_role", None)
     artifact = tmp_path / f"historical_{key}.yaml"
-    artifact.write_text(yaml.safe_dump(body, sort_keys=False))
+    artifact.write_text(captured["raw"], encoding="utf-8")
     path = str(artifact)
 
-    # Historical task_health_peek markers expanded to this audited task roster.
-    # No ambient framework profile may supply those indices after separation.
+    # The formerly sufficient profile must not rescue the obsolete marker.
     profile = DatasetProfile(
         partition_count=20,
         topology={},
         anchor_selection_files=[0, 10, 19],
         health_peek_files=[3, 10, 17],
     )
-    with bind_dataset_profile(profile):
-        assert captured["expected_body_sha256"] == HISTORICAL_SHAS[key]
-        assert legacy_config_body_sha(path) == HISTORICAL_SHAS[key]
-        assert all(
-            gate.gate_role is None
-            for gate in load_health_gates_config(path).health_gates
-        )
-        assert resolve_scientific_gate_ids(path) == SCIENTIFIC
+    with (
+        bind_dataset_profile(profile),
+        pytest.raises(ValueError, match="peek_file_indices.*explicit list"),
+    ):
+        load_health_gates_config(path)
 
 
-def test_audited_map_keeps_original_sha_keys():
-    """Rekeying to current policy hashes would orphan historical workspaces."""
-    assert set(_LEGACY_ROLES_BY_CONFIG_SHA) == set(HISTORICAL_SHAS.values())
+def test_roleless_concrete_policy_is_not_rescued_by_historical_membership(tmp_path):
+    """Catch accepting missing roles independently of the obsolete-marker refusal."""
+    artifact = tmp_path / "roleless.yaml"
+    artifact.write_text(
+        yaml.safe_dump(
+            {
+                "health_gates": [
+                    {
+                        "id": "amplitude_collapse_blocking",
+                        "after_round": "every",
+                        "checks": [
+                            {
+                                "name": "amplitude_collapse",
+                                "config": {"peek_file_indices": [2, 7]},
+                            }
+                        ],
+                        "on_pass": {"action": "continue"},
+                        "on_fail": {"action": "invalidate_round"},
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    assert resolve_scientific_gate_ids(str(artifact)) is None
