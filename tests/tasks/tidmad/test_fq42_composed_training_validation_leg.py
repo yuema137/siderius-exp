@@ -46,13 +46,14 @@ import pathlib
 import tempfile
 from unittest.mock import patch
 
-import pytest
-
 import core.sandbox_executor as se
+import pytest
+from core.training_execution_bindings import TrainingExecutionBindings
 from execute_tools.scope_artifact import task_scope_argv, validation_rows_argv
 from execute_tools.task_data_path import bind_task_data_path
-from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
 from nodes.ml_hyperparameter_tune_agent.scope_acquisition import AttemptScopes
+
+from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
 
 # Reused, not duplicated: the D14-1 C5 synthetic task is the established way
 # to drive the REAL engine body on CPU with no TIDMAD data (pure defs, no
@@ -114,7 +115,9 @@ def _composed_tidmad_training_argv() -> tuple[list[str], AttemptScopes]:
             validation_max_samples=None,
             task_parameters={"seg_size": _SEG_SIZE},
         )
-        sandbox = se.TidmadSandbox(run_name="fq42", workspace=workspace, progress_bar=False)
+        sandbox = se.TidmadSandbox(
+            run_name="fq42", workspace=workspace, progress_bar=False
+        )
         with patch.object(se, "_run_observed_subprocess", side_effect=_stop):
             try:
                 sandbox.execute_training(
@@ -126,9 +129,9 @@ def _composed_tidmad_training_argv() -> tuple[list[str], AttemptScopes]:
                     {"loss_type": "ce"},
                     sample_set=scopes.training.sample_set,
                     eval_sample_set=scopes.evaluation.sample_set,
-                    task_scopes=scopes,
+                    execution_bindings=TrainingExecutionBindings(task_scopes=scopes),
                 )
-            except BaseException:
+            except SystemExit:
                 pass
     assert "cmd" in captured, (
         "the training spawn was never reached — argv construction failed "
@@ -157,14 +160,20 @@ class TestComposedTidmadTrainingArgvCarriesOneValidationAuthority:
         argv, _ = composed_tidmad_argv
         assert "--validation_requested_rows" not in argv
 
-    def test_exactly_one_validation_declaration_authority_on_the_wire(self, composed_tidmad_argv):
+    def test_exactly_one_validation_declaration_authority_on_the_wire(
+        self, composed_tidmad_argv
+    ):
         """The invariant whose violation IS the crosswise refusal: the child
         dispatches its declaration authority on flag presence, so the parent
         must put exactly one declaration on the wire."""
         argv, _ = composed_tidmad_argv
-        assert ("--eval_sample_set_json" in argv) != ("--validation_requested_rows" in argv)
+        assert ("--eval_sample_set_json" in argv) != (
+            "--validation_requested_rows" in argv
+        )
 
-    def test_the_scope_identity_still_crosses_on_the_regime_a_leg(self, composed_tidmad_argv):
+    def test_the_scope_identity_still_crosses_on_the_regime_a_leg(
+        self, composed_tidmad_argv
+    ):
         """The fix removed the DECLARATION from the regime-A leg, not the
         scope IDENTITY: 12bc's four-flag transport (task_scope + eval-scope
         ref/digest pairs) is unchanged, and the child's R3 pass still receives
@@ -216,10 +225,14 @@ class TestExplicitLegPairing:
         self, tmp_path, training, evaluation, regime_a
     ):
         scopes = AttemptScopes(training=training, evaluation=evaluation)
-        explicit_leg_active = training is not None and evaluation is not None and not regime_a
+        explicit_leg_active = (
+            training is not None and evaluation is not None and not regime_a
+        )
         with (
             bind_task_data_path(TidmadTaskDataPath()),
-            patch.object(TidmadTaskDataPath, "validation_dataset", return_value=self._SizedStub()),
+            patch.object(
+                TidmadTaskDataPath, "validation_dataset", return_value=self._SizedStub()
+            ),
         ):
             scope_fragment = (
                 task_scope_argv(str(tmp_path), "fq42_pair", scopes)

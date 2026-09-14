@@ -34,10 +34,6 @@ from typing import Any, ClassVar
 
 import numpy as np
 import torch
-from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
@@ -48,6 +44,9 @@ from execute_tools.task_data_path import (
     deserialize_rows_scope,
     register_task_data_path,
 )
+from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 #: Frozen geometry (§22.9a; resize rule frozen by D14-3).
 FRAME_WIDTH = 224

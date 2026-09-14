@@ -52,7 +52,7 @@ converted into a qualification score.
 ## Current reviewed dependency and launch boundary
 
 The live wrapper now requires infra
-`5995055e4544262cd52996fc89b705e94128e48c`, matching the root pin, installed
+`a7c4eb51d9f36ef742aca9b576ff8f26c7e0567f`, matching the root pin, installed
 dependency and selected source checkout. Both checks remain: the root pin must
 equal this reviewed literal, and the selected checkout must equal the root pin.
 Task treatment arguments are unchanged. Comparison and Gold policy consumers

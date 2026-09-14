@@ -7,29 +7,31 @@ from pathlib import Path
 
 import torch
 import yaml
-from pytest import approx
-
 from agent.schemas.custom_loss_contract import (
     custom_loss_snapshot_from_forward_contract,
     validate_synthetic_loss_pair,
 )
 from agent.schemas.task_config import ForwardContract
+from pytest import approx
 
 from tasks.cancer_gene_identification.plugins._cancer_gene_task import (
     CancerGeneTaskDataPath,
 )
 from tasks.cancer_gene_identification.plugins.cancer_gene_masked_bce import (
     PLUGIN_CAPABILITY_CONTRACT as CANCER_CONTRACT,
+)
+from tasks.cancer_gene_identification.plugins.cancer_gene_masked_bce import (
     CancerGeneMaskedBce,
     CancerGeneMaskedBceConfig,
 )
 from tasks.davis_future_prediction.plugins.davis_exact_l1_loss import (
     PLUGIN_CAPABILITY_CONTRACT as DAVIS_CONTRACT,
+)
+from tasks.davis_future_prediction.plugins.davis_exact_l1_loss import (
     PluginLoss,
     PluginLossConfig,
 )
 from tasks.davis_future_prediction.runtime.davis_data_path import DavisTaskDataPath
-
 
 ROOT = Path(__file__).resolve().parents[2]
 

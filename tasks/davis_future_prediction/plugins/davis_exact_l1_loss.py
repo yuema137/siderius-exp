@@ -41,8 +41,8 @@ available. Both were silently ignored before D4c:
 from __future__ import annotations
 
 import torch
-import torch.nn as nn
 from pydantic import BaseModel, ConfigDict
+from torch import nn
 
 PLUGIN_LOSS_TYPE = "davis_exact_l1"
 PLUGIN_LOSS_TARGET_DTYPE = "float"
