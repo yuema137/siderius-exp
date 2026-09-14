@@ -323,6 +323,15 @@ class DavisTaskDataPath:
 
     task_data_path_id: ClassVar[str] = DAVIS_TASK_DATA_PATH_ID
 
+    @staticmethod
+    def custom_loss_validation_pair() -> tuple[torch.Tensor, torch.Tensor]:
+        """Return a tiny deterministic pair for the task's exact-MAE loss."""
+        shape = (1, 3, 4, 128, 224)
+        prediction = torch.linspace(0.0, 1.0, steps=torch.tensor(shape).prod().item())
+        prediction = prediction.reshape(shape).to(torch.float32)
+        target = torch.zeros(shape, dtype=torch.float32)
+        return prediction, target
+
     #: The scope payload's self-identifying tag (PR-12bc B8).
     _SCOPE_KIND: ClassVar[str] = "davis_scope_v1"
 

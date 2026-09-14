@@ -18,6 +18,7 @@ forward_contract:
         - {role: batch, dimension: {symbolic: "B"}}
         - {role: class, dimension: {fixed: 2}}
       dtype: {admissible: ["float32"]}
+  segmentation_applicability: not_applicable
   input_description: >-
     [B,224,11] padded event tensors: valid-hit marker; normalized tX, tY,
     tZ, imputed tR; tR-missing marker; and normalized E1, E2, dY, dZ, phiR

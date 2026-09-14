@@ -17,6 +17,7 @@ forward_contract:
         - {role: batch, dimension: {symbolic: "B"}}
         - {role: class, dimension: {fixed: 2}}
       dtype: {admissible: ["float32"]}
+  segmentation_applicability: not_applicable
   input_description: "baseline-subtracted raw waveform divided by baseline standard deviation; shape [B,1,3800]"
   output_description: "two raw logits ordered [rejected, accepted]"
   task_type: classification

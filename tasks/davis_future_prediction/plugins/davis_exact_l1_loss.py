@@ -47,6 +47,12 @@ from pydantic import BaseModel, ConfigDict
 PLUGIN_LOSS_TYPE = "davis_exact_l1"
 PLUGIN_LOSS_TARGET_DTYPE = "float"
 PLUGIN_LOSS_REDUCTION = "mean"
+PLUGIN_CAPABILITY_CONTRACT = {
+    "contract_kind": "custom_loss_applicability",
+    "contract_version": 1,
+    "canonical_payload": '{"applicability":{"dtype":{"admissible":["float32"]},"mode":"equal_shape","rank":5},"prediction":{"axes":[{"dimension":{"dynamic":false,"fixed":null,"symbolic":"B"},"role":"batch"},{"dimension":{"dynamic":false,"fixed":3,"symbolic":null},"role":null},{"dimension":{"dynamic":false,"fixed":4,"symbolic":null},"role":null},{"dimension":{"dynamic":false,"fixed":128,"symbolic":null},"role":null},{"dimension":{"dynamic":false,"fixed":224,"symbolic":null},"role":null}],"dtype":{"admissible":["float32"]}},"supervision_target":{"axes":[{"dimension":{"dynamic":false,"fixed":null,"symbolic":"B"},"role":"batch"},{"dimension":{"dynamic":false,"fixed":3,"symbolic":null},"role":null},{"dimension":{"dynamic":false,"fixed":4,"symbolic":null},"role":null},{"dimension":{"dynamic":false,"fixed":128,"symbolic":null},"role":null},{"dimension":{"dynamic":false,"fixed":224,"symbolic":null},"role":null}],"dtype":{"admissible":["float32"]}}}',
+    "sha256": "85cfe585f3b252e5206d712e9774d80f79094e1e47afcd822fccdef32936e289",
+}
 
 
 class PluginLossConfig(BaseModel):

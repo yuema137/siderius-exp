@@ -155,6 +155,17 @@ class CancerGeneTaskDataPath:
     task_data_path_id: ClassVar[str] = CANCER_GENE_TASK_ID
     _SCOPE_KIND: ClassVar[str] = "naturebench_cancer_gene_scope_v1"
 
+    @staticmethod
+    def custom_loss_validation_pair() -> tuple[torch.Tensor, torch.Tensor]:
+        """Return a tiny labeled-node pair without reading NatureBench data."""
+        prediction = torch.tensor(
+            [[[1.0, 1.0, 0.25], [0.0, 1.0, 0.0]]], dtype=torch.float32
+        )
+        target = torch.tensor(
+            [[[1.0, 1.0, 1.0], [0.0, 1.0, -1.0]]], dtype=torch.float32
+        )
+        return prediction, target
+
     def __init__(
         self,
         instances: Sequence[str] = INSTANCES,

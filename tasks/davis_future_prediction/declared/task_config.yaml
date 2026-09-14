@@ -61,6 +61,19 @@ forward_contract:
         - {dimension: {fixed: 128}}
         - {dimension: {fixed: 224}}
       dtype: {admissible: ["float32"]}
+  segmentation_applicability: not_applicable
+  supervision_target:
+    axes:
+      - {role: batch, dimension: {symbolic: "B"}}
+      - {dimension: {fixed: 3}}
+      - {dimension: {fixed: 4}}
+      - {dimension: {fixed: 128}}
+      - {dimension: {fixed: 224}}
+    dtype: {admissible: ["float32"]}
+  custom_loss_applicability:
+    mode: equal_shape
+    dtype: {admissible: ["float32"]}
+    rank: 5
   input_description: >-
     eight context frames, channel-first per frame and stacked on a temporal
     axis; pixel values already normalized to [0, 1]

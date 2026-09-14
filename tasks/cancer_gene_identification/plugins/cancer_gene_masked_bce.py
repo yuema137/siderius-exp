@@ -9,6 +9,12 @@ from torch import nn
 PLUGIN_LOSS_TYPE = "cancer_gene_masked_bce"
 PLUGIN_LOSS_TARGET_DTYPE = "float"
 PLUGIN_LOSS_REDUCTION = "mean"
+PLUGIN_CAPABILITY_CONTRACT = {
+    "contract_kind": "custom_loss_applicability",
+    "contract_version": 1,
+    "canonical_payload": '{"applicability":{"dtype":{"admissible":["float32"]},"mode":"equal_shape","rank":3},"prediction":{"axes":[{"dimension":{"dynamic":false,"fixed":null,"symbolic":"B"},"role":"batch"},{"dimension":{"dynamic":false,"fixed":null,"symbolic":"R"},"role":null},{"dimension":{"dynamic":false,"fixed":3,"symbolic":null},"role":null}],"dtype":{"admissible":["float32"]}},"supervision_target":{"axes":[{"dimension":{"dynamic":false,"fixed":null,"symbolic":"B"},"role":"batch"},{"dimension":{"dynamic":false,"fixed":null,"symbolic":"R"},"role":null},{"dimension":{"dynamic":false,"fixed":3,"symbolic":null},"role":null}],"dtype":{"admissible":["float32"]}}}',
+    "sha256": "444ba6c455b1a11902552bedb44c136d73227c47477bb22bd9161be542e7862b",
+}
 
 
 class CancerGeneMaskedBceConfig(BaseModel):
