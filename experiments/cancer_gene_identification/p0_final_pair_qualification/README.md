@@ -1,5 +1,10 @@
 # Cancer MTG final-pair qualification
 
+This is a bounded consumer-pair qualification wrapper, not a campaign. Read
+the [Cancer task contract](../../../tasks/cancer_gene_identification/README.md),
+use a fresh external workspace, and inspect the command with `--dry-run`
+before execution.
+
 ```bash
 bash experiments/cancer_gene_identification/p0_final_pair_qualification/launch.sh --siderius-checkout /path/to/SIDERIUS --workspace /path/to/fresh/workspace --data_dir /path/to/problem/data
 ```

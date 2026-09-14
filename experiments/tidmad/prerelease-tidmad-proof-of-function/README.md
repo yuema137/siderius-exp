@@ -1,5 +1,10 @@
 # TIDMAD prerelease proof of function
 
+This page documents a historical, dry-run-qualified regression witness. It is
+not a current qualification route and does not authorize a campaign or a
+provider-backed launch. For current bounded work, use
+[`../two_iteration_qualification/`](../two_iteration_qualification/).
+
 This is a bounded, dry-run-qualified continuous-waveform regression witness.
 It does not authorize a campaign or a provider-backed launch.
 
