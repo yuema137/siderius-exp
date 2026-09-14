@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import subprocess
@@ -52,6 +51,31 @@ def _capture_command(environment, output):
         "--out",
         str(output),
     ]
+
+
+def _task_description_sha(environment, manifest: Path) -> str:
+    """Compose in a fresh interpreter so plugin registration is isolated."""
+    framework = Path(environment["SIDERIUS_CHECKOUT"])
+    result = subprocess.run(
+        [
+            str(framework / ".venv/bin/python"),
+            "-c",
+            (
+                "import hashlib, sys; "
+                "from workflows.task_composition import compose_run_task_bindings; "
+                "from workflows.task_config import get_task_description; "
+                "b=compose_run_task_bindings(sys.argv[1]); "
+                "print(hashlib.sha256(get_task_description(b.task_config_values()).encode()).hexdigest())"
+            ),
+            str(manifest),
+        ],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout.strip().splitlines()[-1]
 
 
 def test_real_launcher_to_preflight_capture(tmp_path, surface_env):
@@ -125,13 +149,8 @@ def test_missing_task_source_is_not_a_default_task(tmp_path, surface_env):
 
 @pytest.mark.parametrize("task", ["tidmad", "oxford_iiit_pet"])
 def test_selected_task_description_reaches_real_rendering(tmp_path, surface_env, task):
-    from workflows.task_composition import compose_run_task_bindings
-    from workflows.task_config import get_task_description
-
     manifest = EXP_ROOT / "tasks" / task / "compositions/bounded_qualification.yaml"
-    description = get_task_description(
-        compose_run_task_bindings(str(manifest)).task_config_values()
-    )
+    description_sha = _task_description_sha(surface_env, manifest)
     output = tmp_path / "surface.json"
     result = _call(
         _capture_command(surface_env, output) + ["--task-composition", str(manifest)],
@@ -140,8 +159,8 @@ def test_selected_task_description_reaches_real_rendering(tmp_path, surface_env,
     )
     assert result.returncode == 0, result.stderr
     surface = json.loads(output.read_text())
-    expected = hashlib.sha256(description.encode()).hexdigest()
     for mode in ("arm", "neutral"):
         assert (
-            surface["prompt_bytes"]["task.task_description"][mode]["sha256"] == expected
+            surface["prompt_bytes"]["task.task_description"][mode]["sha256"]
+            == description_sha
         )

@@ -22,7 +22,7 @@ for n in 15 16 17 18 19; do
 done
 cmp -s "$data_dir/segment_anchors.json" "$ROOT/tasks/tidmad/reference_data/segment_anchors.json" || fail "staged segment_anchors.json is missing or differs from the approved ruler"
 expected="$(tr -d '[:space:]' < "$ROOT/SIDERIUS_REVISION")"
-[[ "$expected" == "61d5e5b1bcb8d569cf9904aae904ffef312e28f6" ]] || fail "unexpected SIDERIUS_REVISION"
+[[ "$expected" == "8ab23489f4590f3470f4db242b03a6c6801a0607" ]] || fail "unexpected SIDERIUS_REVISION"
 actual="$(git -C "$checkout" rev-parse HEAD 2>/dev/null)" || fail "cannot inspect SIDERIUS checkout"
 [[ "$actual" == "$expected" ]] || fail "SIDERIUS checkout revision mismatch"
 launcher="$checkout/scripts/launch/run_chain.sh"; [[ -f "$launcher" ]] || fail "run_chain.sh is missing"

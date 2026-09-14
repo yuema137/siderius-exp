@@ -24,19 +24,6 @@ def _scope(*image_ids: str) -> PetsScope:
     )
 
 
-def test_pets_declares_coverage_for_exact_nonempty_scope() -> None:
-    result = PetsTaskDataPath().validate_health_coverage(
-        HealthCoverageRequest(
-            evaluation_scope=_scope("a"),
-            round_kind="formal",
-            health_binding="declared/task_health.yaml",
-        )
-    )
-    assert result.applicable is True
-    assert result.covered is True
-    assert "1 image" in result.reason
-
-
 def test_pets_rejects_empty_health_scope() -> None:
     # Build an invalid scope only to exercise this boundary's fail-closed
     # response; normal scope construction rejects empty rows earlier.

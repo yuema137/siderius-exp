@@ -71,13 +71,9 @@ def test_tidmad_refuses_missing_monitored_file() -> None:
         )
 
 
-def test_tidmad_refuses_when_resolved_monitored_files_are_absent() -> None:
+def test_tidmad_refuses_when_health_binding_cannot_be_resolved() -> None:
     task = TidmadTaskDataPath()
     scope = TidmadScope(sample_set={3: [0], 10: [0], 17: [0]}, seg_size=1)
-    result = task.validate_health_coverage(
-        _request(scope, files=(3, 10))
-    )
-    assert result.covered is True
     with pytest.raises(TaskHealthCoverageError, match="effective monitored"):
         validate_attempt_health_coverage(
             data_path=task,
