@@ -39,6 +39,8 @@ from execute_tools.task_data_path import (
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
+    HealthCoverageRequest,
+    HealthCoverageResult,
     ScopeBuildRequest,
     ValidationScopeError,
     deserialize_rows_scope,
@@ -420,6 +422,26 @@ class DavisTaskDataPath:
         pre-existing behaviour and is why the shipped manifest declares both.
         """
         return self._select(request, source=self._eval_clips_path or self._clips_path)
+
+    def validate_health_coverage(
+        self, request: HealthCoverageRequest
+    ) -> HealthCoverageResult:
+        """Declare coverage for DAVIS' whole-output Health family."""
+        scope = self._scope(request.evaluation_scope)
+        if not scope.rows:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason="DAVIS Health requires a non-empty evaluation scope",
+            )
+        return HealthCoverageResult(
+            applicable=True,
+            covered=True,
+            reason=(
+                "DAVIS Health coverage is available for the exact evaluation "
+                f"scope ({len(scope.rows)} clip predictions)"
+            ),
+        )
 
     def serialize_scope(self, scope: object) -> str:
         s = self._scope(scope)

@@ -36,9 +36,6 @@ from typing import Any, ClassVar, Literal, cast
 import h5py
 import numpy as np
 import torch
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.array2h5 import create_abra_file
 from execute_tools.dataset_config import (
     DataScope,
@@ -51,17 +48,22 @@ from execute_tools.deliverable_spec import (
     default_deliverable_storage,
     derive_tidmad_deliverable_spec,
 )
+from execute_tools.health_checks.config import load_composed_health_config
 from execute_tools.sample_set_builder import build_sample_set
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
+    HealthCoverageRequest,
+    HealthCoverageResult,
     ScopeBuildRequest,
     StorageReadScope,
     TaskEvaluationPayload,
     ValidationScopeError,
 )
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
@@ -465,6 +467,77 @@ class TidmadTaskDataPath:
         return self._build_scope(
             request, strategy=request.selection_strategy, seed=request.seed
         )
+
+    def validate_health_coverage(
+        self, request: HealthCoverageRequest
+    ) -> HealthCoverageResult:
+        """Confirm every effective Health-monitored file is in this scope.
+
+        An explicit monitored-file override is transparently transported by
+        infra in the typed request. When it is absent, this task resolves its
+        task-owned Health binding through the existing public composed-Health
+        authority. Checks without an explicit peek use the established
+        full-dataset scope contract; any unresolved demand fails closed.
+        """
+        scope = self._scope(request.evaluation_scope)
+        monitored = request.health_gate_files
+        if monitored is None:
+            monitored = self._health_files_from_binding(request.health_binding, scope)
+            if monitored is None:
+                return HealthCoverageResult(
+                    applicable=True,
+                    covered=False,
+                    reason=(
+                        "TIDMAD Health coverage could not resolve the task's "
+                        "effective monitored file set"
+                    ),
+                )
+        present = {int(file_index) for file_index in scope.sample_set}
+        missing = sorted(set(monitored) - present)
+        if missing:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason=(
+                    "TIDMAD Health monitored files are absent from the exact "
+                    f"scope: {missing}"
+                ),
+            )
+        return HealthCoverageResult(
+            applicable=True,
+            covered=True,
+            reason=(
+                "TIDMAD Health coverage includes every resolved monitored "
+                f"file ({len(monitored)} files)"
+            ),
+        )
+
+    @staticmethod
+    def _health_files_from_binding(
+        binding: object, scope: TidmadScope
+    ) -> tuple[int, ...] | None:
+        """Resolve default monitored files through the public Health loader."""
+        if not isinstance(binding, str):
+            return None
+        try:
+            config, _task_config, _plugins = load_composed_health_config(
+                None, binding
+            )
+        except (OSError, TypeError, ValueError):
+            return None
+        demand: set[int] = set()
+        partition_count = scope.profile.partition_count if scope.profile is not None else None
+        if partition_count is None:
+            return None
+        for gate in config.health_gates:
+            for check in gate.checks:
+                configured = check.config.get("peek_file_indices")
+                demand.update(
+                    range(partition_count)
+                    if not configured
+                    else (int(index) for index in configured)
+                )
+        return tuple(sorted(demand))
 
     def trial_anchor_path(self, data_root: str) -> str:
         """TIDMAD's trial-anchoring artifact (B7, satellite (e)).
