@@ -1,5 +1,20 @@
 # Experiments
 
+Start here when you have selected a task and need one concrete, bounded
+treatment. An experiment is a reproducibility identity, not a campaign
+authorization. Open the task-specific qualification page before preparing a
+workspace; use `--dry-run` where the launcher supports it.
+
+| Task family | Bounded qualification | Notes |
+|---|---|---|
+| TIDMAD | [`two_iteration_qualification/`](tidmad/two_iteration_qualification/) | engineering qualification; not Gold |
+| Oxford-IIIT Pet | [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | consumer-pair qualification |
+| DAVIS | [`two_iteration_qualification/`](davis_future_prediction/two_iteration_qualification/) | consumer-pair qualification |
+| Cancer MTG | [`p0_final_pair_qualification/`](cancer_gene_identification/p0_final_pair_qualification/) | consumer-pair qualification |
+
+Archived experiments are retained as dated evidence and are not current launch
+routes. Campaign coordination belongs under [`campaigns/`](../campaigns/README.md).
+
 Each experiment directory selects one static task package and one workflow,
 then owns one concrete treatment: parameter values, advice, literature-review
 state, iteration and epoch counts, data exposure, output locks, resource

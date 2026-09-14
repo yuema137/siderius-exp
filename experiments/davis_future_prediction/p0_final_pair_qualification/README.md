@@ -1,5 +1,10 @@
 # DAVIS final-pair qualification
 
+This is a bounded consumer-pair qualification wrapper, not a campaign. Read
+the [DAVIS task contract](../../../tasks/davis_future_prediction/README.md),
+use a fresh external workspace, and inspect the command with `--dry-run`
+before execution.
+
 ```bash
 bash experiments/davis_future_prediction/p0_final_pair_qualification/launch.sh --siderius-checkout /path/to/SIDERIUS --workspace /path/to/fresh/workspace --data_dir /path/to/DAVIS_2017
 ```

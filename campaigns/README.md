@@ -1,5 +1,17 @@
 # Campaigns
 
+Start here when work spans multiple runs, arms, bands, or stages. A campaign
+page tells you whether execution is authorized; an experiment page tells you
+what one run means. The presence of scripts, ledgers, or a workspace never
+authorizes a launch.
+
+| Campaign | Current state | Entry point |
+|---|---|---|
+| TIDMAD Gold | stopped; not authorized | [`tidmad_gold/README.md`](tidmad_gold/README.md) |
+| Oxford-IIIT Pet | planned; not launchable | [`oxford_iiit_pet/README.md`](oxford_iiit_pet/README.md) |
+| DAVIS | planned; not launchable | [`davis_future_prediction/README.md`](davis_future_prediction/README.md) |
+| Cancer | planned; not launchable | [`cancer_gene_identification/README.md`](cancer_gene_identification/README.md) |
+
 Campaigns compose one or more experiments into multi-stage or multi-arm work.
 They own cross-run authorization, stage transitions, arm or band topology,
 campaign-wide frozen treatment, and result-selection protocols. Each campaign

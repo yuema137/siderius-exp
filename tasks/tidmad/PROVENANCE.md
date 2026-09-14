@@ -15,13 +15,15 @@
   `abra_validation_{file_index:04d}.h5`, `file_index` 0–19 (see
   `resolved/identity.json`, generated from the profile's file patterns).
 
-Raw data is NEVER committed to this repository (roadmap §22.23.10). Nothing in
-`examples/tidmad/` fetches it.
+Raw data is NEVER committed to this repository (roadmap §22.23.10). The
+historical `examples/tidmad/` projection did not fetch it; current task data is
+caller-staged outside this repository.
 
 ## Literature-review configuration
 
-`framework_configs/lit_review.yaml` is the task-owned semantic projection of
-the production TIDMAD literature configuration from SIDERIUS `98610b8d`.
+`framework_configs/lit_review.yaml` is the current task-owned literature
+configuration. SIDERIUS `98610b8d` below is historical source provenance, not
+the active framework pin.
 That source file has SHA-256
 `004ffa44c7bfd3684c6e07c63091dabf6d059050309934fd3862577baaaae203`.
 The projection preserves every executable value while removing repository-

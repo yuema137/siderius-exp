@@ -1,5 +1,11 @@
 # TIDMAD two-iteration qualification
 
+Start here for the current bounded TIDMAD experiment. It selects the task
+package's composition and records one treatment; it is not a Gold campaign and
+does not authorize provider-backed execution. Read the [task README](../../../tasks/tidmad/README.md)
+for scientific semantics and the [campaign index](../../../campaigns/README.md)
+for Gold status.
+
 This bounded engineering experiment selects
 `tasks/tidmad/compositions/bounded_qualification.yaml` and drives it through
 the normal SIDERIUS Trial/Formal workflow. It is not a Gold campaign.

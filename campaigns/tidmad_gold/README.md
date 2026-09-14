@@ -1,5 +1,9 @@
 # TIDMAD Gold Campaign
 
+Read the [current Gold index](docs/CURRENT.md) first. It is the concise
+operator-facing status page; the decision notebook and ledgers linked there
+remain the detailed, immutable record.
+
 - Status: stopped
 - Launch authorization: not authorized
 - Stage 2 authorization: not authorized
