@@ -29,20 +29,21 @@ from pathlib import Path
 from typing import Any, ClassVar
 
 import torch
-from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
+    HealthCoverageRequest,
+    HealthCoverageResult,
     ScopeBuildRequest,
     ValidationScopeError,
     deserialize_rows_scope,
     register_task_data_path,
 )
+from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 #: Frozen preprocessing parameters (§22.9a; interpolation frozen by D14-2).
 RESIZE_SHORTER_SIDE = 160
@@ -332,6 +333,33 @@ class PetsTaskDataPath:
         behaviour, and why the shipped manifest declares both.
         """
         return self._select(request, source=self._eval_manifest_path or self._manifest_path)
+
+    def validate_health_coverage(
+        self, request: HealthCoverageRequest
+    ) -> HealthCoverageResult:
+        """Declare whether this attempt has samples for Pets Health checks.
+
+        Pets Health is prediction-dependent: the task-owned Health provider
+        needs the exact evaluation scope to produce at least one prediction.
+        The framework deliberately treats the scope as opaque; this adapter
+        is the owner of the ``PetsScope`` shape and makes the applicability
+        decision here.
+        """
+        scope = self._scope(request.evaluation_scope)
+        if not scope.rows:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason="Pets Health requires a non-empty evaluation scope",
+            )
+        return HealthCoverageResult(
+            applicable=True,
+            covered=True,
+            reason=(
+                "Pets Health coverage is available for the exact evaluation "
+                f"scope ({len(scope.rows)} image predictions)"
+            ),
+        )
 
     def serialize_scope(self, scope: object) -> str:
         s = self._scope(scope)
