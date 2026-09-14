@@ -473,9 +473,11 @@ class TidmadTaskDataPath:
     ) -> HealthCoverageResult:
         """Confirm every effective Health-monitored file is in this scope.
 
-        The resolved file set is supplied by infra in the typed request. A
-        missing set is not interpreted from task YAML here: without the exact
-        effective set, coverage cannot be established safely.
+        An explicit monitored-file override is transparently transported by
+        infra in the typed request. When it is absent, this task resolves its
+        task-owned Health binding through the existing public composed-Health
+        authority. Checks without an explicit peek use the established
+        full-dataset scope contract; any unresolved demand fails closed.
         """
         scope = self._scope(request.evaluation_scope)
         monitored = request.health_gate_files
