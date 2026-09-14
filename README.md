@@ -59,13 +59,13 @@ Ordinary Python imports and captured imports have separate namespaces; identity
 is shared within one capture, not between those independent loading modes.
 This integrity check is not a security sandbox for arbitrary Python.
 
-See the pinned framework's [task-composition contract](https://github.com/Galileo-Sandbox/SIDERIUS/blob/7cef3ec4ee93ce7143b197166e48d68fff480c57/docs/reference/task-composition.md).
+See the pinned framework's [task-composition contract](https://github.com/Galileo-Sandbox/SIDERIUS/blob/551687e05613b86e7eccd41a5599ce1eb6f2dff9/docs/reference/task-composition.md).
 
 ## API-backed launch preparation
 
 Before an API-backed experiment, prepare credentials in the same shell that
 will own the launcher. Follow the pinned framework's detailed installation
-procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/7cef3ec4ee93ce7143b197166e48d68fff480c57/docs/getting-started/installation.md),
+procedure in [SIDERIUS installation](https://github.com/Galileo-Sandbox/SIDERIUS/blob/551687e05613b86e7eccd41a5599ce1eb6f2dff9/docs/getting-started/installation.md),
 using either a trusted external file with mode `600` or managed secret
 injection. Enable shell export only around the source step (`set -a`, source,
 `set +a`), and before any effectful launch verify that every key required by
