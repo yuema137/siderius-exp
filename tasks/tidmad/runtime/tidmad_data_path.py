@@ -36,9 +36,6 @@ from typing import Any, ClassVar, Literal, cast
 import h5py
 import numpy as np
 import torch
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.array2h5 import create_abra_file
 from execute_tools.dataset_config import (
     DataScope,
@@ -57,11 +54,15 @@ from execute_tools.task_data_path import (
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
+    HealthCoverageRequest,
+    HealthCoverageResult,
     ScopeBuildRequest,
     StorageReadScope,
     TaskEvaluationPayload,
     ValidationScopeError,
 )
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
@@ -464,6 +465,46 @@ class TidmadTaskDataPath:
         """
         return self._build_scope(
             request, strategy=request.selection_strategy, seed=request.seed
+        )
+
+    def validate_health_coverage(
+        self, request: HealthCoverageRequest
+    ) -> HealthCoverageResult:
+        """Confirm every effective Health-monitored file is in this scope.
+
+        The resolved file set is supplied by infra in the typed request. A
+        missing set is not interpreted from task YAML here: without the exact
+        effective set, coverage cannot be established safely.
+        """
+        scope = self._scope(request.evaluation_scope)
+        monitored = request.health_gate_files
+        if monitored is None:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason=(
+                    "TIDMAD Health coverage requires the resolved monitored "
+                    "file set; it was not supplied"
+                ),
+            )
+        present = {int(file_index) for file_index in scope.sample_set}
+        missing = sorted(set(monitored) - present)
+        if missing:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason=(
+                    "TIDMAD Health monitored files are absent from the exact "
+                    f"scope: {missing}"
+                ),
+            )
+        return HealthCoverageResult(
+            applicable=True,
+            covered=True,
+            reason=(
+                "TIDMAD Health coverage includes every resolved monitored "
+                f"file ({len(monitored)} files)"
+            ),
         )
 
     def trial_anchor_path(self, data_root: str) -> str:
