@@ -11,6 +11,7 @@ import numpy as np
 
 def run_phases(task: str, exp: Path, workspace: Path, data: Path):
     from core.sandbox_executor import TidmadSandbox
+    from core.training_execution_bindings import TrainingExecutionBindings
     from execute_tools.health_checks._composition import HealthBindingState
     from execute_tools.task_data_path import (
         EvaluationReadRequest,
@@ -109,7 +110,14 @@ def run_phases(task: str, exp: Path, workspace: Path, data: Path):
             workspace=str(workspace), run_name="cpu", progress_bar=False, file_index=0
         )
         train = sb.execute_training(
-            "cpu", "cpu", model, mc, tc, lc, train_base_seed=17, task_scopes=scopes
+            "cpu",
+            "cpu",
+            model,
+            mc,
+            tc,
+            lc,
+            train_base_seed=17,
+            execution_bindings=TrainingExecutionBindings(task_scopes=scopes),
         )
         assert train["status"] == "success", train
         assert len(train["results"]["loss_history"]) == 1

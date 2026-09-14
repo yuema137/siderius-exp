@@ -34,10 +34,6 @@ from typing import Any, ClassVar
 
 import numpy as np
 import torch
-from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
@@ -48,6 +44,9 @@ from execute_tools.task_data_path import (
     deserialize_rows_scope,
     register_task_data_path,
 )
+from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 #: Frozen geometry (§22.9a; resize rule frozen by D14-3).
 FRAME_WIDTH = 224
@@ -322,6 +321,15 @@ class DavisTaskDataPath:
     """The registered DAVIS implementation of the four-method seam."""
 
     task_data_path_id: ClassVar[str] = DAVIS_TASK_DATA_PATH_ID
+
+    @staticmethod
+    def custom_loss_validation_pair() -> tuple[torch.Tensor, torch.Tensor]:
+        """Return a tiny deterministic pair for the task's exact-MAE loss."""
+        shape = (1, 3, 4, 128, 224)
+        prediction = torch.linspace(0.0, 1.0, steps=torch.tensor(shape).prod().item())
+        prediction = prediction.reshape(shape).to(torch.float32)
+        target = torch.zeros(shape, dtype=torch.float32)
+        return prediction, target
 
     #: The scope payload's self-identifying tag (PR-12bc B8).
     _SCOPE_KIND: ClassVar[str] = "davis_scope_v1"

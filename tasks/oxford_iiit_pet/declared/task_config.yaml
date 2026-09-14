@@ -59,6 +59,7 @@ forward_contract:
         - {role: batch, dimension: {symbolic: "B"}}
         - {role: class, dimension: {fixed: 37}}
       dtype: {admissible: ["float32"]}
+  segmentation_applicability: not_applicable
   input_description: >-
     a batch of preprocessed RGB images, channels-first, already scaled to
     [0, 1]; no augmentation and no per-channel normalization is applied

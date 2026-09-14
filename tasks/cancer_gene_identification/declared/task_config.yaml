@@ -21,6 +21,17 @@ forward_contract:
         - {dimension: {symbolic: "R"}}
         - {dimension: {fixed: 3}}
       dtype: {admissible: ["float32"]}
+  segmentation_applicability: not_applicable
+  supervision_target:
+    axes:
+      - {role: batch, dimension: {symbolic: "B"}}
+      - {dimension: {symbolic: "R"}}
+      - {dimension: {fixed: 3}}
+    dtype: {admissible: ["float32"]}
+  custom_loss_applicability:
+    mode: equal_shape
+    dtype: {admissible: ["float32"]}
+    rank: 3
   input_description: >-
     packed graph records [B, R, 68]: node records first, then directed edge
     records; columns encode node marker, source, destination, active split
