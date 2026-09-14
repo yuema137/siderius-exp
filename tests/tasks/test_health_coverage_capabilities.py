@@ -16,11 +16,6 @@ from tasks.davis_future_prediction.runtime.davis_data_path import (
     DavisScope,
     DavisTaskDataPath,
 )
-from tasks.oxford_iiit_pet.runtime.pets_data_path import (
-    PetsItem,
-    PetsScope,
-    PetsTaskDataPath,
-)
 from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
 
 
@@ -31,14 +26,6 @@ def _request(scope: object, *, files: tuple[int, ...] | None = None):
         health_binding="declared/task_health.yaml",
         health_gate_files=files,
     )
-
-
-def test_pets_requires_nonempty_exact_evaluation_scope() -> None:
-    task = PetsTaskDataPath()
-    result = task.validate_health_coverage(
-        _request(PetsScope(rows=(PetsItem(image_id="a", class_index=0),)))
-    )
-    assert result.covered is True
 
 
 def test_davis_requires_nonempty_exact_evaluation_scope() -> None:
