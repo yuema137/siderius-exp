@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import hashlib
+import os
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -72,3 +74,95 @@ def test_advice_digest_and_schema_are_verified_by_framework_loader() -> None:
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     artifact = load_advice_artifact(str(path), declared_sha256=digest)
     assert set(artifact.content) == {"propose", "tune"}
+
+
+def _fake_checkout(tmp_path: Path, *, revision: str) -> tuple[Path, Path]:
+    checkout = tmp_path / "fake-siderius"
+    (checkout / "scripts/launch").mkdir(parents=True)
+    (checkout / "configs/llm").mkdir(parents=True)
+    (checkout / "configs/llm/openai_tiered_pro.json").write_text("{}")
+    capture = tmp_path / "argv.txt"
+    (checkout / "scripts/launch/run_chain.sh").write_text(
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$@" > "$CAPTURE"\n'
+    )
+    (checkout / "scripts/launch/run_chain.sh").chmod(0o755)
+    shim = tmp_path / "git"
+    shim.write_text(f"#!/usr/bin/env bash\nif [[ $1 == -C ]]; then echo {revision}; exit 0; fi\nexit 1\n")
+    shim.chmod(0o755)
+    return checkout, capture
+
+
+def _data_root(tmp_path: Path, *, tamper_anchor: bool = False) -> Path:
+    data = tmp_path / "data"
+    data.mkdir()
+    for index in range(15, 20):
+        (data / f"abra_training_{index:04d}.h5").write_bytes(b"x")
+        (data / f"abra_validation_{index:04d}.h5").write_bytes(b"x")
+    anchor = ROOT / "tasks/tidmad/reference_data/segment_anchors.json"
+    (data / "segment_anchors.json").write_bytes(anchor.read_bytes() + (b"x" if tamper_anchor else b""))
+    return data
+
+
+def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
+    revision = "61d5e5b1bcb8d569cf9904aae904ffef312e28f6"
+    checkout, capture = _fake_checkout(tmp_path, revision=revision)
+    data = _data_root(tmp_path)
+    workspace = tmp_path / "workspace"
+    env = {**os.environ, "PATH": f"{tmp_path}:{os.environ['PATH']}", "CAPTURE": str(capture)}
+    result = subprocess.run(
+        ["bash", str(ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/launch.sh"),
+         "--siderius-checkout", str(checkout), "--workspace", str(workspace),
+         "--data_dir", str(data), "--dry-run"], env=env, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    argv = capture.read_text().splitlines()
+    def value(flag: str) -> str:
+        return argv[argv.index(flag) + 1]
+
+    assert value("--run_name") == "prerelease-tidmad-proof-of-function"
+    assert value("--num_iterations") == "10" and value("--max_rounds") == "2"
+    assert value("--trial_portion") == "0.1" and value("--formal_portion") == "1.0"
+    assert value("--formal_train_portion") == "0.1" and value("--formal_eval_portion") == "1.0"
+    assert value("--trial_time_budget_minutes") == "30" and value("--formal_time_budget_minutes") == "120"
+    assert value("--trial_vram_budget_gb") == "16" and value("--formal_vram_budget_gb") == "16"
+    assert value("--data_scope") == "15-19" and value("--health_gate_files") == "15-19"
+    assert value("--file_order_override") == "15,16,17,18,19"
+    assert "--force_fresh" in argv and "--no_auto_resume" in argv and "--dry-run" in argv
+    advice = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json"
+    assert value("--advice") == str(advice)
+    assert value("--advice_sha256") == hashlib.sha256(advice.read_bytes()).hexdigest()
+
+
+def test_launcher_refuses_stale_inputs_and_overrides(tmp_path: Path) -> None:
+    revision = "61d5e5b1bcb8d569cf9904aae904ffef312e28f6"
+    checkout, _ = _fake_checkout(tmp_path, revision=revision)
+    data = _data_root(tmp_path)
+    launcher = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/launch.sh"
+    base = ["bash", str(launcher), "--siderius-checkout", str(checkout), "--workspace", str(tmp_path / "w"), "--data_dir", str(data)]
+    cases = [base + ["--num_iterations", "99"], [*base[:-4], "--workspace", str(tmp_path / "nonempty"), "--data_dir", str(data)], base]
+    (tmp_path / "nonempty").mkdir(); (tmp_path / "nonempty/x").write_text("x")
+    (data / "segment_anchors.json").write_text("tampered")
+    cases[-1] = base
+    for command in cases:
+        result = subprocess.run(command, env={**os.environ, "PATH": f"{tmp_path}:{os.environ['PATH']}"}, capture_output=True, text=True)
+        assert result.returncode != 0
+
+
+def test_gold_regression_yaml_blobs_remain_unchanged() -> None:
+    pairs = (
+        ("tasks/tidmad/declared/task_config_regression.yaml", "campaigns/tidmad_gold/task/task_config_regression.yaml"),
+        ("tasks/tidmad/framework_configs/health_regression.yaml", "campaigns/tidmad_gold/task/task_health_regression.yaml"),
+        ("tasks/tidmad/framework_configs/proposal_regression.yaml", "campaigns/tidmad_gold/task/task_proposal_regression.yaml"),
+    )
+    for task_path, gold_path in pairs:
+        expected = subprocess.run(["git", "show", f"origin/master:{gold_path}"], cwd=ROOT, check=True, capture_output=True).stdout
+        assert hashlib.sha256((ROOT / gold_path).read_bytes()).hexdigest() == hashlib.sha256(expected).hexdigest()
+        task = yaml.safe_load((ROOT / task_path).read_text())
+        gold = yaml.safe_load((ROOT / gold_path).read_text())
+        if "roster" in task:
+            assert task["roster"] == gold["roster"]
+        elif "forward_contract" in task:
+            assert task["forward_contract"]["task_type"] == "regression"
+            assert gold["forward_contract"]["task_type"] == "regression"
+        else:
+            assert task["output_contract_guidance"] == gold["output_contract_guidance"]
