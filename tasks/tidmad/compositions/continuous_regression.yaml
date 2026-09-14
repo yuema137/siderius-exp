@@ -1,0 +1,33 @@
+# Reusable task-owned continuous waveform regression composition.
+task_data_path:
+  file: ../runtime/tidmad_data_path.py
+  symbol: TidmadTaskDataPath
+  id: tidmad
+
+dataset_profile:
+  config: ../resolved/dataset_profile.json
+
+metric:
+  declaration: ../resolved/metric_spec.json
+  implementation:
+    file: ../runtime/scoring.py
+    symbol: TidmadDenoisingMetric
+  scoreability_contracts:
+    tidmad_denoised_h5:
+      file: ../runtime/scoreability.py
+      symbol: TidmadScoreabilityContract
+
+task_health:
+  config: ../framework_configs/health_regression.yaml
+interpretation_blocks:
+  config: ../framework_configs/interpretation.yaml
+proposal_blocks:
+  config: ../framework_configs/proposal_regression.yaml
+implementor_blocks:
+  config: ../framework_configs/implementor.yaml
+task_config:
+  config: ../declared/task_config_regression.yaml
+deliverable:
+  prefix: abra_validation_denoised
+  extension: .h5
+  index_width: 4

@@ -1,0 +1,18 @@
+{
+  "propose": [
+    "The task contract is continuous waveform regression: emit [B,T] float32 directly. Do not emit class logits, a class axis, or use argmax.",
+    "The historical FCNet reference is a fully connected autoencoder over a 40,000-sample window. Its documented compression is 40000 -> 4000 -> 400 -> 40, followed by a mirrored decoder to a continuous [B,T] waveform.",
+    "The reference reports SmoothL1 (Huber) beta=1 with mean reduction. Treat this as a useful starting point, not a locked objective; the objective remains searchable within the regression contract.",
+    "Explore long-context compression and related encoder-decoder or residual ideas that preserve amplitude and low-frequency structure. Exact FCNet activations and other implementation details are not established by the committed reference and must not be invented.",
+    "Use the 16-GiB Trial/Formal and 30/120-minute ceilings productively, but they are hard ceilings, not utilization targets. Keep proposals credibly within them."
+  ],
+  "tune": [
+    "Keep the continuous [B,T] float32 output contract and the measured resource ceilings. Tune the objective and architecture from evidence; do not turn the FCNet dimensions or parameter count into a model lock."
+  ],
+  "sources": {
+    "fcnet_baseline_config": "tasks/tidmad/reference_data/legacy_baseline_configs.json",
+    "fcnet_baseline_config_sha256": "2e15932ae8c87500b888f95efb4f356f16ed646a2f42b144fafd9610163728b0",
+    "fcnet_reference_summary": "tasks/tidmad/reference_data/official_paper_result/fcnet.md",
+    "fcnet_reference_summary_sha256": "74dff62030771e72b5bfe286cc8a5acd1616aed29311985ee43bf7adc9d62706"
+  }
+}
