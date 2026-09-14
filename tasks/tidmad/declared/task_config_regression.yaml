@@ -1,4 +1,4 @@
-# sdsc_submission_scripts/gold_task/task_config_regression.yaml
+# Task-owned TIDMAD continuous-regression configuration.
 # ---------------------------------------------------------------------------
 # Reusable TIDMAD task configuration for continuous regression.
 #
@@ -16,7 +16,7 @@
 # the proposer would receive two contradicting authorities, advice saying
 # regression and the task definition saying 256-class classification.
 #
-# The historical FCNet reference this campaign is measured against is a
+# The historical FCNet reference used for scientific context is a
 # CONTINUOUS WAVEFORM REGRESSOR (`output_kind: regressor` in the adopted score
 # artifact; SmoothL1 in the paper implementation). Comparing a classifier search
 # against a regression baseline was never apples-to-apples.

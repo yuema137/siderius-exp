@@ -10,7 +10,7 @@
 # no `reason` prose, no value scale, no band-aware variation, no recalibration.
 # The diff against the shipped roster is two words, and a test asserts that.
 #
-# WHY. Under the Gold regression task the output is a continuous waveform, and
+# WHY. Under this continuous-regression task the output is a continuous waveform, and
 # `output_diversity` thresholds a count of unique INT8 values — a
 # classification-era quantity. Keeping it blocking would refuse healthy
 # regression outputs for failing a test that no longer describes them.

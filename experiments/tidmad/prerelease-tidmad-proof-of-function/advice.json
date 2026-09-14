@@ -8,11 +8,5 @@
   ],
   "tune": [
     "Keep the continuous [B,T] float32 output contract and the measured resource ceilings. Tune the objective and architecture from evidence; do not turn the FCNet dimensions or parameter count into a model lock."
-  ],
-  "sources": {
-    "fcnet_baseline_config": "tasks/tidmad/reference_data/legacy_baseline_configs.json",
-    "fcnet_baseline_config_sha256": "2e15932ae8c87500b888f95efb4f356f16ed646a2f42b144fafd9610163728b0",
-    "fcnet_reference_summary": "tasks/tidmad/reference_data/official_paper_result/fcnet.md",
-    "fcnet_reference_summary_sha256": "74dff62030771e72b5bfe286cc8a5acd1616aed29311985ee43bf7adc9d62706"
-  }
+  ]
 }

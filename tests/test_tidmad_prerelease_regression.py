@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import yaml
@@ -45,9 +46,29 @@ def test_advice_is_factual_and_does_not_lock_fcnet() -> None:
         ).read_text()
     )
     text = " ".join(advice["propose"])
+    baseline = json.loads(
+        (ROOT / "tasks/tidmad/reference_data/legacy_baseline_configs.json").read_text()
+    )["fcnet"]
+    assert baseline["model_cfg"]["segmentation_size"] == 40000
+    assert baseline["model_cfg"]["latent_dims"] == [4000, 400, 40]
+    assert baseline["loss_cfg"] == {
+        "loss_type": "smooth_l1",
+        "beta": 1.0,
+        "reduction": "mean",
+        "use_class_weights": False,
+    }
     assert "40000 -> 4000 -> 400 -> 40" in text
     assert "SmoothL1" in text and "beta=1" in text
     assert "activations" in text and "must not be invented" in text
     assert "parameter count" not in text.lower() or "not a model lock" in " ".join(
         advice["tune"]
     )
+
+
+def test_advice_digest_and_schema_are_verified_by_framework_loader() -> None:
+    from workflows.run_one_iteration import load_advice_artifact
+
+    path = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json"
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    artifact = load_advice_artifact(str(path), declared_sha256=digest)
+    assert set(artifact.content) == {"propose", "tune"}
