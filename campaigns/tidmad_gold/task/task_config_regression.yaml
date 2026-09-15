@@ -63,6 +63,10 @@ forward_contract:
         - {role: batch, dimension: {symbolic: "B"}}
         - {role: temporal, dimension: {symbolic: "T"}}
       dtype: {admissible: ["float32"]}
+  # Resource measurement must know that this task's model window is a
+  # temporal segment. This is task-owned semantics; a generated model cannot
+  # safely supply or override it in its hyperparameter proposal.
+  segmentation_applicability: temporal
   input_description: "raw signal, integer-coded samples 0-255"
   output_description: "continuous denoised waveform value per timestep"
   embedding_note: >

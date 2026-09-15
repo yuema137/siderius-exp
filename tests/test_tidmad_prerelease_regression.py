@@ -16,13 +16,23 @@ COMPOSITION = ROOT / "tasks/tidmad/compositions/continuous_regression.yaml"
 
 
 def test_continuous_composition_has_waveform_contract_and_blocking_health() -> None:
-    from workflows.task_composition import compose_run_task_bindings
+    from workflows.task_composition import (
+        build_task_composition_ref,
+        compose_run_task_bindings,
+    )
 
     composition = compose_run_task_bindings(str(COMPOSITION))
     assert composition.forward_contract.task_type == "regression"
     assert composition.forward_contract.input_shape == "[B, T] int64"
     assert composition.forward_contract.output_shape == "[B, T] float32"
     assert composition.forward_contract.num_classes == 0
+    # Regression incident 2026-09-14: without this task-owned declaration,
+    # every generated model was refused before the VRAM probe. A proposal-level
+    # field cannot repair a missing composition contract.
+    assert composition.forward_contract.segmentation_applicability == "temporal"
+    task_ref = build_task_composition_ref(composition)
+    assert task_ref is not None
+    assert task_ref.segmentation_applicability == "temporal"
     assert composition.metric.spec.id == "tidmad_denoising_score"
     assert composition.metric.spec.direction == "higher"
     health = yaml.safe_load(Path(composition.task_health_binding).read_text())
@@ -249,7 +259,7 @@ def test_gold_regression_yaml_blobs_remain_unchanged() -> None:
     )
     for task_path, gold_path in pairs:
         expected_sha = {
-            "task_config_regression.yaml": "7eabe995fc1345ab0072ddc83625af22f12b412af790821f0f29685233406efe",
+            "task_config_regression.yaml": "922f2420a152f2841befe310a84c77cb39887ed58f3b33a32308970f9481ddf1",
             "task_health_regression.yaml": "9d3fd2fa1ce9e58e2218f7ae34f4176af244077c3ba42b62919918aa45fad762",
             "task_proposal_regression.yaml": "fc35f7d69ef6027d14dc25ead22a9e2b7bb9e170230be97b83fffb525021e6b4",
         }[Path(gold_path).name]
@@ -263,5 +273,7 @@ def test_gold_regression_yaml_blobs_remain_unchanged() -> None:
         elif "forward_contract" in task:
             assert task["forward_contract"]["task_type"] == "regression"
             assert gold["forward_contract"]["task_type"] == "regression"
+            assert task["forward_contract"]["segmentation_applicability"] == "temporal"
+            assert gold["forward_contract"]["segmentation_applicability"] == "temporal"
         else:
             assert task["output_contract_guidance"] == gold["output_contract_guidance"]
