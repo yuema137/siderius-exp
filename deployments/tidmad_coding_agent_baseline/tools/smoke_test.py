@@ -22,7 +22,7 @@ Work only below {root}. Without asking for human approval:
    record its version in result/package.txt;
 6. use /baseline/agent/environments/runtime/bin/python and its PyTorch to save
    a tiny checkpoint as result/checkpoint.pt, reload it, confirm equality, and
-   write result/reload-ok.txt;
+   write exactly CHECKPOINT_RELOAD_OK plus a newline to result/reload-ok.txt;
 7. write result/COMPLETE with a concise success report, including the model
    identity the product says is serving this invocation; then exit normally.
 Do not inspect any scientific data or prior workspace.
@@ -54,7 +54,7 @@ def _verify_results(root: Path) -> dict[str, str]:
     if "H100" not in gpu_text.upper():
         raise RuntimeError("smoke result does not prove an H100 was visible")
     reload_text = (result_root / "reload-ok.txt").read_text(errors="replace")
-    if "ok" not in reload_text.lower():
+    if reload_text != "CHECKPOINT_RELOAD_OK\n":
         raise RuntimeError("smoke result does not confirm checkpoint reload")
     return {name: sha256_file(result_root / name) for name in _REQUIRED_RESULTS}
 

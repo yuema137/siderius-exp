@@ -3,7 +3,6 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
-
 from deployments.tidmad_coding_agent_baseline.tools import smoke_test
 from deployments.tidmad_coding_agent_baseline.tools.smoke_test import (
     _REQUIRED_RESULTS,
@@ -17,6 +16,7 @@ def _complete_result(root):
     for name in _REQUIRED_RESULTS:
         (result / name).write_bytes(b"ok\n")
     (result / "gpu.txt").write_text("NVIDIA H100 80GB HBM3\n")
+    (result / "reload-ok.txt").write_text("CHECKPOINT_RELOAD_OK\n")
     return result
 
 
@@ -37,6 +37,10 @@ def test_smoke_requires_h100_evidence_and_checkpoint_reload(tmp_path):
 
     (result / "gpu.txt").write_text("NVIDIA H100 80GB HBM3\n")
     (result / "reload-ok.txt").write_text("failed\n")
+    with pytest.raises(RuntimeError, match="does not confirm checkpoint reload"):
+        _verify_results(tmp_path)
+
+    (result / "reload-ok.txt").write_text("checkpoint confirmed\n")
     with pytest.raises(RuntimeError, match="does not confirm checkpoint reload"):
         _verify_results(tmp_path)
 
