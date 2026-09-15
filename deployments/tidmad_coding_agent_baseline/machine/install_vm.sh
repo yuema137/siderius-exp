@@ -59,7 +59,9 @@ getent group baseline-agent >/dev/null || groupadd --system baseline-agent
 getent group baseline-evaluator >/dev/null || groupadd --system baseline-evaluator
 getent group baseline-inference >/dev/null || groupadd --system baseline-inference
 id baseline-agent >/dev/null 2>&1 \
-    || useradd --create-home --shell /bin/bash --gid baseline-agent baseline-agent
+    || useradd --no-create-home --home-dir /baseline/agent/home \
+        --shell /bin/bash --gid baseline-agent baseline-agent
+usermod --home /baseline/agent/home baseline-agent
 usermod -a -G baseline-results baseline-agent
 id baseline-evaluator >/dev/null 2>&1 \
     || useradd --system --home /nonexistent --shell /usr/sbin/nologin \
@@ -76,6 +78,18 @@ done
 id baseline-backup >/dev/null 2>&1 \
     || useradd --system --home /nonexistent --shell /usr/sbin/nologin baseline-backup
 usermod -a -G baseline-results baseline-backup
+
+# Keep every agent-owned environment, cache and temporary byte on the fixed
+# scientific working disk.  Do not rely on an interactive login shell to add
+# the product CLI to PATH: the evaluated process starts directly from systemd.
+install -d -o baseline-agent -g baseline-results -m 2770 \
+    /baseline/agent/home \
+    /baseline/agent/tmp \
+    /baseline/agent/cache \
+    /baseline/agent/cache/pip \
+    /baseline/agent/cache/uv \
+    /baseline/agent/cache/huggingface \
+    /baseline/agent/cache/torch
 
 rm -rf -- /work/harness /work/input /opt/tidmad-evaluator /opt/tidmad-inference
 install -d -o root -g root -m 0755 /work /work/harness /work/input
@@ -153,6 +167,15 @@ install -m 0644 /work/harness/systemd/tidmad-baseline-backup.timer /etc/systemd/
 install -m 0644 /work/harness/systemd/tidmad-baseline-finalize.service /etc/systemd/system/
 cat >/etc/tidmad-baseline/agent.env <<EOF
 BASELINE_PRODUCT=$PRODUCT
+HOME=/baseline/agent/home
+TMPDIR=/baseline/agent/tmp
+XDG_CACHE_HOME=/baseline/agent/cache
+PIP_CACHE_DIR=/baseline/agent/cache/pip
+UV_CACHE_DIR=/baseline/agent/cache/uv
+HF_HOME=/baseline/agent/cache/huggingface
+TORCH_HOME=/baseline/agent/cache/torch
+NPM_CONFIG_CACHE=/baseline/agent/cache/npm
+PATH=/baseline/agent/home/.local/bin:/baseline/agent/home/.local/npm/bin:/baseline/agent/environments/runtime/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EOF
 chown root:baseline-agent /etc/tidmad-baseline/agent.env
 chmod 0640 /etc/tidmad-baseline/agent.env
