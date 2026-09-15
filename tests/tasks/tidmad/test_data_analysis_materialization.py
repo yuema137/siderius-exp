@@ -14,6 +14,7 @@ from agent.schemas.data_analysis.assets import (
     AssetProvenance,
     LegacyPartitionScope,
     TaskDataAssetLocation,
+    TaskOpaqueScopeRef,
 )
 from agent.schemas.data_analysis.common import canonical_sha256
 from agent.schemas.data_analysis.resources import SamplingPolicy
@@ -21,7 +22,8 @@ from execute_tools.analysis_materialization import (
     AnalysisMaterializationRequest,
     AuthorizedAnalysisMaterializationRequest,
 )
-from tasks.tidmad.runtime.tidmad_data_path import TidmadTaskDataPath
+from tasks.tidmad.runtime import tidmad_data_path as tidmad_data_path_module
+from tasks.tidmad.runtime.tidmad_data_path import TidmadScope, TidmadTaskDataPath
 
 from execute_tools.data_paths import bind_physical_data_root
 from execute_tools.dataset_config import DataScope, bind_dataset_profile, tidmad_topology
@@ -95,6 +97,87 @@ def _write_validation_file(root, *, profile, samples: int) -> np.ndarray:
     return values
 
 
+def _model_segment_profile(profile, *, psd_segment_length: int):
+    topology = dict(profile.topology)
+    dataset = dict(topology["dataset"])
+    dataset["psd_segment_length"] = psd_segment_length
+    dataset["segments_per_file"] = 1
+    topology["dataset"] = dataset
+    return profile.model_copy(update={"topology": topology})
+
+
+def _authorized_model_segment_request(
+    *, profile, capability: TidmadTaskDataPath, information_class: str
+):
+    scope = TidmadScope(sample_set={0: [0]}, seg_size=4, profile=profile)
+    serialized_scope = capability.serialize_scope(scope)
+    scope_ref = TaskOpaqueScopeRef(
+        task_data_path_id="tidmad",
+        serialized_scope=serialized_scope,
+        sha256=hashlib.sha256(serialized_scope.encode("utf-8")).hexdigest(),
+    )
+    role = (
+        "validation_model_input_segments"
+        if information_class == "data"
+        else "validation_model_target_segments"
+    )
+    asset = AnalysisAsset(
+        asset_id=f"tidmad-validation-{information_class}",
+        asset_type="dataset",
+        description="Exact candidate-sized TIDMAD validation rows.",
+        location=TaskDataAssetLocation(
+            task_data_path_id="tidmad",
+            dataset_profile_sha256=hashlib.sha256(
+                profile.model_dump_json().encode("utf-8")
+            ).hexdigest(),
+            logical_role=role,
+        ),
+        provenance=AssetProvenance(producer="tidmad-task-package"),
+        authorized_scope=scope_ref,
+        split_id="validation",
+    )
+    policy = AnalysisAccessPolicy(
+        policy_id="tidmad-model-segment-test",
+        policy_version=1,
+        purpose="Verify exact target-isolated model input materialization.",
+        split_rules=(
+            {
+                "split_id": "validation",
+                "data_visible": True,
+                "targets_visible": information_class == "target",
+            },
+        ),
+    )
+    request = AnalysisMaterializationRequest(
+        request_id=f"request-{information_class}",
+        invocation_id="invocation-model-segments",
+        binding_id=f"binding-{information_class}",
+        slot_id=information_class,
+        asset=asset,
+        split_id="validation",
+        requested_scope=scope_ref,
+        requested_information=(RequestedInformation(information_class=information_class),),
+        requested_format_id="siderius.numeric-array.v1",
+        operation="materialize",
+        sampling_policy=SamplingPolicy(
+            mode="fixed", strategy="uniform", max_items=2, seed=17
+        ),
+        access_policy=policy,
+    )
+    receipt = AnalysisAuthorizationReceipt(
+        invocation_id=request.invocation_id,
+        binding_id=request.binding_id,
+        slot_id=request.slot_id,
+        request_digest=canonical_sha256(request),
+        policy_digest=canonical_sha256(policy),
+        asset_digest=canonical_sha256(asset),
+        authorized_at="2026-09-15T00:00:00+00:00",
+    )
+    return AuthorizedAnalysisMaterializationRequest(
+        request=request, authorization_receipt=receipt
+    )
+
+
 def test_task_adapter_emits_bounded_regular_view_without_target(tmp_path, tidmad_profile) -> None:
     """Fails if task bytes, cadence, selection, or information isolation drift."""
 
@@ -150,3 +233,44 @@ def test_task_adapter_does_not_treat_requested_information_as_authority(
         pytest.raises(ValueError, match="does not match TIDMAD asset role"),
     ):
         TidmadTaskDataPath().materialize_analysis_view(authorized)
+
+
+def test_model_input_segments_match_ordinary_row_geometry_without_target_read(
+    tmp_path, tidmad_profile, monkeypatch
+) -> None:
+    """Fails if historical input rows drift or inference input opens target bytes."""
+
+    profile = _model_segment_profile(tidmad_profile, psd_segment_length=16)
+    source = _write_validation_file(tmp_path, profile=profile, samples=16)
+    capability = TidmadTaskDataPath()
+    authorized = _authorized_model_segment_request(
+        profile=profile, capability=capability, information_class="data"
+    )
+    opened_channels: list[str] = []
+    original = tidmad_data_path_module._h5_dataset
+
+    def recording_h5_dataset(handle, *path):
+        opened_channels.append(path[1])
+        return original(handle, *path)
+
+    monkeypatch.setattr(
+        "tasks.tidmad.runtime.tidmad_data_path._h5_dataset", recording_h5_dataset
+    )
+    with bind_dataset_profile(profile), bind_physical_data_root(str(tmp_path)):
+        view = capability.materialize_analysis_view(authorized)
+
+    exported = tmp_path / "model-input.npz"
+    capability.export_analysis_materialization(view.content_ref, exported)
+    with np.load(exported, allow_pickle=False) as payload:
+        assert set(payload.files) == {"example_ids", "information__data"}
+        rows = payload["information__data"]
+        selected = [int(item.rsplit("-", 1)[1]) for item in payload["example_ids"]]
+        for row, row_index in zip(rows, selected, strict=True):
+            expected = source[row_index * 4 : (row_index + 1) * 4] + 128
+            np.testing.assert_array_equal(row, expected)
+
+    topology = tidmad_topology(profile)
+    assert opened_channels == [topology.channels.input_channel] * 2
+    assert view.population_unit == "validation model-input segments"
+    assert view.total_available == 4
+    assert view.materialized_count == 2

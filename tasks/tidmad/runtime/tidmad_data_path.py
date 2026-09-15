@@ -43,10 +43,11 @@ from agent.schemas.data_analysis.assets import (
     LegacyPartitionScope,
     MaterializedAnalysisView,
     TaskDataAssetLocation,
+    TaskOpaqueScopeRef,
 )
 from agent.schemas.data_analysis.common import CertifiedArtifactRef, canonical_sha256
 from agent.schemas.data_analysis.resources import CertifiedSelectionIdentity
-from agent.schemas.data_analysis.view_formats import TIMESERIES_ARRAY_V1
+from agent.schemas.data_analysis.view_formats import NUMERIC_ARRAY_V1, TIMESERIES_ARRAY_V1
 from execute_tools.analysis_materialization import AuthorizedAnalysisMaterializationRequest
 from pydantic import BaseModel, ConfigDict, Field
 from torch.utils.data import Dataset
@@ -384,8 +385,13 @@ class TidmadTaskDataPath:
         """
 
         request = authorized.request
+        if request.requested_format_id == NUMERIC_ARRAY_V1:
+            return self._materialize_model_segment_view(authorized)
         if request.requested_format_id != TIMESERIES_ARRAY_V1:
-            raise ValueError("TIDMAD analysis supports only timeseries-array.v1")
+            raise ValueError(
+                "TIDMAD analysis supports only numeric-array.v1 and "
+                "timeseries-array.v1"
+            )
         if not isinstance(request.requested_scope, LegacyPartitionScope):
             raise ValueError("TIDMAD analysis requires a legacy-partition scope")
         location = request.asset.location
@@ -511,6 +517,152 @@ class TidmadTaskDataPath:
             ),
             format_id=request.requested_format_id,
             population_unit="fixed-duration validation windows",
+            total_available=total_available,
+            materialized_count=len(example_ids),
+            certified_information=request.requested_information,
+            selection_identity=selection,
+            task_data_path_id=self.task_data_path_id,
+            source_digests=(digest,),
+            authorization_receipt=authorized.authorization_receipt,
+        )
+
+    def _materialize_model_segment_view(
+        self,
+        authorized: AuthorizedAnalysisMaterializationRequest,
+    ) -> MaterializedAnalysisView:
+        """Expose exact candidate-sized validation rows without reading the other channel.
+
+        Ordinary composed evaluation iterates :meth:`validation_dataset` in
+        deterministic row order.  This materializer uses the same task scope,
+        PSD geometry, value offset and row order, but reads only the one channel
+        authorized by the asset.  In particular, an inference-input request
+        never opens the target dataset.
+        """
+
+        request = authorized.request
+        if not isinstance(request.requested_scope, TaskOpaqueScopeRef):
+            raise ValueError("TIDMAD model-segment analysis requires a task-opaque scope")
+        if request.requested_scope.task_data_path_id != self.task_data_path_id:
+            raise ValueError("TIDMAD model-segment scope belongs to another task data path")
+        location = request.asset.location
+        if not isinstance(location, TaskDataAssetLocation):
+            raise ValueError("TIDMAD model-segment analysis requires a task-data asset")
+        role_to_information = {
+            "validation_model_input_segments": ("data", "input_channel"),
+            "validation_model_target_segments": ("target", "target_channel"),
+        }
+        expected = role_to_information.get(location.logical_role)
+        requested_classes = tuple(
+            item.information_class for item in request.requested_information
+        )
+        if expected is None or requested_classes != (expected[0],):
+            raise ValueError("requested information does not match TIDMAD model-segment role")
+
+        scope = self.deserialize_scope(request.requested_scope.serialized_scope)
+        assert isinstance(scope, TidmadScope)
+        profile = scope.profile or resolve_dataset_profile()
+        topology = tidmad_topology(profile)
+        psd_length = topology.dataset.psd_segment_length
+        if psd_length % scope.seg_size:
+            raise ValueError(
+                "TIDMAD model-segment materialization requires segmentation_size "
+                "to divide the task PSD segment length exactly"
+            )
+        rows_per_psd = psd_length // scope.seg_size
+        row_identities = [
+            (int(file_index), int(psd_index), row_index)
+            for file_index in sorted(scope.sample_set, key=int)
+            for psd_index in scope.sample_set[file_index]
+            for row_index in range(rows_per_psd)
+        ]
+        total_available = len(row_identities)
+        if total_available == 0:
+            raise ValueError("TIDMAD model-segment scope contains no rows")
+        policy = request.sampling_policy
+        selected_count = total_available
+        if policy.fraction is not None:
+            selected_count = max(1, round(total_available * policy.fraction))
+        if policy.max_items is not None:
+            selected_count = min(selected_count, policy.max_items)
+        if policy.mode == "representative" and policy.max_items is None and policy.fraction is None:
+            selected_count = min(4, total_available)
+        rng = np.random.default_rng(policy.seed)
+        if selected_count == total_available:
+            selected_indices = np.arange(total_available, dtype=np.int64)
+        else:
+            selected_indices = np.sort(
+                rng.choice(total_available, size=selected_count, replace=False)
+            )
+
+        selected_rows: list[np.ndarray] = []
+        selected_ids: list[str] = []
+        data_root = resolve_physical_data_root()
+        channel_name = getattr(topology.channels, expected[1])
+        handles: dict[int, h5py.File] = {}
+        try:
+            for selected_index in selected_indices.tolist():
+                file_index, psd_index, row_index = row_identities[int(selected_index)]
+                handle = handles.get(file_index)
+                if handle is None:
+                    source = (
+                        Path(data_root)
+                        / topology.dataset.validation_file_name(file_index)
+                    )
+                    handle = h5py.File(source, "r")
+                    handles[file_index] = handle
+                values = _h5_dataset(handle, "timeseries", channel_name, "timeseries")
+                start = psd_index * psd_length + row_index * scope.seg_size
+                stop = start + scope.seg_size
+                selected_rows.append(
+                    np.asarray(values[start:stop], dtype=np.int16)
+                    + topology.encoding.value_offset
+                )
+                selected_ids.append(
+                    f"validation-{file_index:04d}-psd-{psd_index:06d}-ml-{row_index:04d}"
+                )
+        finally:
+            for handle in handles.values():
+                handle.close()
+
+        rows = np.stack(selected_rows)
+        example_ids = np.asarray(selected_ids, dtype="U64")
+        selection_sha = canonical_sha256({"example_ids": example_ids.tolist()})
+        selection = CertifiedSelectionIdentity(
+            selection_id=f"tidmad-model-segments-{selection_sha[:16]}",
+            selection_sha256=selection_sha,
+            sampling_policy_sha256=canonical_sha256(request.sampling_policy),
+            sampling_mode=policy.mode,
+            sampling_strategy=policy.strategy,
+            sampling_seed=policy.seed,
+            population_unit="validation model-input segments",
+            total_available=total_available,
+            selected_count=len(example_ids),
+        )
+        buffer = io.BytesIO()
+        np.savez(
+            buffer,
+            example_ids=example_ids,
+            **{f"information__{expected[0]}": rows},
+        )
+        payload = buffer.getvalue()
+        digest = hashlib.sha256(payload).hexdigest()
+        logical_ref = f"opaque://tidmad-analysis/{request.binding_id}/{digest}"
+        self._analysis_payload_store()[logical_ref] = payload
+        return MaterializedAnalysisView(
+            materialization_id=f"tidmad-{request.binding_id}-{digest[:16]}",
+            invocation_id=request.invocation_id,
+            binding_id=request.binding_id,
+            slot_id=request.slot_id,
+            asset_id=request.asset.asset_id,
+            split_id=request.split_id,
+            content_ref=CertifiedArtifactRef(
+                logical_ref=logical_ref,
+                sha256=digest,
+                media_type="application/x-npz",
+                byte_size=len(payload),
+            ),
+            format_id=request.requested_format_id,
+            population_unit="validation model-input segments",
             total_available=total_available,
             materialized_count=len(example_ids),
             certified_information=request.requested_information,
