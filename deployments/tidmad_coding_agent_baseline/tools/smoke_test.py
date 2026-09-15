@@ -122,12 +122,16 @@ def smoke(
     if result.returncode != 0:
         raise RuntimeError(f"{product} smoke exited {result.returncode}; inspect {log}")
     result_hashes = _verify_results(root)
-    if (
-        re.search(expected_model_regex, log.read_text(errors="replace"), re.IGNORECASE)
-        is None
-    ):
+    identity_evidence = "\n".join(
+        (
+            log.read_text(errors="replace"),
+            (root / "result" / "COMPLETE").read_text(errors="replace"),
+        )
+    )
+    if re.search(expected_model_regex, identity_evidence, re.IGNORECASE) is None:
         raise RuntimeError(
-            f"served model identity matching {expected_model_regex!r} absent from {log}"
+            "served model identity matching "
+            f"{expected_model_regex!r} absent from CLI output and COMPLETE receipt"
         )
     ended = int(time.time())
     atomic_write_json(
