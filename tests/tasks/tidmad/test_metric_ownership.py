@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -14,9 +15,35 @@ from execute_tools.evaluation_metric import (
 )
 from execute_tools.task_data_path import EvaluationReadRequest, TaskEvaluationPayload
 
-from tasks.tidmad.runtime import scoring
-from tasks.tidmad.runtime import tidmad_data_path
+from tasks.tidmad.runtime import scoring, tidmad_data_path
 from tasks.tidmad.runtime.tidmad_data_path import TidmadScope
+
+
+def test_task_scorer_runs_its_external_worker_through_real_spawn(
+    bound_tidmad_profile,
+) -> None:
+    """Catches file-loaded task workers relying on a parent-only module name.
+
+    Empty segment lists deliberately avoid scientific arithmetic and HDF5 I/O;
+    two file tasks still force the production parallel branch and real spawned
+    workers.  Before the generic spawned-file boundary this raises
+    ``ModuleNotFoundError`` / ``BrokenProcessPool``.
+    """
+
+    file_vector, scalar = scoring.score_vector(
+        data_dir="unused",
+        raw_data_dir="unused",
+        sample_set={0: [], 1: []},
+        anchor_map={},
+        s_max=1.0,
+        denoised_filename_fn=lambda file_index: f"unused_{file_index}.h5",
+        parallel=True,
+        num_workers=2,
+        profile=bound_tidmad_profile,
+    )
+
+    assert file_vector == [None] * 20
+    assert math.isinf(scalar) and scalar < 0
 
 
 def test_composed_metric_uses_the_task_owned_scoreability_contract() -> None:
