@@ -10,6 +10,8 @@ from pathlib import Path
 
 from .deadline import load_or_create
 
+SUPERVISOR_GROUP = "baseline-results"
+
 
 def timer_text(description: str, epoch: int, unit: str) -> str:
     return f"""[Unit]
@@ -47,7 +49,7 @@ def install_schedule(
     start_epoch: int,
     systemd_root: Path,
     deadline_path: Path,
-    agent_group: str = "baseline-agent",
+    agent_group: str = SUPERVISOR_GROUP,
 ) -> None:
     if os.geteuid() != 0:
         raise PermissionError("schedule installation must run as root")
@@ -103,7 +105,7 @@ def main() -> int:
     parser.add_argument(
         "--deadline", type=Path, default=Path("/work/state/deadline.json")
     )
-    parser.add_argument("--agent-group", default="baseline-agent")
+    parser.add_argument("--agent-group", default=SUPERVISOR_GROUP)
     args = parser.parse_args()
     install_schedule(
         args.scheduled_start_epoch,
