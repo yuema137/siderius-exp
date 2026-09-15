@@ -48,8 +48,14 @@ input is an evaluator-created batch of raw, non-overlapping 40,000-sample
 segments. Segmentation, file handling, ADC offset conversion, output decoding,
 reassembly, and HDF5 writing are fixed evaluator operations; candidate-specific
 free-form preprocessing or postprocessing outside the submitted model is not
-part of this task. Within that model boundary, architecture and training choices
-are yours.
+part of this task.
+
+The permitted solution class is a learned ML model fitted from the provided
+labelled training data. A standalone hand-designed filter, analytic
+reconstruction rule, lookup table, or other free-form data-processing pipeline
+is not a valid solution merely because it is wrapped in model-shaped code.
+Within the fixed segment-model interface, you may choose the model architecture,
+loss, optimizer, hyperparameters, and training experiments.
 
 The exact injected frequencies, scoring anchors, official validation inputs,
 and official validation truth are not part of the information available to the
@@ -94,8 +100,8 @@ An unexpectedly high raw score is a reason to inspect scientific validity; it
 does not override Health and is not, by itself, evidence of improvement.
 
 These are evaluation requirements, not a prescribed experiment schedule. You
-choose the ML architectures, training procedure, experiments, and order of work
-within the stated time, compute, storage, security, and deliverable constraints.
+choose how to train and compare permitted ML models within the stated time,
+compute, storage, security, input, and deliverable constraints.
 
 For every candidate that you want evaluated, retain enough material to reload
 and reproduce it: model source code, `weights.pth`, `architecture.json`,
