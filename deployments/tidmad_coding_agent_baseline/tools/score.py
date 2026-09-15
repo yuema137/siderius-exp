@@ -1,0 +1,266 @@
+"""Expose the existing task-owned scorer without a second scientific formula."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+import shutil
+import stat
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any
+
+from .archive_candidate import (
+    archive_candidate,
+    candidate_tree_digest,
+    validate_candidate_source,
+)
+from .evaluator_policy import EvaluatorPolicy
+from .io import atomic_write_json, fsync_directory
+from .model import BANDS
+
+
+def _load_runtime(input_root: Path):
+    """Import the immutable task snapshot and its pinned generic dependencies."""
+
+    resolved = str(input_root.resolve())
+    if resolved not in sys.path:
+        sys.path.insert(0, resolved)
+    from execute_tools.dataset_config import load_dataset_profile
+
+    from tasks.tidmad.runtime.anchor_map import load_anchor_map
+    from tasks.tidmad.runtime.scoreability import TidmadScoreabilityContract
+    from tasks.tidmad.runtime.scoring import score_vector
+
+    return (
+        load_dataset_profile,
+        load_anchor_map,
+        TidmadScoreabilityContract,
+        score_vector,
+    )
+
+
+def _sample_set(path: Path) -> dict[int, list[int]]:
+    payload = json.loads(path.read_text())
+    if not isinstance(payload, dict):
+        raise TypeError("sample set must be a JSON object")
+    return {
+        int(key): [int(value) for value in values] for key, values in payload.items()
+    }
+
+
+def _deliverable_name(input_root: Path, file_index: int) -> str:
+    spec = json.loads(
+        (
+            input_root / "tasks" / "tidmad" / "resolved" / "deliverable_spec.json"
+        ).read_text()
+    )
+    naming = spec["naming"]
+    return f"{naming['prefix']}_{file_index:0{int(naming['index_width'])}d}{naming['extension']}"
+
+
+def _scoreability(
+    input_root: Path, deliverables: dict[int, str], contract_type: Any
+) -> None:
+    metric = json.loads(
+        (input_root / "tasks" / "tidmad" / "resolved" / "metric_spec.json").read_text()
+    )
+    contract = contract_type(**metric["scoreability"])
+    for raw_path in deliverables.values():
+        path = Path(raw_path)
+        mode = path.lstat().st_mode
+        if path.is_symlink() or not stat.S_ISREG(mode):
+            raise ValueError(f"candidate deliverable must be a regular file: {path}")
+    verdict = contract.check(deliverables)
+    if not verdict.scoreable:
+        details = "; ".join(
+            f"{item.requirement}: {item.detail}" for item in verdict.failures
+        )
+        raise ValueError(f"candidate deliverables are not scoreable: {details}")
+
+
+def compute_score(
+    *,
+    input_root: Path,
+    raw_data_dir: Path,
+    denoised_dir: Path,
+    sample_set_path: Path,
+    workers: int,
+) -> tuple[dict[str, Any], list[Path]]:
+    load_profile, load_anchors, contract_type, score_vector = _load_runtime(input_root)
+    task_root = input_root / "tasks" / "tidmad"
+    profile = load_profile(task_root / "resolved" / "dataset_profile.json")
+    anchor_map = load_anchors(task_root / "reference_data" / "segment_anchors.json")
+    sample_set = _sample_set(sample_set_path)
+    paths = [
+        denoised_dir / _deliverable_name(input_root, index) for index in sample_set
+    ]
+    deliverables = {
+        index: str(path) for index, path in zip(sample_set, paths, strict=True)
+    }
+    _scoreability(input_root, deliverables, contract_type)
+    file_vector, scalar = score_vector(
+        data_dir=str(denoised_dir),
+        sample_set=sample_set,
+        anchor_map=anchor_map["anchors"],
+        s_max=float(anchor_map["s_max"]),
+        denoised_filename_fn=lambda index: _deliverable_name(input_root, index),
+        raw_data_dir=str(raw_data_dir),
+        parallel=workers > 1,
+        num_workers=workers,
+        legacy_mode=False,
+        profile=profile,
+    )
+    valid = math.isfinite(float(scalar))
+    return (
+        {
+            "version": "tidmad-coding-agent-score-v1",
+            "valid": valid,
+            "scalar": float(scalar),
+            "file_vector": file_vector,
+            "sample_set": {str(key): value for key, value in sample_set.items()},
+        },
+        paths,
+    )
+
+
+def _delete_scored_deliverables(paths: list[Path]) -> None:
+    for path in paths:
+        path.unlink()
+
+
+def score_candidate(
+    args: argparse.Namespace, policy: EvaluatorPolicy | None = None
+) -> Path:
+    policy = policy or EvaluatorPolicy()
+    candidate_source = policy.agent_path(
+        args.candidate_source, label="candidate source"
+    )
+    denoised_dir = policy.agent_path(args.denoised_dir, label="denoised directory")
+    sample_set = policy.scope_path(args.scope, band=args.band)
+    policy.archive_root.parent.mkdir(parents=True, exist_ok=True)
+    snapshot_root = Path(
+        tempfile.mkdtemp(
+            prefix=f".{args.candidate_id}.snapshot.", dir=policy.archive_root.parent
+        )
+    )
+    snapshot = snapshot_root / "candidate"
+    # Preserve links as links so an evaluator-owned copy cannot dereference an
+    # agent-created link into hidden truth or another privileged path.
+    shutil.copytree(candidate_source, snapshot, symlinks=True)
+    validate_candidate_source(snapshot)
+    candidate_digest = candidate_tree_digest(snapshot)
+    try:
+        score, deliverables = compute_score(
+            input_root=policy.input_root,
+            raw_data_dir=policy.raw_data_dir,
+            denoised_dir=denoised_dir,
+            sample_set_path=sample_set,
+            workers=args.workers,
+        )
+        score["candidate_tree_sha256"] = candidate_digest
+        return _publish_candidate_score(
+            args=args,
+            policy=policy,
+            snapshot=snapshot,
+            score=score,
+            deliverables=deliverables,
+        )
+    finally:
+        shutil.rmtree(snapshot_root)
+
+
+def _publish_candidate_score(
+    *,
+    args: argparse.Namespace,
+    policy: EvaluatorPolicy,
+    snapshot: Path,
+    score: dict[str, Any],
+    deliverables: list[Path],
+) -> Path:
+    descriptor, raw_score = tempfile.mkstemp(
+        prefix=f".{args.candidate_id}.score.",
+        suffix=".json",
+        dir=policy.archive_root.parent,
+    )
+    os.close(descriptor)
+    temporary_score = Path(raw_score)
+    atomic_write_json(temporary_score, score)
+    try:
+        destination = archive_candidate(
+            source=snapshot,
+            score_path=temporary_score,
+            archive_root=policy.archive_root,
+            band=args.band,
+            candidate_id=args.candidate_id,
+        )
+    finally:
+        temporary_score.unlink(missing_ok=True)
+    _delete_scored_deliverables(deliverables)
+    return destination
+
+
+def _winner_map(values: list[str]) -> dict[str, str]:
+    winners: dict[str, str] = {}
+    for value in values:
+        band, separator, candidate_id = value.partition("=")
+        if not separator or band not in BANDS or not candidate_id:
+            raise ValueError(f"invalid --winner value: {value!r}")
+        winners[band] = candidate_id
+    if set(winners) != set(BANDS):
+        raise ValueError("final scoring requires exactly one winner for every band")
+    return winners
+
+
+def score_final(
+    args: argparse.Namespace, policy: EvaluatorPolicy | None = None
+) -> Path:
+    policy = policy or EvaluatorPolicy()
+    winners = _winner_map(args.winner)
+    denoised_dir = policy.agent_path(args.denoised_dir, label="denoised directory")
+    sample_set = policy.scope_path(args.scope, band=None)
+    score, deliverables = compute_score(
+        input_root=policy.input_root,
+        raw_data_dir=policy.raw_data_dir,
+        denoised_dir=denoised_dir,
+        sample_set_path=sample_set,
+        workers=args.workers,
+    )
+    if not score["valid"] or any(value is None for value in score["file_vector"]):
+        raise ValueError("final score must be finite and cover all 20 validation files")
+    score["winner_candidates"] = winners
+    atomic_write_json(policy.final_score, score)
+    policy.final_score.chmod(0o440)
+    fsync_directory(policy.final_score.parent)
+    _delete_scored_deliverables(deliverables)
+    return policy.final_score
+
+
+def _common(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--denoised-dir", type=Path, required=True)
+    parser.add_argument("--scope", required=True)
+    parser.add_argument("--workers", type=int, default=8)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="mode", required=True)
+    candidate = subparsers.add_parser("candidate")
+    _common(candidate)
+    candidate.add_argument("--candidate-source", type=Path, required=True)
+    candidate.add_argument("--band", choices=BANDS, required=True)
+    candidate.add_argument("--candidate-id", required=True)
+    final = subparsers.add_parser("final")
+    _common(final)
+    final.add_argument("--winner", action="append", required=True)
+    args = parser.parse_args()
+    output = score_candidate(args) if args.mode == "candidate" else score_final(args)
+    print(output)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

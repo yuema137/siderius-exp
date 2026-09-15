@@ -2,6 +2,13 @@
 
 Deployment configuration is explicit and portable. Machine-specific values arrive through configuration or environment variables and are never hidden in task or framework code.
 
+## Available packages
+
+- [TIDMAD coding-agent baseline](tidmad_coding_agent_baseline/README.md):
+  prepares isolated Codex and Claude Code product baselines from the existing
+  TIDMAD task package. It does not define a new task or add a workflow to the
+  agents.
+
 ## Planned campaign topology
 
 This table records resource ownership intent only. It is not an executable

@@ -1,0 +1,12 @@
+[Unit]
+Description=Periodically back up completed TIDMAD baseline candidates
+
+[Timer]
+OnBootSec=10m
+OnUnitActiveSec=10m
+RandomizedDelaySec=30
+Persistent=true
+Unit=tidmad-baseline-backup.service
+
+[Install]
+WantedBy=timers.target
