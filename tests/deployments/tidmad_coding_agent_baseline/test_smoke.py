@@ -54,6 +54,7 @@ def test_smoke_runs_product_from_the_declared_smoke_root(tmp_path, monkeypatch):
             return SimpleNamespace(stdout="codex-cli test\n", returncode=0)
         observed_cwd = kwargs.get("cwd")
         kwargs["stdout"].write(b'{"model":"gpt-5.6-sol"}\n')
+        _complete_result(observed_cwd)
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(smoke_test.subprocess, "run", fake_run)
@@ -66,3 +67,31 @@ def test_smoke_runs_product_from_the_declared_smoke_root(tmp_path, monkeypatch):
 
     assert observed_cwd == root
     assert "write non-empty confirmation text" in smoke_test.SMOKE_PROMPT
+
+
+def test_smoke_accepts_served_model_identity_from_complete_receipt(
+    tmp_path, monkeypatch
+):
+    observed_cwd = None
+
+    def fake_run(command, **kwargs):
+        nonlocal observed_cwd
+        if command == ["codex", "--version"]:
+            return SimpleNamespace(stdout="codex-cli test\n", returncode=0)
+        observed_cwd = kwargs.get("cwd")
+        kwargs["stdout"].write(b'{"type":"turn.completed"}\n')
+        result = _complete_result(observed_cwd)
+        (result / "COMPLETE").write_text(
+            "Serving model identity: Codex (GPT-5).\n"
+        )
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(smoke_test.subprocess, "run", fake_run)
+    monkeypatch.setattr(smoke_test, "_help_text", lambda _product: "all flags present")
+    monkeypatch.setattr(smoke_test, "_required_flags", lambda _product: ())
+
+    root = tmp_path / "smoke"
+    smoke_test.smoke("codex", root, "GPT-5", 10)
+
+    assert observed_cwd == root
+    assert (root / "smoke_receipt.json").is_file()
