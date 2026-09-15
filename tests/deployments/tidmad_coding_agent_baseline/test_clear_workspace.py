@@ -51,6 +51,12 @@ def test_clear_removes_external_drill_candidates_and_recreates_roots(
     retained = tmp_path / "var" / "lib" / "tidmad-baseline"
     (retained / "candidates" / "drill").mkdir(parents=True)
     (retained / "candidates" / "drill" / "weights.pth").write_bytes(b"drill")
+    (retained / "evaluations" / "0-3").mkdir(parents=True)
+    (retained / "evaluations" / "0-3" / "drill.json").write_text("{}")
+    (retained / "health-configs" / "scope-0-1-2-3").mkdir(parents=True)
+    (retained / "health-configs" / "scope-0-1-2-3" / "effective.yaml").write_text(
+        "drill"
+    )
     (retained / "backup-receipts").mkdir()
     (retained / "final_score.json").write_text("{}")
     monkeypatch.setattr("shutil.chown", lambda *_args, **_kwargs: None)
@@ -64,5 +70,7 @@ def test_clear_removes_external_drill_candidates_and_recreates_roots(
     )
 
     assert list((retained / "candidates").iterdir()) == []
+    assert list((retained / "evaluations").iterdir()) == []
+    assert list((retained / "health-configs").iterdir()) == []
     assert list((retained / "backup-receipts").iterdir()) == []
     assert not (retained / "final_score.json").exists()
