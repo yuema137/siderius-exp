@@ -276,17 +276,20 @@ class _ValidationSegment:
 
 
 class TIDMADValidationDataset(Dataset):
-    """Memory-bounded, exact validation view over selected HDF5 segments.
+    """Exact validation view that reads selected HDF5 rows on demand.
 
     Construction validates file/channel presence, physical segment bounds and
     the complete logical row map, but does not read signal arrays. Individual
-    ML rows are read lazily when a DataLoader requests them, so peak resident
-    data is governed by the loader batch rather than the complete Formal
-    validation scope.
+    ML rows are read when a DataLoader requests them, so peak resident data is
+    governed by the loader batch rather than the complete Formal scope.
 
     HDF5 handles are cached per process. The PID check and ``__getstate__``
-    keep the dataset safe if a future caller opts into worker processes; a
-    worker never inherits and reuses its parent's open HDF5 handles.
+    ensure a future worker process never reuses its parent's open handles.
+
+    This class remains in the task-data-path plugin module deliberately. File
+    plugins are cold-loaded without adding the experiment repository to
+    ``sys.path``; moving this implementation to an unpinned sibling import
+    would make the real training/inference children unable to load the task.
     """
 
     def __init__(
@@ -319,34 +322,8 @@ class TIDMADValidationDataset(Dataset):
             if not os.path.exists(file_path):
                 continue
 
-            with h5py.File(file_path, "r") as handle:
-                input_data = _h5_dataset(
-                    handle,
-                    "timeseries",
-                    self._channels.input_channel,
-                    "timeseries",
-                )
-                target_data = _h5_dataset(
-                    handle,
-                    "timeseries",
-                    self._channels.target_channel,
-                    "timeseries",
-                )
-                available = (
-                    min(len(input_data), len(target_data))
-                    // self._dataset.psd_segment_length
-                )
-                selected = tuple(int(segment) for segment in sample_set[file_key])
-                invalid = [
-                    segment for segment in selected if not 0 <= segment < available
-                ]
-                if invalid:
-                    raise ValidationScopeError(
-                        f"validation scope requests PSD segment(s) {invalid!r} "
-                        f"of file {file_index}, but {file_path!r} holds only "
-                        f"{available} complete PSD segment(s)."
-                    )
-
+            selected = tuple(int(segment) for segment in sample_set[file_key])
+            self._validate_segments(file_path, file_index, selected)
             file_start = rows_so_far
             for psd_index in selected:
                 row_end = rows_so_far + self._ml_segs_per_psd
@@ -364,6 +341,28 @@ class TIDMADValidationDataset(Dataset):
                 self.file_row_ranges[file_index] = (file_start, rows_so_far)
 
         self._row_count = rows_so_far
+
+    def _validate_segments(
+        self, file_path: str, file_index: int, selected: tuple[int, ...]
+    ) -> None:
+        with h5py.File(file_path, "r") as handle:
+            input_data = _h5_dataset(
+                handle, "timeseries", self._channels.input_channel, "timeseries"
+            )
+            target_data = _h5_dataset(
+                handle, "timeseries", self._channels.target_channel, "timeseries"
+            )
+            available = (
+                min(len(input_data), len(target_data))
+                // self._dataset.psd_segment_length
+            )
+        invalid = [segment for segment in selected if not 0 <= segment < available]
+        if invalid:
+            raise ValidationScopeError(
+                f"validation scope requests PSD segment(s) {invalid!r} of file "
+                f"{file_index}, but {file_path!r} holds only {available} complete "
+                "PSD segment(s)."
+            )
 
     def __len__(self) -> int:
         return self._row_count
