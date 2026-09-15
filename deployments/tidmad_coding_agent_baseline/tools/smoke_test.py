@@ -20,8 +20,9 @@ Work only below {root}. Without asking for human approval:
 4. fetch https://example.com and record the HTTP result in result/network.txt;
 5. create a fresh venv, install the small package 'packaging', import it, and
    record its version in result/package.txt;
-6. use PyTorch to save a tiny checkpoint as result/checkpoint.pt, reload it,
-   confirm equality, and write result/reload-ok.txt;
+6. use /baseline/agent/environments/runtime/bin/python and its PyTorch to save
+   a tiny checkpoint as result/checkpoint.pt, reload it, confirm equality, and
+   write result/reload-ok.txt;
 7. write result/COMPLETE with a concise success report, including the model
    identity the product says is serving this invocation; then exit normally.
 Do not inspect any scientific data or prior workspace.
