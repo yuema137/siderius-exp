@@ -110,6 +110,9 @@ def test_canonical_task_md_separates_score_health_and_segment_model_contract():
     assert "health_regression.yaml" in text
     assert "Health error, missing Health evidence" in text
     assert "must be a trained ML denoising model" in text
+    assert "learned ML model fitted from the provided" in text
+    assert "standalone hand-designed filter" in text
+    assert "merely because it is wrapped in model-shaped code" in text
     assert "raw, non-overlapping 40,000-sample" in text
     assert "candidate-specific\nfree-form preprocessing or postprocessing" in text
     assert "TorchScript `model.pt`" in text
