@@ -363,7 +363,13 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
 
 
 def test_watchdog_replay_is_explicit_and_bounded(tmp_path: Path) -> None:
-    """The #388 replay must opt into watchdogs without widening the workload."""
+    """The #388 replay must actually request Trial then forced Formal.
+
+    One round plus ``--force_formal_round`` executes only Formal.  This test
+    therefore pins both the two-round count and the final-round policy; losing
+    either silently destroys the Trial measurement that the replay exists to
+    carry into Formal admission.
+    """
     checkout = _siderius_checkout()
     data_dir = tmp_path / "data"
     for network in ("cpdb", "ltg"):
@@ -403,7 +409,10 @@ def test_watchdog_replay_is_explicit_and_bounded(tmp_path: Path) -> None:
     expected_values = {
         "--run_name": "cancer_two_network_watchdog_replay",
         "--start_iteration": "1",
-        "--max_rounds": "1",
+        "--max_rounds": "2",
+        "--skip_formal_min_delta": "-1.0",
+        "--formal_round_strategy": "full_clone",
+        "--plan_overrides": '{"is_trial":true}',
         "--max_epochs": "1",
         "--trial_max_epochs": "1",
         "--formal_max_epochs": "1",
