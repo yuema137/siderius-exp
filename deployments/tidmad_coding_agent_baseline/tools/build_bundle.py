@@ -91,7 +91,9 @@ def _build_evaluator(
     wheels = list(wheel_dir.glob("*.whl"))
     if len(wheels) != 1:
         raise RuntimeError(f"expected one SIDERIUS wheel, found {len(wheels)}")
-    shutil.copy2(wheels[0], output / "siderius.whl")
+    wheel_name = wheels[0].name
+    shutil.copy2(wheels[0], output / wheel_name)
+    (output / "siderius-wheel-name.txt").write_text(f"{wheel_name}\n")
     requirements = subprocess.run(
         [
             "uv",
@@ -111,7 +113,7 @@ def _build_evaluator(
     (output / "requirements.txt").write_text(requirements)
     shutil.rmtree(wheel_dir)
     shutil.rmtree(source_dir)
-    return actual, sha256_file(output / "siderius.whl")
+    return actual, sha256_file(output / wheel_name)
 
 
 def _write_checksums(root: Path, output: Path) -> None:

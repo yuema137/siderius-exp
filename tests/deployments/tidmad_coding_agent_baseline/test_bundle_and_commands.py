@@ -34,7 +34,9 @@ def test_bundle_requires_task_md_and_snapshots_existing_task_unchanged(
         build_bundle(missing, siderius_checkout, tmp_path / "missing.tar.gz")
 
     def fake_build(_repo, _checkout, output):
-        (output / "siderius.whl").write_bytes(b"test wheel")
+        wheel = "siderius-0.2.0rc6-py3-none-any.whl"
+        (output / wheel).write_bytes(b"test wheel")
+        (output / "siderius-wheel-name.txt").write_text(f"{wheel}\n")
         (output / "requirements.txt").write_text("numpy==2.5.2\n")
         return "1" * 40, "f" * 64
 
@@ -53,7 +55,10 @@ def test_bundle_requires_task_md_and_snapshots_existing_task_unchanged(
             for name in names
         )
         assert "tidmad-coding-agent-baseline/input/bundle.sha256" in names
-        assert "tidmad-coding-agent-baseline/evaluator/siderius.whl" in names
+        assert (
+            "tidmad-coding-agent-baseline/evaluator/"
+            "siderius-0.2.0rc6-py3-none-any.whl"
+        ) in names
         assert "tidmad-coding-agent-baseline/evaluator/requirements.txt" in names
 
         repo = Path(__file__).resolve().parents[3]

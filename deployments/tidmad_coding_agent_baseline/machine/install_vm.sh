@@ -13,14 +13,24 @@ fi
 PRODUCT="$1"
 BUNDLE_ROOT="$(cd "$2" && pwd -P)"
 PYTHON_BIN="${BASELINE_PYTHON_BIN:-python3.12}"
-SIDERIUS_WHEEL="${BUNDLE_ROOT}/evaluator/siderius.whl"
+WHEEL_NAME_FILE="${BUNDLE_ROOT}/evaluator/siderius-wheel-name.txt"
 EVALUATOR_REQUIREMENTS="${BUNDLE_ROOT}/evaluator/requirements.txt"
 if [ "$PRODUCT" != codex ] && [ "$PRODUCT" != claude ]; then
     echo "ERROR: product must be codex or claude" >&2
     exit 2
 fi
-if [ ! -f "$SIDERIUS_WHEEL" ] || [ ! -f "$EVALUATOR_REQUIREMENTS" ]; then
+if [ ! -f "$WHEEL_NAME_FILE" ] || [ ! -f "$EVALUATOR_REQUIREMENTS" ]; then
     echo "ERROR: pinned evaluator environment is incomplete" >&2
+    exit 2
+fi
+WHEEL_NAME="$(tr -d '\r\n' <"$WHEEL_NAME_FILE")"
+if [ -z "$WHEEL_NAME" ] || [ "$(basename "$WHEEL_NAME")" != "$WHEEL_NAME" ]; then
+    echo "ERROR: invalid pinned evaluator wheel name" >&2
+    exit 2
+fi
+SIDERIUS_WHEEL="${BUNDLE_ROOT}/evaluator/${WHEEL_NAME}"
+if [ ! -f "$SIDERIUS_WHEEL" ]; then
+    echo "ERROR: pinned evaluator wheel is missing: $WHEEL_NAME" >&2
     exit 2
 fi
 if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
@@ -83,7 +93,7 @@ cp -a "${BUNDLE_ROOT}/evaluator/." /opt/tidmad-evaluator/assets/
 /opt/tidmad-evaluator/venv/bin/pip install --disable-pip-version-check \
     --requirement /opt/tidmad-evaluator/assets/requirements.txt
 /opt/tidmad-evaluator/venv/bin/pip install --disable-pip-version-check \
-    --no-deps /opt/tidmad-evaluator/assets/siderius.whl
+    --no-deps "/opt/tidmad-evaluator/assets/${WHEEL_NAME}"
 EVALUATOR_SITE="$(/opt/tidmad-evaluator/venv/bin/python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
 cp -a /work/harness/baseline_harness "$EVALUATOR_SITE/"
 chown -R baseline-evaluator:baseline-evaluator /opt/tidmad-evaluator
