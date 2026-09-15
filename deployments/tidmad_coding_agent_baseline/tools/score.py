@@ -10,6 +10,7 @@ import shutil
 import stat
 import sys
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +21,7 @@ from .archive_candidate import (
 )
 from .evaluator_policy import EvaluatorPolicy
 from .io import atomic_write_json, fsync_directory
-from .model import BANDS
+from .model import BANDS, utc_text
 
 
 def _load_runtime(input_root: Path):
@@ -162,6 +163,11 @@ def score_candidate(
             workers=args.workers,
         )
         score["candidate_tree_sha256"] = candidate_digest
+        scored_epoch = int(time.time())
+        score["score_epoch"] = scored_epoch
+        score["score_utc"] = utc_text(scored_epoch)
+        score["run_id"] = os.environ.get("BASELINE_RUN_ID")
+        score["invocation_id"] = os.environ.get("BASELINE_INVOCATION_ID")
         return _publish_candidate_score(
             args=args,
             policy=policy,

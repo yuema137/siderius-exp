@@ -33,8 +33,6 @@ def command_for(product: AgentProduct, prompt: Path) -> list[str]:
             "--effort",
             "medium",
             "--dangerously-skip-permissions",
-            "--permission-prompts",
-            "none",
             "--output-format",
             "stream-json",
             "--verbose",

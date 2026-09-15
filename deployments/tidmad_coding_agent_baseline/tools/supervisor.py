@@ -37,7 +37,13 @@ def _wait_for_start(start_epoch: int) -> None:
 
 
 def _run_once(
-    *, product: AgentProduct, prompt: Path, log_path: Path, deadline_epoch: int
+    *,
+    product: AgentProduct,
+    prompt: Path,
+    log_path: Path,
+    deadline_epoch: int,
+    run_id: str,
+    invocation_id: str,
 ) -> tuple[int, bool]:
     command = command_for(product, prompt)
     prompt_input = prompt_bytes(prompt)
@@ -49,6 +55,11 @@ def _run_once(
             stdout=output,
             stderr=subprocess.STDOUT,
             start_new_session=True,
+            env={
+                **os.environ,
+                "BASELINE_RUN_ID": run_id,
+                "BASELINE_INVOCATION_ID": invocation_id,
+            },
         )
         assert process.stdin is not None
         process.stdin.write(prompt_input)
@@ -77,11 +88,13 @@ def supervise(
     deadline = load_or_create(state / "deadline.json", scheduled_start_epoch)
     _wait_for_start(deadline.scheduled_start_epoch)
     actual_start = int(time.time())
+    run_id = f"{product}-{deadline.scheduled_start_epoch}"
     create_json_once(
         state / "run_start.json",
         {
             "version": "tidmad-coding-agent-run-start-v1",
             "product": product,
+            "run_id": run_id,
             "scheduled_start_epoch": deadline.scheduled_start_epoch,
             "scheduled_start_utc": utc_text(deadline.scheduled_start_epoch),
             "actual_start_epoch": actual_start,
@@ -93,6 +106,7 @@ def supervise(
     invocation = sum(1 for _ in receipts.open("rb")) if receipts.exists() else 0
     while int(time.time()) < deadline.agent_deadline_epoch:
         invocation += 1
+        invocation_id = f"{run_id}-invocation-{invocation:04d}"
         started = int(time.time())
         log_path = logs / f"{product}-invocation-{invocation:04d}.jsonl"
         returncode, deadline_stop = _run_once(
@@ -100,12 +114,15 @@ def supervise(
             prompt=prompt,
             log_path=log_path,
             deadline_epoch=deadline.agent_deadline_epoch,
+            run_id=run_id,
+            invocation_id=invocation_id,
         )
         ended = int(time.time())
         _append_receipt(
             receipts,
             {
                 "invocation": invocation,
+                "invocation_id": invocation_id,
                 "started_epoch": started,
                 "started_utc": utc_text(started),
                 "ended_epoch": ended,

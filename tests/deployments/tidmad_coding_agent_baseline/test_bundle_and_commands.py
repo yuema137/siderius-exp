@@ -21,7 +21,7 @@ def test_product_commands_pin_models_effort_and_noninteractive_permissions(tmp_p
     assert "--search" in codex
     assert "--dangerously-skip-permissions" in claude
     assert claude[claude.index("--effort") + 1] == "medium"
-    assert claude[claude.index("--permission-prompts") + 1] == "none"
+    assert "--permission-prompts" not in claude
 
 
 def test_bundle_requires_task_md_and_snapshots_existing_task_unchanged(

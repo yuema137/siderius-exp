@@ -35,3 +35,8 @@ def test_normal_agent_exit_restarts_until_one_fixed_deadline(tmp_path, monkeypat
     ]
     assert [item["invocation"] for item in receipts] == [1, 2]
     assert all(call["deadline_epoch"] == 105 for call in invocations)
+    assert [call["invocation_id"] for call in invocations] == [
+        "codex-100-invocation-0001",
+        "codex-100-invocation-0002",
+    ]
+    assert all(call["run_id"] == "codex-100" for call in invocations)

@@ -51,6 +51,8 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(
     deliverable = tmp_path / "denoised.h5"
     deliverable.write_bytes(b"temporary")
     events = []
+    monkeypatch.setenv("BASELINE_RUN_ID", "codex-100")
+    monkeypatch.setenv("BASELINE_INVOCATION_ID", "codex-100-invocation-0001")
 
     monkeypatch.setattr(
         score,
@@ -64,6 +66,10 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(
     def archive(**kwargs):
         assert deliverable.exists()
         assert kwargs["score_path"].exists()
+        receipt = json.loads(kwargs["score_path"].read_text())
+        assert receipt["score_utc"].endswith("Z")
+        assert receipt["run_id"] == "codex-100"
+        assert receipt["invocation_id"] == "codex-100-invocation-0001"
         events.append("archive")
         return tmp_path / "published"
 

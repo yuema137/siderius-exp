@@ -83,7 +83,6 @@ def _required_flags(product: str) -> tuple[str, ...]:
         )
     return (
         "--dangerously-skip-permissions",
-        "--permission-prompts",
         "--effort",
         "--model",
         "--output-format",

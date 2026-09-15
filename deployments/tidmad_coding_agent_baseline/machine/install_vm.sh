@@ -90,13 +90,13 @@ chown -R baseline-evaluator:baseline-evaluator /opt/tidmad-evaluator
 chmod -R o-rwx /opt/tidmad-evaluator
 
 cat >/etc/sudoers.d/tidmad-baseline-score <<'EOF'
-baseline-agent ALL=(baseline-evaluator) NOPASSWD: /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score *
+baseline-agent ALL=(baseline-evaluator) NOPASSWD:SETENV: /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score *
 EOF
 chmod 0440 /etc/sudoers.d/tidmad-baseline-score
 
 cat >/usr/local/bin/tidmad-score <<'EOF'
 #!/bin/sh
-exec sudo -n -u baseline-evaluator \
+exec sudo -n --preserve-env=BASELINE_RUN_ID,BASELINE_INVOCATION_ID -u baseline-evaluator \
     /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score "$@"
 EOF
 chmod 0755 /usr/local/bin/tidmad-score
