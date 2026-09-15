@@ -82,6 +82,16 @@ def _authorized_request(*, profile, window_samples: int, information_class: str 
     return AuthorizedAnalysisMaterializationRequest(request=request, authorization_receipt=receipt)
 
 
+def _with_requested_format(authorized, format_id: str):
+    request = authorized.request.model_copy(update={"requested_format_id": format_id})
+    receipt = authorized.authorization_receipt.model_copy(
+        update={"request_digest": canonical_sha256(request)}
+    )
+    return AuthorizedAnalysisMaterializationRequest(
+        request=request, authorization_receipt=receipt
+    )
+
+
 def _write_validation_file(root, *, profile, samples: int) -> np.ndarray:
     topology = tidmad_topology(profile)
     values = np.arange(samples, dtype=np.int16) % 255 - 128
@@ -233,6 +243,31 @@ def test_task_adapter_does_not_treat_requested_information_as_authority(
         pytest.raises(ValueError, match="does not match TIDMAD asset role"),
     ):
         TidmadTaskDataPath().materialize_analysis_view(authorized)
+
+
+def test_window_asset_numeric_format_does_not_become_model_segment_scope(
+    tmp_path, tidmad_profile
+) -> None:
+    """Fails if representation choice overrides the asset's scientific role."""
+
+    window_samples = 32
+    _write_validation_file(tmp_path, profile=tidmad_profile, samples=3 * window_samples)
+    capability = TidmadTaskDataPath()
+    authorized = _with_requested_format(
+        _authorized_request(profile=tidmad_profile, window_samples=window_samples),
+        "siderius.numeric-array.v1",
+    )
+
+    with bind_dataset_profile(tidmad_profile), bind_physical_data_root(str(tmp_path)):
+        view = capability.materialize_analysis_view(authorized)
+
+    exported = tmp_path / "window-numeric.npz"
+    capability.export_analysis_materialization(view.content_ref, exported)
+    with np.load(exported, allow_pickle=False) as payload:
+        assert set(payload.files) == {"example_ids", "information__data"}
+        assert payload["information__data"].shape == (2, window_samples)
+    assert view.format_id == "siderius.numeric-array.v1"
+    assert view.population_unit == "fixed-duration validation windows"
 
 
 def test_model_input_segments_match_ordinary_row_geometry_without_target_read(

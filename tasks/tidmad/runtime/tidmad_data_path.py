@@ -385,16 +385,25 @@ class TidmadTaskDataPath:
         """
 
         request = authorized.request
-        if request.requested_format_id == NUMERIC_ARRAY_V1:
+        location = request.asset.location
+        model_segment_roles = {
+            "validation_model_input_segments",
+            "validation_model_target_segments",
+        }
+        if (
+            isinstance(location, TaskDataAssetLocation)
+            and location.logical_role in model_segment_roles
+        ):
+            if request.requested_format_id != NUMERIC_ARRAY_V1:
+                raise ValueError("TIDMAD model-segment assets require numeric-array.v1")
             return self._materialize_model_segment_view(authorized)
-        if request.requested_format_id != TIMESERIES_ARRAY_V1:
+        if request.requested_format_id not in {NUMERIC_ARRAY_V1, TIMESERIES_ARRAY_V1}:
             raise ValueError(
                 "TIDMAD analysis supports only numeric-array.v1 and "
                 "timeseries-array.v1"
             )
         if not isinstance(request.requested_scope, LegacyPartitionScope):
             raise ValueError("TIDMAD analysis requires a legacy-partition scope")
-        location = request.asset.location
         if not isinstance(location, TaskDataAssetLocation):
             raise ValueError("TIDMAD analysis requires a task-data asset")
         requested_classes = tuple(item.information_class for item in request.requested_information)
@@ -485,19 +494,26 @@ class TidmadTaskDataPath:
             selected_count=len(example_ids),
         )
         buffer = io.BytesIO()
-        np.savez(
-            buffer,
-            example_ids=example_ids,
-            channel_ids=np.asarray([channel_name], dtype="U32"),
-            valid_mask=np.ones((len(example_ids), window_samples), dtype=np.bool_),
-            time_start_seconds=np.zeros(len(example_ids), dtype=np.float64),
-            time_step_seconds=np.full(
-                len(example_ids),
-                1.0 / topology.dataset.sampling_frequency,
-                dtype=np.float64,
-            ),
-            **{f"information__{expected[0]}": rows[:, np.newaxis, :]},
-        )
+        if request.requested_format_id == TIMESERIES_ARRAY_V1:
+            np.savez(
+                buffer,
+                example_ids=example_ids,
+                channel_ids=np.asarray([channel_name], dtype="U32"),
+                valid_mask=np.ones((len(example_ids), window_samples), dtype=np.bool_),
+                time_start_seconds=np.zeros(len(example_ids), dtype=np.float64),
+                time_step_seconds=np.full(
+                    len(example_ids),
+                    1.0 / topology.dataset.sampling_frequency,
+                    dtype=np.float64,
+                ),
+                **{f"information__{expected[0]}": rows[:, np.newaxis, :]},
+            )
+        else:
+            np.savez(
+                buffer,
+                example_ids=example_ids,
+                **{f"information__{expected[0]}": rows},
+            )
         payload = buffer.getvalue()
         digest = hashlib.sha256(payload).hexdigest()
         logical_ref = f"opaque://tidmad-analysis/{request.binding_id}/{digest}"
