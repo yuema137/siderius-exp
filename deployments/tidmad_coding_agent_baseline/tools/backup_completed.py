@@ -9,10 +9,11 @@ import os
 import subprocess
 import tarfile
 import tempfile
+import time
 from pathlib import Path
 
 from .io import create_json_once, sha256_file
-from .model import BANDS
+from .model import BANDS, utc_text
 
 
 def _aws(*args: str, timeout_seconds: int) -> subprocess.CompletedProcess[str]:
@@ -110,6 +111,7 @@ def _publish_one(
                 "archive_sha256": archive_digest,
                 "candidate_manifest_sha256": digest,
                 "created": result.returncode == 0,
+                "event_utc": utc_text(time.time()),
             },
         )
     return "created" if result.returncode == 0 else "already-existed"
@@ -186,6 +188,7 @@ def _publish_submission(
                 "archive_sha256": archive_digest,
                 "submission_manifest_sha256": digest,
                 "created": result.returncode == 0,
+                "event_utc": utc_text(time.time()),
             },
         )
     return "created" if result.returncode == 0 else "already-existed"

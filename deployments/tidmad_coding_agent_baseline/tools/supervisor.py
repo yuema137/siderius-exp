@@ -95,6 +95,7 @@ def supervise(
             "version": "tidmad-coding-agent-run-start-v1",
             "product": product,
             "run_id": run_id,
+            "boot_id": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
             "scheduled_start_epoch": deadline.scheduled_start_epoch,
             "scheduled_start_utc": utc_text(deadline.scheduled_start_epoch),
             "actual_start_epoch": actual_start,
