@@ -25,8 +25,7 @@ outside the 24-hour evaluation window.
 - `/work/input/inference-requirements.txt`: the packages available in the
   immutable evaluator-owned Python environment that executes `predict.py`.
 
-Read the frozen task package before designing models. Do not use simulation or
-hidden development/final truth that is not present in the provided inputs.
+Read the frozen task package before designing models.
 
 The original scientific reference is *TIDMAD: Time Series Dataset for
 Discovering Dark Matter with AI Denoising*, J. Fry et al., arXiv:2406.04378
@@ -39,21 +38,16 @@ Search independently for each of the four bands: `0-3`, `4-9`, `10-14`, and
 `15-19`. The four winning architectures may differ. Higher TIDMAD raw score is
 better among candidates that pass the scientific validity contract below.
 
-This is supervised machine-learning denoising. Each training HDF5 file contains
-noisy detector time-series input and its clean target. Train a machine-learning
-model whose learned parameters are fixed from `/data/public-training`. The
-model must transform a previously unseen noisy input into a denoised time
-series with the shape and fields required by the frozen model-I/O and
-deliverable contracts.
+This is a supervised denoising task. Each training HDF5 file contains a noisy
+detector time-series input and its clean target. A candidate must transform a
+previously unseen noisy input into a denoised time series with the shape and
+fields required by the frozen model-I/O and deliverable contracts.
 
-Development and final inputs are for inference only. Do not fit, tune, infer,
-or cache candidate parameters from the development inputs, from the final
-inputs, or from a collection-wide ordering or acquisition pattern. The
-submitted denoiser must not be an analytic frequency lookup, frequency comb,
-matched filter selected from a known injection grid, or parametric sinusoid
-re-synthesis. Signal-processing operations may be components of a learned
-model, but the submitted mapping must be a trained machine-learning model, and
-its trainable state must be learned only from the provided training split.
+The exact injected frequencies, scoring anchors, official validation inputs,
+and official validation truth are not part of the information available to the
+research condition. The evaluator enforces that boundary. Within the provided
+information, time, compute, storage, and output contracts, the choice of model,
+algorithm, training procedure, and research strategy is yours.
 
 ## Evaluation and scientific validity
 
@@ -105,16 +99,16 @@ used for both development and final inference and must accept exactly:
 predict.py --input-file INPUT.h5 --output-file OUTPUT.h5
 ```
 
-It must load the candidate's frozen weights and write one scoreable TIDMAD
-deliverable using only the frozen inference environment and code vendored in
-the candidate directory. It must not train or mutate candidate parameters. Use
-`tidmad-score --help` for the exact scoring interface. The evaluator snapshots
-the candidate before inference, runs that snapshot on the held-out development
-input, and retains every candidate that obtains an eligible valid development
-score. Retained bytes cannot be replaced or removed from storage accounting.
-The highest eligible development score becomes that band's final winner. Save
-useful candidates early so a partial submission remains available if the run
-ends unexpectedly.
+It must write one scoreable TIDMAD deliverable using only the frozen inference
+environment, the submitted candidate bytes, and the single input supplied for
+that invocation. The evaluator snapshots the candidate before inference and
+discards any changes made to the execution copy; only the output deliverable is
+used. Use `tidmad-score --help` for the exact scoring interface. The evaluator
+runs that snapshot on the held-out development input and retains every
+candidate that obtains an eligible valid development score. Retained bytes
+cannot be replaced or removed from storage accounting. The highest eligible
+development score becomes that band's final winner. Save useful candidates
+early so a partial submission remains available if the run ends unexpectedly.
 
 The development scorer returns a finite higher-is-better scalar plus a
 20-position vector with one non-null held-out file for the requested band. For

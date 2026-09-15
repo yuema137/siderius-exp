@@ -109,8 +109,9 @@ def test_canonical_task_md_separates_raw_score_health_and_agent_strategy():
     assert "finite raw score alone is **not** a valid result" in text
     assert "health_regression.yaml" in text
     assert "Health error, missing Health evidence" in text
-    assert "trained machine-learning model" in text
-    assert "Do not fit, tune, infer" in text
+    assert "the choice of model" in text
+    assert "frequency comb" not in text
+    assert "matched filter" not in text
     assert "There is no agent-callable final-scoring command" in text
     assert "raw_and_ground_score.md" in text
 
