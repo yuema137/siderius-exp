@@ -2,9 +2,10 @@
 
 This folder prepares two independent 24-hour baselines: one gives the TIDMAD
 problem to Codex, and the other gives the same problem to Claude Code. It does
-not define a second version of TIDMAD. Both machines receive a byte-for-byte
-snapshot of the existing [`tasks/tidmad`](../../tasks/tidmad/) package and the
-same operator-approved kickoff file, `task.md`.
+not define a second version of TIDMAD. The builder derives both an agent-visible
+view and an evaluator-private snapshot from the same tracked
+[`tasks/tidmad`](../../tasks/tidmad/) authority. Both machines receive the same
+bundle bytes and the same operator-approved kickoff file, `task.md`.
 
 The baseline adds no research workflow, resource monitor or general preflight
 to either CLI. The surrounding scripts only keep the clock honest, restart a
@@ -13,16 +14,17 @@ scored candidates, back them up, and collect the final result.
 
 ## What the agent can see
 
-- the frozen `tasks/tidmad` snapshot and shared `task.md`;
-- all 20 labelled training files;
-- validation inputs with `channel0002` removed;
+- the sanitized `tasks/tidmad` view and shared `task.md`;
+- 16 labelled training files;
+- four unlabelled held-out development inputs, one per band;
 - its own 1 TiB local workspace and outbound internet;
 - the fixed `tidmad-score` command.
 
-It cannot read validation truth, the evaluator environment, backup credentials,
-the other agent's machine, or any SIDERIUS campaign output. Each of the four
-bands is an independent search: architectures may differ, and an accidental
-match is allowed. Every candidate that receives a valid score is retained.
+It cannot read development truth, official validation inputs or truth, the
+private scorer assets, backup credentials, the other agent's machine, or any
+SIDERIUS campaign output. Each of the four bands is an independent search:
+architectures may differ. Every candidate that receives an eligible development
+score is retained.
 
 ## Before renting GPUs
 
@@ -70,10 +72,10 @@ record is create-once and survives service and VM restarts.
 /work/state/       deadline, invocation receipts and retained candidates
 /work/submission/  final collection
 /work/logs/        structured CLI output
-/data/             machine-local public inputs and private validation truth
+/data/             public train/dev views plus evaluator-private dev/final views
 ```
 
-Every validly scored candidate is retained below
+Every validly scored development candidate is retained below
 `/var/lib/tidmad-baseline/candidates/<band>/<candidate-id>/`. That tree is
 readable but not writable by the agent. A completed identity cannot be
 replaced. Temporary denoised HDF5 files are deleted only after score and
@@ -96,10 +98,12 @@ sudo /opt/tidmad-evaluator/venv/bin/python -I -m \
   --private-group baseline-evaluator
 ```
 
-Data preparation verifies the 40 repository-owned checksums. Training files
-remain labelled. The public validation copies contain only `channel0001`; the
-unchanged validation files containing `channel0002` are readable only by the
-fixed evaluator.
+Data preparation verifies the 40 repository-owned checksums. It withholds one
+training-family file per band as development data, leaving 16 labelled files
+for fitting. Its four public development copies contain only `channel0001`.
+The official validation inputs, all development/final targets, and exact
+frequency/anchor/scorer assets remain evaluator-only. Public inference files
+also omit release-identity attributes such as the original file number.
 
 Put `BASELINE_PRODUCT` and the product API key in
 `/etc/tidmad-baseline/agent.env`, mode `0640`, owned by
@@ -165,9 +169,11 @@ active:
 
 ```bash
 sudo systemctl stop tidmad-coding-agent.service \
-  tidmad-baseline-start.timer tidmad-baseline-stop.timer
+  tidmad-baseline-start.timer tidmad-baseline-stop.timer \
+  tidmad-baseline-finalize.timer tidmad-baseline-backup.timer
 sudo systemctl disable tidmad-coding-agent.service \
-  tidmad-baseline-start.timer tidmad-baseline-stop.timer
+  tidmad-baseline-start.timer tidmad-baseline-stop.timer \
+  tidmad-baseline-finalize.timer tidmad-baseline-backup.timer
 sudo /work/harness/venv/bin/python -m baseline_harness.clear_workspace \
   --owner baseline-agent --group baseline-results
 ```
@@ -179,25 +185,26 @@ recomputed after restart.
 
 ## Scoring and submission
 
-The scorer owns the canonical TIDMAD formula. The agent may select only a
-root-owned named scope and paths below `/work/agent`; it cannot replace the task
-package, raw validation truth or archive destination. The current bundle
-contains full scopes named `band-0-3-full`, `band-4-9-full`,
-`band-10-14-full`, `band-15-19-full`, and `all-full`.
+The scorer owns the canonical TIDMAD formula. During search the agent may name
+only a candidate below `/work/agent` and one of the four bands. The evaluator
+chooses that band's fixed held-out development input, snapshots the candidate,
+runs its frozen predictor, applies scoring and Health, and retains eligible
+candidates. It does not expose an official-final scoring command.
 
 ```bash
-tidmad-score candidate \
-  --band 0-3 --scope band-0-3-full \
+tidmad-score \
+  --band 0-3 \
   --candidate-id my-candidate-001 \
-  --candidate-source /work/agent/candidates/my-candidate-001 \
-  --denoised-dir /work/agent/evaluation/my-candidate-001
+  --candidate-source /work/agent/candidates/my-candidate-001
 ```
 
 Candidate source contains `model.py` (or `model/`), `architecture.json`,
-`train_config.json` and `weights.pth`. The final all-band invocation names one
-retained winner per band and writes the canonical 20-entry score vector. At the
-deadline the finalizer packages complete winners when available and otherwise
-marks the submission partial; it never invents missing scores.
+`train_config.json`, `weights.pth`, and an inference-only `predict.py`. The
+predictor runs under a root-owned, network-disabled inference identity, against
+one copied input at a time. At the immutable deadline the finalizer stops the
+agent, selects the best retained development candidate for each band, performs
+one hidden official-validation inference and score, and packages the result. A
+missing band remains a partial submission; the finalizer never invents scores.
 
 The final `task.md`, cloud provisioning commands, model identity patterns and
 actual drill receipts remain launch-time inputs. A local test is not evidence

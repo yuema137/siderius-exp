@@ -45,6 +45,10 @@ if ! command -v aws >/dev/null 2>&1; then
     echo "ERROR: provision an AWS CLI before install; the harness will not install an unpinned latest version" >&2
     exit 2
 fi
+if systemctl is-active --quiet tidmad-coding-agent.service; then
+    echo "ERROR: refuse to replace a bundle while the evaluated agent is active" >&2
+    exit 2
+fi
 (
     cd "${BUNDLE_ROOT}/evaluator"
     sha256sum --check SHA256
@@ -53,6 +57,7 @@ fi
 getent group baseline-results >/dev/null || groupadd --system baseline-results
 getent group baseline-agent >/dev/null || groupadd --system baseline-agent
 getent group baseline-evaluator >/dev/null || groupadd --system baseline-evaluator
+getent group baseline-inference >/dev/null || groupadd --system baseline-inference
 id baseline-agent >/dev/null 2>&1 \
     || useradd --create-home --shell /bin/bash --gid baseline-agent baseline-agent
 usermod -a -G baseline-results baseline-agent
@@ -60,10 +65,19 @@ id baseline-evaluator >/dev/null 2>&1 \
     || useradd --system --home /nonexistent --shell /usr/sbin/nologin \
         --gid baseline-evaluator baseline-evaluator
 usermod -a -G baseline-results baseline-evaluator
+id baseline-inference >/dev/null 2>&1 \
+    || useradd --system --home /nonexistent --shell /usr/sbin/nologin \
+        --gid baseline-inference baseline-inference
+for device_group in video render; do
+    if getent group "$device_group" >/dev/null; then
+        usermod -a -G "$device_group" baseline-inference
+    fi
+done
 id baseline-backup >/dev/null 2>&1 \
     || useradd --system --home /nonexistent --shell /usr/sbin/nologin baseline-backup
 usermod -a -G baseline-results baseline-backup
 
+rm -rf -- /work/harness /work/input /opt/tidmad-evaluator /opt/tidmad-inference
 install -d -o root -g root -m 0755 /work /work/harness /work/input
 cp -a "$BUNDLE_ROOT/input/." /work/input/
 cp -a "$BUNDLE_ROOT/harness/." /work/harness/
@@ -77,6 +91,8 @@ done
 install -d -o root -g root -m 0755 /data
 install -d -o baseline-evaluator -g baseline-results -m 2750 \
     /var/lib/tidmad-baseline /var/lib/tidmad-baseline/candidates
+install -d -o root -g baseline-inference -m 0750 \
+    /var/lib/tidmad-baseline/inference-sessions
 install -d -o baseline-backup -g baseline-backup -m 0700 \
     /var/lib/tidmad-baseline/backup-receipts
 install -d -o root -g root -m 0755 /etc/tidmad-baseline
@@ -99,21 +115,40 @@ cp -a /work/harness/baseline_harness "$EVALUATOR_SITE/"
 chown -R baseline-evaluator:baseline-evaluator /opt/tidmad-evaluator
 chmod -R o-rwx /opt/tidmad-evaluator
 
+install -d -o root -g root -m 0755 /opt/tidmad-inference
+"$PYTHON_BIN" -m venv /opt/tidmad-inference/venv
+/opt/tidmad-inference/venv/bin/pip install --disable-pip-version-check \
+    --requirement /opt/tidmad-evaluator/assets/requirements.txt
+/opt/tidmad-inference/venv/bin/pip install --disable-pip-version-check \
+    --force-reinstall --no-deps "/opt/tidmad-evaluator/assets/${WHEEL_NAME}"
+chown -R root:root /opt/tidmad-inference
+find /opt/tidmad-inference -type d -exec chmod 0555 {} +
+find /opt/tidmad-inference -type f -exec chmod 0444 {} +
+find /opt/tidmad-inference/venv/bin -type f -exec chmod 0555 {} +
+
+install -d -o root -g root -m 0755 /usr/local/libexec
+cat >/usr/local/libexec/tidmad-score-candidate <<'EOF'
+#!/bin/sh
+exec /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score candidate "$@"
+EOF
+chmod 0755 /usr/local/libexec/tidmad-score-candidate
+
 cat >/etc/sudoers.d/tidmad-baseline-score <<'EOF'
-baseline-agent ALL=(baseline-evaluator) NOPASSWD:SETENV: /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score *
+Defaults!/usr/local/libexec/tidmad-score-candidate env_keep += "BASELINE_RUN_ID BASELINE_INVOCATION_ID"
+baseline-agent ALL=(root) NOPASSWD: /usr/local/libexec/tidmad-score-candidate *
 EOF
 chmod 0440 /etc/sudoers.d/tidmad-baseline-score
 
 cat >/usr/local/bin/tidmad-score <<'EOF'
 #!/bin/sh
-exec sudo -n --preserve-env=BASELINE_RUN_ID,BASELINE_INVOCATION_ID -u baseline-evaluator \
-    /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score "$@"
+exec sudo -n /usr/local/libexec/tidmad-score-candidate "$@"
 EOF
 chmod 0755 /usr/local/bin/tidmad-score
 
 install -m 0644 /work/harness/systemd/tidmad-coding-agent.service /etc/systemd/system/
 install -m 0644 /work/harness/systemd/tidmad-baseline-backup.service /etc/systemd/system/
 install -m 0644 /work/harness/systemd/tidmad-baseline-backup.timer /etc/systemd/system/
+install -m 0644 /work/harness/systemd/tidmad-baseline-finalize.service /etc/systemd/system/
 cat >/etc/tidmad-baseline/agent.env <<EOF
 BASELINE_PRODUCT=$PRODUCT
 EOF

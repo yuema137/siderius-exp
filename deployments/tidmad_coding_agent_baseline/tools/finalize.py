@@ -11,8 +11,11 @@ import time
 from pathlib import Path
 from typing import Any
 
-from .io import atomic_write_json, fsync_directory, sha256_file
+from .evaluator_policy import EvaluatorPolicy
+from .final_inference import run_candidate_inference
+from .io import atomic_write_json, create_json_once, fsync_directory, sha256_file
 from .model import BANDS, utc_text
+from .score import score_final
 from .usage import aggregate_usage
 
 
@@ -57,11 +60,7 @@ def _validated_final_score(
     if payload.get("winner_candidates") != expected:
         raise ValueError("final score was not produced from the marked band winners")
     vector = payload.get("file_vector")
-    if (
-        not isinstance(vector, list)
-        or len(vector) != 20
-        or any(value is None for value in vector)
-    ):
+    if not isinstance(vector, list) or len(vector) != 20 or any(value is None for value in vector):
         raise ValueError("final score record needs all 20 per-file values")
     return payload
 
@@ -71,9 +70,66 @@ def finalize(
     product: str,
     archive_root: Path = Path("/var/lib/tidmad-baseline/candidates"),
     final_score_path: Path = Path("/var/lib/tidmad-baseline/final_score.json"),
+    policy: EvaluatorPolicy | None = None,
 ) -> Path:
     winners = _read_best(archive_root)
+    final_attempt_path = archive_root.parent / "final_attempt.json"
+    final_failure_path = archive_root.parent / "final_failure.json"
+    if (
+        len(winners) == len(BANDS)
+        and not final_score_path.is_file()
+        and not final_attempt_path.is_file()
+    ):
+        policy = policy or EvaluatorPolicy(
+            archive_root=archive_root,
+            final_score=final_score_path,
+            final_output_dir=archive_root.parent / "final-denoised",
+        )
+        create_json_once(
+            final_attempt_path,
+            {
+                "version": "tidmad-coding-agent-final-attempt-v1",
+                "started_utc": utc_text(time.time()),
+                "winner_candidates": {
+                    band: identity for band, (identity, _path) in winners.items()
+                },
+            },
+        )
+        try:
+            denoised = run_candidate_inference(
+                winners=winners,
+                task_root=policy.input_root,
+                input_root=policy.final_input_dir,
+                output_root=policy.final_output_dir,
+            )
+            try:
+                score_final(
+                    argparse.Namespace(
+                        winner=[
+                            f"{band}={candidate_id}"
+                            for band, (candidate_id, _path) in winners.items()
+                        ],
+                        denoised_dir=denoised,
+                        workers=16,
+                    ),
+                    policy,
+                )
+            finally:
+                shutil.rmtree(denoised, ignore_errors=True)
+        except Exception as error:
+            atomic_write_json(
+                final_failure_path,
+                {
+                    "version": "tidmad-coding-agent-final-failure-v1",
+                    "failed_utc": utc_text(time.time()),
+                    "error_type": type(error).__name__,
+                    "error": str(error),
+                },
+            )
     final_score = _validated_final_score(final_score_path, winners)
+    final_failure = (
+        json.loads(final_failure_path.read_text()) if final_failure_path.is_file() else None
+    )
     submission = work_root / "submission"
     if submission.exists() and any(submission.iterdir()):
         raise FileExistsError(f"submission directory is not empty: {submission}")
@@ -90,9 +146,7 @@ def finalize(
         if final_score is not None:
             atomic_write_json(temporary / "score_vector.json", final_score)
         receipts = work_root / "state" / "invocations.jsonl"
-        invocation_count = (
-            sum(1 for _ in receipts.open("rb")) if receipts.exists() else 0
-        )
+        invocation_count = sum(1 for _ in receipts.open("rb")) if receipts.exists() else 0
         complete = len(winners) == len(BANDS) and final_score is not None
         ended = int(time.time())
         start_path = work_root / "state" / "run_start.json"
@@ -104,11 +158,11 @@ def finalize(
                 "version": "tidmad-coding-agent-submission-v1",
                 "product": product,
                 "complete": complete,
-                "winner_candidates": {
-                    band: identity for band, (identity, _) in winners.items()
-                },
+                "winner_candidates": {band: identity for band, (identity, _) in winners.items()},
                 "missing_bands": [band for band in BANDS if band not in winners],
                 "final_score_present": final_score is not None,
+                "final_evaluation_attempted": final_attempt_path.is_file(),
+                "final_evaluation_failure": final_failure,
                 "outer_loop_invocations": invocation_count,
                 "scheduled_start_utc": start.get("scheduled_start_utc"),
                 "actual_start_utc": start.get("actual_start_utc"),
@@ -116,9 +170,7 @@ def finalize(
                 "actual_wall_clock_seconds": (
                     ended - int(started) if isinstance(started, int) else None
                 ),
-                "gpu_hours": (
-                    (ended - int(started)) / 3600 if isinstance(started, int) else None
-                ),
+                "gpu_hours": ((ended - int(started)) / 3600 if isinstance(started, int) else None),
                 "token_usage": aggregate_usage(work_root / "logs", product),
                 "work_tree_bytes": _tree_bytes(work_root),
                 "retained_candidate_bytes": _tree_bytes(archive_root),

@@ -72,6 +72,11 @@ def install_schedule(
             deadline.systemd_ceiling_epoch,
             "tidmad-baseline-stop.service",
         ),
+        "tidmad-baseline-finalize.timer": timer_text(
+            "Finalize hidden TIDMAD evaluation after the agent deadline",
+            deadline.agent_deadline_epoch + 30,
+            "tidmad-baseline-finalize.service",
+        ),
     }
     systemd_root.mkdir(parents=True, exist_ok=True)
     for name, content in units.items():
@@ -90,6 +95,7 @@ def install_schedule(
             "--now",
             "tidmad-baseline-start.timer",
             "tidmad-baseline-stop.timer",
+            "tidmad-baseline-finalize.timer",
             "tidmad-baseline-backup.timer",
         ],
         check=True,
@@ -99,12 +105,8 @@ def install_schedule(
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scheduled-start-epoch", type=int, required=True)
-    parser.add_argument(
-        "--systemd-root", type=Path, default=Path("/etc/systemd/system")
-    )
-    parser.add_argument(
-        "--deadline", type=Path, default=Path("/work/state/deadline.json")
-    )
+    parser.add_argument("--systemd-root", type=Path, default=Path("/etc/systemd/system"))
+    parser.add_argument("--deadline", type=Path, default=Path("/work/state/deadline.json"))
     parser.add_argument("--agent-group", default=SUPERVISOR_GROUP)
     args = parser.parse_args()
     install_schedule(

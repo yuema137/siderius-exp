@@ -14,10 +14,10 @@ from pathlib import Path
 from typing import Any
 
 from .io import atomic_write_json, fsync_directory, fsync_tree, sha256_file
-from .model import BANDS
+from .model import BANDS, DEVELOPMENT_FILE_BY_BAND
 
 _IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
-_REQUIRED = ("architecture.json", "train_config.json", "weights.pth")
+_REQUIRED = ("architecture.json", "train_config.json", "weights.pth", "predict.py")
 
 
 def validate_candidate_identity(candidate_id: str) -> None:
@@ -40,17 +40,11 @@ def validate_candidate_source(source: Path) -> None:
     for path in source.rglob("*"):
         if path.is_symlink():
             raise ValueError(f"candidate source contains a symlink: {path}")
-        if path.is_file() and (
-            path.name.endswith(".tmp") or path.suffix in {".h5", ".hdf5"}
-        ):
-            raise ValueError(
-                f"candidate source contains a temporary/data artifact: {path}"
-            )
+        if path.is_file() and (path.name.endswith(".tmp") or path.suffix in {".h5", ".hdf5"}):
+            raise ValueError(f"candidate source contains a temporary/data artifact: {path}")
 
 
-def _validate_score(
-    path: Path, band: str, expected_candidate_digest: str
-) -> dict[str, Any]:
+def _validate_score(path: Path, band: str, expected_candidate_digest: str) -> dict[str, Any]:
     payload = json.loads(path.read_text())
     scalar = payload.get("scalar")
     vector = payload.get("file_vector")
@@ -60,20 +54,16 @@ def _validate_score(
         raise ValueError("score scalar must be finite")
     if not isinstance(vector, list) or len(vector) != 20:
         raise ValueError("score file_vector must have exactly 20 entries")
-    expected = _band_indices(band)
+    expected = {DEVELOPMENT_FILE_BY_BAND[band]}
     present = {index for index, value in enumerate(vector) if value is not None}
     if present != expected:
         raise ValueError(
-            f"score vector identities {sorted(present)} differ from band {band}"
+            "development score vector identities "
+            f"{sorted(present)} differ from frozen holdout for band {band}"
         )
     if payload.get("candidate_tree_sha256") != expected_candidate_digest:
         raise ValueError("score is not bound to these candidate bytes")
     return payload
-
-
-def _band_indices(band: str) -> set[int]:
-    low, high = (int(value) for value in band.split("-"))
-    return set(range(low, high + 1))
 
 
 def _manifest(root: Path) -> dict[str, str]:
@@ -87,9 +77,7 @@ def _manifest(root: Path) -> dict[str, str]:
 def candidate_tree_digest(root: Path) -> str:
     """Hash the exact candidate-file manifest using a stable encoding."""
 
-    payload = json.dumps(
-        _manifest(root), sort_keys=True, separators=(",", ":")
-    ).encode()
+    payload = json.dumps(_manifest(root), sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(payload).hexdigest()
 
 
@@ -128,6 +116,7 @@ def archive_candidate(
                 "candidate_id": candidate_id,
                 "band": band,
                 "scalar": float(score["scalar"]),
+                "selection_split": "development",
                 "candidate_tree_sha256": digest,
                 "files": files,
             },
@@ -144,9 +133,7 @@ def archive_candidate(
             shutil.rmtree(temporary)
 
 
-def _update_best(
-    archive_root: Path, band: str, candidate_id: str, scalar: float
-) -> None:
+def _update_best(archive_root: Path, band: str, candidate_id: str, scalar: float) -> None:
     marker = archive_root / "best" / f"{band}.json"
     if marker.exists():
         current = json.loads(marker.read_text())
@@ -164,9 +151,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--score", type=Path, required=True)
-    parser.add_argument(
-        "--archive-root", type=Path, default=Path("/work/state/candidates")
-    )
+    parser.add_argument("--archive-root", type=Path, default=Path("/work/state/candidates"))
     parser.add_argument("--band", choices=BANDS, required=True)
     parser.add_argument("--candidate-id", required=True)
     args = parser.parse_args()
