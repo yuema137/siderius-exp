@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import hashlib
+from pathlib import Path
 
 import pytest
 
 from deployments.tidmad_coding_agent_baseline.tools.clear_workspace import (
+    _safe_work_root,
     clear_retained_state,
     clear_workspace,
 )
@@ -20,6 +22,16 @@ def _prepare(root):
     (root / "harness" / "keep").write_text("yes")
     for child in ("agent", "state", "submission", "logs"):
         (root / child / "drill-only").write_text("remove")
+
+
+def test_production_default_is_the_only_accepted_shallow_work_root():
+    """The CLI's /work default must be usable without making /var or /tmp safe."""
+
+    assert _safe_work_root(Path("/work")) is True
+    assert _safe_work_root(Path("/")) is False
+    assert _safe_work_root(Path("/var")) is False
+    assert _safe_work_root(Path("/tmp")) is False
+    assert _safe_work_root(Path("/srv/baseline/work")) is True
 
 
 def test_clear_removes_exact_runtime_roots_and_preserves_input_harness(tmp_path):

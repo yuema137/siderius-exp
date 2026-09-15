@@ -19,6 +19,16 @@ ACTIVE_UNITS = (
 )
 
 
+def _safe_work_root(root: Path) -> bool:
+    """Accept the production mount or an explicitly nested test/deployment root."""
+
+    return (
+        root.is_absolute()
+        and root != Path("/")
+        and (root == Path("/work") or len(root.parts) >= 3)
+    )
+
+
 def _verify_manifest(input_root: Path) -> None:
     manifest = input_root / "bundle.sha256"
     if not manifest.is_file():
@@ -39,7 +49,7 @@ def clear_workspace(
     work_root: Path, owner: str | None = None, group: str | None = None
 ) -> None:
     root = work_root.resolve()
-    if not root.is_absolute() or root == Path("/") or len(root.parts) < 3:
+    if not _safe_work_root(root):
         raise ValueError(f"unsafe work root: {root}")
     for child in PRESERVED_CHILDREN:
         if not (root / child).is_dir():
