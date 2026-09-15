@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -35,10 +36,23 @@ ExecStart=/bin/systemctl {action} tidmad-coding-agent.service
 """
 
 
-def install_schedule(start_epoch: int, systemd_root: Path, deadline_path: Path) -> None:
+def _grant_deadline_read(path: Path, agent_group: str) -> None:
+    """Keep the immutable clock root-owned while allowing the supervisor to read it."""
+
+    shutil.chown(path, user="root", group=agent_group)
+    path.chmod(0o640)
+
+
+def install_schedule(
+    start_epoch: int,
+    systemd_root: Path,
+    deadline_path: Path,
+    agent_group: str = "baseline-agent",
+) -> None:
     if os.geteuid() != 0:
         raise PermissionError("schedule installation must run as root")
     deadline = load_or_create(deadline_path, start_epoch)
+    _grant_deadline_read(deadline_path, agent_group)
     units = {
         "tidmad-baseline-start.service": action_text(
             "Start the TIDMAD coding-agent baseline", "start"
@@ -89,8 +103,14 @@ def main() -> int:
     parser.add_argument(
         "--deadline", type=Path, default=Path("/work/state/deadline.json")
     )
+    parser.add_argument("--agent-group", default="baseline-agent")
     args = parser.parse_args()
-    install_schedule(args.scheduled_start_epoch, args.systemd_root, args.deadline)
+    install_schedule(
+        args.scheduled_start_epoch,
+        args.systemd_root,
+        args.deadline,
+        agent_group=args.agent_group,
+    )
     return 0
 
 
