@@ -341,6 +341,8 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
     ]
     assert len(commands) == 30
     for command in commands:
+        assert "--no-runtime_watchdog" in command
+        assert "--runtime_watchdog" not in command
         expected_values = {
             "--run_name": "cancer_mtg_campaign_v6_lit_on",
             "--max_rounds": "2",
