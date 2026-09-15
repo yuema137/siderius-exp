@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import os
 import subprocess
 import tarfile
 import tempfile
@@ -15,8 +16,12 @@ from .model import BANDS
 
 
 def _aws(*args: str, timeout_seconds: int) -> subprocess.CompletedProcess[str]:
+    endpoint = os.environ.get("BACKUP_ENDPOINT")
+    command = ["aws"]
+    if endpoint:
+        command.extend(("--endpoint-url", endpoint))
     return subprocess.run(
-        ["aws", *args],
+        [*command, *args],
         check=False,
         capture_output=True,
         text=True,

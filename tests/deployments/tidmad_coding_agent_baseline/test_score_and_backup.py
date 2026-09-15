@@ -164,6 +164,27 @@ def test_backup_uses_conditional_create_and_records_completed_candidate(
     assert len(calls) == 1
 
 
+def test_backup_uses_configured_s3_compatible_endpoint(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setenv("BACKUP_ENDPOINT", "https://storage.example.test")
+    monkeypatch.setattr(
+        backup_completed.subprocess,
+        "run",
+        lambda command, **kwargs: (
+            calls.append((command, kwargs))
+            or subprocess.CompletedProcess(command, 0, "{}", "")
+        ),
+    )
+
+    backup_completed._aws("s3api", "head-object", timeout_seconds=10)
+
+    assert calls[0][0][:3] == [
+        "aws",
+        "--endpoint-url",
+        "https://storage.example.test",
+    ]
+
+
 def test_backup_refuses_preexisting_object_with_different_candidate_identity(
     tmp_path, monkeypatch
 ):
