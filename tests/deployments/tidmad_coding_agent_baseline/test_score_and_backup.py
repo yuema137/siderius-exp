@@ -6,8 +6,11 @@ import subprocess
 from pathlib import Path
 
 import pytest
-
-from deployments.tidmad_coding_agent_baseline.tools import backup_completed, score
+from deployments.tidmad_coding_agent_baseline.tools import (
+    backup_completed,
+    final_inference,
+    score,
+)
 from deployments.tidmad_coding_agent_baseline.tools.evaluator_policy import (
     EvaluatorPolicy,
 )
@@ -23,10 +26,8 @@ def _candidate_args(tmp_path):
     (source / "architecture.json").write_text(json.dumps({"kind": "test"}))
     (source / "train_config.json").write_text(json.dumps({"epochs": 1}))
     (source / "weights.pth").write_bytes(b"weights")
-    (tmp_path / "agent" / "denoised").mkdir()
+    (source / "predict.py").write_text("raise SystemExit('test fixture only')\n")
     return argparse.Namespace(
-        denoised_dir=tmp_path / "agent" / "denoised",
-        scope="band-0-3",
         workers=1,
         candidate_source=source,
         band="0-3",
@@ -37,15 +38,19 @@ def _candidate_args(tmp_path):
 def _policy(tmp_path):
     scope_root = tmp_path / "scopes"
     scope_root.mkdir(parents=True)
-    (scope_root / "band-0-3.json").write_text('{"0":[0],"1":[0],"2":[0],"3":[0]}')
+    (scope_root / "band-0-3-development.json").write_text('{"3":[0]}')
     return EvaluatorPolicy(
         input_root=tmp_path / "input",
         scope_root=scope_root,
-        raw_data_dir=tmp_path / "raw",
+        development_truth_dir=tmp_path / "development-truth",
+        development_input_dir=tmp_path / "development-input",
+        final_input_dir=tmp_path / "final-input",
+        final_truth_dir=tmp_path / "final-truth",
         agent_root=tmp_path / "agent",
         archive_root=tmp_path / "state" / "candidates",
         evaluation_root=tmp_path / "state" / "evaluations",
         health_config_root=tmp_path / "state" / "health-configs",
+        final_output_dir=tmp_path / "state" / "final-denoised",
         final_score=tmp_path / "state" / "final_score.json",
     )
 
@@ -66,20 +71,23 @@ def _health(*, eligible=True):
 
 
 def _deliverables(tmp_path):
-    paths = [tmp_path / f"denoised-{index}.h5" for index in range(4)]
+    paths = [tmp_path / "denoised-3.h5"]
     for path in paths:
         path.write_bytes(b"temporary")
     return paths
 
 
-def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(
-    tmp_path, monkeypatch
-):
+def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(tmp_path, monkeypatch):
     args = _candidate_args(tmp_path)
     deliverables = _deliverables(tmp_path)
     events = []
     monkeypatch.setenv("BASELINE_RUN_ID", "codex-100")
     monkeypatch.setenv("BASELINE_INVOCATION_ID", "codex-100-invocation-0001")
+    monkeypatch.setattr(
+        score,
+        "run_candidate_inference",
+        lambda **kwargs: kwargs["output_root"].mkdir() or kwargs["output_root"],
+    )
 
     monkeypatch.setattr(
         score,
@@ -89,7 +97,7 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(
                 "scoreable": True,
                 "valid": False,
                 "scalar": 1.0,
-                "file_vector": [1.0] * 4 + [None] * 16,
+                "file_vector": [None, None, None, 1.0] + [None] * 16,
             },
             deliverables,
         ),
@@ -117,13 +125,18 @@ def test_candidate_scoring_keeps_deliverables_when_archive_fails(tmp_path, monke
     deliverables = _deliverables(tmp_path)
     monkeypatch.setattr(
         score,
+        "run_candidate_inference",
+        lambda **kwargs: kwargs["output_root"].mkdir() or kwargs["output_root"],
+    )
+    monkeypatch.setattr(
+        score,
         "compute_score",
         lambda **_kwargs: (
             {
                 "scoreable": True,
                 "valid": False,
                 "scalar": 1.0,
-                "file_vector": [1.0] * 4 + [None] * 16,
+                "file_vector": [None, None, None, 1.0] + [None] * 16,
             },
             deliverables,
         ),
@@ -139,11 +152,14 @@ def test_candidate_scoring_keeps_deliverables_when_archive_fails(tmp_path, monke
     assert all(path.exists() for path in deliverables)
 
 
-def test_health_failure_returns_raw_feedback_but_never_archives_or_selects(
-    tmp_path, monkeypatch
-):
+def test_health_failure_returns_raw_feedback_but_never_archives_or_selects(tmp_path, monkeypatch):
     args = _candidate_args(tmp_path)
     deliverables = _deliverables(tmp_path)
+    monkeypatch.setattr(
+        score,
+        "run_candidate_inference",
+        lambda **kwargs: kwargs["output_root"].mkdir() or kwargs["output_root"],
+    )
     monkeypatch.setattr(
         score,
         "compute_score",
@@ -152,7 +168,7 @@ def test_health_failure_returns_raw_feedback_but_never_archives_or_selects(
                 "scoreable": True,
                 "valid": False,
                 "scalar": 22.0,
-                "file_vector": [22.0] * 4 + [None] * 16,
+                "file_vector": [None, None, None, 22.0] + [None] * 16,
             },
             deliverables,
         ),
@@ -177,26 +193,21 @@ def test_health_failure_returns_raw_feedback_but_never_archives_or_selects(
     assert all(path.exists() for path in deliverables)
 
 
-def test_final_scoring_refuses_health_failure_before_writing_or_deleting(
-    tmp_path, monkeypatch
-):
+def test_final_scoring_refuses_health_failure_before_writing_or_deleting(tmp_path, monkeypatch):
     """A raw-complete final submission must not bypass task Health."""
 
     deliverables = [tmp_path / f"denoised-{index}.h5" for index in range(20)]
     for path in deliverables:
         path.write_bytes(b"temporary")
     policy = _policy(tmp_path)
-    (tmp_path / "agent" / "denoised").mkdir(parents=True)
-    (policy.scope_root / "all-files.json").write_text(
+    policy.final_output_dir.mkdir(parents=True)
+    (policy.scope_root / "all-final.json").write_text(
         json.dumps({str(index): [0] for index in range(20)})
     )
     args = argparse.Namespace(
-        denoised_dir=tmp_path / "agent" / "denoised",
-        scope="all-files",
+        denoised_dir=policy.final_output_dir,
         workers=1,
-        winner=[
-            f"{band}=candidate-{band}" for band in ("0-3", "4-9", "10-14", "15-19")
-        ],
+        winner=[f"{band}=candidate-{band}" for band in ("0-3", "4-9", "10-14", "15-19")],
     )
     monkeypatch.setattr(
         score,
@@ -261,14 +272,40 @@ def test_privileged_scorer_refuses_agent_selected_scientific_roots(tmp_path):
         score.score_candidate(args, _policy(tmp_path))
 
 
+def test_inference_command_hides_file_identity_and_blocks_network(tmp_path):
+    runtime = final_inference.FinalInferenceRuntime(
+        python=tmp_path / "immutable-python",
+        systemd_run=tmp_path / "systemd-run",
+        session_root=tmp_path / "sessions",
+    )
+    command = final_inference._command(
+        runtime=runtime,
+        candidate=tmp_path / "candidate",
+        input_path=tmp_path / "session" / "input.h5",
+        output_path=tmp_path / "session" / "output.h5",
+        session_root=tmp_path / "session",
+    )
+
+    assert str(runtime.python) in command
+    assert "--property=RestrictAddressFamilies=AF_UNIX" in command
+    assert "--property=KillMode=control-group" in command
+    assert not any("file-index" in argument for argument in command)
+    assert not any("abra_validation" in argument for argument in command)
+
+
+def test_public_score_cli_has_no_final_mode(monkeypatch):
+    monkeypatch.setattr("sys.argv", ["tidmad-score", "final"])
+    with pytest.raises(SystemExit) as refusal:
+        score.main()
+    assert refusal.value.code == 2
+
+
 def test_privileged_snapshot_never_follows_agent_symlinks(tmp_path, monkeypatch):
     args = _candidate_args(tmp_path)
     hidden = tmp_path / "private-validation"
     hidden.mkdir()
     (hidden / "truth.h5").write_bytes(b"hidden truth")
-    (args.candidate_source / "borrowed-truth").symlink_to(
-        hidden, target_is_directory=True
-    )
+    (args.candidate_source / "borrowed-truth").symlink_to(hidden, target_is_directory=True)
     monkeypatch.setattr(
         score,
         "compute_score",
@@ -279,9 +316,7 @@ def test_privileged_snapshot_never_follows_agent_symlinks(tmp_path, monkeypatch)
         score.score_candidate(args, _policy(tmp_path))
 
 
-def test_backup_uses_conditional_create_and_records_completed_candidate(
-    tmp_path, monkeypatch
-):
+def test_backup_uses_conditional_create_and_records_completed_candidate(tmp_path, monkeypatch):
     candidate = tmp_path / "candidates" / "0-3" / "candidate-1"
     candidate.mkdir(parents=True)
     (candidate / "candidate_manifest.json").write_text('{"candidate_id":"candidate-1"}')
@@ -322,8 +357,7 @@ def test_backup_uses_configured_s3_compatible_endpoint(tmp_path, monkeypatch):
         backup_completed.subprocess,
         "run",
         lambda command, **kwargs: (
-            calls.append((command, kwargs))
-            or subprocess.CompletedProcess(command, 0, "{}", "")
+            calls.append((command, kwargs)) or subprocess.CompletedProcess(command, 0, "{}", "")
         ),
     )
 
@@ -336,9 +370,7 @@ def test_backup_uses_configured_s3_compatible_endpoint(tmp_path, monkeypatch):
     ]
 
 
-def test_backup_refuses_preexisting_object_with_different_candidate_identity(
-    tmp_path, monkeypatch
-):
+def test_backup_refuses_preexisting_object_with_different_candidate_identity(tmp_path, monkeypatch):
     candidate = tmp_path / "candidates" / "0-3" / "candidate-1"
     candidate.mkdir(parents=True)
     (candidate / "candidate_manifest.json").write_text('{"candidate_id":"candidate-1"}')

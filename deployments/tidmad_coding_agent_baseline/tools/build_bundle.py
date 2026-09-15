@@ -14,7 +14,21 @@ import tempfile
 from pathlib import Path
 
 from .io import atomic_write_json, sha256_file
-from .model import BANDS
+from .model import BANDS, DEVELOPMENT_FILE_BY_BAND
+
+_EVALUATOR_ONLY_TASK_FILES = {
+    Path("tasks/tidmad/reference_data/segment_anchors.json"),
+    Path("tasks/tidmad/reference_data/tidmad_signal_frequencies.txt"),
+    Path("tasks/tidmad/runtime/anchor_map.py"),
+    Path("tasks/tidmad/runtime/reference_scores.py"),
+    Path("tasks/tidmad/runtime/scoring.py"),
+}
+_EVALUATOR_ONLY_TASK_PREFIXES = (
+    Path("tasks/tidmad/tools/compute_ground_truth.py"),
+    Path("tasks/tidmad/tools/compute_raw_baseline.py"),
+    Path("tasks/tidmad/tools/score_tidmad_official_banded.py"),
+    Path("tasks/tidmad/tools/score_tidmad_official_wavenet.py"),
+)
 
 
 def _repo_root() -> Path:
@@ -30,9 +44,7 @@ def _tracked_task_files(repo: Path) -> list[Path]:
         text=True,
     ).stdout
     if status:
-        raise RuntimeError(
-            "tasks/tidmad has uncommitted changes; refuse a drifting snapshot"
-        )
+        raise RuntimeError("tasks/tidmad has uncommitted changes; refuse a drifting snapshot")
     output = subprocess.run(
         ["git", "ls-files", "-z", "tasks/tidmad"],
         cwd=repo,
@@ -49,15 +61,29 @@ def _copy_relative(source: Path, repo: Path, destination: Path) -> None:
     shutil.copy2(source, target)
 
 
+def _is_evaluator_only_task_file(source: Path, repo: Path) -> bool:
+    """Classify task bytes that implement or parameterize private scoring."""
+
+    relative = source.relative_to(repo)
+    return relative in _EVALUATOR_ONLY_TASK_FILES or relative in _EVALUATOR_ONLY_TASK_PREFIXES
+
+
+def _copy_task_views(files: list[Path], repo: Path, public: Path, private: Path) -> None:
+    """Export one tracked task authority into public and evaluator-only views."""
+
+    for source in files:
+        _copy_relative(source, repo, private)
+        if not _is_evaluator_only_task_file(source, repo):
+            _copy_relative(source, repo, public)
+
+
 def _git(repo: Path, *args: str) -> str:
     return subprocess.run(
         ["git", *args], cwd=repo, check=True, capture_output=True, text=True
     ).stdout.strip()
 
 
-def _build_evaluator(
-    repo: Path, siderius_checkout: Path, output: Path
-) -> tuple[str, str]:
+def _build_evaluator(repo: Path, siderius_checkout: Path, output: Path) -> tuple[str, str]:
     expected = (repo / "SIDERIUS_REVISION").read_text().strip()
     actual = _git(siderius_checkout, "rev-parse", "HEAD")
     if actual != expected:
@@ -79,9 +105,7 @@ def _build_evaluator(
     wheel_dir = output / "wheel-build"
     wheel_dir.mkdir()
     environment = os.environ.copy()
-    environment["SOURCE_DATE_EPOCH"] = _git(
-        siderius_checkout, "show", "-s", "--format=%ct", "HEAD"
-    )
+    environment["SOURCE_DATE_EPOCH"] = _git(siderius_checkout, "show", "-s", "--format=%ct", "HEAD")
     subprocess.run(
         ["uv", "build", "--wheel", "--out-dir", str(wheel_dir)],
         cwd=source_dir,
@@ -124,22 +148,22 @@ def _write_checksums(root: Path, output: Path) -> None:
     output.write_text("\n".join(lines) + "\n")
 
 
-def _write_full_evaluation_scopes(input_root: Path, evaluator_root: Path) -> None:
-    """Derive canonical full-band scopes from the frozen task profile."""
+def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
+    """Derive held-out development and final scopes from the frozen task profile."""
 
-    profile = json.loads(
-        (input_root / "tasks/tidmad/resolved/dataset_profile.json").read_text()
-    )
+    profile = json.loads((task_root / "tasks/tidmad/resolved/dataset_profile.json").read_text())
     count = int(profile["dataset"]["segments_per_file"])
     scopes = evaluator_root / "evaluation_scopes"
     scopes.mkdir()
     all_scope: dict[str, list[int]] = {}
     for band in BANDS:
         low, high = (int(value) for value in band.split("-"))
-        sample_set = {str(index): list(range(count)) for index in range(low, high + 1)}
-        atomic_write_json(scopes / f"band-{band}-full.json", sample_set)
-        all_scope.update(sample_set)
-    atomic_write_json(scopes / "all-full.json", all_scope)
+        final_scope = {str(index): list(range(count)) for index in range(low, high + 1)}
+        development_scope = {str(DEVELOPMENT_FILE_BY_BAND[band]): list(range(count))}
+        atomic_write_json(scopes / f"band-{band}-development.json", development_scope)
+        atomic_write_json(scopes / f"band-{band}-final.json", final_scope)
+        all_scope.update(final_scope)
+    atomic_write_json(scopes / "all-final.json", all_scope)
 
 
 def build_bundle(
@@ -154,37 +178,40 @@ def build_bundle(
     if not siderius_checkout.is_dir():
         raise ValueError("an exact-pin SIDERIUS checkout is required")
     deployment = repo / "deployments" / "tidmad_coding_agent_baseline"
-    data_manifest = (
-        repo / "campaigns" / "tidmad_gold" / "inputs" / "q3_data_manifest.sha256"
-    )
+    data_manifest = repo / "campaigns" / "tidmad_gold" / "inputs" / "q3_data_manifest.sha256"
     with tempfile.TemporaryDirectory(prefix="tidmad-coding-agent-bundle-") as raw:
         staging = Path(raw) / "tidmad-coding-agent-baseline"
         input_root = staging / "input"
         harness_root = staging / "harness" / "baseline_harness"
         input_root.mkdir(parents=True)
         harness_root.mkdir(parents=True)
-        for source in _tracked_task_files(repo):
-            _copy_relative(source, repo, input_root)
+        evaluator_root = staging / "evaluator"
+        evaluator_root.mkdir()
+        private_task_root = evaluator_root / "task_snapshot"
+        _copy_task_views(_tracked_task_files(repo), repo, input_root, private_task_root)
         shutil.copy2(task_md, input_root / "task.md")
         for source in sorted((deployment / "tools").glob("*.py")):
             shutil.copy2(source, harness_root / source.name)
         shutil.copytree(deployment / "systemd", staging / "harness" / "systemd")
         shutil.copytree(deployment / "machine", staging / "harness" / "machine")
-        evaluator_root = staging / "evaluator"
-        evaluator_root.mkdir()
         shutil.copy2(data_manifest, evaluator_root / "data_manifest.sha256")
-        _write_full_evaluation_scopes(input_root, evaluator_root)
+        _write_evaluation_scopes(private_task_root, evaluator_root)
         siderius_revision, wheel_sha = _build_evaluator(
             repo, siderius_checkout.resolve(), evaluator_root
+        )
+        shutil.copy2(
+            evaluator_root / "requirements.txt",
+            input_root / "inference-requirements.txt",
         )
         _write_checksums(evaluator_root, evaluator_root / "SHA256")
         atomic_write_json(
             input_root / "provenance.json",
             {
-                "version": "tidmad-coding-agent-input-v2",
+                "version": "tidmad-coding-agent-input-v3",
                 "siderius_exp_revision": _git(repo, "rev-parse", "HEAD"),
                 "siderius_revision": siderius_revision,
                 "task_tree": _git(repo, "rev-parse", "HEAD:tasks/tidmad"),
+                "task_visibility": "agent-public-view-v1",
                 "siderius_wheel_sha256": wheel_sha,
                 "task_md_sha256": sha256_file(task_md),
             },
@@ -194,12 +221,8 @@ def build_bundle(
         temporary = output.with_name(f".{output.name}.tmp")
         with (
             temporary.open("wb") as raw_output,
-            gzip.GzipFile(
-                filename="", mode="wb", fileobj=raw_output, mtime=0
-            ) as compressed,
-            tarfile.open(
-                fileobj=compressed, mode="w", format=tarfile.PAX_FORMAT
-            ) as archive,
+            gzip.GzipFile(filename="", mode="wb", fileobj=raw_output, mtime=0) as compressed,
+            tarfile.open(fileobj=compressed, mode="w", format=tarfile.PAX_FORMAT) as archive,
         ):
             archive.add(
                 staging,

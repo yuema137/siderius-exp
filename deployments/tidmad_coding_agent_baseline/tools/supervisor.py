@@ -12,7 +12,6 @@ from pathlib import Path
 
 from .agent_command import command_for, prompt_bytes
 from .deadline import load_or_create
-from .finalize import finalize
 from .io import create_json_once
 from .model import AgentProduct, utc_text
 
@@ -150,7 +149,6 @@ def main() -> int:
         prompt=args.prompt,
         scheduled_start_epoch=args.scheduled_start_epoch,
     )
-    finalize(args.work_root, args.product)
     return 0
 
 

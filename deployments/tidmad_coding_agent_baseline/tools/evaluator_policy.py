@@ -16,13 +16,17 @@ _SCOPE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 class EvaluatorPolicy:
     """Evaluator-owned roots; none are selected by the agent."""
 
-    input_root: Path = Path("/work/input")
+    input_root: Path = Path("/opt/tidmad-evaluator/assets/task_snapshot")
     scope_root: Path = Path("/opt/tidmad-evaluator/assets/evaluation_scopes")
-    raw_data_dir: Path = Path("/data/private-validation")
+    development_truth_dir: Path = Path("/data/private-development")
+    development_input_dir: Path = Path("/data/public-development")
+    final_input_dir: Path = Path("/data/private-validation-input")
+    final_truth_dir: Path = Path("/data/private-validation")
     agent_root: Path = Path("/work/agent")
     archive_root: Path = Path("/var/lib/tidmad-baseline/candidates")
     evaluation_root: Path = Path("/var/lib/tidmad-baseline/evaluations")
     health_config_root: Path = Path("/var/lib/tidmad-baseline/health-configs")
+    final_output_dir: Path = Path("/var/lib/tidmad-baseline/final-denoised")
     final_score: Path = Path("/var/lib/tidmad-baseline/final_score.json")
 
     def agent_path(self, supplied: Path, *, label: str) -> Path:
@@ -30,7 +34,7 @@ class EvaluatorPolicy:
 
         return _contained(self.agent_root, supplied, label=label)
 
-    def scope_path(self, scope_name: str, *, band: str | None) -> Path:
+    def scope_path(self, scope_name: str, *, band: str | None, phase: str) -> Path:
         """Resolve a root-owned named evaluation scope."""
 
         if not _SCOPE_NAME.fullmatch(scope_name):
@@ -38,12 +42,23 @@ class EvaluatorPolicy:
         expected = "all" if band is None else band
         if expected not in (*BANDS, "all"):
             raise ValueError(f"unsupported evaluation scope band: {expected}")
+        if phase not in {"development", "final"}:
+            raise ValueError(f"unsupported evaluation phase: {phase}")
+        required_name = f"{'all' if band is None else f'band-{band}'}-{phase}"
+        if scope_name != required_name:
+            raise ValueError(f"{phase} evaluation requires frozen scope {required_name!r}")
         path = self.scope_root / f"{scope_name}.json"
         if not path.is_file():
             raise ValueError(f"frozen evaluation scope is missing: {scope_name}")
         payload = json.loads(path.read_text())
         observed = {int(value) for value in payload}
-        if expected == "all":
+        if phase == "development":
+            from .model import DEVELOPMENT_FILE_BY_BAND
+
+            if band is None:
+                raise ValueError("development evaluation requires one band")
+            required = {DEVELOPMENT_FILE_BY_BAND[band]}
+        elif expected == "all":
             required = set(range(20))
         else:
             low, high = (int(value) for value in expected.split("-"))

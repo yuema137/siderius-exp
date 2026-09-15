@@ -21,9 +21,10 @@ from .archive_candidate import (
     validate_candidate_source,
 )
 from .evaluator_policy import EvaluatorPolicy
+from .final_inference import run_candidate_inference
 from .health import evaluate_candidate_health
 from .io import atomic_write_json, fsync_directory
-from .model import BANDS, utc_text
+from .model import BANDS, DEVELOPMENT_FILE_BY_BAND, utc_text
 
 
 def _load_runtime(input_root: Path):
@@ -32,11 +33,11 @@ def _load_runtime(input_root: Path):
     resolved = str(input_root.resolve())
     if resolved not in sys.path:
         sys.path.insert(0, resolved)
-    from execute_tools.dataset_config import load_dataset_profile
-
     from tasks.tidmad.runtime.anchor_map import load_anchor_map
     from tasks.tidmad.runtime.scoreability import TidmadScoreabilityContract
     from tasks.tidmad.runtime.scoring import score_vector
+
+    from execute_tools.dataset_config import load_dataset_profile
 
     return (
         load_dataset_profile,
@@ -50,24 +51,18 @@ def _sample_set(path: Path) -> dict[int, list[int]]:
     payload = json.loads(path.read_text())
     if not isinstance(payload, dict):
         raise TypeError("sample set must be a JSON object")
-    return {
-        int(key): [int(value) for value in values] for key, values in payload.items()
-    }
+    return {int(key): [int(value) for value in values] for key, values in payload.items()}
 
 
 def _deliverable_name(input_root: Path, file_index: int) -> str:
     spec = json.loads(
-        (
-            input_root / "tasks" / "tidmad" / "resolved" / "deliverable_spec.json"
-        ).read_text()
+        (input_root / "tasks" / "tidmad" / "resolved" / "deliverable_spec.json").read_text()
     )
     naming = spec["naming"]
     return f"{naming['prefix']}_{file_index:0{int(naming['index_width'])}d}{naming['extension']}"
 
 
-def _scoreability(
-    input_root: Path, deliverables: dict[int, str], contract_type: Any
-) -> None:
+def _scoreability(input_root: Path, deliverables: dict[int, str], contract_type: Any) -> None:
     metric = json.loads(
         (input_root / "tasks" / "tidmad" / "resolved" / "metric_spec.json").read_text()
     )
@@ -79,9 +74,7 @@ def _scoreability(
             raise ValueError(f"candidate deliverable must be a regular file: {path}")
     verdict = contract.check(deliverables)
     if not verdict.scoreable:
-        details = "; ".join(
-            f"{item.requirement}: {item.detail}" for item in verdict.failures
-        )
+        details = "; ".join(f"{item.requirement}: {item.detail}" for item in verdict.failures)
         raise ValueError(f"candidate deliverables are not scoreable: {details}")
 
 
@@ -98,12 +91,8 @@ def compute_score(
     profile = load_profile(task_root / "resolved" / "dataset_profile.json")
     anchor_map = load_anchors(task_root / "reference_data" / "segment_anchors.json")
     sample_set = _sample_set(sample_set_path)
-    paths = [
-        denoised_dir / _deliverable_name(input_root, index) for index in sample_set
-    ]
-    deliverables = {
-        index: str(path) for index, path in zip(sample_set, paths, strict=True)
-    }
+    paths = [denoised_dir / _deliverable_name(input_root, index) for index in sample_set]
+    deliverables = {index: str(path) for index, path in zip(sample_set, paths, strict=True)}
     _scoreability(input_root, deliverables, contract_type)
     file_vector, scalar = score_vector(
         data_dir=str(denoised_dir),
@@ -137,21 +126,18 @@ def _delete_scored_deliverables(paths: list[Path]) -> None:
         path.unlink()
 
 
-def score_candidate(
-    args: argparse.Namespace, policy: EvaluatorPolicy | None = None
-) -> Path:
+def score_candidate(args: argparse.Namespace, policy: EvaluatorPolicy | None = None) -> Path:
     policy = policy or EvaluatorPolicy()
     validate_candidate_identity(args.candidate_id)
-    candidate_source = policy.agent_path(
-        args.candidate_source, label="candidate source"
+    candidate_source = policy.agent_path(args.candidate_source, label="candidate source")
+    sample_set = policy.scope_path(
+        f"band-{args.band}-development",
+        band=args.band,
+        phase="development",
     )
-    denoised_dir = policy.agent_path(args.denoised_dir, label="denoised directory")
-    sample_set = policy.scope_path(args.scope, band=args.band)
     policy.archive_root.parent.mkdir(parents=True, exist_ok=True)
     snapshot_root = Path(
-        tempfile.mkdtemp(
-            prefix=f".{args.candidate_id}.snapshot.", dir=policy.archive_root.parent
-        )
+        tempfile.mkdtemp(prefix=f".{args.candidate_id}.snapshot.", dir=policy.archive_root.parent)
     )
     snapshot = snapshot_root / "candidate"
     # Preserve links as links so an evaluator-owned copy cannot dereference an
@@ -160,20 +146,27 @@ def score_candidate(
     validate_candidate_source(snapshot)
     candidate_digest = candidate_tree_digest(snapshot)
     try:
+        denoised_dir = run_candidate_inference(
+            winners={args.band: (args.candidate_id, snapshot_root)},
+            task_root=policy.input_root,
+            input_root=policy.development_input_dir,
+            output_root=snapshot_root / "denoised",
+            files_by_band={args.band: (DEVELOPMENT_FILE_BY_BAND[args.band],)},
+            opaque_band_inputs=True,
+        )
         score, deliverables = compute_score(
             input_root=policy.input_root,
-            raw_data_dir=policy.raw_data_dir,
+            raw_data_dir=policy.development_truth_dir,
             denoised_dir=denoised_dir,
             sample_set_path=sample_set,
             workers=args.workers,
         )
         denoised_paths = {
-            index: path
-            for index, path in zip(_sample_set(sample_set), deliverables, strict=True)
+            index: path for index, path in zip(_sample_set(sample_set), deliverables, strict=True)
         }
         health = evaluate_candidate_health(
             input_root=policy.input_root,
-            raw_data_dir=policy.raw_data_dir,
+            raw_data_dir=policy.development_truth_dir,
             denoised_paths=denoised_paths,
             file_vector=score["file_vector"],
             scalar=float(score["scalar"]),
@@ -183,6 +176,7 @@ def score_candidate(
         )
         score.update(
             {
+                "evaluation_split": "development",
                 "health_status": health.status,
                 "health_passed": health.eligible,
                 "health_gate_results": health.gate_results,
@@ -275,27 +269,26 @@ def _winner_map(values: list[str]) -> dict[str, str]:
     return winners
 
 
-def score_final(
-    args: argparse.Namespace, policy: EvaluatorPolicy | None = None
-) -> Path:
+def score_final(args: argparse.Namespace, policy: EvaluatorPolicy | None = None) -> Path:
     policy = policy or EvaluatorPolicy()
     winners = _winner_map(args.winner)
-    denoised_dir = policy.agent_path(args.denoised_dir, label="denoised directory")
-    sample_set = policy.scope_path(args.scope, band=None)
+    denoised_dir = args.denoised_dir.resolve(strict=True)
+    if denoised_dir != policy.final_output_dir.resolve(strict=True):
+        raise ValueError(f"final denoised directory must be evaluator-owned: {denoised_dir}")
+    sample_set = policy.scope_path("all-final", band=None, phase="final")
     score, deliverables = compute_score(
         input_root=policy.input_root,
-        raw_data_dir=policy.raw_data_dir,
+        raw_data_dir=policy.final_truth_dir,
         denoised_dir=denoised_dir,
         sample_set_path=sample_set,
         workers=args.workers,
     )
     denoised_paths = {
-        index: path
-        for index, path in zip(_sample_set(sample_set), deliverables, strict=True)
+        index: path for index, path in zip(_sample_set(sample_set), deliverables, strict=True)
     }
     health = evaluate_candidate_health(
         input_root=policy.input_root,
-        raw_data_dir=policy.raw_data_dir,
+        raw_data_dir=policy.final_truth_dir,
         denoised_paths=denoised_paths,
         file_vector=score["file_vector"],
         scalar=float(score["scalar"]),
@@ -305,6 +298,7 @@ def score_final(
     )
     score.update(
         {
+            "evaluation_split": "final",
             "health_status": health.status,
             "health_passed": health.eligible,
             "health_gate_results": health.gate_results,
@@ -321,6 +315,8 @@ def score_final(
             f"health_status={health.status}; no final artifact was written"
         )
     score["winner_candidates"] = winners
+    score["score_epoch"] = int(time.time())
+    score["score_utc"] = utc_text(score["score_epoch"])
     atomic_write_json(policy.final_score, score)
     policy.final_score.chmod(0o440)
     fsync_directory(policy.final_score.parent)
@@ -329,8 +325,6 @@ def score_final(
 
 
 def _common(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("--denoised-dir", type=Path, required=True)
-    parser.add_argument("--scope", required=True)
     parser.add_argument("--workers", type=int, default=8)
 
 
@@ -342,11 +336,8 @@ def main() -> int:
     candidate.add_argument("--candidate-source", type=Path, required=True)
     candidate.add_argument("--band", choices=BANDS, required=True)
     candidate.add_argument("--candidate-id", required=True)
-    final = subparsers.add_parser("final")
-    _common(final)
-    final.add_argument("--winner", action="append", required=True)
     args = parser.parse_args()
-    output = score_candidate(args) if args.mode == "candidate" else score_final(args)
+    output = score_candidate(args)
     print(output)
     return 0
 

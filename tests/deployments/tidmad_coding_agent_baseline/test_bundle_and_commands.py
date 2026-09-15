@@ -5,7 +5,6 @@ import tarfile
 from pathlib import Path
 
 import pytest
-
 from deployments.tidmad_coding_agent_baseline.tools import build_bundle as bundle_module
 from deployments.tidmad_coding_agent_baseline.tools.agent_command import command_for
 from deployments.tidmad_coding_agent_baseline.tools.build_bundle import build_bundle
@@ -26,9 +25,7 @@ def test_product_commands_pin_models_effort_and_noninteractive_permissions(tmp_p
     assert "--permission-prompts" not in claude
 
 
-def test_bundle_requires_task_md_and_snapshots_existing_task_unchanged(
-    tmp_path, monkeypatch
-):
+def test_bundle_splits_public_task_view_from_exact_private_task_snapshot(tmp_path, monkeypatch):
     missing = tmp_path / "missing.md"
     siderius_checkout = tmp_path / "siderius"
     siderius_checkout.mkdir()
@@ -52,16 +49,27 @@ def test_bundle_requires_task_md_and_snapshots_existing_task_unchanged(
     with tarfile.open(output, "r:gz") as archive:
         names = set(archive.getnames())
         assert "tidmad-coding-agent-baseline/input/task.md" in names
+        assert any(name.endswith("/input/tasks/tidmad/resolved/metric_spec.json") for name in names)
+        assert not any(
+            name.endswith("/input/tasks/tidmad/reference_data/segment_anchors.json")
+            for name in names
+        )
+        assert not any(
+            name.endswith("/input/tasks/tidmad/reference_data/tidmad_signal_frequencies.txt")
+            for name in names
+        )
         assert any(
-            name.endswith("/input/tasks/tidmad/resolved/metric_spec.json")
+            name.endswith(
+                "/evaluator/task_snapshot/tasks/tidmad/reference_data/segment_anchors.json"
+            )
             for name in names
         )
         assert "tidmad-coding-agent-baseline/input/bundle.sha256" in names
         assert (
-            "tidmad-coding-agent-baseline/evaluator/"
-            "siderius-0.2.0rc6-py3-none-any.whl"
+            "tidmad-coding-agent-baseline/evaluator/siderius-0.2.0rc6-py3-none-any.whl"
         ) in names
         assert "tidmad-coding-agent-baseline/evaluator/requirements.txt" in names
+        assert "tidmad-coding-agent-baseline/input/inference-requirements.txt" in names
 
         repo = Path(__file__).resolve().parents[3]
         task_members = [
@@ -72,35 +80,38 @@ def test_bundle_requires_task_md_and_snapshots_existing_task_unchanged(
         assert task_members
         bundled_paths = {member.name.split("/input/", 1)[1] for member in task_members}
         tracked_paths = {
-            str(path.relative_to(repo))
-            for path in bundle_module._tracked_task_files(repo)
+            str(path.relative_to(repo)) for path in bundle_module._tracked_task_files(repo)
         }
-        assert bundled_paths == tracked_paths
+        expected_public = {
+            path
+            for path in tracked_paths
+            if not bundle_module._is_evaluator_only_task_file(repo / path, repo)
+        }
+        assert bundled_paths == expected_public
         for member in task_members:
             relative = member.name.split("/input/", 1)[1]
             extracted = archive.extractfile(member)
             assert extracted is not None
             assert extracted.read() == (repo / relative).read_bytes()
 
-        provenance_member = archive.getmember(
-            "tidmad-coding-agent-baseline/input/provenance.json"
-        )
+        provenance_member = archive.getmember("tidmad-coding-agent-baseline/input/provenance.json")
         provenance_file = archive.extractfile(provenance_member)
         assert provenance_file is not None
         provenance = json.load(provenance_file)
-        assert provenance["version"] == "tidmad-coding-agent-input-v2"
+        assert provenance["version"] == "tidmad-coding-agent-input-v3"
+        assert provenance["task_visibility"] == "agent-public-view-v1"
         assert len(provenance["task_md_sha256"]) == 64
 
 
 def test_canonical_task_md_separates_raw_score_health_and_agent_strategy():
     repo = Path(__file__).resolve().parents[3]
-    text = (
-        repo / "deployments/tidmad_coding_agent_baseline/task.md"
-    ).read_text()
+    text = (repo / "deployments/tidmad_coding_agent_baseline/task.md").read_text()
     assert "finite raw score alone is **not** a valid result" in text
     assert "health_regression.yaml" in text
     assert "Health error, missing Health evidence" in text
-    assert "not a prescribed research workflow" in text
+    assert "trained machine-learning model" in text
+    assert "Do not fit, tune, infer" in text
+    assert "There is no agent-callable final-scoring command" in text
     assert "raw_and_ground_score.md" in text
 
 
@@ -109,10 +120,11 @@ def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():
 
     repo = Path(__file__).resolve().parents[3]
     install = (
-        repo
-        / "deployments"
-        / "tidmad_coding_agent_baseline"
-        / "machine"
-        / "install_vm.sh"
+        repo / "deployments" / "tidmad_coding_agent_baseline" / "machine" / "install_vm.sh"
     ).read_text()
     assert "--force-reinstall --no-deps" in install
+    assert "SETENV" not in install
+    assert "/opt/tidmad-inference/venv" in install
+    assert "baseline-inference" in install
+    assert "refuse to replace a bundle while the evaluated agent is active" in install
+    assert "rm -rf -- /work/harness /work/input" in install

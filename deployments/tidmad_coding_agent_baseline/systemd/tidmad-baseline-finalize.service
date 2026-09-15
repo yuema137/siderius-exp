@@ -1,0 +1,13 @@
+[Unit]
+Description=Finalize the hidden TIDMAD coding-agent evaluation
+After=tidmad-coding-agent.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+EnvironmentFile=/etc/tidmad-baseline/agent.env
+ExecStartPre=/bin/systemctl stop tidmad-coding-agent.service
+ExecStart=/opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.finalize --product ${BASELINE_PRODUCT}
+TimeoutStartSec=infinity
+Nice=5

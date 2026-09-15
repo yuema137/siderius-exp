@@ -16,6 +16,10 @@ ACTIVE_UNITS = (
     "tidmad-coding-agent.service",
     "tidmad-baseline-start.timer",
     "tidmad-baseline-stop.timer",
+    "tidmad-baseline-finalize.timer",
+    "tidmad-baseline-finalize.service",
+    "tidmad-baseline-backup.timer",
+    "tidmad-baseline-backup.service",
 )
 
 
@@ -23,9 +27,7 @@ def _safe_work_root(root: Path) -> bool:
     """Accept the production mount or an explicitly nested test/deployment root."""
 
     return (
-        root.is_absolute()
-        and root != Path("/")
-        and (root == Path("/work") or len(root.parts) >= 3)
+        root.is_absolute() and root != Path("/") and (root == Path("/work") or len(root.parts) >= 3)
     )
 
 
@@ -40,14 +42,10 @@ def _verify_manifest(input_root: Path) -> None:
         relative = relative.lstrip("*")
         target = input_root / relative
         if not target.is_file() or sha256_file(target) != expected:
-            raise ValueError(
-                f"input manifest mismatch at line {line_number}: {relative}"
-            )
+            raise ValueError(f"input manifest mismatch at line {line_number}: {relative}")
 
 
-def clear_workspace(
-    work_root: Path, owner: str | None = None, group: str | None = None
-) -> None:
+def clear_workspace(work_root: Path, owner: str | None = None, group: str | None = None) -> None:
     root = work_root.resolve()
     if not _safe_work_root(root):
         raise ValueError(f"unsafe work root: {root}")
@@ -71,6 +69,7 @@ def clear_retained_state(
     evaluator_user: str,
     results_group: str,
     backup_user: str,
+    inference_group: str,
     *,
     expected_root: Path = Path("/var/lib/tidmad-baseline"),
 ) -> None:
@@ -81,6 +80,8 @@ def clear_retained_state(
         "candidates",
         "evaluations",
         "health-configs",
+        "final-denoised",
+        "inference-sessions",
         "backup-receipts",
     ):
         target = root / name
@@ -100,16 +101,16 @@ def clear_retained_state(
     receipts = root / "backup-receipts"
     receipts.mkdir(mode=0o700)
     shutil.chown(receipts, user=backup_user, group=backup_user)
+    sessions = root / "inference-sessions"
+    sessions.mkdir(mode=0o750)
+    shutil.chown(sessions, user="root", group=inference_group)
 
 
 def _require_services_stopped() -> None:
     active = [
         unit
         for unit in ACTIVE_UNITS
-        if subprocess.run(
-            ["systemctl", "is-active", "--quiet", unit], check=False
-        ).returncode
-        == 0
+        if subprocess.run(["systemctl", "is-active", "--quiet", unit], check=False).returncode == 0
     ]
     if active:
         raise RuntimeError(f"refuse to clear while baseline units are active: {active}")
@@ -120,9 +121,7 @@ def main() -> int:
     parser.add_argument("--work-root", type=Path, default=Path("/work"))
     parser.add_argument("--owner")
     parser.add_argument("--group")
-    parser.add_argument(
-        "--retained-root", type=Path, default=Path("/var/lib/tidmad-baseline")
-    )
+    parser.add_argument("--retained-root", type=Path, default=Path("/var/lib/tidmad-baseline"))
     args = parser.parse_args()
     if (args.owner is not None or args.group is not None) and os.geteuid() != 0:
         parser.error("--owner/--group require root")
@@ -133,6 +132,7 @@ def main() -> int:
         evaluator_user="baseline-evaluator",
         results_group="baseline-results",
         backup_user="baseline-backup",
+        inference_group="baseline-inference",
     )
     print("workspace reset; frozen input manifest verified before and after")
     return 0

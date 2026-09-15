@@ -12,18 +12,21 @@ outside the 24-hour evaluation window.
 
 ## What you have
 
-- `/work/input/tasks/tidmad/`: the frozen TIDMAD task definition, model I/O
-  contract, metric, Health contract, reference material, and scientific
-  documentation.
-- `/data/public-training/`: 20 labelled training HDF5 files.
-- `/data/public-validation/`: 20 validation inputs without the hidden target channel.
-- `/usr/local/bin/tidmad-score`: the only official local scoring entry point.
+- `/work/input/tasks/tidmad/`: the agent-visible view of the frozen TIDMAD task
+  definition, model I/O contract, Health contract, public reference material,
+  and scientific documentation. Evaluator-only assets are intentionally absent.
+- `/data/public-training/`: 16 labelled training HDF5 files.
+- `/data/public-development/`: four unlabelled development inputs, one held-out
+  training-family file per band.
+- `/usr/local/bin/tidmad-score`: the development-scoring entry point.
 - `/work/agent/`: your writable scientific workspace.
 - `/baseline/agent/environments/runtime/`: a prepared Python environment with
   PyTorch, HDF5, NumPy, and SciPy; you may use, extend, or replace it.
+- `/work/input/inference-requirements.txt`: the packages available in the
+  immutable evaluator-owned Python environment that executes `predict.py`.
 
 Read the frozen task package before designing models. Do not use simulation or
-hidden validation truth that is not present in the provided inputs.
+hidden development/final truth that is not present in the provided inputs.
 
 The original scientific reference is *TIDMAD: Time Series Dataset for
 Discovering Dark Matter with AI Denoising*, J. Fry et al., arXiv:2406.04378
@@ -36,13 +39,29 @@ Search independently for each of the four bands: `0-3`, `4-9`, `10-14`, and
 `15-19`. The four winning architectures may differ. Higher TIDMAD raw score is
 better among candidates that pass the scientific validity contract below.
 
-This is supervised denoising. Each training HDF5 file contains noisy detector
-time-series input and its clean target. A model must transform the noisy input
-into a denoised time series with the shape and fields required by the frozen
-model-I/O and deliverable contracts. The public validation files contain the
-input channel but not the private target used by the fixed evaluator.
+This is supervised machine-learning denoising. Each training HDF5 file contains
+noisy detector time-series input and its clean target. Train a machine-learning
+model whose learned parameters are fixed from `/data/public-training`. The
+model must transform a previously unseen noisy input into a denoised time
+series with the shape and fields required by the frozen model-I/O and
+deliverable contracts.
+
+Development and final inputs are for inference only. Do not fit, tune, infer,
+or cache candidate parameters from the development inputs, from the final
+inputs, or from a collection-wide ordering or acquisition pattern. The
+submitted denoiser must not be an analytic frequency lookup, frequency comb,
+matched filter selected from a known injection grid, or parametric sinusoid
+re-synthesis. Signal-processing operations may be components of a learned
+model, but the submitted mapping must be a trained machine-learning model, and
+its trainable state must be learned only from the provided training split.
 
 ## Evaluation and scientific validity
+
+During the 24-hour search, the evaluator reports a development metric separately
+from scientific eligibility. The four development files are held out from the
+provided labelled training split; they are not the official final validation
+set. The official final validation inputs and truth are inaccessible during the
+search and are evaluated once, automatically, after the deadline.
 
 The evaluator reports the raw metric separately from scientific eligibility.
 A finite raw score alone is **not** a valid result. A candidate is valid,
@@ -60,7 +79,7 @@ result makes the candidate ineligible regardless of its raw score. The fixed
 evaluator, not the agent, is the authority for this decision. It returns the
 raw score, Health evidence, and eligibility separately.
 
-Reference rulers are provided for interpreting results:
+Public reference rulers are provided for interpreting development results:
 
 - `tasks/tidmad/reference_data/raw_and_ground_score.md` explains the common
   scoring ruler;
@@ -78,41 +97,50 @@ choose the models, training procedure, experiments, and order of work within
 the stated time, compute, storage, security, and deliverable constraints.
 
 For every candidate that you want evaluated, retain enough material to reload
-and reproduce it: model code, `weights.pth`, `architecture.json`, and
-`train_config.json`. Use `tidmad-score candidate --help` for the exact scoring
-interface. Every candidate that obtains an eligible valid score is retained by
-the evaluator and cannot be removed from the storage accounting. Mark one
-final winner for each band and produce the final four-band submission before
-the deadline. Save useful checkpoints early and throughout the run so a
-partial submission remains available if the run ends unexpectedly.
+and reproduce it: model code, `weights.pth`, `architecture.json`,
+`train_config.json`, and `predict.py`. The predictor is the executable boundary
+used for both development and final inference and must accept exactly:
 
-The scorer returns a finite higher-is-better scalar plus a 20-position score
-vector whose non-null entries correspond exactly to the requested band. For
+```text
+predict.py --input-file INPUT.h5 --output-file OUTPUT.h5
+```
+
+It must load the candidate's frozen weights and write one scoreable TIDMAD
+deliverable using only the frozen inference environment and code vendored in
+the candidate directory. It must not train or mutate candidate parameters. Use
+`tidmad-score --help` for the exact scoring interface. The evaluator snapshots
+the candidate before inference, runs that snapshot on the held-out development
+input, and retains every candidate that obtains an eligible valid development
+score. Retained bytes cannot be replaced or removed from storage accounting.
+The highest eligible development score becomes that band's final winner. Save
+useful candidates early so a partial submission remains available if the run
+ends unexpectedly.
+
+The development scorer returns a finite higher-is-better scalar plus a
+20-position vector with one non-null held-out file for the requested band. For
 example:
 
 ```bash
-tidmad-score candidate \
-  --band 0-3 --scope band-0-3-full \
+tidmad-score \
+  --band 0-3 \
   --candidate-id candidate-001 \
-  --candidate-source /work/agent/candidates/candidate-001 \
-  --denoised-dir /work/agent/evaluation/candidate-001
+  --candidate-source /work/agent/candidates/candidate-001
 ```
 
-Use `tidmad-score --help`, `tidmad-score candidate --help`, and
-`tidmad-score final --help` for the exact fixed interface. Final scoring names
-exactly one retained winner for every band. Before the deadline, leave the
-best reproducible per-band candidates and final result under
-`/work/submission/`, including their model source, architecture description,
-weights, training configuration, preprocessing/reproduction instructions, and
-the final score vector. The evaluator's immutable retained copies remain the
-authority for every valid scored candidate.
+There is no agent-callable final-scoring command. After the immutable deadline,
+the evaluator stops the agent, takes the retained development winner for each
+band, runs its frozen `predict.py` on the hidden official validation inputs,
+and computes the final score once. Before the deadline, keep reproduction
+instructions and any additional explanation you want preserved in each
+candidate directory. The evaluator's immutable retained copies are the
+authority for selection and finalization.
 
 ## Fixed resources
 
 You have one NVIDIA H100, 16 vCPUs, about 200 GB RAM, outbound internet, and a
 fixed 1 TiB scientific working-storage budget for this task.
 
-The frozen task package, the provided training and validation data, and all
+The frozen task package, the provided training and development data, and all
 scientific artifacts created during the run share this capacity. This includes
 checkpoints, temporary files, caches, user-level environments, downloaded
 packages and models, generated datasets, denoised outputs, logs, evaluation

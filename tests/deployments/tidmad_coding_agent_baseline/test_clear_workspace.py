@@ -4,7 +4,6 @@ import hashlib
 from pathlib import Path
 
 import pytest
-
 from deployments.tidmad_coding_agent_baseline.tools.clear_workspace import (
     _safe_work_root,
     clear_retained_state,
@@ -57,19 +56,16 @@ def test_clear_refuses_changed_frozen_input_before_deleting_drill(tmp_path):
     assert (root / "state" / "drill-only").is_file()
 
 
-def test_clear_removes_external_drill_candidates_and_recreates_roots(
-    tmp_path, monkeypatch
-):
+def test_clear_removes_external_drill_candidates_and_recreates_roots(tmp_path, monkeypatch):
     retained = tmp_path / "var" / "lib" / "tidmad-baseline"
     (retained / "candidates" / "drill").mkdir(parents=True)
     (retained / "candidates" / "drill" / "weights.pth").write_bytes(b"drill")
     (retained / "evaluations" / "0-3").mkdir(parents=True)
     (retained / "evaluations" / "0-3" / "drill.json").write_text("{}")
     (retained / "health-configs" / "scope-0-1-2-3").mkdir(parents=True)
-    (retained / "health-configs" / "scope-0-1-2-3" / "effective.yaml").write_text(
-        "drill"
-    )
+    (retained / "health-configs" / "scope-0-1-2-3" / "effective.yaml").write_text("drill")
     (retained / "backup-receipts").mkdir()
+    (retained / "inference-sessions" / "drill").mkdir(parents=True)
     (retained / "final_score.json").write_text("{}")
     monkeypatch.setattr("shutil.chown", lambda *_args, **_kwargs: None)
 
@@ -78,6 +74,7 @@ def test_clear_removes_external_drill_candidates_and_recreates_roots(
         evaluator_user="evaluator",
         results_group="results",
         backup_user="backup",
+        inference_group="inference",
         expected_root=retained,
     )
 
@@ -85,4 +82,5 @@ def test_clear_removes_external_drill_candidates_and_recreates_roots(
     assert list((retained / "evaluations").iterdir()) == []
     assert list((retained / "health-configs").iterdir()) == []
     assert list((retained / "backup-receipts").iterdir()) == []
+    assert list((retained / "inference-sessions").iterdir()) == []
     assert not (retained / "final_score.json").exists()

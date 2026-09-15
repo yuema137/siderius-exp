@@ -7,6 +7,19 @@ from datetime import UTC, datetime
 from typing import Any, Literal
 
 BANDS = ("0-3", "4-9", "10-14", "15-19")
+FILES_BY_BAND = {
+    band: tuple(range(int(band.split("-")[0]), int(band.split("-")[1]) + 1)) for band in BANDS
+}
+# One labelled release file per scientific band is withheld from model fitting.
+# These identities are a protocol decision, not a model-selection knob.
+DEVELOPMENT_FILE_BY_BAND = {
+    "0-3": 3,
+    "4-9": 9,
+    "10-14": 14,
+    "15-19": 19,
+}
+DEVELOPMENT_FILES = tuple(DEVELOPMENT_FILE_BY_BAND.values())
+TRAINING_FILES = tuple(index for index in range(20) if index not in DEVELOPMENT_FILES)
 AgentProduct = Literal["codex", "claude"]
 
 

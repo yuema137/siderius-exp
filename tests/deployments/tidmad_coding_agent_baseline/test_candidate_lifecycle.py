@@ -3,12 +3,15 @@ from __future__ import annotations
 import json
 
 import pytest
-
+from deployments.tidmad_coding_agent_baseline.tools import finalize as finalize_module
 from deployments.tidmad_coding_agent_baseline.tools.archive_candidate import (
     archive_candidate,
     candidate_tree_digest,
 )
 from deployments.tidmad_coding_agent_baseline.tools.finalize import finalize
+from deployments.tidmad_coding_agent_baseline.tools.model import (
+    DEVELOPMENT_FILE_BY_BAND,
+)
 
 
 def _source(root, tag):
@@ -17,14 +20,13 @@ def _source(root, tag):
     (root / "architecture.json").write_text(json.dumps({"tag": tag}))
     (root / "train_config.json").write_text(json.dumps({"epochs": 1}))
     (root / "weights.pth").write_bytes(tag.encode())
+    (root / "predict.py").write_text("raise SystemExit('test fixture only')\n")
     return root
 
 
 def _score(path, source, band, scalar):
-    low, high = (int(value) for value in band.split("-"))
     vector = [None] * 20
-    for index in range(low, high + 1):
-        vector[index] = scalar
+    vector[DEVELOPMENT_FILE_BY_BAND[band]] = scalar
     path.write_text(
         json.dumps(
             {
@@ -58,9 +60,7 @@ def test_valid_candidates_are_immutable_and_higher_score_marks_best(tmp_path):
     )
 
     assert (first / "COMPLETE.json").is_file()
-    assert (
-        json.loads((archive / "best" / "0-3.json").read_text())["candidate_id"] == "two"
-    )
+    assert json.loads((archive / "best" / "0-3.json").read_text())["candidate_id"] == "two"
     with pytest.raises(FileExistsError, match="already published"):
         archive_candidate(
             source=tmp_path / "one",
@@ -99,13 +99,21 @@ def test_finalizer_collects_partial_results_without_fabricating_score(tmp_path):
 
 
 def test_archive_refuses_score_with_wrong_band_identities(tmp_path):
+    candidate = _source(tmp_path / "candidate", "bad")
     bad = tmp_path / "bad-score.json"
     bad.write_text(
-        json.dumps({"valid": True, "scalar": 1.0, "file_vector": [1.0] * 20})
+        json.dumps(
+            {
+                "valid": True,
+                "scalar": 1.0,
+                "file_vector": [1.0] * 20,
+                "candidate_tree_sha256": candidate_tree_digest(candidate),
+            }
+        )
     )
-    with pytest.raises(ValueError, match="differ from band"):
+    with pytest.raises(ValueError, match="differ from frozen holdout"):
         archive_candidate(
-            source=_source(tmp_path / "candidate", "bad"),
+            source=candidate,
             score_path=bad,
             archive_root=tmp_path / "archive",
             band="0-3",
@@ -126,3 +134,51 @@ def test_archive_refuses_score_from_different_candidate_bytes(tmp_path):
             band="0-3",
             candidate_id="mismatch",
         )
+
+
+def test_finalizer_runs_hidden_final_once_from_four_retained_winners(tmp_path, monkeypatch):
+    archive = tmp_path / "state" / "candidates"
+    bands = ("0-3", "4-9", "10-14", "15-19")
+    for band in bands:
+        candidate = _source(tmp_path / f"candidate-{band}", band)
+        archive_candidate(
+            source=candidate,
+            score_path=_score(tmp_path / f"score-{band}.json", candidate, band, 1.0),
+            archive_root=archive,
+            band=band,
+            candidate_id=f"winner-{band}",
+        )
+
+    final_score = tmp_path / "state" / "final_score.json"
+    calls = []
+
+    def fake_inference(**kwargs):
+        calls.append(("inference", sorted(kwargs["winners"])))
+        kwargs["output_root"].mkdir(parents=True)
+        return kwargs["output_root"]
+
+    def fake_score(args, policy):
+        calls.append(("score", sorted(args.winner)))
+        policy.final_score.parent.mkdir(parents=True, exist_ok=True)
+        policy.final_score.write_text(
+            json.dumps(
+                {
+                    "valid": True,
+                    "file_vector": [1.0] * 20,
+                    "winner_candidates": {band: f"winner-{band}" for band in bands},
+                }
+            )
+        )
+        return policy.final_score
+
+    monkeypatch.setattr(finalize_module, "run_candidate_inference", fake_inference)
+    monkeypatch.setattr(finalize_module, "score_final", fake_score)
+    submission = finalize_module.finalize(
+        tmp_path,
+        "codex",
+        archive_root=archive,
+        final_score_path=final_score,
+    )
+
+    assert [name for name, _detail in calls] == ["inference", "score"]
+    assert json.loads((submission / "manifest.json").read_text())["complete"] is True
