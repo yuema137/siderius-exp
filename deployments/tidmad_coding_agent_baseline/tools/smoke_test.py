@@ -14,7 +14,7 @@ from .model import utc_text
 
 SMOKE_PROMPT = """This is a pre-budget smoke test, not the scientific run.
 Work only below {root}. Without asking for human approval:
-1. create result/write-ok.txt;
+1. write non-empty confirmation text to result/write-ok.txt;
 2. run Python and record its version in result/python.txt;
 3. run nvidia-smi and record its unedited output in result/gpu.txt;
 4. fetch https://example.com and record the HTTP result in result/network.txt;
@@ -115,6 +115,7 @@ def smoke(
             stdin=stdin,
             stdout=output,
             stderr=subprocess.STDOUT,
+            cwd=root,
             timeout=timeout_seconds,
             check=False,
         )
