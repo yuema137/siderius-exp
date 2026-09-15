@@ -22,8 +22,8 @@ outside the 24-hour evaluation window.
 - `/work/agent/`: your writable scientific workspace.
 - `/baseline/agent/environments/runtime/`: a prepared Python environment with
   PyTorch, HDF5, NumPy, and SciPy; you may use, extend, or replace it.
-- `/work/input/inference-requirements.txt`: the packages available in the
-  immutable evaluator-owned Python environment that executes `predict.py`.
+- `/work/input/inference-requirements.txt`: the packages used by the immutable
+  evaluator-owned runtime that executes submitted models.
 
 Read the frozen task package before designing models.
 
@@ -43,11 +43,18 @@ detector time-series input and its clean target. A candidate must transform a
 previously unseen noisy input into a denoised time series with the shape and
 fields required by the frozen model-I/O and deliverable contracts.
 
+The evaluated solution must be a trained ML denoising model. Its only inference
+input is an evaluator-created batch of raw, non-overlapping 40,000-sample
+segments. Segmentation, file handling, ADC offset conversion, output decoding,
+reassembly, and HDF5 writing are fixed evaluator operations; candidate-specific
+free-form preprocessing or postprocessing outside the submitted model is not
+part of this task. Within that model boundary, architecture and training choices
+are yours.
+
 The exact injected frequencies, scoring anchors, official validation inputs,
 and official validation truth are not part of the information available to the
-research condition. The evaluator enforces that boundary. Within the provided
-information, time, compute, storage, and output contracts, the choice of model,
-algorithm, training procedure, and research strategy is yours.
+research condition. The evaluator enforces that boundary through the mounted
+filesystem and the scoring interface.
 
 ## Evaluation and scientific validity
 
@@ -86,25 +93,39 @@ Public reference rulers are provided for interpreting development results:
 An unexpectedly high raw score is a reason to inspect scientific validity; it
 does not override Health and is not, by itself, evidence of improvement.
 
-These are evaluation requirements, not a prescribed research workflow. You
-choose the models, training procedure, experiments, and order of work within
-the stated time, compute, storage, security, and deliverable constraints.
+These are evaluation requirements, not a prescribed experiment schedule. You
+choose the ML architectures, training procedure, experiments, and order of work
+within the stated time, compute, storage, security, and deliverable constraints.
 
 For every candidate that you want evaluated, retain enough material to reload
-and reproduce it: model code, `weights.pth`, `architecture.json`,
-`train_config.json`, and `predict.py`. The predictor is the executable boundary
-used for both development and final inference and must accept exactly:
+and reproduce it: model source code, `weights.pth`, `architecture.json`,
+`train_config.json`, and an exported TorchScript `model.pt`. The evaluator,
+not candidate code, owns inference around that model. `model.pt` receives an
+`int64` tensor of shape `[B, 40000]` containing raw ADC values shifted by +128,
+and must return finite floating-point categorical logits of shape
+`[B, 256, 40000]`. The evaluator applies `argmax` over the class dimension,
+restores the persisted int8 representation, and creates the deliverable.
 
-```text
-predict.py --input-file INPUT.h5 --output-file OUTPUT.h5
+`weights.pth` must be a direct, non-empty PyTorch state dict whose tensors match
+the state embedded in `model.pt`. This establishes that the submitted artifact
+is a parameterized trained model; it does not prescribe an architecture.
+`architecture.json` must include the fixed inference contract (and may include
+additional architecture documentation):
+
+```json
+{
+  "version": "tidmad-segment-model-v1",
+  "segment_size": 40000,
+  "input_dtype": "int64",
+  "output_kind": "categorical_logits",
+  "num_classes": 256,
+  "inference_batch_size": 1
+}
 ```
 
-It must write one scoreable TIDMAD deliverable using only the frozen inference
-environment, the submitted candidate bytes, and the single input supplied for
-that invocation. The evaluator snapshots the candidate before inference and
-discards any changes made to the execution copy; only the output deliverable is
-used. Use `tidmad-score --help` for the exact scoring interface. The evaluator
-runs that snapshot on the held-out development input and retains every
+`inference_batch_size` may be from 1 through 32. Use `tidmad-score --help` for
+the exact scoring interface. The evaluator snapshots the candidate, runs its
+model on the held-out development input, and retains every
 candidate that obtains an eligible valid development score. Retained bytes
 cannot be replaced or removed from storage accounting. The highest eligible
 development score becomes that band's final winner. Save useful candidates
@@ -123,7 +144,7 @@ tidmad-score \
 
 There is no agent-callable final-scoring command. After the immutable deadline,
 the evaluator stops the agent, takes the retained development winner for each
-band, runs its frozen `predict.py` on the hidden official validation inputs,
+band, runs its frozen trained model on the hidden official validation inputs,
 and computes the final score once. Before the deadline, keep reproduction
 instructions and any additional explanation you want preserved in each
 candidate directory. The evaluator's immutable retained copies are the
@@ -159,7 +180,8 @@ You may use the installed command-line tools and outbound public internet for
 papers, documentation, public code, and package installation. Record enough
 dependency and source information to reproduce the final models. You have no
 access to evaluator credentials, private validation targets, supervisor
-controls, or external artifact storage, and should not attempt to obtain them.
+controls, or external artifact storage; those are not mounted into the agent
+environment.
 
 Do not stop merely because one reasonable solution works. Use the available
 time to test, compare, and improve candidates while keeping reproducible valid

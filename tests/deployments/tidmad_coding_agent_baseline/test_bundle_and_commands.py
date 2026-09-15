@@ -98,18 +98,23 @@ def test_bundle_splits_public_task_view_from_exact_private_task_snapshot(tmp_pat
         provenance_file = archive.extractfile(provenance_member)
         assert provenance_file is not None
         provenance = json.load(provenance_file)
-        assert provenance["version"] == "tidmad-coding-agent-input-v3"
-        assert provenance["task_visibility"] == "agent-public-view-v1"
+        assert provenance["version"] == "tidmad-coding-agent-input-v4"
+        assert provenance["task_visibility"] == "agent-public-view-v2"
         assert len(provenance["task_md_sha256"]) == 64
 
 
-def test_canonical_task_md_separates_raw_score_health_and_agent_strategy():
+def test_canonical_task_md_separates_score_health_and_segment_model_contract():
     repo = Path(__file__).resolve().parents[3]
     text = (repo / "deployments/tidmad_coding_agent_baseline/task.md").read_text()
     assert "finite raw score alone is **not** a valid result" in text
     assert "health_regression.yaml" in text
     assert "Health error, missing Health evidence" in text
-    assert "the choice of model" in text
+    assert "must be a trained ML denoising model" in text
+    assert "raw, non-overlapping 40,000-sample" in text
+    assert "candidate-specific\nfree-form preprocessing or postprocessing" in text
+    assert "TorchScript `model.pt`" in text
+    assert "`[B, 40000]`" in text
+    assert "`[B, 256, 40000]`" in text
     assert "frequency comb" not in text
     assert "matched filter" not in text
     assert "There is no agent-callable final-scoring command" in text

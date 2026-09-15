@@ -20,7 +20,7 @@ def _source(root, tag):
     (root / "architecture.json").write_text(json.dumps({"tag": tag}))
     (root / "train_config.json").write_text(json.dumps({"epochs": 1}))
     (root / "weights.pth").write_bytes(tag.encode())
-    (root / "predict.py").write_text("raise SystemExit('test fixture only')\n")
+    (root / "model.pt").write_bytes(tag.encode())
     return root
 
 
@@ -201,7 +201,7 @@ def test_finalizer_records_hidden_failure_without_retrying_or_losing_winners(tmp
 
     def fail_inference(**_kwargs):
         calls.append("inference")
-        raise RuntimeError("predictor failed")
+        raise RuntimeError("model inference failed")
 
     monkeypatch.setattr(finalize_module, "run_candidate_inference", fail_inference)
     first = finalize_module.finalize(
