@@ -341,6 +341,8 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
     ]
     assert len(commands) == 30
     for command in commands:
+        assert "--no-runtime_watchdog" in command
+        assert "--runtime_watchdog" not in command
         expected_values = {
             "--run_name": "cancer_mtg_campaign_v6_lit_on",
             "--max_rounds": "2",
@@ -358,3 +360,109 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
         assert Path(command[command.index("--advice") + 1]).name == (
             "mtg_campaign_v5.json"
         )
+
+
+def test_watchdog_replay_is_explicit_and_bounded(tmp_path: Path) -> None:
+    """The #388 replay must opt into watchdogs without widening the workload."""
+    checkout = _siderius_checkout()
+    data_dir = tmp_path / "data"
+    for network in ("cpdb", "ltg"):
+        network_dir = data_dir / network
+        network_dir.mkdir(parents=True)
+        (network_dir / "data.h5").touch()
+    workspace = tmp_path / "caller-owned-workspace"
+    completed = subprocess.run(
+        [
+            "bash",
+            str(LAUNCHER),
+            "--experiment",
+            "two_network_qualification",
+            "--profile",
+            "watchdog_replay",
+            "--siderius-checkout",
+            str(checkout),
+            "--workspace",
+            str(workspace),
+            "--data_dir",
+            str(data_dir),
+            "--dry-run",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=120,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    commands = [
+        shlex.split(line)
+        for line in completed.stdout.splitlines()
+        if "run_one_iteration.py" in line
+    ]
+    assert len(commands) == 1
+    command = commands[0]
+    expected_values = {
+        "--run_name": "cancer_two_network_watchdog_replay",
+        "--start_iteration": "1",
+        "--max_rounds": "1",
+        "--max_epochs": "1",
+        "--trial_max_epochs": "1",
+        "--formal_max_epochs": "1",
+        "--trial_portion": "0.25",
+        "--train_portion": "0.25",
+        "--eval_portion": "0.25",
+        "--formal_portion": "1.0",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--trial_time_budget_minutes": "5",
+        "--formal_time_budget_minutes": "20",
+        "--min_formal_batch_size": "1",
+        "--runtime_watchdog_safety_factor": "3.5",
+        "--runtime_watchdog_floor_seconds": "120",
+    }
+    values = {
+        command[index]: command[index + 1]
+        for index in range(len(command) - 1)
+        if command[index].startswith("--")
+    }
+    for flag, expected in expected_values.items():
+        assert values.get(flag) == expected
+    assert "--runtime_watchdog" in command
+    assert "--no-runtime_watchdog" not in command
+    assert "auto_resume=0, force_fresh=1" in completed.stdout
+    assert "--formal_round_strategy" in command
+    assert "--no-health_gate_enabled" in command
+    assert "Formal round   : policy=full_clone" in completed.stdout
+    assert values["--task_composition"].endswith("two_network.yaml")
+    assert values["--data_dir"] == str(data_dir)
+    assert values["--workspace"] == str(workspace)
+
+
+def test_watchdog_replay_rejects_other_experiments(tmp_path: Path) -> None:
+    """The replay profile cannot silently alter another experiment's treatment."""
+    data_dir = tmp_path / "data"
+    (data_dir / "mtg").mkdir(parents=True)
+    (data_dir / "mtg" / "data.h5").touch()
+    completed = subprocess.run(
+        [
+            "bash",
+            str(LAUNCHER),
+            "--experiment",
+            "mtg_size_qualification",
+            "--profile",
+            "watchdog_replay",
+            "--siderius-checkout",
+            str(tmp_path),
+            "--workspace",
+            str(tmp_path / "workspace"),
+            "--data_dir",
+            str(data_dir),
+            "--dry-run",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=120,
+    )
+    assert completed.returncode == 2
+    assert "requires --experiment two_network_qualification" in completed.stderr
+    assert "run_one_iteration.py" not in completed.stdout

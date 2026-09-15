@@ -25,3 +25,25 @@ bash experiments/cancer_gene_identification/launch.sh \
 
 Use `--dry-run` first. Any override creates a different experiment treatment
 and must be recorded separately.
+
+## Watchdog replay
+
+The issue-#388 CPDB/LTG replay is a separate, bounded profile. It is the only
+Cancer launcher profile that enables the runtime watchdog; it uses a fresh
+workspace identity, one Trial followed by a forced Formal round, one epoch,
+batch size one, a 20-minute Formal operator budget, a 3.5 watchdog safety
+factor, and a 120-second floor:
+
+```bash
+bash experiments/cancer_gene_identification/launch.sh \
+    --experiment two_network_qualification \
+    --profile watchdog_replay \
+    --siderius-checkout /path/to/pinned/SIDERIUS \
+    --workspace /path/to/fresh/cancer-watchdog-replay-workspace \
+    --data_dir /path/to/NatureBench/problem/data \
+    --dry-run
+```
+
+This profile is for the planned external replay and does not certify a
+runtime-profile or launch a workload by itself. Preserve its setup-only
+evidence and record the measured Formal admission/deadline after a real run.

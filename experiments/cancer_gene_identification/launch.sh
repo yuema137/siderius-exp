@@ -10,7 +10,7 @@ usage() {
 Usage: bash experiments/cancer_gene_identification/launch.sh \
   --siderius-checkout DIR --workspace DIR --data_dir DIR \
   [--experiment mtg_size_qualification|mtg_campaign|two_network_qualification|eight_network_comparison] \
-  [--profile qualification|campaign] \
+  [--profile qualification|campaign|watchdog_replay] \
   [extra run_chain.sh args...]
 
 Required:
@@ -120,6 +120,7 @@ case "$PROFILE" in
         )
         LIT_ARGS=()
         ADVICE_ARGS=()
+        WATCHDOG_ARGS=(--no-runtime_watchdog)
         ;;
     campaign)
         [ "$EXPERIMENT" = "mtg_campaign" ] || fail "--profile campaign requires --experiment mtg_campaign"
@@ -149,9 +150,44 @@ case "$PROFILE" in
             --advice "${EXPERIMENT_ROOT}/advice/mtg_campaign_v5.json"
             --advice_sha256 "c180d6a5238ccbabeb800c5c9bb539661a4f66c8bdced1b5cbff1cda14ab673f"
         )
+        WATCHDOG_ARGS=(--no-runtime_watchdog)
+        ;;
+    watchdog_replay)
+        [ "$EXPERIMENT" = "two_network_qualification" ] || fail "--profile watchdog_replay requires --experiment two_network_qualification"
+        PROFILE_ARGS=(
+            --run_name cancer_two_network_watchdog_replay
+            --force_fresh
+            --no_auto_resume
+            --formal_strategy snapshot
+            --formal_round_strategy full_clone
+            --force_formal_round
+            --num_iterations 1
+            --max_rounds 1
+            --max_epochs 1
+            --trial_max_epochs 1
+            --formal_max_epochs 1
+            --workflow_parameter_rules '{"train_config.epochs":{"exact":1},"train_config.batch_size":{"exact":1}}'
+            --trial_portion 0.25
+            --train_portion 0.25
+            --eval_portion 0.25
+            --formal_portion 1.0
+            --formal_train_portion 1.0
+            --formal_eval_portion 1.0
+            --trial_time_budget_minutes 5
+            --formal_time_budget_minutes 20
+            --trial_vram_budget_gb 10
+            --formal_vram_budget_gb 16
+        )
+        LIT_ARGS=(--no-ml_lit_review_enabled --no-health_gate_enabled)
+        ADVICE_ARGS=()
+        WATCHDOG_ARGS=(
+            --runtime_watchdog
+            --runtime_watchdog_safety_factor 3.5
+            --runtime_watchdog_floor_seconds 120
+        )
         ;;
     *)
-        fail "unknown profile '$PROFILE'; expected qualification or campaign"
+        fail "unknown profile '$PROFILE'; expected qualification, campaign, or watchdog_replay"
         ;;
 esac
 for network in "${NETWORKS[@]}"; do
@@ -181,7 +217,7 @@ exec bash "$LAUNCHER" \
     --min_formal_batch_size 1 \
     --vram_probe_step_timeout_seconds 600 \
     --vram_preflight_total_timeout_seconds 1800 \
-    --no-runtime_watchdog \
+    "${WATCHDOG_ARGS[@]}" \
     "${LIT_ARGS[@]}" \
     "${ADVICE_ARGS[@]}" \
     "${PROFILE_ARGS[@]}" \
