@@ -52,7 +52,7 @@ def test_explicit_health_scope_is_distinct_from_task_peek_defaults() -> None:
     assert health["health_peek_files"] == [3, 10, 17]
 
 
-def test_advice_is_factual_and_does_not_lock_fcnet() -> None:
+def test_advice_carries_the_approved_scale_and_resource_guidance() -> None:
     advice = json.loads(
         (
             ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json"
@@ -73,9 +73,11 @@ def test_advice_is_factual_and_does_not_lock_fcnet() -> None:
     assert "40000 -> 4000 -> 400 -> 40" in text
     assert "SmoothL1" in text and "beta=1" in text
     assert "activations" in text and "must not be invented" in text
-    assert "parameter count" not in text.lower() or "not a model lock" in " ".join(
-        advice["tune"]
-    )
+    assert "300M-parameter FCNet" in text
+    assert "10M-500M" in text
+    assert "do not leave most of the available envelope unused by default" in text
+    assert "hard ceilings" in text
+    assert "not an architecture lock" in " ".join(advice["tune"])
 
 
 def test_advice_digest_and_schema_are_verified_by_framework_loader() -> None:
@@ -119,7 +121,7 @@ def _data_root(tmp_path: Path, *, tamper_anchor: bool = False) -> Path:
 
 
 def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
-    revision = "1aa96013335d0d16e2484439ef6dd7ae8c26b94d"
+    revision = "14494576671ad6f6b1a772d966b1fced02fab2a9"
     checkout, capture = _fake_checkout(tmp_path, revision=revision)
     data = _data_root(tmp_path)
     workspace = tmp_path / "workspace"
@@ -203,7 +205,7 @@ def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
 def test_launcher_refuses_stale_inputs_and_overrides(
     tmp_path: Path, kind: str, expected: str
 ) -> None:
-    revision = "1aa96013335d0d16e2484439ef6dd7ae8c26b94d"
+    revision = "14494576671ad6f6b1a772d966b1fced02fab2a9"
     checkout, _ = _fake_checkout(
         tmp_path, revision=("wrong" if kind == "revision" else revision)
     )
