@@ -93,7 +93,7 @@ cp -a "${BUNDLE_ROOT}/evaluator/." /opt/tidmad-evaluator/assets/
 /opt/tidmad-evaluator/venv/bin/pip install --disable-pip-version-check \
     --requirement /opt/tidmad-evaluator/assets/requirements.txt
 /opt/tidmad-evaluator/venv/bin/pip install --disable-pip-version-check \
-    --no-deps "/opt/tidmad-evaluator/assets/${WHEEL_NAME}"
+    --force-reinstall --no-deps "/opt/tidmad-evaluator/assets/${WHEEL_NAME}"
 EVALUATOR_SITE="$(/opt/tidmad-evaluator/venv/bin/python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
 cp -a /work/harness/baseline_harness "$EVALUATOR_SITE/"
 chown -R baseline-evaluator:baseline-evaluator /opt/tidmad-evaluator

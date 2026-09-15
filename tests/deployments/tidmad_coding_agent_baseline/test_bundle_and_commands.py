@@ -102,3 +102,17 @@ def test_canonical_task_md_separates_raw_score_health_and_agent_strategy():
     assert "Health error, missing Health evidence" in text
     assert "not a prescribed research workflow" in text
     assert "raw_and_ground_score.md" in text
+
+
+def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():
+    """A pin change can retain the package version and must still reinstall."""
+
+    repo = Path(__file__).resolve().parents[3]
+    install = (
+        repo
+        / "deployments"
+        / "tidmad_coding_agent_baseline"
+        / "machine"
+        / "install_vm.sh"
+    ).read_text()
+    assert "--force-reinstall --no-deps" in install
