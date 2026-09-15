@@ -14,6 +14,13 @@ The active framework revision for new work is the exact value in the repository
 `14494576671ad6f6b1a772d966b1fced02fab2a9`. Older SHAs in this document are
 evidence labels for completed migration witnesses.
 
+The task-owned validation adapter is memory-bounded: it validates the complete
+declared HDF5 scope from metadata, then reads signal rows lazily as the
+framework DataLoader requests them. Full Formal validation therefore does not
+copy the whole selected validation corpus into host RAM. Training keeps its
+existing eager, shuffleable epoch dataset; this change does not alter training
+selection or ordering.
+
 | projected in this pack (PR0) | how | verified by |
 |---|---|---|
 | `DatasetProfile` | `resolved/dataset_profile.json` — GENERATED, DO NOT EDIT | `tests/unit/examples/test_tidmad_projection.py` (deep-compare vs `resolve_dataset_profile()`) |
@@ -51,6 +58,12 @@ test rather than being harmless.
 
 ## Separation qualification — dated evidence
 
+- On 2026-09-15, the task-owned lazy validation adapter constructed the full
+  files 15--19 Formal scope at segmentation size 40,000: 250,000 logical rows,
+  exact 50,000-row ranges per file, 0.035 seconds construction time, and a
+  2.105 MiB process peak-RSS increase. Construction read metadata only. All
+  five source-file SHA-256 values matched the committed Q3 manifest. This is a
+  data-path/memory-bound witness, not a model-training or score result.
 - `compositions/bounded_qualification.yaml` resolves from `siderius-exp`
   against SIDERIUS `7476bf44` with task-data-path id `tidmad`, primary metric
   `tidmad_denoising_score`, and semantic fingerprint
