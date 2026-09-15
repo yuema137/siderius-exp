@@ -155,3 +155,15 @@ def test_vm_install_binds_noninteractive_agent_state_to_working_disk():
     assert "UV_CACHE_DIR=/baseline/agent/cache/uv" in install
     assert "NPM_CONFIG_CACHE=/baseline/agent/cache/npm" in install
     assert "PATH=/baseline/agent/home/.local/bin:" in install
+
+
+def test_vm_install_makes_inference_session_reachable_without_results_membership():
+    """Catch a correct child directory made unreachable by its parent mode."""
+
+    repo = Path(__file__).resolve().parents[3]
+    install = (
+        repo / "deployments" / "tidmad_coding_agent_baseline" / "machine" / "install_vm.sh"
+    ).read_text()
+
+    assert "baseline-evaluator -g baseline-results -m 2751" in install
+    assert "usermod -a -G baseline-results baseline-inference" not in install
