@@ -196,6 +196,10 @@ runs its frozen model through evaluator-owned segmentation and output assembly,
 applies scoring and Health, and retains eligible
 candidates. It does not expose an official-final scoring command.
 
+The inference identity receives execute-only traversal through the retained
+state root to its own root-created session directory. It is not a member of the
+results group and cannot list or read retained sibling state.
+
 ```bash
 tidmad-score \
   --band 0-3 \

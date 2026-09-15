@@ -103,8 +103,13 @@ for child in agent state submission logs; do
     install -d -o baseline-agent -g baseline-results -m 2770 "/work/$child"
 done
 install -d -o root -g root -m 0755 /data
+# The inference identity needs execute-only traversal to its isolated session
+# subtree. It must not gain baseline-results membership, which would expose
+# retained candidate/evaluation siblings as readable state.
+install -d -o baseline-evaluator -g baseline-results -m 2751 \
+    /var/lib/tidmad-baseline
 install -d -o baseline-evaluator -g baseline-results -m 2750 \
-    /var/lib/tidmad-baseline /var/lib/tidmad-baseline/candidates
+    /var/lib/tidmad-baseline/candidates
 install -d -o root -g baseline-inference -m 0750 \
     /var/lib/tidmad-baseline/inference-sessions
 install -d -o baseline-backup -g baseline-backup -m 0700 \
