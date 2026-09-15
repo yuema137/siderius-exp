@@ -29,8 +29,15 @@ from execute_tools.data_paths import bind_physical_data_root
 from execute_tools.dataset_config import DataScope, bind_dataset_profile, tidmad_topology
 
 
-def _authorized_request(*, profile, window_samples: int, information_class: str = "data"):
-    scope = LegacyPartitionScope(data_scope=DataScope(file_indices=[0]))
+def _authorized_request(
+    *,
+    profile,
+    window_samples: int,
+    information_class: str = "data",
+    file_indices: list[int] | None = None,
+    sampling_policy: SamplingPolicy | None = None,
+):
+    scope = LegacyPartitionScope(data_scope=DataScope(file_indices=file_indices or [0]))
     asset = AnalysisAsset(
         asset_id="tidmad-validation-input",
         asset_type="dataset",
@@ -67,7 +74,8 @@ def _authorized_request(*, profile, window_samples: int, information_class: str 
         requested_information=(RequestedInformation(information_class=information_class),),
         requested_format_id="siderius.timeseries-array.v1",
         operation="materialize",
-        sampling_policy=SamplingPolicy(mode="fixed", strategy="uniform", max_items=2, seed=17),
+        sampling_policy=sampling_policy
+        or SamplingPolicy(mode="fixed", strategy="uniform", max_items=2, seed=17),
         access_policy=policy,
     )
     receipt = AnalysisAuthorizationReceipt(
@@ -92,10 +100,10 @@ def _with_requested_format(authorized, format_id: str):
     )
 
 
-def _write_validation_file(root, *, profile, samples: int) -> np.ndarray:
+def _write_validation_file(root, *, profile, samples: int, file_index: int = 0) -> np.ndarray:
     topology = tidmad_topology(profile)
     values = np.arange(samples, dtype=np.int16) % 255 - 128
-    path = root / topology.dataset.validation_file_name(0)
+    path = root / topology.dataset.validation_file_name(file_index)
     with h5py.File(path, "w") as handle:
         group = handle.create_group("timeseries")
         group.create_group(topology.channels.input_channel).create_dataset(
@@ -224,6 +232,62 @@ def test_task_adapter_emits_bounded_regular_view_without_target(tmp_path, tidmad
     assert view.total_available == 3
     assert view.selection_identity.selected_count == 2
     assert view.certified_information == (RequestedInformation(information_class="data"),)
+
+
+def test_task_adapter_stratifies_across_every_requested_band_file(tmp_path, tidmad_profile) -> None:
+    """Fails if a band-scoped selection silently omits one requested file."""
+
+    window_samples = 16
+    file_indices = [15, 16, 17, 18, 19]
+    sources = {
+        file_index: _write_validation_file(
+            tmp_path,
+            profile=tidmad_profile,
+            samples=3 * window_samples,
+            file_index=file_index,
+        )
+        for file_index in file_indices
+    }
+    capability = TidmadTaskDataPath()
+    authorized = _authorized_request(
+        profile=tidmad_profile,
+        window_samples=window_samples,
+        file_indices=file_indices,
+        sampling_policy=SamplingPolicy(
+            mode="fixed",
+            strategy="stratified",
+            strata_fields=("file_index",),
+            max_items=10,
+            seed=17,
+        ),
+    )
+
+    with bind_dataset_profile(tidmad_profile), bind_physical_data_root(str(tmp_path)):
+        view = capability.materialize_analysis_view(authorized)
+
+    exported = tmp_path / "materialized-band.npz"
+    capability.export_analysis_materialization(view.content_ref, exported)
+    with np.load(exported, allow_pickle=False) as payload:
+        ids = payload["example_ids"].tolist()
+        observed_files = [int(item.split("-")[1]) for item in ids]
+        assert {file_index: observed_files.count(file_index) for file_index in file_indices} == {
+            file_index: 2 for file_index in file_indices
+        }
+        for row, item in zip(payload["information__data"][:, 0], ids, strict=True):
+            _, file_text, _, window_text = item.split("-")
+            file_index = int(file_text)
+            window_index = int(window_text)
+            expected = (
+                sources[file_index][
+                    window_index * window_samples : (window_index + 1) * window_samples
+                ]
+                + 128
+            )
+            np.testing.assert_array_equal(row, expected)
+
+    assert view.total_available == 15
+    assert view.materialized_count == 10
+    assert view.selection_identity.selected_count == 10
 
 
 def test_task_adapter_does_not_treat_requested_information_as_authority(

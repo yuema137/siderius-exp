@@ -436,54 +436,115 @@ class TidmadTaskDataPath:
         profile = resolve_dataset_profile()
         topology = tidmad_topology(profile)
         file_indices = request.requested_scope.data_scope.file_indices
-        if file_indices is None or len(file_indices) != 1:
-            raise ValueError("bounded TIDMAD smoke requires exactly one file index")
-        file_index = int(file_indices[0])
+        if not file_indices:
+            raise ValueError("TIDMAD analysis requires at least one file index")
+        resolved_file_indices = tuple(int(index) for index in file_indices)
+        if len(set(resolved_file_indices)) != len(resolved_file_indices):
+            raise ValueError("TIDMAD analysis file indices must be unique")
         data_root = resolve_physical_data_root()
-        source = Path(data_root) / topology.dataset.validation_file_name(file_index)
         channel_name = getattr(topology.channels, expected[1])
-        with h5py.File(source, "r") as handle:
-            values = _h5_dataset(handle, "timeseries", channel_name, "timeseries")
-            total_available = len(values) // window_samples
-            if total_available <= 0:
-                raise ValueError(
-                    "TIDMAD analysis source contains no complete declared analysis window"
-                )
-            policy = request.sampling_policy
-            selected_count = total_available
-            if policy.fraction is not None:
-                selected_count = max(1, round(total_available * policy.fraction))
-            if policy.max_items is not None:
-                selected_count = min(selected_count, policy.max_items)
-            if (
-                policy.mode == "representative"
-                and policy.max_items is None
-                and policy.fraction is None
-            ):
-                selected_count = min(4, total_available)
-            rng = np.random.default_rng(policy.seed)
-            if selected_count == total_available:
-                indices = np.arange(total_available, dtype=np.int64)
-            else:
-                indices = np.sort(rng.choice(total_available, size=selected_count, replace=False))
-            rows = np.stack(
-                [
-                    np.asarray(
-                        values[int(index) * window_samples : (int(index) + 1) * window_samples],
-                        dtype=np.int16,
-                    )
-                    + topology.encoding.value_offset
-                    for index in indices
-                ]
+        available_by_file: dict[int, int] = {}
+        for file_index in resolved_file_indices:
+            source = Path(data_root) / topology.dataset.validation_file_name(file_index)
+            with h5py.File(source, "r") as handle:
+                values = _h5_dataset(handle, "timeseries", channel_name, "timeseries")
+                available_by_file[file_index] = len(values) // window_samples
+        if any(count <= 0 for count in available_by_file.values()):
+            raise ValueError(
+                "every requested TIDMAD analysis file must contain at least one "
+                "complete declared analysis window"
             )
 
-        example_ids = np.asarray(
-            [f"validation-{file_index:04d}-window-{int(index):06d}" for index in indices],
-            dtype="U48",
-        )
+        total_available = sum(available_by_file.values())
+        policy = request.sampling_policy
+        selected_count = total_available
+        if policy.fraction is not None:
+            selected_count = max(1, round(total_available * policy.fraction))
+        if policy.max_items is not None:
+            selected_count = min(selected_count, policy.max_items)
+        if (
+            policy.mode == "representative"
+            and policy.max_items is None
+            and policy.fraction is None
+        ):
+            selected_count = min(max(4, len(resolved_file_indices)), total_available)
+
+        rng = np.random.default_rng(policy.seed)
+        selected_by_file: dict[int, np.ndarray]
+        if policy.strategy == "stratified":
+            if selected_count < len(resolved_file_indices):
+                raise ValueError(
+                    "stratified TIDMAD band sampling requires at least one item "
+                    "per requested file"
+                )
+            selected_by_file = {
+                index: np.empty(0, dtype=np.int64) for index in resolved_file_indices
+            }
+            remaining = selected_count
+            active = list(resolved_file_indices)
+            allocations = {index: 0 for index in resolved_file_indices}
+            while remaining and active:
+                for file_index in tuple(active):
+                    if remaining == 0:
+                        break
+                    if allocations[file_index] >= available_by_file[file_index]:
+                        active.remove(file_index)
+                        continue
+                    allocations[file_index] += 1
+                    remaining -= 1
+            for file_index in resolved_file_indices:
+                count = allocations[file_index]
+                selected_by_file[file_index] = np.sort(
+                    rng.choice(available_by_file[file_index], size=count, replace=False)
+                )
+        else:
+            population = [
+                (file_index, window_index)
+                for file_index in resolved_file_indices
+                for window_index in range(available_by_file[file_index])
+            ]
+            if selected_count == total_available:
+                chosen_positions = np.arange(total_available, dtype=np.int64)
+            else:
+                chosen_positions = np.sort(
+                    rng.choice(total_available, size=selected_count, replace=False)
+                )
+            selected_lists: dict[int, list[int]] = {
+                index: [] for index in resolved_file_indices
+            }
+            for position in chosen_positions:
+                file_index, window_index = population[int(position)]
+                selected_lists[file_index].append(window_index)
+            selected_by_file = {
+                index: np.asarray(indices, dtype=np.int64)
+                for index, indices in selected_lists.items()
+            }
+
+        rows_list: list[np.ndarray] = []
+        example_id_list: list[str] = []
+        for file_index in resolved_file_indices:
+            source = Path(data_root) / topology.dataset.validation_file_name(file_index)
+            with h5py.File(source, "r") as handle:
+                values = _h5_dataset(handle, "timeseries", channel_name, "timeseries")
+                for index in selected_by_file[file_index]:
+                    rows_list.append(
+                        np.asarray(
+                            values[
+                                int(index) * window_samples : (int(index) + 1) * window_samples
+                            ],
+                            dtype=np.int16,
+                        )
+                        + topology.encoding.value_offset
+                    )
+                    example_id_list.append(
+                        f"validation-{file_index:04d}-window-{int(index):06d}"
+                    )
+        rows = np.stack(rows_list)
+
+        example_ids = np.asarray(example_id_list, dtype="U48")
         selection_sha = canonical_sha256({"example_ids": example_ids.tolist()})
         selection = CertifiedSelectionIdentity(
-            selection_id=f"tidmad-validation-{file_index}-{selection_sha[:16]}",
+            selection_id=f"tidmad-validation-{selection_sha[:16]}",
             selection_sha256=selection_sha,
             sampling_policy_sha256=canonical_sha256(request.sampling_policy),
             sampling_mode=policy.mode,
