@@ -420,9 +420,7 @@ class TIDMADValidationDataset(Dataset):
         logical_row = start
         output_row = 0
         while logical_row < end:
-            segment = self._segments[
-                bisect_right(self._segment_row_ends, logical_row)
-            ]
+            segment = self._segments[bisect_right(self._segment_row_ends, logical_row)]
             rows = min(end, segment.row_end) - logical_row
             row_within_segment = logical_row - segment.row_start
             sample_start = segment.sample_start + row_within_segment * self.seg_size

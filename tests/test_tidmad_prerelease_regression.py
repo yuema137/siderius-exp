@@ -121,7 +121,7 @@ def _data_root(tmp_path: Path, *, tamper_anchor: bool = False) -> Path:
 
 
 def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
-    revision = "14494576671ad6f6b1a772d966b1fced02fab2a9"
+    revision = "e5ace318cf007c02f9c3286a8224a6a634433372"
     checkout, capture = _fake_checkout(tmp_path, revision=revision)
     data = _data_root(tmp_path)
     workspace = tmp_path / "workspace"
@@ -205,7 +205,7 @@ def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
 def test_launcher_refuses_stale_inputs_and_overrides(
     tmp_path: Path, kind: str, expected: str
 ) -> None:
-    revision = "14494576671ad6f6b1a772d966b1fced02fab2a9"
+    revision = "e5ace318cf007c02f9c3286a8224a6a634433372"
     checkout, _ = _fake_checkout(
         tmp_path, revision=("wrong" if kind == "revision" else revision)
     )
