@@ -67,7 +67,12 @@ def clear_retained_state(
     root = retained_root.resolve()
     if root != expected_root.resolve():
         raise ValueError(f"unexpected retained-state root: {root}")
-    for name in ("candidates", "backup-receipts"):
+    for name in (
+        "candidates",
+        "evaluations",
+        "health-configs",
+        "backup-receipts",
+    ):
         target = root / name
         if target.exists():
             shutil.rmtree(target)
@@ -77,6 +82,11 @@ def clear_retained_state(
     candidates.mkdir(mode=0o2750)
     candidates.chmod(0o2750)
     shutil.chown(candidates, user=evaluator_user, group=results_group)
+    for name in ("evaluations", "health-configs"):
+        target = root / name
+        target.mkdir(mode=0o2750)
+        target.chmod(0o2750)
+        shutil.chown(target, user=evaluator_user, group=results_group)
     receipts = root / "backup-receipts"
     receipts.mkdir(mode=0o700)
     shutil.chown(receipts, user=backup_user, group=backup_user)
