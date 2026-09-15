@@ -27,16 +27,32 @@ the moved block byte-identical.
 """
 
 import gc
+import hashlib
+import io
 import json
 import os
 import random
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Any, ClassVar, Literal, cast
 
 import h5py
 import numpy as np
 import torch
+from agent.schemas.data_analysis.assets import (
+    LegacyPartitionScope,
+    MaterializedAnalysisView,
+    TaskDataAssetLocation,
+)
+from agent.schemas.data_analysis.common import CertifiedArtifactRef, canonical_sha256
+from agent.schemas.data_analysis.resources import CertifiedSelectionIdentity
+from agent.schemas.data_analysis.view_formats import TIMESERIES_ARRAY_V1
+from execute_tools.analysis_materialization import AuthorizedAnalysisMaterializationRequest
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
+
 from execute_tools.array2h5 import create_abra_file
+from execute_tools.data_paths import resolve_physical_data_root
 from execute_tools.dataset_config import (
     DataScope,
     DatasetProfile,
@@ -62,8 +78,6 @@ from execute_tools.task_data_path import (
     TaskEvaluationPayload,
     ValidationScopeError,
 )
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
@@ -350,6 +364,171 @@ class TidmadTaskDataPath:
     """
 
     task_data_path_id: ClassVar[str] = _TIDMAD_TASK_DATA_PATH_ID
+
+    def _analysis_payload_store(self) -> dict[str, bytes]:
+        store = getattr(self, "_analysis_payloads", None)
+        if store is None:
+            store = {}
+            self._analysis_payloads = store
+        return cast(dict[str, bytes], store)
+
+    def materialize_analysis_view(
+        self,
+        authorized: AuthorizedAnalysisMaterializationRequest,
+    ) -> MaterializedAnalysisView:
+        """Materialize a bounded, row-aligned real TIDMAD time-series view.
+
+        This task-owned adapter reads only the explicitly scoped validation
+        partition and only the information class authorized by the request.
+        It performs no interpolation, filtering, resampling, or repair.
+        """
+
+        request = authorized.request
+        if request.requested_format_id != TIMESERIES_ARRAY_V1:
+            raise ValueError("TIDMAD analysis supports only timeseries-array.v1")
+        if not isinstance(request.requested_scope, LegacyPartitionScope):
+            raise ValueError("TIDMAD analysis requires a legacy-partition scope")
+        location = request.asset.location
+        if not isinstance(location, TaskDataAssetLocation):
+            raise ValueError("TIDMAD analysis requires a task-data asset")
+        requested_classes = tuple(item.information_class for item in request.requested_information)
+        role_to_information = {
+            "validation_input_windows": ("data", "input_channel"),
+            "validation_target_windows": ("target", "target_channel"),
+            "validation_residual_windows": ("residual", "target_channel"),
+        }
+        expected = role_to_information.get(location.logical_role)
+        if expected is None or requested_classes != (expected[0],):
+            raise ValueError("requested information does not match TIDMAD asset role")
+        if expected[0] == "residual":
+            raise ValueError("residuals must be supplied as certified evaluation artifacts")
+
+        # Analysis-window extent is caller/task-composition policy, not model
+        # training geometry. Requiring the descriptor to state it keeps the
+        # task adapter free of a validation-treatment default and leaves
+        # ``segmentation_size`` under its existing training-plan authority.
+        window_samples = request.asset.metadata.get("window_samples")
+        if (
+            not isinstance(window_samples, int)
+            or isinstance(window_samples, bool)
+            or window_samples <= 0
+        ):
+            raise ValueError(
+                "TIDMAD analysis assets require a positive integer "
+                "metadata.window_samples declaration"
+            )
+
+        profile = resolve_dataset_profile()
+        topology = tidmad_topology(profile)
+        file_indices = request.requested_scope.data_scope.file_indices
+        if file_indices is None or len(file_indices) != 1:
+            raise ValueError("bounded TIDMAD smoke requires exactly one file index")
+        file_index = int(file_indices[0])
+        data_root = resolve_physical_data_root()
+        source = Path(data_root) / topology.dataset.validation_file_name(file_index)
+        channel_name = getattr(topology.channels, expected[1])
+        with h5py.File(source, "r") as handle:
+            values = _h5_dataset(handle, "timeseries", channel_name, "timeseries")
+            total_available = len(values) // window_samples
+            if total_available <= 0:
+                raise ValueError(
+                    "TIDMAD analysis source contains no complete declared analysis window"
+                )
+            policy = request.sampling_policy
+            selected_count = total_available
+            if policy.fraction is not None:
+                selected_count = max(1, round(total_available * policy.fraction))
+            if policy.max_items is not None:
+                selected_count = min(selected_count, policy.max_items)
+            if (
+                policy.mode == "representative"
+                and policy.max_items is None
+                and policy.fraction is None
+            ):
+                selected_count = min(4, total_available)
+            rng = np.random.default_rng(policy.seed)
+            if selected_count == total_available:
+                indices = np.arange(total_available, dtype=np.int64)
+            else:
+                indices = np.sort(rng.choice(total_available, size=selected_count, replace=False))
+            rows = np.stack(
+                [
+                    np.asarray(
+                        values[int(index) * window_samples : (int(index) + 1) * window_samples],
+                        dtype=np.int16,
+                    )
+                    + topology.encoding.value_offset
+                    for index in indices
+                ]
+            )
+
+        example_ids = np.asarray(
+            [f"validation-{file_index:04d}-window-{int(index):06d}" for index in indices],
+            dtype="U48",
+        )
+        selection_sha = canonical_sha256({"example_ids": example_ids.tolist()})
+        selection = CertifiedSelectionIdentity(
+            selection_id=f"tidmad-validation-{file_index}-{selection_sha[:16]}",
+            selection_sha256=selection_sha,
+            sampling_policy_sha256=canonical_sha256(request.sampling_policy),
+            sampling_mode=policy.mode,
+            sampling_strategy=policy.strategy,
+            sampling_seed=policy.seed,
+            population_unit="fixed-duration validation windows",
+            total_available=total_available,
+            selected_count=len(example_ids),
+        )
+        buffer = io.BytesIO()
+        np.savez(
+            buffer,
+            example_ids=example_ids,
+            channel_ids=np.asarray([channel_name], dtype="U32"),
+            valid_mask=np.ones((len(example_ids), window_samples), dtype=np.bool_),
+            time_start_seconds=np.zeros(len(example_ids), dtype=np.float64),
+            time_step_seconds=np.full(
+                len(example_ids),
+                1.0 / topology.dataset.sampling_frequency,
+                dtype=np.float64,
+            ),
+            **{f"information__{expected[0]}": rows[:, np.newaxis, :]},
+        )
+        payload = buffer.getvalue()
+        digest = hashlib.sha256(payload).hexdigest()
+        logical_ref = f"opaque://tidmad-analysis/{request.binding_id}/{digest}"
+        self._analysis_payload_store()[logical_ref] = payload
+        return MaterializedAnalysisView(
+            materialization_id=f"tidmad-{request.binding_id}-{digest[:16]}",
+            invocation_id=request.invocation_id,
+            binding_id=request.binding_id,
+            slot_id=request.slot_id,
+            asset_id=request.asset.asset_id,
+            split_id=request.split_id,
+            content_ref=CertifiedArtifactRef(
+                logical_ref=logical_ref,
+                sha256=digest,
+                media_type="application/x-npz",
+                byte_size=len(payload),
+            ),
+            format_id=request.requested_format_id,
+            population_unit="fixed-duration validation windows",
+            total_available=total_available,
+            materialized_count=len(example_ids),
+            certified_information=request.requested_information,
+            selection_identity=selection,
+            task_data_path_id=self.task_data_path_id,
+            source_digests=(digest,),
+            authorization_receipt=authorized.authorization_receipt,
+        )
+
+    def export_analysis_materialization(
+        self,
+        content_ref: CertifiedArtifactRef,
+        destination: Path,
+    ) -> None:
+        payload = self._analysis_payload_store().get(content_ref.logical_ref)
+        if payload is None or hashlib.sha256(payload).hexdigest() != content_ref.sha256:
+            raise ValueError("unknown or mismatched TIDMAD analysis materialization")
+        destination.write_bytes(payload)
 
     @staticmethod
     def _scope(scope: object) -> TidmadScope:
