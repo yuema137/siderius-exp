@@ -471,7 +471,7 @@ class TidmadTaskDataPath:
 
         rng = np.random.default_rng(policy.seed)
         selected_by_file: dict[int, np.ndarray]
-        if policy.strategy == "stratified":
+        if policy.strategy in {"stratified", "task_defined"}:
             if selected_count < len(resolved_file_indices):
                 raise ValueError(
                     "stratified TIDMAD band sampling requires at least one item "

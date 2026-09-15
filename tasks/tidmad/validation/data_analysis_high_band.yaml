@@ -58,8 +58,7 @@ resource_envelope:
   sampling_policy:
     mode: fixed
     max_items: 10
-    strategy: stratified
-    strata_fields: [file_index]
+    strategy: task_defined
     seed: 20260915
 builtin_skill_packs:
   - core-analysis

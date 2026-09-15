@@ -255,8 +255,7 @@ def test_task_adapter_stratifies_across_every_requested_band_file(tmp_path, tidm
         file_indices=file_indices,
         sampling_policy=SamplingPolicy(
             mode="fixed",
-            strategy="stratified",
-            strata_fields=("file_index",),
+            strategy="task_defined",
             max_items=10,
             seed=17,
         ),
