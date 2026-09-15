@@ -67,6 +67,8 @@ def test_clear_removes_external_drill_candidates_and_recreates_roots(tmp_path, m
     (retained / "backup-receipts").mkdir()
     (retained / "inference-sessions" / "drill").mkdir(parents=True)
     (retained / "final_score.json").write_text("{}")
+    (retained / "final_attempt.json").write_text("{}")
+    (retained / "final_failure.json").write_text("{}")
     monkeypatch.setattr("shutil.chown", lambda *_args, **_kwargs: None)
 
     clear_retained_state(
@@ -84,3 +86,5 @@ def test_clear_removes_external_drill_candidates_and_recreates_roots(tmp_path, m
     assert list((retained / "backup-receipts").iterdir()) == []
     assert list((retained / "inference-sessions").iterdir()) == []
     assert not (retained / "final_score.json").exists()
+    assert not (retained / "final_attempt.json").exists()
+    assert not (retained / "final_failure.json").exists()

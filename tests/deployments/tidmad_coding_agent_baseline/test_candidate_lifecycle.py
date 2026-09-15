@@ -182,3 +182,46 @@ def test_finalizer_runs_hidden_final_once_from_four_retained_winners(tmp_path, m
 
     assert [name for name, _detail in calls] == ["inference", "score"]
     assert json.loads((submission / "manifest.json").read_text())["complete"] is True
+
+
+def test_finalizer_records_hidden_failure_without_retrying_or_losing_winners(tmp_path, monkeypatch):
+    archive = tmp_path / "state" / "candidates"
+    bands = ("0-3", "4-9", "10-14", "15-19")
+    for band in bands:
+        candidate = _source(tmp_path / f"candidate-{band}", band)
+        archive_candidate(
+            source=candidate,
+            score_path=_score(tmp_path / f"score-{band}.json", candidate, band, 1.0),
+            archive_root=archive,
+            band=band,
+            candidate_id=f"winner-{band}",
+        )
+
+    calls = []
+
+    def fail_inference(**_kwargs):
+        calls.append("inference")
+        raise RuntimeError("predictor failed")
+
+    monkeypatch.setattr(finalize_module, "run_candidate_inference", fail_inference)
+    first = finalize_module.finalize(
+        tmp_path,
+        "claude",
+        archive_root=archive,
+        final_score_path=tmp_path / "state" / "final_score.json",
+    )
+    manifest = json.loads((first / "manifest.json").read_text())
+    assert manifest["complete"] is False
+    assert manifest["missing_bands"] == []
+    assert manifest["final_evaluation_attempted"] is True
+    assert manifest["final_evaluation_failure"]["error_type"] == "RuntimeError"
+    assert calls == ["inference"]
+
+    # A second finalizer invocation must not query the hidden set again.
+    finalize_module.finalize(
+        tmp_path / "second-finalizer",
+        "claude",
+        archive_root=archive,
+        final_score_path=tmp_path / "state" / "final_score.json",
+    )
+    assert calls == ["inference"]

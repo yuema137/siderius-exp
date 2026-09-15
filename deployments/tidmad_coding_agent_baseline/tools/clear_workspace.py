@@ -87,7 +87,7 @@ def clear_retained_state(
         target = root / name
         if target.exists():
             shutil.rmtree(target)
-    for name in ("final_score.json",):
+    for name in ("final_score.json", "final_attempt.json", "final_failure.json"):
         (root / name).unlink(missing_ok=True)
     candidates = root / "candidates"
     candidates.mkdir(mode=0o2750)

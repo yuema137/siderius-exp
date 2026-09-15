@@ -13,7 +13,7 @@ from typing import Any
 
 from .evaluator_policy import EvaluatorPolicy
 from .final_inference import run_candidate_inference
-from .io import atomic_write_json, fsync_directory, sha256_file
+from .io import atomic_write_json, create_json_once, fsync_directory, sha256_file
 from .model import BANDS, utc_text
 from .score import score_final
 from .usage import aggregate_usage
@@ -73,32 +73,63 @@ def finalize(
     policy: EvaluatorPolicy | None = None,
 ) -> Path:
     winners = _read_best(archive_root)
-    if len(winners) == len(BANDS) and not final_score_path.is_file():
+    final_attempt_path = archive_root.parent / "final_attempt.json"
+    final_failure_path = archive_root.parent / "final_failure.json"
+    if (
+        len(winners) == len(BANDS)
+        and not final_score_path.is_file()
+        and not final_attempt_path.is_file()
+    ):
         policy = policy or EvaluatorPolicy(
             archive_root=archive_root,
             final_score=final_score_path,
             final_output_dir=archive_root.parent / "final-denoised",
         )
-        denoised = run_candidate_inference(
-            winners=winners,
-            task_root=policy.input_root,
-            input_root=policy.final_input_dir,
-            output_root=policy.final_output_dir,
+        create_json_once(
+            final_attempt_path,
+            {
+                "version": "tidmad-coding-agent-final-attempt-v1",
+                "started_utc": utc_text(time.time()),
+                "winner_candidates": {
+                    band: identity for band, (identity, _path) in winners.items()
+                },
+            },
         )
         try:
-            score_final(
-                argparse.Namespace(
-                    winner=[
-                        f"{band}={candidate_id}" for band, (candidate_id, _path) in winners.items()
-                    ],
-                    denoised_dir=denoised,
-                    workers=16,
-                ),
-                policy,
+            denoised = run_candidate_inference(
+                winners=winners,
+                task_root=policy.input_root,
+                input_root=policy.final_input_dir,
+                output_root=policy.final_output_dir,
             )
-        finally:
-            shutil.rmtree(denoised, ignore_errors=True)
+            try:
+                score_final(
+                    argparse.Namespace(
+                        winner=[
+                            f"{band}={candidate_id}"
+                            for band, (candidate_id, _path) in winners.items()
+                        ],
+                        denoised_dir=denoised,
+                        workers=16,
+                    ),
+                    policy,
+                )
+            finally:
+                shutil.rmtree(denoised, ignore_errors=True)
+        except Exception as error:
+            atomic_write_json(
+                final_failure_path,
+                {
+                    "version": "tidmad-coding-agent-final-failure-v1",
+                    "failed_utc": utc_text(time.time()),
+                    "error_type": type(error).__name__,
+                    "error": str(error),
+                },
+            )
     final_score = _validated_final_score(final_score_path, winners)
+    final_failure = (
+        json.loads(final_failure_path.read_text()) if final_failure_path.is_file() else None
+    )
     submission = work_root / "submission"
     if submission.exists() and any(submission.iterdir()):
         raise FileExistsError(f"submission directory is not empty: {submission}")
@@ -130,6 +161,8 @@ def finalize(
                 "winner_candidates": {band: identity for band, (identity, _) in winners.items()},
                 "missing_bands": [band for band in BANDS if band not in winners],
                 "final_score_present": final_score is not None,
+                "final_evaluation_attempted": final_attempt_path.is_file(),
+                "final_evaluation_failure": final_failure,
                 "outer_loop_invocations": invocation_count,
                 "scheduled_start_utc": start.get("scheduled_start_utc"),
                 "actual_start_utc": start.get("actual_start_utc"),
