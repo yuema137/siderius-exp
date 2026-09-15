@@ -3,12 +3,16 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+from pathlib import Path
 
 import pytest
 
 from deployments.tidmad_coding_agent_baseline.tools import backup_completed, score
 from deployments.tidmad_coding_agent_baseline.tools.evaluator_policy import (
     EvaluatorPolicy,
+)
+from deployments.tidmad_coding_agent_baseline.tools.health import (
+    CandidateHealthEvaluation,
 )
 
 
@@ -40,16 +44,39 @@ def _policy(tmp_path):
         raw_data_dir=tmp_path / "raw",
         agent_root=tmp_path / "agent",
         archive_root=tmp_path / "state" / "candidates",
+        evaluation_root=tmp_path / "state" / "evaluations",
+        health_config_root=tmp_path / "state" / "health-configs",
         final_score=tmp_path / "state" / "final_score.json",
     )
+
+
+def _health(*, eligible=True):
+    return CandidateHealthEvaluation(
+        status="valid" if eligible else "invalid",
+        eligible=eligible,
+        effective_config_sha256="a" * 64,
+        gate_results=[
+            {
+                "gate_name": "amplitude_collapse_blocking",
+                "execution_status": "passed" if eligible else "failed",
+                "check_passed": eligible,
+            }
+        ],
+    )
+
+
+def _deliverables(tmp_path):
+    paths = [tmp_path / f"denoised-{index}.h5" for index in range(4)]
+    for path in paths:
+        path.write_bytes(b"temporary")
+    return paths
 
 
 def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(
     tmp_path, monkeypatch
 ):
     args = _candidate_args(tmp_path)
-    deliverable = tmp_path / "denoised.h5"
-    deliverable.write_bytes(b"temporary")
+    deliverables = _deliverables(tmp_path)
     events = []
     monkeypatch.setenv("BASELINE_RUN_ID", "codex-100")
     monkeypatch.setenv("BASELINE_INVOCATION_ID", "codex-100-invocation-0001")
@@ -58,13 +85,19 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(
         score,
         "compute_score",
         lambda **_kwargs: (
-            {"valid": True, "scalar": 1.0, "file_vector": [1.0] * 4 + [None] * 16},
-            [deliverable],
+            {
+                "scoreable": True,
+                "valid": False,
+                "scalar": 1.0,
+                "file_vector": [1.0] * 4 + [None] * 16,
+            },
+            deliverables,
         ),
     )
+    monkeypatch.setattr(score, "evaluate_candidate_health", lambda **_kwargs: _health())
 
     def archive(**kwargs):
-        assert deliverable.exists()
+        assert all(path.exists() for path in deliverables)
         assert kwargs["score_path"].exists()
         receipt = json.loads(kwargs["score_path"].read_text())
         assert receipt["score_utc"].endswith("Z")
@@ -76,21 +109,26 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(
     monkeypatch.setattr(score, "archive_candidate", archive)
     assert score.score_candidate(args, _policy(tmp_path)) == tmp_path / "published"
     assert events == ["archive"]
-    assert not deliverable.exists()
+    assert not any(path.exists() for path in deliverables)
 
 
 def test_candidate_scoring_keeps_deliverables_when_archive_fails(tmp_path, monkeypatch):
     args = _candidate_args(tmp_path)
-    deliverable = tmp_path / "denoised.h5"
-    deliverable.write_bytes(b"temporary")
+    deliverables = _deliverables(tmp_path)
     monkeypatch.setattr(
         score,
         "compute_score",
         lambda **_kwargs: (
-            {"valid": True, "scalar": 1.0, "file_vector": [1.0] * 4 + [None] * 16},
-            [deliverable],
+            {
+                "scoreable": True,
+                "valid": False,
+                "scalar": 1.0,
+                "file_vector": [1.0] * 4 + [None] * 16,
+            },
+            deliverables,
         ),
     )
+    monkeypatch.setattr(score, "evaluate_candidate_health", lambda **_kwargs: _health())
     monkeypatch.setattr(
         score,
         "archive_candidate",
@@ -98,7 +136,120 @@ def test_candidate_scoring_keeps_deliverables_when_archive_fails(tmp_path, monke
     )
     with pytest.raises(RuntimeError, match="archive failed"):
         score.score_candidate(args, _policy(tmp_path))
-    assert deliverable.exists()
+    assert all(path.exists() for path in deliverables)
+
+
+def test_health_failure_returns_raw_feedback_but_never_archives_or_selects(
+    tmp_path, monkeypatch
+):
+    args = _candidate_args(tmp_path)
+    deliverables = _deliverables(tmp_path)
+    monkeypatch.setattr(
+        score,
+        "compute_score",
+        lambda **_kwargs: (
+            {
+                "scoreable": True,
+                "valid": False,
+                "scalar": 22.0,
+                "file_vector": [22.0] * 4 + [None] * 16,
+            },
+            deliverables,
+        ),
+    )
+    monkeypatch.setattr(
+        score, "evaluate_candidate_health", lambda **_kwargs: _health(eligible=False)
+    )
+    monkeypatch.setattr(
+        score,
+        "archive_candidate",
+        lambda **_kwargs: pytest.fail("Health-invalid candidate reached archive"),
+    )
+
+    receipt = score.score_candidate(args, _policy(tmp_path))
+    payload = json.loads(receipt.read_text())
+    assert payload["scalar"] == 22.0
+    assert payload["scoreable"] is True
+    assert payload["health_passed"] is False
+    assert payload["health_status"] == "invalid"
+    assert payload["eligible_for_selection"] is False
+    assert payload["valid"] is False
+    assert all(path.exists() for path in deliverables)
+
+
+def test_final_scoring_refuses_health_failure_before_writing_or_deleting(
+    tmp_path, monkeypatch
+):
+    """A raw-complete final submission must not bypass task Health."""
+
+    deliverables = [tmp_path / f"denoised-{index}.h5" for index in range(20)]
+    for path in deliverables:
+        path.write_bytes(b"temporary")
+    policy = _policy(tmp_path)
+    (tmp_path / "agent" / "denoised").mkdir(parents=True)
+    (policy.scope_root / "all-files.json").write_text(
+        json.dumps({str(index): [0] for index in range(20)})
+    )
+    args = argparse.Namespace(
+        denoised_dir=tmp_path / "agent" / "denoised",
+        scope="all-files",
+        workers=1,
+        winner=[
+            f"{band}=candidate-{band}" for band in ("0-3", "4-9", "10-14", "15-19")
+        ],
+    )
+    monkeypatch.setattr(
+        score,
+        "compute_score",
+        lambda **_kwargs: (
+            {
+                "scoreable": True,
+                "valid": False,
+                "scalar": 22.0,
+                "file_vector": [22.0] * 20,
+            },
+            deliverables,
+        ),
+    )
+    monkeypatch.setattr(
+        score, "evaluate_candidate_health", lambda **_kwargs: _health(eligible=False)
+    )
+
+    with pytest.raises(ValueError, match="refused by task Health"):
+        score.score_final(args, policy)
+
+    assert not policy.final_score.exists()
+    assert all(path.exists() for path in deliverables)
+
+
+def test_task_health_materialization_is_band_scoped_and_regression_appropriate(
+    tmp_path,
+):
+    from execute_tools.health_checks.config import (
+        default_health_policy_path,
+        load_health_gates_config,
+        materialize_effective_config,
+    )
+
+    repo = Path(__file__).resolve().parents[3]
+    binding = repo / "tasks/tidmad/framework_configs/health_regression.yaml"
+    path, _sha = materialize_effective_config(
+        source_path=default_health_policy_path(),
+        files=[0, 1, 2, 3],
+        workspace=str(tmp_path),
+        resolved_scope=[0, 1, 2, 3],
+        task_health_binding=str(binding),
+        dataset_partition_count=20,
+    )
+    config = load_health_gates_config(path)
+    roles = {gate.id: gate.gate_role for gate in config.health_gates}
+    assert roles["amplitude_collapse_blocking"] == "blocking"
+    assert roles["output_diversity_blocking"] == "observational"
+    assert roles["output_std_blocking"] == "observational"
+    for gate in config.health_gates:
+        for check in gate.checks:
+            if "peek_file_indices" in check.config:
+                assert check.config["peek_file_indices"] == [0, 1, 2, 3]
 
 
 def test_privileged_scorer_refuses_agent_selected_scientific_roots(tmp_path):

@@ -26,7 +26,8 @@ match is allowed. Every candidate that receives a valid score is retained.
 
 ## Before renting GPUs
 
-1. Finish and approve one `task.md` outside the repository.
+1. Review the tracked [`task.md`](task.md); changing it creates a new frozen
+   experiment package and run identity.
 2. Build one archive and copy those exact bytes to both machines.
 3. Prepare a distinct agent API credential and append-only backup credential
    for each machine.
@@ -38,7 +39,7 @@ checkout:
 ```bash
 .venv/bin/python -m \
   deployments.tidmad_coding_agent_baseline.tools.build_bundle \
-  --task-md /safe/operator/task.md \
+  --task-md deployments/tidmad_coding_agent_baseline/task.md \
   --siderius-checkout /path/to/exact-pinned-SIDERIUS \
   --output /safe/bundles/tidmad-coding-agent-baseline.tar.gz
 sha256sum /safe/bundles/tidmad-coding-agent-baseline.tar.gz

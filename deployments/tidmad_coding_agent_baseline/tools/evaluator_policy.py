@@ -21,6 +21,8 @@ class EvaluatorPolicy:
     raw_data_dir: Path = Path("/data/private-validation")
     agent_root: Path = Path("/work/agent")
     archive_root: Path = Path("/var/lib/tidmad-baseline/candidates")
+    evaluation_root: Path = Path("/var/lib/tidmad-baseline/evaluations")
+    health_config_root: Path = Path("/var/lib/tidmad-baseline/health-configs")
     final_score: Path = Path("/var/lib/tidmad-baseline/final_score.json")
 
     def agent_path(self, supplied: Path, *, label: str) -> Path:

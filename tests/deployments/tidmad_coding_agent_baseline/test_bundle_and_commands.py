@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tarfile
 from pathlib import Path
 
@@ -80,3 +81,24 @@ def test_bundle_requires_task_md_and_snapshots_existing_task_unchanged(
             extracted = archive.extractfile(member)
             assert extracted is not None
             assert extracted.read() == (repo / relative).read_bytes()
+
+        provenance_member = archive.getmember(
+            "tidmad-coding-agent-baseline/input/provenance.json"
+        )
+        provenance_file = archive.extractfile(provenance_member)
+        assert provenance_file is not None
+        provenance = json.load(provenance_file)
+        assert provenance["version"] == "tidmad-coding-agent-input-v2"
+        assert len(provenance["task_md_sha256"]) == 64
+
+
+def test_canonical_task_md_separates_raw_score_health_and_agent_strategy():
+    repo = Path(__file__).resolve().parents[3]
+    text = (
+        repo / "deployments/tidmad_coding_agent_baseline/task.md"
+    ).read_text()
+    assert "finite raw score alone is **not** a valid result" in text
+    assert "health_regression.yaml" in text
+    assert "Health error, missing Health evidence" in text
+    assert "not a prescribed research workflow" in text
+    assert "raw_and_ground_score.md" in text

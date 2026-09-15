@@ -17,9 +17,11 @@ from typing import Any
 from .archive_candidate import (
     archive_candidate,
     candidate_tree_digest,
+    validate_candidate_identity,
     validate_candidate_source,
 )
 from .evaluator_policy import EvaluatorPolicy
+from .health import evaluate_candidate_health
 from .io import atomic_write_json, fsync_directory
 from .model import BANDS, utc_text
 
@@ -115,11 +117,13 @@ def compute_score(
         legacy_mode=False,
         profile=profile,
     )
-    valid = math.isfinite(float(scalar))
+    scoreable = math.isfinite(float(scalar))
     return (
         {
-            "version": "tidmad-coding-agent-score-v1",
-            "valid": valid,
+            "version": "tidmad-coding-agent-score-v2",
+            "scoreable": scoreable,
+            # Eligibility is established only after task-owned Health runs.
+            "valid": False,
             "scalar": float(scalar),
             "file_vector": file_vector,
             "sample_set": {str(key): value for key, value in sample_set.items()},
@@ -137,6 +141,7 @@ def score_candidate(
     args: argparse.Namespace, policy: EvaluatorPolicy | None = None
 ) -> Path:
     policy = policy or EvaluatorPolicy()
+    validate_candidate_identity(args.candidate_id)
     candidate_source = policy.agent_path(
         args.candidate_source, label="candidate source"
     )
@@ -162,12 +167,42 @@ def score_candidate(
             sample_set_path=sample_set,
             workers=args.workers,
         )
+        denoised_paths = {
+            index: path
+            for index, path in zip(_sample_set(sample_set), deliverables, strict=True)
+        }
+        health = evaluate_candidate_health(
+            input_root=policy.input_root,
+            raw_data_dir=policy.raw_data_dir,
+            denoised_paths=denoised_paths,
+            file_vector=score["file_vector"],
+            scalar=float(score["scalar"]),
+            candidate_id=args.candidate_id,
+            run_id=os.environ.get("BASELINE_RUN_ID", "unbound"),
+            config_root=policy.health_config_root,
+        )
+        score.update(
+            {
+                "health_status": health.status,
+                "health_passed": health.eligible,
+                "health_gate_results": health.gate_results,
+                "health_effective_config_sha256": health.effective_config_sha256,
+                "eligible_for_selection": bool(score["scoreable"] and health.eligible),
+            }
+        )
+        score["valid"] = score["eligible_for_selection"]
         score["candidate_tree_sha256"] = candidate_digest
         scored_epoch = int(time.time())
         score["score_epoch"] = scored_epoch
         score["score_utc"] = utc_text(scored_epoch)
         score["run_id"] = os.environ.get("BASELINE_RUN_ID")
         score["invocation_id"] = os.environ.get("BASELINE_INVOCATION_ID")
+        if not score["eligible_for_selection"]:
+            return _publish_ineligible_evaluation(
+                args=args,
+                policy=policy,
+                score=score,
+            )
         return _publish_candidate_score(
             args=args,
             policy=policy,
@@ -177,6 +212,25 @@ def score_candidate(
         )
     finally:
         shutil.rmtree(snapshot_root)
+
+
+def _publish_ineligible_evaluation(
+    *,
+    args: argparse.Namespace,
+    policy: EvaluatorPolicy,
+    score: dict[str, Any],
+) -> Path:
+    """Persist feedback without retaining or selecting an invalid candidate."""
+
+    band_root = policy.evaluation_root / args.band
+    band_root.mkdir(parents=True, exist_ok=True)
+    destination = band_root / f"{args.candidate_id}.json"
+    if destination.exists():
+        raise FileExistsError(f"candidate evaluation already exists: {destination}")
+    atomic_write_json(destination, score)
+    destination.chmod(0o440)
+    fsync_directory(band_root)
+    return destination
 
 
 def _publish_candidate_score(
@@ -235,8 +289,37 @@ def score_final(
         sample_set_path=sample_set,
         workers=args.workers,
     )
-    if not score["valid"] or any(value is None for value in score["file_vector"]):
+    denoised_paths = {
+        index: path
+        for index, path in zip(_sample_set(sample_set), deliverables, strict=True)
+    }
+    health = evaluate_candidate_health(
+        input_root=policy.input_root,
+        raw_data_dir=policy.raw_data_dir,
+        denoised_paths=denoised_paths,
+        file_vector=score["file_vector"],
+        scalar=float(score["scalar"]),
+        candidate_id="final-submission",
+        run_id=os.environ.get("BASELINE_RUN_ID", "unbound"),
+        config_root=policy.health_config_root,
+    )
+    score.update(
+        {
+            "health_status": health.status,
+            "health_passed": health.eligible,
+            "health_gate_results": health.gate_results,
+            "health_effective_config_sha256": health.effective_config_sha256,
+            "eligible_for_selection": bool(score["scoreable"] and health.eligible),
+        }
+    )
+    score["valid"] = score["eligible_for_selection"]
+    if not score["scoreable"] or any(value is None for value in score["file_vector"]):
         raise ValueError("final score must be finite and cover all 20 validation files")
+    if not health.eligible:
+        raise ValueError(
+            "final score refused by task Health: "
+            f"health_status={health.status}; no final artifact was written"
+        )
     score["winner_candidates"] = winners
     atomic_write_json(policy.final_score, score)
     policy.final_score.chmod(0o440)

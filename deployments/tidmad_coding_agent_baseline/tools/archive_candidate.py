@@ -20,6 +20,13 @@ _IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _REQUIRED = ("architecture.json", "train_config.json", "weights.pth")
 
 
+def validate_candidate_identity(candidate_id: str) -> None:
+    """Refuse identities that cannot safely become evaluator-owned paths."""
+
+    if not _IDENTITY.fullmatch(candidate_id):
+        raise ValueError(f"invalid candidate identity: {candidate_id!r}")
+
+
 def validate_candidate_source(source: Path) -> None:
     """Refuse incomplete, transient, data-bearing, or linked candidate trees."""
 
@@ -97,8 +104,7 @@ def archive_candidate(
 ) -> Path:
     if band not in BANDS:
         raise ValueError(f"unsupported band: {band}")
-    if not _IDENTITY.fullmatch(candidate_id):
-        raise ValueError(f"invalid candidate identity: {candidate_id!r}")
+    validate_candidate_identity(candidate_id)
     validate_candidate_source(source)
     digest = candidate_tree_digest(source)
     score = _validate_score(score_path, band, digest)
