@@ -60,4 +60,4 @@ index. Historical records are evidence, not launch authorization.
 - [experiment index](experiments/README.md)
 - [campaign index](campaigns/README.md)
 - [migration evidence](provenance/MIGRATION.md)
-- [framework task-composition contract](https://github.com/Galileo-Sandbox/SIDERIUS/blob/1aa96013335d0d16e2484439ef6dd7ae8c26b94d/docs/reference/task-composition.md)
+- [framework task-composition contract](https://github.com/Galileo-Sandbox/SIDERIUS/blob/14494576671ad6f6b1a772d966b1fced02fab2a9/docs/reference/task-composition.md)

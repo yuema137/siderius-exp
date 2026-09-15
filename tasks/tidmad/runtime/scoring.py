@@ -61,8 +61,6 @@ from typing import Any, ClassVar, cast
 
 import h5py
 import numpy as np
-
-from execute_tools.evaluation_metric import EvaluationMetric
 from execute_tools.dataset_config import (
     NUM_FILES,
     SEGMENT_LENGTH,
@@ -73,6 +71,11 @@ from execute_tools.dataset_config import (
     resolve_dataset_profile,
     resolve_tidmad_topology,
     tidmad_topology,
+)
+from execute_tools.evaluation_metric import EvaluationMetric
+from execute_tools.spawned_file_callable import (
+    SpawnedFileCallable,
+    map_spawned_file_callable,
 )
 
 
@@ -658,9 +661,6 @@ def score_vector(
         ValueError: If ``denoised_filename_fn`` is None, or if
                     ``legacy_mode=False`` and ``s_max`` is None.
     """
-    import concurrent.futures
-    import multiprocessing as mp
-
     if denoised_filename_fn is None:
         raise ValueError(
             "denoised_filename_fn is required — the scorer needs to know "
@@ -705,16 +705,20 @@ def score_vector(
         # Phase 6.8 §2 Layer A — force ``spawn`` start method so worker
         # processes do NOT copy-on-write the parent's ~8 GB heap. Default
         # ``fork`` on Linux caused a +15 GB transient on 2026-04-27 that
-        # OOM-killed the v5 explore parent. ``_collect_raw_pairs`` is
-        # module-level (picklable), so spawn is safe; cost is ~1-2 s of
-        # worker import warmup on each call. See
+        # OOM-killed the v5 explore parent. This file is loaded through the
+        # external task-composition ``file:`` contract, so its synthetic
+        # parent-process module name is not importable in a fresh worker.
+        # The framework helper instead sends a content-pinned file/symbol
+        # identity and loads that exact callable inside each spawn worker;
+        # cost is ~1-2 s of worker import warmup on each call. See
         # docs/phase68_task1_memory_diagnostic_20260427.md §2 Commit 1.
-        with concurrent.futures.ProcessPoolExecutor(
+        worker = SpawnedFileCallable.capture(__file__, "_collect_raw_pairs")
+        for fi, pairs in map_spawned_file_callable(
+            worker,
+            tasks,
             max_workers=min(num_workers, len(tasks)),
-            mp_context=mp.get_context("spawn"),
-        ) as executor:
-            for fi, pairs in executor.map(_collect_raw_pairs, tasks):
-                raw_pairs[fi] = pairs
+        ):
+            raw_pairs[fi] = pairs
     else:
         for task_args in tasks:
             fi, pairs = _collect_raw_pairs(task_args)

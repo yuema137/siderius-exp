@@ -1,12 +1,13 @@
 {
   "propose": [
     "The task contract is continuous waveform regression: emit [B,T] float32 directly. Do not emit class logits, a class axis, or use argmax.",
-    "The historical FCNet reference is a fully connected autoencoder over a 40,000-sample window. Its documented compression is 40000 -> 4000 -> 400 -> 40, followed by a mirrored decoder to a continuous [B,T] waveform.",
+    "The strongest committed task reference available to this experiment is the roughly 300M-parameter FCNet: a fully connected autoencoder over a 40,000-sample window, with documented compression 40000 -> 4000 -> 400 -> 40 followed by a mirrored decoder to a continuous [B,T] waveform. Treat its scale and long-context compression as serious evidence, while keeping the architecture searchable.",
     "The reference reports SmoothL1 (Huber) beta=1 with mean reduction. Treat this as a useful starting point, not a locked objective; the objective remains searchable within the regression contract.",
     "Explore long-context compression and related encoder-decoder or residual ideas that preserve amplitude and low-frequency structure. Exact FCNet activations and other implementation details are not established by the committed reference and must not be invented.",
-    "Use the 16-GiB Trial/Formal and 30/120-minute ceilings productively, but they are hard ceilings, not utilization targets. Keep proposals credibly within them."
+    "Actively explore scientifically plausible candidates in the 10M-500M trainable-parameter range, and do not remain below 10M merely from conservatism. This is an exploratory range rather than a quality proxy or a hard minimum: a smaller efficient model remains valid when evidence indicates it is stronger.",
+    "Use the 16-GiB Trial/Formal and 30/120-minute envelopes productively. Scale model capacity, batch strategy, context processing, and optimization work when they can plausibly improve the score; do not leave most of the available envelope unused by default. The limits remain hard ceilings, and memory or elapsed time alone is never evidence of quality."
   ],
   "tune": [
-    "Keep the continuous [B,T] float32 output contract and the measured resource ceilings. Tune the objective and architecture from evidence; do not turn the FCNet dimensions or parameter count into a model lock."
+    "Keep the continuous [B,T] float32 output contract and the measured resource ceilings. Tune the objective and architecture from score, training, validation, resource, and Health evidence. Treat the roughly 300M FCNet and the encouraged 10M-500M exploration range as scale evidence, not an architecture lock or a substitute for the campaign metric."
   ]
 }

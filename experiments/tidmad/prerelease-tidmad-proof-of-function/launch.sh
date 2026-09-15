@@ -22,7 +22,7 @@ for n in 15 16 17 18 19; do
 done
 cmp -s "$data_dir/segment_anchors.json" "$ROOT/tasks/tidmad/reference_data/segment_anchors.json" || fail "staged segment_anchors.json is missing or differs from the approved ruler"
 expected="$(tr -d '[:space:]' < "$ROOT/SIDERIUS_REVISION")"
-[[ "$expected" == "1aa96013335d0d16e2484439ef6dd7ae8c26b94d" ]] || fail "unexpected SIDERIUS_REVISION"
+[[ "$expected" == "14494576671ad6f6b1a772d966b1fced02fab2a9" ]] || fail "unexpected SIDERIUS_REVISION"
 actual="$(git -C "$checkout" rev-parse HEAD 2>/dev/null)" || fail "cannot inspect SIDERIUS checkout"
 [[ "$actual" == "$expected" ]] || fail "SIDERIUS checkout revision mismatch"
 launcher="$checkout/scripts/launch/run_chain.sh"; [[ -f "$launcher" ]] || fail "run_chain.sh is missing"
@@ -45,7 +45,7 @@ args=(
   --order_strategy_override sequential --file_order_override 15,16,17,18,19
   --force_fresh --no_auto_resume --no-cleanup_denoised
 )
-args+=(--advice "$ROOT/experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json" --advice_sha256 8ca95e88d44f41da4c95a81035728661f3f44731257c62d5c515d2d2c763e213)
+args+=(--advice "$ROOT/experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json" --advice_sha256 1f485a6fb60abfe9ee633282414e82cd82570fe0ae8066b7e898b9b02d7e4f95)
 if [[ "$dry_run" == 1 ]]; then
   args+=(--dry-run)
 fi
