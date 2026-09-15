@@ -161,8 +161,9 @@ case "$PROFILE" in
             --formal_strategy snapshot
             --formal_round_strategy full_clone
             --force_formal_round
+            --plan_overrides '{"is_trial":true}'
             --num_iterations 1
-            --max_rounds 1
+            --max_rounds 2
             --max_epochs 1
             --trial_max_epochs 1
             --formal_max_epochs 1
