@@ -1,0 +1,22 @@
+[Unit]
+Description=TIDMAD coding-agent baseline
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=baseline-agent
+Group=baseline-results
+EnvironmentFile=/etc/tidmad-baseline/agent.env
+WorkingDirectory=/work/agent
+ExecStart=/work/harness/venv/bin/python -m baseline_harness.supervisor --product ${BASELINE_PRODUCT} --work-root /work --prompt /work/input/task.md --scheduled-start-epoch ${SCHEDULED_START_EPOCH}
+Restart=on-failure
+RestartSec=30
+RuntimeMaxSec=24h15m
+TimeoutStopSec=150
+KillMode=control-group
+NoNewPrivileges=false
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

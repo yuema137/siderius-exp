@@ -1,0 +1,14 @@
+[Unit]
+Description=Append-only backup of completed TIDMAD baseline candidates
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=baseline-backup
+Group=baseline-backup
+SupplementaryGroups=baseline-results
+EnvironmentFile=/etc/tidmad-baseline/backup.env
+Environment=PATH=/work/harness/venv/bin:/usr/local/bin:/usr/bin
+ExecStart=/work/harness/venv/bin/python -m baseline_harness.backup_completed --archive-root /var/lib/tidmad-baseline/candidates --receipt-root /var/lib/tidmad-baseline/backup-receipts --bucket ${BACKUP_BUCKET} --prefix ${BACKUP_PREFIX} --timeout-seconds 540
+TimeoutStartSec=10m
+Nice=10
