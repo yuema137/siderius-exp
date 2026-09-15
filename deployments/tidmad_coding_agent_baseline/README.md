@@ -188,7 +188,8 @@ recomputed after restart.
 The scorer owns the canonical TIDMAD formula. During search the agent may name
 only a candidate below `/work/agent` and one of the four bands. The evaluator
 chooses that band's fixed held-out development input, snapshots the candidate,
-runs its frozen predictor, applies scoring and Health, and retains eligible
+runs its frozen model through evaluator-owned segmentation and output assembly,
+applies scoring and Health, and retains eligible
 candidates. It does not expose an official-final scoring command.
 
 ```bash
@@ -199,9 +200,11 @@ tidmad-score \
 ```
 
 Candidate source contains `model.py` (or `model/`), `architecture.json`,
-`train_config.json`, `weights.pth`, and an inference-only `predict.py`. The
-predictor runs under a root-owned, network-disabled inference identity, against
-one copied input at a time. At the immutable deadline the finalizer stops the
+`train_config.json`, `weights.pth`, and an exported TorchScript `model.pt`.
+Evaluator code alone reads HDF5 files, slices fixed raw 40,000-sample segments,
+decodes model logits, and writes deliverables. The model runs under a root-owned,
+network-disabled inference identity and receives only segment tensors. At the
+immutable deadline the finalizer stops the
 agent, selects the best retained development candidate for each band, performs
 one hidden official-validation inference and score, and packages the result. A
 missing band remains a partial submission; the finalizer never invents scores.

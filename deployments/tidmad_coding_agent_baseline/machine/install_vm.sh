@@ -121,6 +121,8 @@ install -d -o root -g root -m 0755 /opt/tidmad-inference
     --requirement /opt/tidmad-evaluator/assets/requirements.txt
 /opt/tidmad-inference/venv/bin/pip install --disable-pip-version-check \
     --force-reinstall --no-deps "/opt/tidmad-evaluator/assets/${WHEEL_NAME}"
+INFERENCE_SITE="$(/opt/tidmad-inference/venv/bin/python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
+cp -a /work/harness/baseline_harness "$INFERENCE_SITE/"
 chown -R root:root /opt/tidmad-inference
 find /opt/tidmad-inference -type d -exec chmod 0555 {} +
 find /opt/tidmad-inference -type f -exec chmod 0444 {} +

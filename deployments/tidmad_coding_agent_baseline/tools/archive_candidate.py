@@ -17,7 +17,7 @@ from .io import atomic_write_json, fsync_directory, fsync_tree, sha256_file
 from .model import BANDS, DEVELOPMENT_FILE_BY_BAND
 
 _IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
-_REQUIRED = ("architecture.json", "train_config.json", "weights.pth", "predict.py")
+_REQUIRED = ("architecture.json", "train_config.json", "weights.pth", "model.pt")
 
 
 def validate_candidate_identity(candidate_id: str) -> None:

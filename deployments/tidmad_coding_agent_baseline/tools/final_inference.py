@@ -1,4 +1,4 @@
-"""Run frozen winner predictors on hidden final inputs after the agent deadline."""
+"""Run frozen segment models on hidden final inputs after the agent deadline."""
 
 from __future__ import annotations
 
@@ -76,7 +76,11 @@ def _command(
         f"--setenv=TMPDIR={session_root / 'tmp'}",
         "--setenv=PYTHONNOUSERSITE=1",
         str(runtime.python),
-        str(candidate / "predict.py"),
+        "-I",
+        "-m",
+        "baseline_harness.segment_inference",
+        "--candidate",
+        str(candidate),
         "--input-file",
         str(input_path),
         "--output-file",
@@ -103,8 +107,8 @@ def run_candidate_inference(
     try:
         for band, (_candidate_id, retained) in winners.items():
             source = retained / "candidate"
-            if not (source / "predict.py").is_file():
-                raise ValueError(f"winner lacks required predict.py: {source}")
+            if not (source / "model.pt").is_file():
+                raise ValueError(f"winner lacks required model.pt: {source}")
             for file_index in files_by_band[band]:
                 input_name = (
                     f"development-band-{band}.h5"
@@ -146,9 +150,16 @@ def run_candidate_inference(
                         check=True,
                         timeout=runtime.timeout_seconds_per_file + 60,
                     )
+                    completion_marker = temporary_output.with_suffix(
+                        temporary_output.suffix + ".complete"
+                    )
+                    if not completion_marker.is_file():
+                        raise RuntimeError(
+                            f"segment-model inference did not complete for file {file_index}"
+                        )
                     if temporary_output.is_symlink() or not temporary_output.is_file():
                         raise RuntimeError(
-                            f"predictor did not create a regular output for file {file_index}"
+                            f"segment model did not create a regular output for file {file_index}"
                         )
                     destination = output_root / _deliverable_name(
                         task_root, file_index

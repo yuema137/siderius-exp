@@ -26,7 +26,7 @@ def _candidate_args(tmp_path):
     (source / "architecture.json").write_text(json.dumps({"kind": "test"}))
     (source / "train_config.json").write_text(json.dumps({"epochs": 1}))
     (source / "weights.pth").write_bytes(b"weights")
-    (source / "predict.py").write_text("raise SystemExit('test fixture only')\n")
+    (source / "model.pt").write_bytes(b"model")
     return argparse.Namespace(
         workers=1,
         candidate_source=source,
@@ -287,6 +287,8 @@ def test_inference_command_hides_file_identity_and_blocks_network(tmp_path):
     )
 
     assert str(runtime.python) in command
+    assert "baseline_harness.segment_inference" in command
+    assert str(tmp_path / "candidate") in command
     assert "--property=RestrictAddressFamilies=AF_UNIX" in command
     assert "--property=KillMode=control-group" in command
     assert not any("file-index" in argument for argument in command)

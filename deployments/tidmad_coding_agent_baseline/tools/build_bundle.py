@@ -207,11 +207,11 @@ def build_bundle(
         atomic_write_json(
             input_root / "provenance.json",
             {
-                "version": "tidmad-coding-agent-input-v3",
+                "version": "tidmad-coding-agent-input-v4",
                 "siderius_exp_revision": _git(repo, "rev-parse", "HEAD"),
                 "siderius_revision": siderius_revision,
                 "task_tree": _git(repo, "rev-parse", "HEAD:tasks/tidmad"),
-                "task_visibility": "agent-public-view-v1",
+                "task_visibility": "agent-public-view-v2",
                 "siderius_wheel_sha256": wheel_sha,
                 "task_md_sha256": sha256_file(task_md),
             },
