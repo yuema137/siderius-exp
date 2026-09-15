@@ -2019,8 +2019,8 @@ wheels = [
 
 [[package]]
 name = "siderius"
-version = "0.2.0rc4"
-source = { git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=e712d8544b7b10b57618a0ba309d39d1098815f7#e712d8544b7b10b57618a0ba309d39d1098815f7" }
+version = "0.2.0rc6"
+source = { git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=1aa96013335d0d16e2484439ef6dd7ae8c26b94d#1aa96013335d0d16e2484439ef6dd7ae8c26b94d" }
 dependencies = [
     { name = "fastapi" },
     { name = "h5py" },
@@ -2061,7 +2061,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "siderius", git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=e712d8544b7b10b57618a0ba309d39d1098815f7" }]
+requires-dist = [{ name = "siderius", git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=1aa96013335d0d16e2484439ef6dd7ae8c26b94d" }]
 
 [package.metadata.requires-dev]
 dev = [

@@ -11,7 +11,7 @@ be presented as tests executed from this repository.
 
 The active framework revision for new work is the exact value in the repository
 [`SIDERIUS_REVISION`](../../SIDERIUS_REVISION):
-`e712d8544b7b10b57618a0ba309d39d1098815f7`. Older SHAs in this document are
+`1aa96013335d0d16e2484439ef6dd7ae8c26b94d`. Older SHAs in this document are
 evidence labels for completed migration witnesses.
 
 | projected in this pack (PR0) | how | verified by |
