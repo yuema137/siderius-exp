@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from deployments.tidmad_coding_agent_baseline.tools import schedule
 from deployments.tidmad_coding_agent_baseline.tools.schedule import timer_text
 
@@ -28,3 +30,12 @@ def test_deadline_remains_root_owned_and_agent_readable(tmp_path, monkeypatch):
         "group": "science-agent",
     }
     assert deadline.stat().st_mode & 0o777 == 0o640
+
+
+def test_deadline_reader_group_matches_systemd_service_group():
+    unit = (
+        Path(__file__).parents[3]
+        / "deployments/tidmad_coding_agent_baseline/systemd/tidmad-coding-agent.service"
+    ).read_text()
+
+    assert f"Group={schedule.SUPERVISOR_GROUP}" in unit
