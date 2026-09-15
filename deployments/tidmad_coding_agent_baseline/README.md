@@ -117,6 +117,10 @@ clock yet. The machine must also provide Python 3.12 and an operator-selected
 AWS CLI version. The installer records both versions and deliberately refuses
 to fetch an unpinned latest AWS CLI during installation. Set
 `BASELINE_PYTHON_BIN` only when Python 3.12 is installed under another name.
+The installer sets the non-interactive systemd process's HOME, temporary and
+cache directories below `/baseline/agent/` and puts the user-installed product
+CLI directory on PATH. This is explicit runtime configuration; it does not
+copy, inspect or replace either product's authenticated account state.
 
 ## Required H100 drill
 

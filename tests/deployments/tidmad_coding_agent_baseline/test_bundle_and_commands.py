@@ -134,3 +134,21 @@ def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():
     assert "baseline-inference" in install
     assert "refuse to replace a bundle while the evaluated agent is active" in install
     assert "rm -rf -- /work/harness /work/input" in install
+
+
+def test_vm_install_binds_noninteractive_agent_state_to_working_disk():
+    """Catch systemd losing the CLI and silently using boot-disk HOME/cache state."""
+
+    repo = Path(__file__).resolve().parents[3]
+    install = (
+        repo / "deployments" / "tidmad_coding_agent_baseline" / "machine" / "install_vm.sh"
+    ).read_text()
+
+    assert "usermod --home /baseline/agent/home baseline-agent" in install
+    assert "HOME=/baseline/agent/home" in install
+    assert "TMPDIR=/baseline/agent/tmp" in install
+    assert "XDG_CACHE_HOME=/baseline/agent/cache" in install
+    assert "PIP_CACHE_DIR=/baseline/agent/cache/pip" in install
+    assert "UV_CACHE_DIR=/baseline/agent/cache/uv" in install
+    assert "NPM_CONFIG_CACHE=/baseline/agent/cache/npm" in install
+    assert "PATH=/baseline/agent/home/.local/bin:" in install
