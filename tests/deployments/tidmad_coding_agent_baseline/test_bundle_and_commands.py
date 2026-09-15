@@ -19,6 +19,7 @@ def test_product_commands_pin_models_effort_and_noninteractive_permissions(tmp_p
     assert "gpt-5.6-sol" in codex
     assert 'model_reasoning_effort="medium"' in codex
     assert "--search" in codex
+    assert "--skip-git-repo-check" in codex
     assert "--dangerously-skip-permissions" in claude
     assert claude[claude.index("--effort") + 1] == "medium"
     assert "--permission-prompts" not in claude

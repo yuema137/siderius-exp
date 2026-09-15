@@ -17,6 +17,7 @@ def command_for(product: AgentProduct, prompt: Path) -> list[str]:
             "danger-full-access",
             "--search",
             "exec",
+            "--skip-git-repo-check",
             "-m",
             "gpt-5.6-sol",
             "-c",
