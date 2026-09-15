@@ -212,3 +212,28 @@ def test_backup_refuses_preexisting_object_with_different_candidate_identity(
             receipts=tmp_path / "receipts",
             timeout_seconds=42,
         )
+
+
+def test_backup_publishes_completed_final_submission(tmp_path, monkeypatch):
+    submission = tmp_path / "submission"
+    submission.mkdir()
+    (submission / "manifest.json").write_text('{"complete":true}')
+    (submission / "COMPLETE.json").write_text('{"complete":true}')
+    calls = []
+
+    def fake_aws(*args, timeout_seconds):
+        calls.append((args, timeout_seconds))
+        return subprocess.CompletedProcess(args, 0, "{}", "")
+
+    monkeypatch.setattr(backup_completed, "_aws", fake_aws)
+    outcomes = backup_completed.backup_completed(
+        tmp_path / "candidates",
+        bucket="condition-only",
+        prefix="codex",
+        receipts=tmp_path / "receipts",
+        timeout_seconds=42,
+        submission_root=submission,
+    )
+
+    assert outcomes == [(submission, "created")]
+    assert "/submission/" in calls[0][0][calls[0][0].index("--key") + 1]

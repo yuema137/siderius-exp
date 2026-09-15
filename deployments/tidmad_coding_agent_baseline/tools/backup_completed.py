@@ -58,14 +58,7 @@ def _publish_one(
 
     with tempfile.TemporaryDirectory(prefix="tidmad-baseline-backup-") as raw:
         archive = Path(raw) / "candidate.tar.gz"
-        with (
-            archive.open("wb") as raw_archive,
-            gzip.GzipFile(
-                filename="", mode="wb", fileobj=raw_archive, mtime=0
-            ) as zipped,
-            tarfile.open(fileobj=zipped, mode="w", format=tarfile.PAX_FORMAT) as tar,
-        ):
-            tar.add(candidate, arcname=candidate.name, recursive=True, filter=_tar_info)
+        _archive_tree(candidate, archive)
         archive_digest = sha256_file(archive)
         result = _aws(
             "s3api",
@@ -122,6 +115,82 @@ def _publish_one(
     return "created" if result.returncode == 0 else "already-existed"
 
 
+def _archive_tree(source: Path, archive: Path) -> None:
+    with (
+        archive.open("wb") as raw_archive,
+        gzip.GzipFile(filename="", mode="wb", fileobj=raw_archive, mtime=0) as zipped,
+        tarfile.open(fileobj=zipped, mode="w", format=tarfile.PAX_FORMAT) as tar,
+    ):
+        tar.add(source, arcname=source.name, recursive=True, filter=_tar_info)
+
+
+def _publish_submission(
+    submission: Path,
+    *,
+    bucket: str,
+    prefix: str,
+    receipts: Path,
+    timeout_seconds: int,
+) -> str | None:
+    manifest = submission / "manifest.json"
+    if not manifest.is_file() or not (submission / "COMPLETE.json").is_file():
+        return None
+    digest = sha256_file(manifest)
+    receipt = receipts / "submission.json"
+    if receipt.exists():
+        return "already-recorded"
+    key = "/".join(
+        part
+        for part in (
+            prefix.strip("/"),
+            "submission",
+            f"submission-{digest}.tar.gz",
+        )
+        if part
+    )
+    with tempfile.TemporaryDirectory(prefix="tidmad-baseline-final-backup-") as raw:
+        archive = Path(raw) / "submission.tar.gz"
+        _archive_tree(submission, archive)
+        archive_digest = sha256_file(archive)
+        result = _aws(
+            "s3api",
+            "put-object",
+            "--bucket",
+            bucket,
+            "--key",
+            key,
+            "--body",
+            str(archive),
+            "--if-none-match",
+            "*",
+            "--metadata",
+            f"sha256={archive_digest},submission-manifest-sha256={digest}",
+            "--cli-connect-timeout",
+            "15",
+            "--cli-read-timeout",
+            str(min(timeout_seconds, 300)),
+            timeout_seconds=timeout_seconds,
+        )
+        if result.returncode != 0:
+            combined = f"{result.stdout}\n{result.stderr}"
+            if "PreconditionFailed" not in combined and "412" not in combined:
+                raise RuntimeError(
+                    f"append-only submission upload failed: {combined.strip()}"
+                )
+        create_json_once(
+            receipt,
+            {
+                "version": "tidmad-coding-agent-final-backup-v1",
+                "bucket": bucket,
+                "key": key,
+                "archive_sha256": archive_digest,
+                "submission_manifest_sha256": digest,
+                "created": result.returncode == 0,
+            },
+        )
+    return "created" if result.returncode == 0 else "already-existed"
+
+
 def _tar_info(info: tarfile.TarInfo) -> tarfile.TarInfo:
     info.uid = 0
     info.gid = 0
@@ -138,6 +207,7 @@ def backup_completed(
     prefix: str,
     receipts: Path,
     timeout_seconds: int,
+    submission_root: Path | None = None,
 ) -> list[tuple[Path, str]]:
     outcomes: list[tuple[Path, str]] = []
     for band in BANDS:
@@ -158,6 +228,16 @@ def backup_completed(
                         ),
                     )
                 )
+    if submission_root is not None:
+        outcome = _publish_submission(
+            submission_root,
+            bucket=bucket,
+            prefix=prefix,
+            receipts=receipts,
+            timeout_seconds=timeout_seconds,
+        )
+        if outcome is not None:
+            outcomes.append((submission_root, outcome))
     return outcomes
 
 
@@ -171,6 +251,7 @@ def main() -> int:
     )
     parser.add_argument("--bucket", required=True)
     parser.add_argument("--prefix", required=True)
+    parser.add_argument("--submission-root", type=Path, default=Path("/work/submission"))
     parser.add_argument("--timeout-seconds", type=int, default=600)
     args = parser.parse_args()
     for path, outcome in backup_completed(
@@ -179,6 +260,7 @@ def main() -> int:
         prefix=args.prefix,
         receipts=args.receipt_root,
         timeout_seconds=args.timeout_seconds,
+        submission_root=args.submission_root,
     ):
         print(f"{outcome}\t{path}")
     return 0
