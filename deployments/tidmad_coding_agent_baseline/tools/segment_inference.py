@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import uuid
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Literal
 
 import h5py
 import numpy as np
 import torch
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 SEGMENT_SIZE = 40_000
 NUM_CLASSES = 256
@@ -23,12 +25,21 @@ class SegmentModelContract(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
-    version: Literal["tidmad-segment-model-v1"]
+    version: Literal["tidmad-segment-model-v1", "tidmad-segment-model-v2"]
     segment_size: Literal[SEGMENT_SIZE]
     input_dtype: Literal["int64"]
-    output_kind: Literal["categorical_logits"]
-    num_classes: Literal[NUM_CLASSES]
+    output_kind: Literal["categorical_logits", "continuous_regression"]
+    num_classes: int | None = None
     inference_batch_size: int = Field(default=1, ge=1, le=32)
+
+    @model_validator(mode="after")
+    def require_matching_output_contract(self) -> SegmentModelContract:
+        if self.version == "tidmad-segment-model-v1":
+            if self.output_kind != "categorical_logits" or self.num_classes != NUM_CLASSES:
+                raise ValueError("v1 requires 256-class categorical logits")
+        elif self.output_kind != "continuous_regression" or self.num_classes is not None:
+            raise ValueError("v2 requires continuous regression without num_classes")
+        return self
 
 
 def _load_contract(candidate: Path) -> SegmentModelContract:
@@ -73,8 +84,30 @@ def load_candidate_model(
     return model, contract
 
 
+def _load_regression_conversion(
+    task_root: Path | None,
+) -> Callable[..., np.ndarray]:
+    """Load the task codec copied beside this module into the frozen harness."""
+
+    path = (
+        task_root / "tasks/tidmad/runtime/output_conversion.py"
+        if task_root is not None
+        else Path(__file__).with_name("frozen_output_conversion.py")
+    )
+    spec = importlib.util.spec_from_file_location("tidmad_frozen_output_conversion", path)
+    if spec is None or spec.loader is None:
+        raise ValueError(f"frozen TIDMAD output conversion is missing: {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.regression_to_storage
+
+
 def _decode(
-    model: torch.jit.ScriptModule, values: np.ndarray, device: torch.device
+    model: torch.jit.ScriptModule,
+    values: np.ndarray,
+    device: torch.device,
+    contract: SegmentModelContract,
+    regression_conversion: Callable[..., np.ndarray] | None,
 ) -> np.ndarray:
     inputs = torch.from_numpy(values.astype(np.int16, copy=False) + 128).to(
         device=device,
@@ -82,13 +115,23 @@ def _decode(
     )
     with torch.inference_mode():
         output = model(inputs)
-    required = (inputs.shape[0], NUM_CLASSES, SEGMENT_SIZE)
+    required = (
+        (inputs.shape[0], NUM_CLASSES, SEGMENT_SIZE)
+        if contract.output_kind == "categorical_logits"
+        else (inputs.shape[0], SEGMENT_SIZE)
+    )
     if not isinstance(output, torch.Tensor) or tuple(output.shape) != required:
         observed = None if not isinstance(output, torch.Tensor) else tuple(output.shape)
         raise ValueError(f"model output shape {observed} does not match {required}")
     if not output.dtype.is_floating_point or not torch.isfinite(output).all():
-        raise ValueError("model output must contain finite floating-point logits")
-    return (output.argmax(dim=1).to(torch.int16) - 128).to(torch.int8).cpu().numpy()
+        raise ValueError("model output must contain finite floating-point predictions")
+    if contract.output_kind == "categorical_logits":
+        return (output.argmax(dim=1).to(torch.int16) - 128).to(torch.int8).cpu().numpy()
+    if regression_conversion is None:
+        raise ValueError("continuous regression requires the frozen task-owned conversion")
+    return regression_conversion(
+        output.cpu().numpy(), value_offset=128, storage_dtype=np.dtype("int8")
+    )
 
 
 def run_segment_model(
@@ -97,11 +140,20 @@ def run_segment_model(
     input_file: Path,
     output_file: Path,
     device: torch.device | None = None,
+    task_root: Path | None = None,
+    required_output_kind: str | None = None,
 ) -> None:
     """Apply a trained model only to evaluator-created raw 40k-sample tensors."""
 
     device = device or torch.device("cuda")
     model, contract = load_candidate_model(candidate, device)
+    if required_output_kind is not None and contract.output_kind != required_output_kind:
+        raise ValueError(
+            f"frozen unit requires {required_output_kind}, got {contract.output_kind}"
+        )
+    regression_conversion = None
+    if contract.output_kind == "continuous_regression":
+        regression_conversion = _load_regression_conversion(task_root)
     temporary = output_file.with_name(f".{output_file.name}.{uuid.uuid4().hex}.tmp")
     marker = output_file.with_suffix(output_file.suffix + ".complete")
     marker_tmp = marker.with_name(f".{marker.name}.{uuid.uuid4().hex}.tmp")
@@ -128,7 +180,9 @@ def run_segment_model(
                 start = first * SEGMENT_SIZE
                 stop = (first + count) * SEGMENT_SIZE
                 raw_batch = np.asarray(raw[start:stop]).reshape(count, SEGMENT_SIZE)
-                output[start:stop] = _decode(model, raw_batch, device).reshape(-1)
+                output[start:stop] = _decode(
+                    model, raw_batch, device, contract, regression_conversion
+                ).reshape(-1)
             destination.flush()
         os.replace(temporary, output_file)
         with marker_tmp.open("x") as handle:
@@ -147,11 +201,15 @@ def main() -> int:
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--input-file", type=Path, required=True)
     parser.add_argument("--output-file", type=Path, required=True)
+    parser.add_argument("--task-root", type=Path)
+    parser.add_argument("--required-output-kind", choices=("continuous_regression",))
     args = parser.parse_args()
     run_segment_model(
         candidate=args.candidate,
         input_file=args.input_file,
         output_file=args.output_file,
+        task_root=args.task_root,
+        required_output_kind=args.required_output_kind,
     )
     return 0
 

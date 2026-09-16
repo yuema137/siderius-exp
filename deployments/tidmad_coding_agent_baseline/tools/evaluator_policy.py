@@ -26,6 +26,22 @@ class EvaluatorPolicy:
     health_config_root: Path = Path("/var/lib/tidmad-baseline/health-configs")
     final_output_dir: Path = Path("/var/lib/tidmad-baseline/final-denoised")
     final_score: Path = Path("/var/lib/tidmad-baseline/final_score.json")
+    unit_manifest: Path = Path("/opt/tidmad-evaluator/assets/unit.json")
+
+    def required_bands(self) -> tuple[str, ...]:
+        """Resolve the frozen unit scope; old diagnostic bundles cover all bands."""
+
+        if not self.unit_manifest.is_file():
+            return BANDS
+        payload = json.loads(self.unit_manifest.read_text())
+        if payload.get("version") != "tidmad-baseline-unit-v1":
+            raise ValueError("invalid evaluator unit manifest version")
+        band = payload.get("band")
+        if band is None:
+            return BANDS
+        if band not in BANDS:
+            raise ValueError(f"invalid evaluator unit band: {band!r}")
+        return (band,)
 
     def agent_path(self, supplied: Path, *, label: str) -> Path:
         """Resolve an agent artifact and reject paths outside its workspace."""
@@ -40,6 +56,10 @@ class EvaluatorPolicy:
         expected = "all" if band is None else band
         if expected not in (*BANDS, "all"):
             raise ValueError(f"unsupported evaluation scope band: {expected}")
+        if band is not None and band not in self.required_bands():
+            raise ValueError(f"band {band} is outside this evaluator's frozen unit")
+        if band is None and len(self.required_bands()) != len(BANDS):
+            raise ValueError("all-band scoring is outside this single-band unit")
         if phase not in {"candidate", "final"}:
             raise ValueError(f"unsupported evaluation phase: {phase}")
         required_name = f"{'all' if band is None else f'band-{band}'}-{phase}"

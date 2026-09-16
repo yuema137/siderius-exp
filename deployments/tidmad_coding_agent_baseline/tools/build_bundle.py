@@ -16,6 +16,7 @@ from pathlib import Path
 
 from experiments.shared.information_treatment import (
     AdviceMode,
+    ModuleState,
     ResolvedInformationTreatment,
     resolve_information_treatment,
 )
@@ -171,6 +172,7 @@ def _write_task_kickoff(
     source: Path,
     destination: Path,
     treatment: ResolvedInformationTreatment,
+    band: str | None = None,
 ) -> None:
     """Render treatment state without copying advice content into the kickoff."""
 
@@ -184,6 +186,10 @@ def _write_task_kickoff(
             "Human advice is disabled. No human-advice artifact is supplied for this run."
         )
     base = source.read_text(encoding="utf-8").rstrip()
+    if band is not None:
+        if "{{BAND}}" not in base:
+            raise ValueError("single-band task.md must contain the {{BAND}} placeholder")
+        base = base.replace("{{BAND}}", band)
     destination.write_text(
         f"{base}\n\n"
         "## Frozen information treatment for this run\n\n"
@@ -193,7 +199,9 @@ def _write_task_kickoff(
     )
 
 
-def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
+def _write_evaluation_scopes(
+    task_root: Path, evaluator_root: Path, *, band: str | None = None
+) -> None:
     """Derive operator-approved full-band candidate and final scopes."""
 
     profile = json.loads((task_root / "tasks/tidmad/resolved/dataset_profile.json").read_text())
@@ -201,14 +209,34 @@ def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
     scopes = evaluator_root / "evaluation_scopes"
     scopes.mkdir()
     all_scope: dict[str, list[int]] = {}
-    for band in BANDS:
-        low, high = (int(value) for value in band.split("-"))
+    for selected in (BANDS if band is None else (band,)):
+        low, high = (int(value) for value in selected.split("-"))
         final_scope = {str(index): list(range(count)) for index in range(low, high + 1)}
-        candidate_scope = {str(index): list(range(count)) for index in FILES_BY_BAND[band]}
-        atomic_write_json(scopes / f"band-{band}-candidate.json", candidate_scope)
-        atomic_write_json(scopes / f"band-{band}-final.json", final_scope)
+        candidate_scope = {str(index): list(range(count)) for index in FILES_BY_BAND[selected]}
+        atomic_write_json(scopes / f"band-{selected}-candidate.json", candidate_scope)
+        atomic_write_json(scopes / f"band-{selected}-final.json", final_scope)
         all_scope.update(final_scope)
-    atomic_write_json(scopes / "all-final.json", all_scope)
+    if band is None:
+        atomic_write_json(scopes / "all-final.json", all_scope)
+
+
+def _write_data_manifest(source: Path, destination: Path, *, band: str | None) -> None:
+    """Keep the 40-file diagnostic or the exact selected band's file pairs."""
+
+    lines = source.read_text().splitlines()
+    if band is None:
+        destination.write_text("\n".join(lines) + "\n")
+        return
+    required = {
+        f"abra_{kind}_{index:04d}.h5"
+        for index in FILES_BY_BAND[band]
+        for kind in ("training", "validation")
+    }
+    selected = [line for line in lines if line.split()[-1] in required]
+    observed = {line.split()[-1] for line in selected}
+    if observed != required or len(selected) != len(required):
+        raise ValueError(f"data manifest lacks the exact file pairs for band {band}")
+    destination.write_text("\n".join(selected) + "\n")
 
 
 def build_bundle(
@@ -217,18 +245,26 @@ def build_bundle(
     siderius_checkout: Path,
     output: Path,
     repo: Path | None = None,
+    band: str | None = None,
 ) -> Path:
     repo = (repo or _repo_root()).resolve()
     if not task_md.is_file() or not task_md.read_text().strip():
         raise ValueError("an operator-approved, non-empty task.md is required")
     if not siderius_checkout.is_dir():
         raise ValueError("an exact-pin SIDERIUS checkout is required")
+    if band is not None and band not in BANDS:
+        raise ValueError(f"unsupported single-band unit: {band}")
     treatment = resolve_information_treatment(
         information_treatment,
         repository_root=repo,
         adapter="coding_agent",
         required_modules=("literature_review",),
     )
+    if band is not None and (
+        treatment.declaration.advice.mode is not AdviceMode.DISABLED
+        or treatment.module_states.get("data_analysis") is not ModuleState.NOT_APPLICABLE
+    ):
+        raise ValueError("single-band CLI baseline requires no advice or data analysis")
     expected_task = (repo / "tasks/tidmad").resolve()
     if treatment.task_package_path != expected_task:
         raise ValueError(
@@ -247,17 +283,25 @@ def build_bundle(
         evaluator_root.mkdir()
         private_task_root = evaluator_root / "task_snapshot"
         _copy_task_views(_tracked_task_files(repo), repo, input_root, private_task_root)
-        _write_task_kickoff(task_md, input_root / "task.md", treatment)
+        _write_task_kickoff(task_md, input_root / "task.md", treatment, band)
         atomic_write_json(input_root / "treatment.json", treatment.receipt())
         if treatment.declaration.advice.mode is AdviceMode.ENABLED:
             assert treatment.advice_path is not None
             shutil.copy2(treatment.advice_path, input_root / "advice.json")
         for source in sorted((deployment / "tools").glob("*.py")):
             shutil.copy2(source, harness_root / source.name)
+        shutil.copy2(
+            repo / "tasks/tidmad/runtime/output_conversion.py",
+            harness_root / "frozen_output_conversion.py",
+        )
         shutil.copytree(deployment / "systemd", staging / "harness" / "systemd")
         shutil.copytree(deployment / "machine", staging / "harness" / "machine")
-        shutil.copy2(data_manifest, evaluator_root / "data_manifest.sha256")
-        _write_evaluation_scopes(private_task_root, evaluator_root)
+        _write_data_manifest(data_manifest, evaluator_root / "data_manifest.sha256", band=band)
+        atomic_write_json(
+            evaluator_root / "unit.json",
+            {"version": "tidmad-baseline-unit-v1", "band": band},
+        )
+        _write_evaluation_scopes(private_task_root, evaluator_root, band=band)
         siderius_revision, wheel_sha = _build_evaluator(
             repo, siderius_checkout.resolve(), evaluator_root
         )
@@ -278,6 +322,7 @@ def build_bundle(
                 "information_treatment_sha256": treatment.manifest_sha256,
                 "siderius_wheel_sha256": wheel_sha,
                 "task_md_sha256": sha256_file(input_root / "task.md"),
+                "band": band,
             },
         )
         _write_checksums(input_root, input_root / "bundle.sha256")
@@ -312,6 +357,7 @@ def main() -> int:
     parser.add_argument("--information-treatment", type=Path, required=True)
     parser.add_argument("--siderius-checkout", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--band", choices=BANDS)
     args = parser.parse_args()
     print(
         build_bundle(
@@ -319,6 +365,7 @@ def main() -> int:
             args.information_treatment,
             args.siderius_checkout,
             args.output,
+            band=args.band,
         )
     )
     return 0

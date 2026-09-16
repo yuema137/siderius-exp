@@ -35,7 +35,8 @@ task_description: |
   full-spectrum 1-D time-series denoising of SQUID dark-matter
   detector data: map a noisy [B, T] integer signal to a clean
   [B, T] continuous waveform, trained across the whole frequency
-  spectrum at once (not split into per-band models). This is a
+  spectrum within the selected band at once (not split into per-file or
+  per-frequency models). This is a
   continuous regression task — the model predicts waveform values
   directly, not a distribution over discrete levels.
 

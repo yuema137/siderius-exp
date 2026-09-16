@@ -1,8 +1,9 @@
 # TIDMAD coding-agent baseline
 
-This folder prepares two independent 24-hour baselines: one gives the TIDMAD
-problem to Codex, and the other gives the same problem to Claude Code. It does
-not define a second version of TIDMAD. The builder derives both an agent-visible
+This folder prepares coding-agent baselines for Codex and Claude Code. The
+existing four-band, one-clock package is a diagnostic pilot; the planned main
+experiment gives each agent one band and a separate 24-hour clock. Neither
+mode defines a second version of TIDMAD. The builder derives both an agent-visible
 view and an evaluator-private snapshot from the same tracked
 [`tasks/tidmad`](../../tasks/tidmad/) authority. Both machines receive the same
 bundle bytes and the same operator-approved kickoff file, `task.md`.
@@ -20,7 +21,8 @@ scored candidates, back them up, and collect the final result.
 ## What the agent can see
 
 - the sanitized `tasks/tidmad` view and shared `task.md`;
-- all 20 labelled training files;
+- the labelled training files selected by the frozen unit: all 20 for the
+  diagnostic pilot, or only the chosen band's 4, 6, 5, or 5 files;
 - its own 1 TiB local workspace and outbound internet;
 - the fixed `tidmad-score` command.
 
@@ -32,8 +34,11 @@ Every candidate that receives an eligible complete-band score is retained.
 ## Operator-owned evaluation contract
 
 Candidate evaluation covers every official validation file in the requested
-band: files 0--3, 4--9, 10--14 or 15--19. Final evaluation composes the four
-frozen band winners over all 20 files. Metric aggregation, band membership,
+band: files 0--3, 4--9, 10--14 or 15--19. The diagnostic pilot's final
+evaluation composes four winners over all 20 files. A main-experiment unit
+finalizes only its selected band and records a sparse 20-file vector; four
+independent accepted units are needed before any overall composition.
+Metric aggregation, band membership,
 Health eligibility and evaluation scope are scientific protocol decisions.
 They must not be narrowed, sampled or otherwise changed for runtime or cost
 reasons without explicit operator approval.
@@ -74,6 +79,27 @@ The resulting `treatment.json` records the selected arm and advice identity;
 the public task-view hash remains the same. Codex and Claude must receive the
 same archive bytes when they belong to the same arm.
 
+The command above is for the four-band diagnostic pilot. For a **single-band
+main-experiment package**, select one band explicitly, use
+`task-main-band.md` and `main-cli-no-advice.yaml`, and build the same archive
+bytes for Codex and Claude in that band:
+
+```bash
+.venv/bin/python -m \
+  deployments.tidmad_coding_agent_baseline.tools.build_bundle \
+  --task-md deployments/tidmad_coding_agent_baseline/task-main-band.md \
+  --information-treatment \
+    experiments/tidmad/information_treatments/main-cli-no-advice.yaml \
+  --siderius-checkout /path/to/exact-pinned-SIDERIUS \
+  --band 4-9 \
+  --output /safe/bundles/tidmad-band-4-9.tar.gz
+```
+
+Replace `4-9` with the selected band and use a distinct run/workspace for
+each band. This package carries only that band's training/validation checksum
+entries and evaluator scopes. It does not by itself authorize a main run:
+freeze the remaining launch inputs and complete the H100 drill first.
+
 ## VM contract
 
 Each condition receives one Nebius H100 VM, 16 vCPU, 200 GB RAM and one
@@ -106,8 +132,10 @@ candidate publication succeed.
 
 ## Install one VM
 
-Copy the archive and the 40 raw files to root-only staging directories on the
-VM's local disk. In particular, `/data/raw-staging` must not be readable by
+Copy the archive and the raw files named by its `data_manifest.sha256` to
+root-only staging directories on the VM's local disk: 40 files for a diagnostic
+pilot, or 8/12/10/10 training-plus-validation files for one selected band.
+In particular, `/data/raw-staging` must not be readable by
 `baseline-agent`. Extract the archive into a root-only directory, then run:
 
 ```bash
@@ -121,8 +149,9 @@ sudo /opt/tidmad-evaluator/venv/bin/python -I -m \
   --private-group baseline-evaluator
 ```
 
-Data preparation verifies the 40 repository-owned checksums. All 20 training
-files remain available for fitting. The 20 validation inputs and targets, plus
+Data preparation verifies every selected repository-owned checksum. The
+selected band's training files remain available for fitting. Validation inputs
+and targets, plus
 the exact frequency/anchor/scorer assets, remain evaluator-only. Evaluator
 inference copies omit release-identity attributes such as the original file
 number.
@@ -212,7 +241,8 @@ recomputed after restart.
 ## Scoring and submission
 
 The scorer owns the canonical TIDMAD formula. During search the agent may name
-only a candidate below `/work/agent` and one of the four bands. The evaluator
+only a candidate below `/work/agent` and a band permitted by its frozen unit.
+The evaluator
 selects every official validation file in that band, snapshots the candidate,
 runs its frozen model through evaluator-owned segmentation and output assembly,
 applies scoring and Health across the complete band, and retains eligible
@@ -223,7 +253,7 @@ state root to its own root-created session directory. It is not a member of the
 results group and cannot list or read retained sibling state.
 
 ```bash
-tidmad-score \
+tidmad-score candidate \
   --band 0-3 \
   --candidate-id my-candidate-001 \
   --candidate-source /work/agent/candidates/my-candidate-001
@@ -232,13 +262,16 @@ tidmad-score \
 Candidate source contains `model.py` (or `model/`), `architecture.json`,
 `train_config.json`, `weights.pth`, and an exported TorchScript `model.pt`.
 Evaluator code alone reads HDF5 files, slices fixed raw 40,000-sample segments,
-decodes model logits, and writes deliverables. The model runs under a root-owned,
+converts the model output with the frozen task-owned rule, and writes
+deliverables. The diagnostic contract accepts categorical logits; a
+single-band main unit requires continuous regression. The model runs under a root-owned,
 network-disabled inference identity and receives only segment tensors. At the
 immutable deadline the finalizer stops the
-agent, selects the best retained complete-band candidate for each band, replays
-the four frozen winners over the same authoritative validation scopes, composes
-the 20-file result, and packages it. A missing band remains a partial
-submission; the finalizer never invents scores.
+agent, selects the best retained complete-band candidate for each required
+band, replays it over that band's full validation scope, and packages the
+result. A diagnostic pilot requires four winners; a single-band unit requires
+one and emits a sparse 20-file vector. A missing required band remains a
+partial submission; the finalizer never invents scores.
 
 The final `task.md`, cloud provisioning commands, model identity patterns and
 actual drill receipts remain launch-time inputs. A local test is not evidence

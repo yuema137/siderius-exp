@@ -35,6 +35,7 @@ import random
 from bisect import bisect_right
 from collections.abc import Iterable
 from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 from typing import Any, ClassVar, Literal, cast
 
@@ -88,6 +89,21 @@ from execute_tools.task_data_path import (
 )
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
+
+
+def _load_regression_conversion():
+    """Load a task-owned sibling when SIDERIUS imports this plugin by file path."""
+
+    path = Path(__file__).with_name("output_conversion.py")
+    spec = spec_from_file_location("tidmad_task_output_conversion", path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"TIDMAD output conversion is missing: {path}")
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.regression_to_storage
+
+
+regression_to_storage = _load_regression_conversion()
 
 
 def _h5_dataset(f: h5py.File, *path: str) -> h5py.Dataset:
@@ -1360,7 +1376,16 @@ class TidmadTaskDataPath:
                         f"TIDMAD prediction has decoded shape {decoded.shape}; "
                         f"expected {(scope.seg_size,)}"
                     )
-                denoised[local_row] = (decoded - encoding.value_offset).astype(storage_np)
+                if np.issubdtype(decoded.dtype, np.floating):
+                    denoised[local_row] = regression_to_storage(
+                        decoded,
+                        value_offset=encoding.value_offset,
+                        storage_dtype=storage_np,
+                    )
+                else:
+                    denoised[local_row] = (decoded - encoding.value_offset).astype(
+                        storage_np
+                    )
                 consumed += 1
 
             self._persist_file(

@@ -33,11 +33,11 @@ def _load_runtime(input_root: Path):
     resolved = str(input_root.resolve())
     if resolved not in sys.path:
         sys.path.insert(0, resolved)
+    from execute_tools.dataset_config import load_dataset_profile
+
     from tasks.tidmad.runtime.anchor_map import load_anchor_map
     from tasks.tidmad.runtime.scoreability import TidmadScoreabilityContract
     from tasks.tidmad.runtime.scoring import score_vector
-
-    from execute_tools.dataset_config import load_dataset_profile
 
     return (
         load_dataset_profile,
@@ -152,6 +152,9 @@ def score_candidate(args: argparse.Namespace, policy: EvaluatorPolicy | None = N
             input_root=policy.evaluation_input_dir,
             output_root=snapshot_root / "denoised",
             files_by_band={args.band: FILES_BY_BAND[args.band]},
+            required_output_kind=(
+                "continuous_regression" if len(policy.required_bands()) == 1 else None
+            ),
         )
         score, deliverables = compute_score(
             input_root=policy.input_root,
@@ -257,25 +260,30 @@ def _publish_candidate_score(
     return destination
 
 
-def _winner_map(values: list[str]) -> dict[str, str]:
+def _winner_map(values: list[str], required_bands: tuple[str, ...] = BANDS) -> dict[str, str]:
     winners: dict[str, str] = {}
     for value in values:
         band, separator, candidate_id = value.partition("=")
         if not separator or band not in BANDS or not candidate_id:
             raise ValueError(f"invalid --winner value: {value!r}")
         winners[band] = candidate_id
-    if set(winners) != set(BANDS):
-        raise ValueError("final scoring requires exactly one winner for every band")
+    if set(winners) != set(required_bands):
+        raise ValueError(
+            f"final scoring requires exactly the frozen unit bands {required_bands}"
+        )
     return winners
 
 
 def score_final(args: argparse.Namespace, policy: EvaluatorPolicy | None = None) -> Path:
     policy = policy or EvaluatorPolicy()
-    winners = _winner_map(args.winner)
+    required_bands = policy.required_bands()
+    winners = _winner_map(args.winner, required_bands)
     denoised_dir = args.denoised_dir.resolve(strict=True)
     if denoised_dir != policy.final_output_dir.resolve(strict=True):
         raise ValueError(f"final denoised directory must be evaluator-owned: {denoised_dir}")
-    sample_set = policy.scope_path("all-final", band=None, phase="final")
+    unit_band = required_bands[0] if len(required_bands) == 1 else None
+    scope_name = f"band-{unit_band}-final" if unit_band else "all-final"
+    sample_set = policy.scope_path(scope_name, band=unit_band, phase="final")
     score, deliverables = compute_score(
         input_root=policy.input_root,
         raw_data_dir=policy.evaluation_truth_dir,
@@ -299,7 +307,7 @@ def score_final(args: argparse.Namespace, policy: EvaluatorPolicy | None = None)
     score.update(
         {
             "evaluation_split": "final",
-            "evaluation_scope": "complete-task",
+            "evaluation_scope": scope_name,
             "health_status": health.status,
             "health_passed": health.eligible,
             "health_gate_results": health.gate_results,
@@ -308,8 +316,10 @@ def score_final(args: argparse.Namespace, policy: EvaluatorPolicy | None = None)
         }
     )
     score["valid"] = score["eligible_for_selection"]
-    if not score["scoreable"] or any(value is None for value in score["file_vector"]):
-        raise ValueError("final score must be finite and cover all 20 validation files")
+    present = {index for index, value in enumerate(score["file_vector"]) if value is not None}
+    expected = {index for band in required_bands for index in FILES_BY_BAND[band]}
+    if not score["scoreable"] or present != expected:
+        raise ValueError("final score must be finite and cover exactly the frozen unit")
     if not health.eligible:
         raise ValueError(
             "final score refused by task Health: "

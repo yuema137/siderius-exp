@@ -6,11 +6,14 @@ valid qualification evidence. Run it only with explicit operator authorization
 and the external API/data preparation described by the framework operating
 guide.
 
-The launcher pins the task composition, OpenAI Pro routing, ten iterations,
-at most two completed rounds per iteration (with the final slot forced Formal
-when reached), one epoch, the declared portions, the
-full-clone Formal slot, measured admission, 30/120-minute time ceilings,
-16/16-GiB VRAM ceilings, scope `15-19`, Health files `15,16,17,18,19`,
+The launcher reads one shared [`workflow.json`](workflow.json) for the task
+composition, the per-agent model settings JSON in the pinned SIDERIUS checkout,
+and all fixed workflow parameters. Advice-on and advice-off use those same
+workflow bytes; only the information treatment and run identity differ. The
+configuration pins ten iterations, at most two completed rounds per iteration
+(with the final slot forced Formal when reached), one epoch, the declared
+portions, the full-clone Formal slot, measured admission, 30/120-minute time
+ceilings, 16/16-GiB VRAM ceilings, scope `15-19`, Health files `15,16,17,18,19`,
 sequential order, fresh start, and retained denoised outputs. Supply explicit
 `--siderius-checkout`, `--workspace`, and `--data_dir`; use `--dry-run` to
 inspect the frozen launch before an authorized effectful run.

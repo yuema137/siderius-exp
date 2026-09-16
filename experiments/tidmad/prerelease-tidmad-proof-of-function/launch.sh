@@ -51,23 +51,17 @@ treatment_output="$("$EXP_PYTHON" -m experiments.shared.information_treatment \
   --adapter siderius \
   --require-module literature_review)" || fail "information treatment is invalid"
 mapfile -t treatment_args <<< "$treatment_output"
+workflow_output="$("$EXP_PYTHON" -m experiments.shared.fixed_workflow_config \
+  --config "$ROOT/experiments/tidmad/prerelease-tidmad-proof-of-function/workflow.json" \
+  --repository-root "$ROOT" \
+  --siderius-checkout "$checkout")" || fail "fixed workflow config is invalid"
+mapfile -t workflow_args <<< "$workflow_output"
 args=(
-  --mode lilab --task_composition "$ROOT/tasks/tidmad/compositions/continuous_regression.yaml"
+  --mode lilab
   --workspace "$workspace" --data_dir "$data_dir"
   --run_name "$RUN_NAME"
-  --llm_config "$checkout/configs/llm/openai_tiered_pro.json"
-  --num_iterations 10 --max_rounds 2 --max_epochs 1
-  --trial_max_epochs 1 --formal_max_epochs 1
-  --trial_portion 0.1 --train_portion 0.1 --eval_portion 0.1
-  --formal_portion 1.0 --formal_train_portion 0.1 --formal_eval_portion 1.0
-  --formal_round_strategy full_clone --force_formal_round
-  --trial_time_budget_minutes 30 --formal_time_budget_minutes 120
-  --trial_vram_budget_gb 16 --formal_vram_budget_gb 16
-  --trial_time_admission_source measured --formal_time_admission_source measured
-  --data_scope 15-19 --health_gate_files 15-19
-  --order_strategy_override sequential --file_order_override 15,16,17,18,19
-  --force_fresh --no_auto_resume --no-cleanup_denoised
 )
+args+=("${workflow_args[@]}")
 args+=("${treatment_args[@]}")
 if [[ "$dry_run" == 1 ]]; then
   args+=(--dry-run)

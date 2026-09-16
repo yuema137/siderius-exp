@@ -14,7 +14,7 @@ from typing import Any
 from .evaluator_policy import EvaluatorPolicy
 from .final_inference import run_candidate_inference
 from .io import atomic_write_json, create_json_once, fsync_directory, sha256_file
-from .model import BANDS, utc_text
+from .model import BANDS, FILES_BY_BAND, utc_text
 from .score import score_final
 from .usage import aggregate_usage
 
@@ -36,9 +36,11 @@ def _candidate(archive_root: Path, band: str, candidate_id: str) -> Path:
     return path
 
 
-def _read_best(archive_root: Path) -> dict[str, tuple[str, Path]]:
+def _read_best(
+    archive_root: Path, required_bands: tuple[str, ...] = BANDS
+) -> dict[str, tuple[str, Path]]:
     winners: dict[str, tuple[str, Path]] = {}
-    for band in BANDS:
+    for band in required_bands:
         marker = archive_root / "best" / f"{band}.json"
         if not marker.is_file():
             continue
@@ -49,7 +51,9 @@ def _read_best(archive_root: Path) -> dict[str, tuple[str, Path]]:
 
 
 def _validated_final_score(
-    path: Path, winners: dict[str, tuple[str, Path]]
+    path: Path,
+    winners: dict[str, tuple[str, Path]],
+    required_bands: tuple[str, ...] = BANDS,
 ) -> dict[str, Any] | None:
     if not path.is_file():
         return None
@@ -60,8 +64,14 @@ def _validated_final_score(
     if payload.get("winner_candidates") != expected:
         raise ValueError("final score was not produced from the marked band winners")
     vector = payload.get("file_vector")
-    if not isinstance(vector, list) or len(vector) != 20 or any(value is None for value in vector):
-        raise ValueError("final score record needs all 20 per-file values")
+    present = (
+        {index for index, value in enumerate(vector) if value is not None}
+        if isinstance(vector, list) and len(vector) == 20
+        else set()
+    )
+    required = {index for band in required_bands for index in FILES_BY_BAND[band]}
+    if present != required:
+        raise ValueError("final score record does not cover exactly the frozen unit")
     return payload
 
 
@@ -72,19 +82,20 @@ def finalize(
     final_score_path: Path = Path("/var/lib/tidmad-baseline/final_score.json"),
     policy: EvaluatorPolicy | None = None,
 ) -> Path:
-    winners = _read_best(archive_root)
+    policy = policy or EvaluatorPolicy(
+        archive_root=archive_root,
+        final_score=final_score_path,
+        final_output_dir=archive_root.parent / "final-denoised",
+    )
+    required_bands = policy.required_bands()
+    winners = _read_best(archive_root, required_bands)
     final_attempt_path = archive_root.parent / "final_attempt.json"
     final_failure_path = archive_root.parent / "final_failure.json"
     if (
-        len(winners) == len(BANDS)
+        len(winners) == len(required_bands)
         and not final_score_path.is_file()
         and not final_attempt_path.is_file()
     ):
-        policy = policy or EvaluatorPolicy(
-            archive_root=archive_root,
-            final_score=final_score_path,
-            final_output_dir=archive_root.parent / "final-denoised",
-        )
         create_json_once(
             final_attempt_path,
             {
@@ -101,6 +112,9 @@ def finalize(
                 task_root=policy.input_root,
                 input_root=policy.evaluation_input_dir,
                 output_root=policy.final_output_dir,
+                required_output_kind=(
+                    "continuous_regression" if len(required_bands) == 1 else None
+                ),
             )
             try:
                 score_final(
@@ -116,7 +130,7 @@ def finalize(
                 )
             finally:
                 shutil.rmtree(denoised, ignore_errors=True)
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 - persist any final replay failure
             atomic_write_json(
                 final_failure_path,
                 {
@@ -126,7 +140,7 @@ def finalize(
                     "error": str(error),
                 },
             )
-    final_score = _validated_final_score(final_score_path, winners)
+    final_score = _validated_final_score(final_score_path, winners, required_bands)
     final_failure = (
         json.loads(final_failure_path.read_text()) if final_failure_path.is_file() else None
     )
@@ -147,7 +161,7 @@ def finalize(
             atomic_write_json(temporary / "score_vector.json", final_score)
         receipts = work_root / "state" / "invocations.jsonl"
         invocation_count = sum(1 for _ in receipts.open("rb")) if receipts.exists() else 0
-        complete = len(winners) == len(BANDS) and final_score is not None
+        complete = len(winners) == len(required_bands) and final_score is not None
         ended = int(time.time())
         start_path = work_root / "state" / "run_start.json"
         start = json.loads(start_path.read_text()) if start_path.is_file() else {}
@@ -159,7 +173,8 @@ def finalize(
                 "product": product,
                 "complete": complete,
                 "winner_candidates": {band: identity for band, (identity, _) in winners.items()},
-                "missing_bands": [band for band in BANDS if band not in winners],
+                "missing_bands": [band for band in required_bands if band not in winners],
+                "unit_bands": list(required_bands),
                 "final_score_present": final_score is not None,
                 "final_evaluation_attempted": final_attempt_path.is_file(),
                 "final_evaluation_failure": final_failure,

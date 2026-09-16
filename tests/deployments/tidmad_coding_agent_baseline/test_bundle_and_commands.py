@@ -2,16 +2,37 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import shlex
 import tarfile
 from pathlib import Path
 
 import pytest
+
 from deployments.tidmad_coding_agent_baseline.tools import build_bundle as bundle_module
 from deployments.tidmad_coding_agent_baseline.tools.agent_command import command_for
 from deployments.tidmad_coding_agent_baseline.tools.build_bundle import build_bundle
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 TREATMENTS = REPOSITORY_ROOT / "experiments/tidmad/information_treatments"
+
+
+def test_operator_readme_names_the_single_band_route_and_live_score_command():
+    """Catch an operator copying the obsolete four-band or no-subcommand recipe."""
+
+    readme = (
+        REPOSITORY_ROOT / "deployments/tidmad_coding_agent_baseline/README.md"
+    ).read_text()
+    commands = [
+        shlex.split(block.replace("\\\n", ""))
+        for block in re.findall(r"```bash\n(.*?)\n```", readme, re.S)
+    ]
+    formal = next(command for command in commands if "task-main-band.md" in " ".join(command))
+    assert formal[formal.index("--band") + 1] == "4-9"
+    assert formal[formal.index("--information-treatment") + 1].endswith(
+        "main-cli-no-advice.yaml"
+    )
+    assert any(command[:2] == ["tidmad-score", "candidate"] for command in commands)
 
 
 def _archive_json(archive: tarfile.TarFile, name: str) -> dict:
@@ -269,6 +290,81 @@ def test_candidate_scopes_cover_every_file_in_each_band(tmp_path):
         )
         assert set(scope) == files
         assert all(segments == [0, 1] for segments in scope.values())
+
+
+def test_single_band_bundle_writes_only_its_frozen_scopes_and_file_pairs(tmp_path):
+    task_root = tmp_path / "task"
+    resolved = task_root / "tasks/tidmad/resolved"
+    resolved.mkdir(parents=True)
+    (resolved / "dataset_profile.json").write_text(
+        json.dumps({"dataset": {"segments_per_file": 2}})
+    )
+    evaluator = tmp_path / "evaluator"
+    evaluator.mkdir()
+    bundle_module._write_evaluation_scopes(task_root, evaluator, band="4-9")
+    scopes = evaluator / "evaluation_scopes"
+    assert sorted(path.name for path in scopes.iterdir()) == [
+        "band-4-9-candidate.json",
+        "band-4-9-final.json",
+    ]
+    assert set(json.loads((scopes / "band-4-9-final.json").read_text())) == {
+        str(index) for index in range(4, 10)
+    }
+
+    source = tmp_path / "all.sha256"
+    source.write_text(
+        "".join(
+            f"{'a' * 64}  abra_{kind}_{index:04d}.h5\n"
+            for index in range(20)
+            for kind in ("training", "validation")
+        )
+    )
+    target = tmp_path / "band.sha256"
+    bundle_module._write_data_manifest(source, target, band="4-9")
+    names = {line.split()[-1] for line in target.read_text().splitlines()}
+    assert names == {
+        f"abra_{kind}_{index:04d}.h5"
+        for index in range(4, 10)
+        for kind in ("training", "validation")
+    }
+
+
+def test_single_band_bundle_has_regression_codec_without_private_truth(tmp_path, monkeypatch):
+    checkout = tmp_path / "siderius"
+    checkout.mkdir()
+
+    def fake_build(_repo, _checkout, output):
+        wheel = "siderius-test.whl"
+        (output / wheel).write_bytes(b"test wheel")
+        (output / "siderius-wheel-name.txt").write_text(f"{wheel}\n")
+        (output / "requirements.txt").write_text("numpy==2.5.2\n")
+        return "1" * 40, "f" * 64
+
+    monkeypatch.setattr(bundle_module, "_build_evaluator", fake_build)
+    output = build_bundle(
+        REPOSITORY_ROOT / "deployments/tidmad_coding_agent_baseline/task-main-band.md",
+        TREATMENTS / "main-cli-no-advice.yaml",
+        checkout,
+        tmp_path / "single-band.tar.gz",
+        band="4-9",
+    )
+    with tarfile.open(output, "r:gz") as archive:
+        root = "tidmad-coding-agent-baseline"
+        names = set(archive.getnames())
+        assert f"{root}/harness/baseline_harness/frozen_output_conversion.py" in names
+        assert f"{root}/input/advice.json" not in names
+        assert f"{root}/evaluator/evaluation_scopes/band-4-9-final.json" in names
+        assert f"{root}/evaluator/evaluation_scopes/all-final.json" not in names
+        assert _archive_json(archive, f"{root}/evaluator/unit.json")["band"] == "4-9"
+        kickoff = archive.extractfile(f"{root}/input/task.md")
+        assert kickoff is not None
+        text = kickoff.read().decode()
+        assert "band `4-9`" in text
+        assert "continuous_regression" in text
+        assert "{{BAND}}" not in text
+        data_manifest = archive.extractfile(f"{root}/evaluator/data_manifest.sha256")
+        assert data_manifest is not None
+        assert len(data_manifest.read().splitlines()) == 12
 
 
 def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():
