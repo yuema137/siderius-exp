@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import tarfile
 from pathlib import Path
@@ -131,6 +132,14 @@ def test_bundle_splits_public_task_view_from_exact_private_task_snapshot(tmp_pat
             "sha256": None,
         }
         assert receipt["modules"] == {"literature_review": "not_applicable"}
+        kickoff = archive.extractfile(
+            archive.getmember("tidmad-coding-agent-baseline/input/task.md")
+        )
+        assert kickoff is not None
+        kickoff_text = kickoff.read().decode()
+        assert "tidmad-prerelease-advice-off-v1" in kickoff_text
+        assert "Human advice is disabled" in kickoff_text
+        assert provenance["task_md_sha256"] == hashlib.sha256(kickoff_text.encode()).hexdigest()
 
 
 def test_advice_enabled_bundle_contains_one_certified_canonical_artifact(tmp_path, monkeypatch):
@@ -177,6 +186,14 @@ def test_advice_enabled_bundle_contains_one_certified_canonical_artifact(tmp_pat
         receipt = _archive_json(archive, "tidmad-coding-agent-baseline/input/treatment.json")
         assert receipt["advice"]["mode"] == "enabled"
         assert receipt["advice"]["artifact"] == "advice.json"
+        kickoff = archive.extractfile(
+            archive.getmember("tidmad-coding-agent-baseline/input/task.md")
+        )
+        assert kickoff is not None
+        kickoff_text = kickoff.read().decode()
+        assert "tidmad-prerelease-advice-on-v1" in kickoff_text
+        assert "Human advice is enabled" in kickoff_text
+        assert "/work/input/advice.json" in kickoff_text
         on_provenance = _archive_json(archive, "tidmad-coding-agent-baseline/input/provenance.json")
         off_provenance = _archive_json(
             off_archive, "tidmad-coding-agent-baseline/input/provenance.json"

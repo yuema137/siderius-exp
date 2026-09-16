@@ -16,6 +16,7 @@ from pathlib import Path
 
 from experiments.shared.information_treatment import (
     AdviceMode,
+    ResolvedInformationTreatment,
     resolve_information_treatment,
 )
 
@@ -166,6 +167,32 @@ def _content_tree_identity(root: Path) -> str:
     return digest.hexdigest()
 
 
+def _write_task_kickoff(
+    source: Path,
+    destination: Path,
+    treatment: ResolvedInformationTreatment,
+) -> None:
+    """Render treatment state without copying advice content into the kickoff."""
+
+    if treatment.declaration.advice.mode is AdviceMode.ENABLED:
+        advice_status = (
+            "Human advice is enabled. Read the sole human-advice artifact at "
+            "`/work/input/advice.json`."
+        )
+    else:
+        advice_status = (
+            "Human advice is disabled. No human-advice artifact is supplied for this run."
+        )
+    base = source.read_text(encoding="utf-8").rstrip()
+    destination.write_text(
+        f"{base}\n\n"
+        "## Frozen information treatment for this run\n\n"
+        f"Treatment: `{treatment.declaration.treatment_id}`.\n\n"
+        f"{advice_status}\n",
+        encoding="utf-8",
+    )
+
+
 def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
     """Derive held-out development and final scopes from the frozen task profile."""
 
@@ -220,7 +247,7 @@ def build_bundle(
         evaluator_root.mkdir()
         private_task_root = evaluator_root / "task_snapshot"
         _copy_task_views(_tracked_task_files(repo), repo, input_root, private_task_root)
-        shutil.copy2(task_md, input_root / "task.md")
+        _write_task_kickoff(task_md, input_root / "task.md", treatment)
         atomic_write_json(input_root / "treatment.json", treatment.receipt())
         if treatment.declaration.advice.mode is AdviceMode.ENABLED:
             assert treatment.advice_path is not None
@@ -250,7 +277,7 @@ def build_bundle(
                 "public_task_view_sha256": _content_tree_identity(input_root / "tasks/tidmad"),
                 "information_treatment_sha256": treatment.manifest_sha256,
                 "siderius_wheel_sha256": wheel_sha,
-                "task_md_sha256": sha256_file(task_md),
+                "task_md_sha256": sha256_file(input_root / "task.md"),
             },
         )
         _write_checksums(input_root, input_root / "bundle.sha256")
