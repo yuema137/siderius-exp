@@ -183,6 +183,7 @@ def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
     assert value("--data_scope") == "15-19" and value("--health_gate_files") == "15-19"
     assert value("--order_strategy_override") == "sequential"
     assert value("--file_order_override") == "15,16,17,18,19"
+    assert "--no-ml_lit_review_enabled" in argv
     assert (
         "--force_fresh" in argv and "--no_auto_resume" in argv and "--dry-run" in argv
     )

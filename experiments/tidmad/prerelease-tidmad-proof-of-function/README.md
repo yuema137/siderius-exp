@@ -15,6 +15,12 @@ sequential order, fresh start, and retained denoised outputs. Supply explicit
 `--siderius-checkout`, `--workspace`, and `--data_dir`; use `--dry-run` to
 inspect the frozen launch before an authorized effectful run.
 
+The experiment's optional information is declared once in
+[`../information_treatments/prerelease-with-advice.yaml`](../information_treatments/prerelease-with-advice.yaml).
+The launcher validates that declaration and the advice checksum before it calls
+SIDERIUS. It does not keep a second copy of the advice path, digest, or
+literature-review setting.
+
 The advice presents the strongest committed reference as the roughly
 300M-parameter FCNet, encourages active exploration across roughly 10M--500M
 parameters, and asks the agent to use the available VRAM and time envelopes

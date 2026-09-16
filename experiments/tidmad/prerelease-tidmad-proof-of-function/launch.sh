@@ -3,6 +3,9 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 fail() { echo "prerelease-tidmad-proof-of-function: $1" >&2; exit 2; }
+EXP_PYTHON="$ROOT/.venv/bin/python"
+TREATMENT="$ROOT/experiments/tidmad/information_treatments/prerelease-with-advice.yaml"
+[[ -x "$EXP_PYTHON" ]] || fail "run uv sync --group dev --frozen in this exact siderius-exp checkout"
 checkout=""; workspace=""; data_dir=""; dry_run=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -28,6 +31,13 @@ actual="$(git -C "$checkout" rev-parse HEAD 2>/dev/null)" || fail "cannot inspec
 launcher="$checkout/scripts/launch/run_chain.sh"; [[ -f "$launcher" ]] || fail "run_chain.sh is missing"
 mkdir -p "$workspace"; workspace="$(cd "$workspace" && pwd -P)"
 export SIDERIUS_GENERATED_LIBRARY_DIR="$workspace/generated_library"
+treatment_output="$("$EXP_PYTHON" -m experiments.shared.information_treatment \
+  siderius-args \
+  --manifest "$TREATMENT" \
+  --repository-root "$ROOT" \
+  --adapter siderius \
+  --require-module literature_review)" || fail "information treatment is invalid"
+mapfile -t treatment_args <<< "$treatment_output"
 args=(
   --mode lilab --task_composition "$ROOT/tasks/tidmad/compositions/continuous_regression.yaml"
   --workspace "$workspace" --data_dir "$data_dir"
@@ -45,7 +55,7 @@ args=(
   --order_strategy_override sequential --file_order_override 15,16,17,18,19
   --force_fresh --no_auto_resume --no-cleanup_denoised
 )
-args+=(--advice "$ROOT/experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json" --advice_sha256 1f485a6fb60abfe9ee633282414e82cd82570fe0ae8066b7e898b9b02d7e4f95)
+args+=("${treatment_args[@]}")
 if [[ "$dry_run" == 1 ]]; then
   args+=(--dry-run)
 fi
