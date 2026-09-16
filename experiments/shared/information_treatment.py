@@ -201,14 +201,16 @@ def resolve_information_treatment(
                 f"declared {declaration.advice.sha256}, observed {observed}"
             )
 
-    module_states: dict[str, ModuleState] = {}
+    module_states = {
+        module: adapters[adapter]
+        for module, adapters in declaration.modules.items()
+        if adapter in adapters
+    }
     for module in required_modules:
-        try:
-            module_states[module] = declaration.modules[module][adapter]
-        except KeyError as exc:
+        if module not in module_states:
             raise ValueError(
                 f"information treatment does not declare module {module!r} for adapter {adapter!r}"
-            ) from exc
+            )
 
     return ResolvedInformationTreatment(
         declaration=declaration,

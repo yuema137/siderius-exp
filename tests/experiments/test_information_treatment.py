@@ -208,6 +208,33 @@ def test_required_adapter_module_state_cannot_be_silently_defaulted(tmp_path):
         )
 
 
+def test_receipt_includes_every_module_declared_for_the_adapter(tmp_path):
+    manifest = _write_treatment(
+        tmp_path,
+        mode="disabled",
+        artifact=None,
+        digest=None,
+        modules={
+            "literature_review": {"coding_agent": "not_applicable"},
+            "future_module": {
+                "coding_agent": "enabled",
+                "siderius": "disabled",
+            },
+        },
+    )
+    resolved = resolve_information_treatment(
+        manifest,
+        repository_root=tmp_path,
+        adapter="coding_agent",
+        required_modules=("literature_review",),
+    )
+
+    assert resolved.receipt()["modules"] == {
+        "future_module": "enabled",
+        "literature_review": "not_applicable",
+    }
+
+
 def test_cli_receipt_is_stable_json(tmp_path):
     manifest = _write_treatment(tmp_path, mode="disabled", artifact=None, digest=None)
     completed = subprocess.run(
