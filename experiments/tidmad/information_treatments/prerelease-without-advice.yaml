@@ -5,6 +5,7 @@ advice:
   mode: disabled
   artifact: null
   sha256: null
+  content_type: null
 modules:
   literature_review:
     siderius: disabled

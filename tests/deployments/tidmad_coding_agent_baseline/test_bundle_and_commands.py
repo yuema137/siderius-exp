@@ -128,6 +128,7 @@ def test_bundle_splits_public_task_view_from_exact_private_task_snapshot(tmp_pat
         receipt = json.load(treatment_file)
         assert receipt["advice"] == {
             "artifact": None,
+            "content_type": None,
             "mode": "disabled",
             "sha256": None,
         }

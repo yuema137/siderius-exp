@@ -9,16 +9,16 @@ The declaration has five authorities:
 - `treatment_id`: one stable arm identity recorded by every adapter;
 - `task_package`: one repository-relative static task root;
 - `advice.mode`: explicit `enabled` or `disabled`;
-- `advice.artifact` and `advice.sha256`: one immutable artifact when enabled,
-  both null when disabled;
+- `advice.artifact`, `advice.sha256`, and `advice.content_type`: one immutable,
+  readable JSON artifact when enabled, all null when disabled;
 - `modules`: adapter-specific states that preserve `enabled`, `disabled`, and
   `not_applicable` as different meanings.
 
 Resolution refuses absolute paths, paths that escape the repository, absent
 task roots, missing or changed advice bytes, inconsistent advice fields, and
-missing required adapter/module states. The resolver never interprets the
-advice JSON keys. SIDERIUS remains the authority for its accepted advice
-format and node routing.
+missing required adapter/module states. It also refuses malformed, empty, or
+non-object JSON. The resolver never interprets the advice JSON keys. SIDERIUS
+remains the authority for its accepted advice format and node routing.
 
 Delivery depends on the adapter, not on a second content file. The SIDERIUS
 adapter supplies the certified artifact to the framework, which validates and

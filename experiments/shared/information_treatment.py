@@ -40,15 +40,18 @@ class AdviceTreatment(BaseModel):
     mode: AdviceMode
     artifact: str | None = None
     sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    content_type: Literal["application/json"] | None = None
 
     @model_validator(mode="after")
     def require_coherent_identity(self) -> AdviceTreatment:
-        if self.mode is AdviceMode.ENABLED and (self.artifact is None or self.sha256 is None):
-            raise ValueError("enabled advice requires both artifact and sha256")
-        if self.mode is AdviceMode.DISABLED and (
-            self.artifact is not None or self.sha256 is not None
+        if self.mode is AdviceMode.ENABLED and (
+            self.artifact is None or self.sha256 is None or self.content_type is None
         ):
-            raise ValueError("disabled advice requires null artifact and sha256")
+            raise ValueError("enabled advice requires artifact, sha256, and content_type")
+        if self.mode is AdviceMode.DISABLED and (
+            self.artifact is not None or self.sha256 is not None or self.content_type is not None
+        ):
+            raise ValueError("disabled advice requires null artifact, sha256, and content_type")
         return self
 
 
@@ -138,6 +141,7 @@ class ResolvedInformationTreatment(BaseModel):
                 "mode": advice.mode.value,
                 "artifact": "advice.json" if advice.mode is AdviceMode.ENABLED else None,
                 "sha256": advice.sha256,
+                "content_type": advice.content_type,
             },
             "adapter": self.adapter,
             "modules": {name: state.value for name, state in sorted(self.module_states.items())},
@@ -196,12 +200,21 @@ def resolve_information_treatment(
         advice_path = _repository_path(root, declaration.advice.artifact, kind="advice artifact")
         if not advice_path.is_file():
             raise FileNotFoundError(f"declared advice artifact does not exist: {advice_path}")
-        observed = _sha256(advice_path)
+        advice_bytes = advice_path.read_bytes()
+        observed = hashlib.sha256(advice_bytes).hexdigest()
         if observed != declaration.advice.sha256:
             raise ValueError(
                 "advice artifact identity mismatch: "
                 f"declared {declaration.advice.sha256}, observed {observed}"
             )
+        try:
+            advice_content = json.loads(advice_bytes)
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError(
+                f"advice artifact is not valid {declaration.advice.content_type}: {exc}"
+            ) from exc
+        if not isinstance(advice_content, dict) or not advice_content:
+            raise ValueError("advice artifact must be a non-empty JSON object")
 
     module_states = {
         module: adapters[adapter]

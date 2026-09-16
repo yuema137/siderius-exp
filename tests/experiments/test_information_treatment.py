@@ -32,7 +32,12 @@ def _write_treatment(
                 "version": "siderius-exp-information-treatment-v1",
                 "treatment_id": "demo-treatment-v1",
                 "task_package": "tasks/demo",
-                "advice": {"mode": mode, "artifact": artifact, "sha256": digest},
+                "advice": {
+                    "mode": mode,
+                    "artifact": artifact,
+                    "sha256": digest,
+                    "content_type": "application/json" if mode == "enabled" else None,
+                },
                 "modules": modules
                 or {
                     "literature_review": {
@@ -86,6 +91,7 @@ def test_enabled_treatment_certifies_one_artifact_and_renders_both_adapters(tmp_
         "mode": "enabled",
         "artifact": "advice.json",
         "sha256": digest,
+        "content_type": "application/json",
     }
     assert siderius.manifest_sha256 == coding.manifest_sha256
     assert siderius.task_package_path == coding.task_package_path
@@ -117,6 +123,7 @@ def test_disabled_treatment_materializes_absence_without_collapsing_module_state
         "mode": "disabled",
         "artifact": None,
         "sha256": None,
+        "content_type": None,
     }
     assert coding.receipt()["modules"] == {"literature_review": "not_applicable"}
 
@@ -179,6 +186,28 @@ def test_changed_advice_bytes_refuse_before_adapter_use(tmp_path):
             manifest,
             repository_root=tmp_path,
             adapter="siderius",
+        )
+
+
+@pytest.mark.parametrize(
+    ("content", "message"),
+    [(b"not-json", "not valid application/json"), (b"{}", "non-empty JSON object")],
+)
+def test_malformed_or_empty_advice_refuses_before_adapter_use(tmp_path, content, message):
+    advice = tmp_path / "advice.json"
+    advice.write_bytes(content)
+    manifest = _write_treatment(
+        tmp_path,
+        mode="enabled",
+        artifact="advice.json",
+        digest=hashlib.sha256(content).hexdigest(),
+    )
+
+    with pytest.raises(ValueError, match=message):
+        resolve_information_treatment(
+            manifest,
+            repository_root=tmp_path,
+            adapter="coding_agent",
         )
 
 
