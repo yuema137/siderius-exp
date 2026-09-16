@@ -232,6 +232,10 @@ def test_canonical_task_md_separates_score_health_and_segment_model_contract():
     assert "Model architecture, fitting method and research process" in text
     assert "raw, non-overlapping 40,000-sample" in text
     assert "candidate-specific\nfree-form preprocessing or postprocessing" in text
+    assert "You may inspect clean training targets" in text
+    assert "per-file or absolute-time signal schedule" in text
+    assert "call order, persistent counters or other state" in text
+    assert "`eligible_for_selection=true` receipt does not certify" in text
     assert "TorchScript `model.pt`" in text
     assert "`[B, 40000]`" in text
     assert "`[B, 256, 40000]`" in text

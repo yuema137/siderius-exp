@@ -58,6 +58,17 @@ tensor described above. Model architecture, fitting method and research process
 are not prescribed by this task; eligibility is determined from the submitted
 artifact, fixed interface, scoring contract and Health evidence.
 
+You may inspect clean training targets and use them to fit, validate and
+diagnose a supervised denoising model, including with frequency-domain losses.
+The submitted predictor must infer each cleaned segment from its current raw
+segment. A per-file or absolute-time signal schedule, waveform template or
+lookup table extracted from clean targets and used to synthesize predictions
+instead of raw-to-clean inference is not an eligible trained model, even when
+stored as model parameters or buffers. Reconstructing file identity or
+absolute-time position from call order, persistent counters or other state does
+not change this requirement. This restriction does not prohibit learned model
+weights derived from ordinary supervised training.
+
 The exact injected frequencies, scoring anchors, official validation inputs,
 and official validation truth are not part of the information available to the
 research condition. The evaluator owns those files and supplies only raw
@@ -88,6 +99,11 @@ A Health FAIL, Health error, missing Health evidence, or indeterminate Health
 result makes the candidate ineligible regardless of its raw score. The fixed
 evaluator, not the agent, is the authority for this decision. It returns the
 raw score, Health evidence, and eligibility separately.
+
+These automated receipts establish scoreability and Health status; even an
+`eligible_for_selection=true` receipt does not certify compliance with the
+trained-model requirement above. Final scientific acceptance includes review
+of the submitted model and training artifacts against that disclosed rule.
 
 Public reference rulers are provided for interpreting candidate results:
 
