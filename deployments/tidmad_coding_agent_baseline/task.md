@@ -15,6 +15,10 @@ outside the 24-hour evaluation window.
 - `/work/input/tasks/tidmad/`: the agent-visible view of the frozen TIDMAD task
   definition, model I/O contract, Health contract, public reference material,
   and scientific documentation. Evaluator-only assets are intentionally absent.
+- `/work/input/treatment.json`: the frozen record of which optional information
+  is present for this run. If its advice mode is `enabled`, the one human-advice
+  artifact is `/work/input/advice.json`; if the mode is `disabled`, no human
+  advice was supplied. No other file is an implicit advice source.
 - `/data/public-training/`: 16 labelled training HDF5 files.
 - `/data/public-development/`: four unlabelled development inputs, one held-out
   training-family file per band.

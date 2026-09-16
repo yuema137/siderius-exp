@@ -7,6 +7,11 @@ view and an evaluator-private snapshot from the same tracked
 [`tasks/tidmad`](../../tasks/tidmad/) authority. Both machines receive the same
 bundle bytes and the same operator-approved kickoff file, `task.md`.
 
+The bundle also requires one explicit information treatment. The treatment
+records whether the run receives human advice and whether optional workflow
+modules apply. Advice is either absent by declaration or copied as one
+checksum-verified `advice.json`; it is never inferred from nearby files.
+
 The baseline adds no research workflow, resource monitor or general preflight
 to either CLI. The surrounding scripts only keep the clock honest, restart a
 CLI that exits early, protect the hidden evaluation truth, retain validly
@@ -30,10 +35,12 @@ score is retained.
 
 1. Review the tracked [`task.md`](task.md); changing it creates a new frozen
    experiment package and run identity.
-2. Build one archive and copy those exact bytes to both machines.
-3. Prepare a distinct agent API credential and append-only backup credential
+2. Choose and review one treatment from
+   [`experiments/tidmad/information_treatments`](../../experiments/tidmad/information_treatments/).
+3. Build one archive and copy those exact bytes to both machines.
+4. Prepare a distinct agent API credential and append-only backup credential
    for each machine.
-4. Create two isolated Nebius VMs only after the archive is ready.
+5. Create two isolated Nebius VMs only after the archive is ready.
 
 From this checkout, using its own environment and the exact pinned SIDERIUS
 checkout:
@@ -42,6 +49,8 @@ checkout:
 .venv/bin/python -m \
   deployments.tidmad_coding_agent_baseline.tools.build_bundle \
   --task-md deployments/tidmad_coding_agent_baseline/task.md \
+  --information-treatment \
+    experiments/tidmad/information_treatments/coding-agent-no-advice.yaml \
   --siderius-checkout /path/to/exact-pinned-SIDERIUS \
   --output /safe/bundles/tidmad-coding-agent-baseline.tar.gz
 sha256sum /safe/bundles/tidmad-coding-agent-baseline.tar.gz
