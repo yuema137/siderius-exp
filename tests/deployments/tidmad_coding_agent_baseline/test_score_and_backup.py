@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -239,6 +240,44 @@ def test_final_scoring_refuses_health_failure_before_writing_or_deleting(tmp_pat
 
     assert not policy.final_score.exists()
     assert all(path.exists() for path in deliverables)
+
+
+def test_single_band_final_score_uses_full_band_scope_and_sparse_vector(tmp_path, monkeypatch):
+    policy = _policy(tmp_path)
+    unit = tmp_path / "unit.json"
+    unit.write_text(json.dumps({"version": "tidmad-baseline-unit-v1", "band": "4-9"}))
+    policy = replace(policy, unit_manifest=unit)
+    policy.final_output_dir.mkdir(parents=True)
+    scope = policy.scope_root / "band-4-9-final.json"
+    scope.write_text(json.dumps({str(index): [0, 1] for index in range(4, 10)}))
+    vector = [None] * 20
+    for index in range(4, 10):
+        vector[index] = 1.5
+    deliverables = [tmp_path / f"denoised-{index}.h5" for index in range(4, 10)]
+    for path in deliverables:
+        path.write_bytes(b"temporary")
+
+    def fake_compute_score(**kwargs):
+        assert kwargs["sample_set_path"] == scope
+        return {"scoreable": True, "scalar": 1.5, "file_vector": vector}, deliverables
+
+    monkeypatch.setattr(score, "compute_score", fake_compute_score)
+    monkeypatch.setattr(score, "evaluate_candidate_health", lambda **_kwargs: _health())
+    result = score.score_final(
+        argparse.Namespace(
+            denoised_dir=policy.final_output_dir,
+            workers=1,
+            winner=["4-9=winner"],
+        ),
+        policy,
+    )
+    payload = json.loads(result.read_text())
+    assert payload["valid"] is True
+    assert payload["evaluation_scope"] == "band-4-9-final"
+    assert {index for index, value in enumerate(payload["file_vector"]) if value is not None} == set(
+        range(4, 10)
+    )
+    assert not any(path.exists() for path in deliverables)
 
 
 def test_task_health_materialization_is_band_scoped_and_regression_appropriate(

@@ -308,6 +308,44 @@ def test_single_band_bundle_writes_only_its_frozen_scopes_and_file_pairs(tmp_pat
     }
 
 
+def test_single_band_bundle_has_regression_codec_without_private_truth(tmp_path, monkeypatch):
+    checkout = tmp_path / "siderius"
+    checkout.mkdir()
+
+    def fake_build(_repo, _checkout, output):
+        wheel = "siderius-test.whl"
+        (output / wheel).write_bytes(b"test wheel")
+        (output / "siderius-wheel-name.txt").write_text(f"{wheel}\n")
+        (output / "requirements.txt").write_text("numpy==2.5.2\n")
+        return "1" * 40, "f" * 64
+
+    monkeypatch.setattr(bundle_module, "_build_evaluator", fake_build)
+    output = build_bundle(
+        REPOSITORY_ROOT / "deployments/tidmad_coding_agent_baseline/task-main-band.md",
+        TREATMENTS / "main-cli-no-advice.yaml",
+        checkout,
+        tmp_path / "single-band.tar.gz",
+        band="4-9",
+    )
+    with tarfile.open(output, "r:gz") as archive:
+        root = "tidmad-coding-agent-baseline"
+        names = set(archive.getnames())
+        assert f"{root}/harness/baseline_harness/frozen_output_conversion.py" in names
+        assert f"{root}/input/advice.json" not in names
+        assert f"{root}/evaluator/evaluation_scopes/band-4-9-final.json" in names
+        assert f"{root}/evaluator/evaluation_scopes/all-final.json" not in names
+        assert _archive_json(archive, f"{root}/evaluator/unit.json")["band"] == "4-9"
+        kickoff = archive.extractfile(f"{root}/input/task.md")
+        assert kickoff is not None
+        text = kickoff.read().decode()
+        assert "band `4-9`" in text
+        assert "continuous_regression" in text
+        assert "{{BAND}}" not in text
+        data_manifest = archive.extractfile(f"{root}/evaluator/data_manifest.sha256")
+        assert data_manifest is not None
+        assert len(data_manifest.read().splitlines()) == 12
+
+
 def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():
     """A pin change can retain the package version and must still reinstall."""
 

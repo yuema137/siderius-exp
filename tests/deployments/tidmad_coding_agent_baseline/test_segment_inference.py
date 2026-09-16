@@ -92,6 +92,19 @@ def test_model_artifact_must_have_matching_nonempty_weights(tmp_path):
         load_candidate_model(candidate, torch.device("cpu"))
 
 
+def test_single_band_formal_refuses_diagnostic_classification_contract(tmp_path):
+    candidate = _candidate(tmp_path / "candidate")
+    with pytest.raises(ValueError, match="requires continuous_regression"):
+        run_segment_model(
+            candidate=candidate,
+            input_file=tmp_path / "input.h5",
+            output_file=tmp_path / "output.h5",
+            device=torch.device("cpu"),
+            required_output_kind="continuous_regression",
+        )
+    assert not (tmp_path / "output.h5").exists()
+
+
 def test_regression_uses_the_task_owned_storage_conversion(tmp_path):
     candidate = tmp_path / "regression"
     candidate.mkdir()
