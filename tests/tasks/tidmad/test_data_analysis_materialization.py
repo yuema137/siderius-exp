@@ -484,6 +484,7 @@ def test_model_input_segments_match_ordinary_row_geometry_without_target_read(
     with np.load(exported, allow_pickle=False) as payload:
         assert set(payload.files) == {"example_ids", "information__data"}
         rows = payload["information__data"]
+        assert rows.dtype == np.dtype("int64")
         selected = [int(item.rsplit("-", 1)[1]) for item in payload["example_ids"]]
         for row, row_index in zip(rows, selected, strict=True):
             expected = source[row_index * 4 : (row_index + 1) * 4] + 128

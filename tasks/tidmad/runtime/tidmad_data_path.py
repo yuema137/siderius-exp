@@ -978,6 +978,11 @@ class TidmadTaskDataPath:
                 handle.close()
 
         rows = np.stack(selected_rows)
+        if requested_classes[0] == "data":
+            # Ordinary TIDMAD inference resolves this task's integer model
+            # input to the declared int64 site preference before forward().
+            # The historical worker validates the same Model-I/O dtype.
+            rows = rows.astype(np.int64)
         example_ids = np.asarray(selected_ids, dtype="U64")
         selection_sha = canonical_sha256({"example_ids": example_ids.tolist()})
         selection = CertifiedSelectionIdentity(
