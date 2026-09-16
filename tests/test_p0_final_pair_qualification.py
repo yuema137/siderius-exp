@@ -324,10 +324,38 @@ def test_wrapper_rejects_nonempty_workspace(
     assert not capture.exists()
 
 
-def test_wrapper_rejects_root_pin_outside_reviewed_literal(
+def test_wrapper_uses_its_historical_pin_when_current_repository_pin_changes(
     fake_checkout, tmp_path: Path, monkeypatch
 ) -> None:
-    """Catch removal of the reviewed-pin guard even when checkout and root agree."""
+    """A new repository dependency must not rewrite a frozen old experiment."""
+    copied_root = tmp_path / "exp"
+    for relative in (
+        "experiments/p0_final_pair_qualification/common.sh",
+        "experiments/p0_final_pair_qualification/SIDERIUS_REVISION",
+        "experiments/tidmad/p0_final_pair_qualification/launch.sh",
+    ):
+        destination = copied_root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, destination)
+    legacy_launcher = copied_root / "experiments/tidmad/two_iteration_qualification/launch.sh"
+    legacy_launcher.parent.mkdir(parents=True, exist_ok=True)
+    legacy_launcher.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+    wrong_revision = "0" * 40
+    (copied_root / "SIDERIUS_REVISION").write_text(wrong_revision + "\n")
+    monkeypatch.setitem(_run.__globals__, "ROOT", copied_root)
+    checkout, capture = fake_checkout
+    data = _data(tmp_path, CASES["tidmad"][0])
+    workspace = tmp_path / "workspace"
+
+    result = _run("tidmad", checkout, capture, workspace, data)
+
+    assert result.returncode == 0, result.stderr
+    assert not capture.exists()
+
+
+def test_wrapper_rejects_malformed_historical_pin(
+    fake_checkout, tmp_path: Path, monkeypatch
+) -> None:
     copied_root = tmp_path / "exp"
     for relative in (
         "experiments/p0_final_pair_qualification/common.sh",
@@ -336,20 +364,17 @@ def test_wrapper_rejects_root_pin_outside_reviewed_literal(
         destination = copied_root / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / relative, destination)
-    wrong_revision = "0" * 40
-    (copied_root / "SIDERIUS_REVISION").write_text(wrong_revision + "\n")
+    pin = copied_root / "experiments/p0_final_pair_qualification/SIDERIUS_REVISION"
+    pin.write_text("not-a-sha\n", encoding="utf-8")
     monkeypatch.setitem(_run.__globals__, "ROOT", copied_root)
-    monkeypatch.setitem(_run.__globals__, "SIDERIUS_REVISION", wrong_revision)
     checkout, capture = fake_checkout
     data = _data(tmp_path, CASES["tidmad"][0])
-    workspace = tmp_path / "workspace"
 
-    result = _run("tidmad", checkout, capture, workspace, data)
+    result = _run("tidmad", checkout, capture, tmp_path / "workspace", data)
 
-    assert result.returncode == 2, result.stderr
-    assert "unexpected SIDERIUS_REVISION" in result.stderr
+    assert result.returncode == 2
+    assert "invalid historical SIDERIUS_REVISION" in result.stderr
     assert not capture.exists()
-    assert not workspace.exists()
 
 
 def test_wrapper_rejects_wrong_framework_pin(fake_checkout, tmp_path: Path) -> None:

@@ -28,6 +28,9 @@ Experiment records identify the exact SIDERIUS revision, this repository
 revision, resolved task identity, configuration and plugin hashes, dataset
 identity, executable argv, and runtime budgets. Changing any treatment value
 creates a new experiment identity; it does not modify the task package.
+Historical locked launchers retain their own `SIDERIUS_REVISION` beside the
+experiment. The repository-root revision names the current development pair;
+updating it must not silently retarget an archived experiment.
 
 Final consumer-pair qualification wrappers live under each task's
 `p0_final_pair_qualification/` directory and support exact-checkout,
