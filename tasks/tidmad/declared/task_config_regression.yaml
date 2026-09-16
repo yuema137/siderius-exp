@@ -62,6 +62,19 @@ forward_contract:
         - {role: batch, dimension: {symbolic: "B"}}
         - {role: temporal, dimension: {symbolic: "T"}}
       dtype: {admissible: ["float32"]}
+    # Standard historical inference exposes the same per-ML-segment forward
+    # values consumed by ordinary evaluation before task-owned deliverable
+    # encoding.  The candidate remains the sole owner of segmentation_size;
+    # this declaration neither chooses nor defaults that value.
+    inference:
+      accepted_input_view_formats: ["siderius.numeric-array.v1"]
+      required_information:
+        - {information_class: data, fields: []}
+      prediction_output_format: "siderius.numeric-array.v1"
+      prediction_semantic_id: "tidmad.offset-encoded-continuous-waveform-segment.v1"
+      prediction_decoder_protocol_id: "siderius.identity-prediction-decoder.v1"
+      alignment: "one_prediction_per_input"
+      determinism: "deterministic"
   # Resource measurement must know that this task's model window is a
   # temporal segment. This is task-owned semantics; a generated model cannot
   # safely supply or override it in its hyperparameter proposal.
