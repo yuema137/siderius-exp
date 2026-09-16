@@ -1,0 +1,12 @@
+version: siderius-exp-information-treatment-v1
+treatment_id: tidmad-prerelease-advice-on-v1
+task_package: tasks/tidmad
+advice:
+  mode: enabled
+  artifact: experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json
+  sha256: 1f485a6fb60abfe9ee633282414e82cd82570fe0ae8066b7e898b9b02d7e4f95
+  content_type: application/json
+modules:
+  literature_review:
+    siderius: disabled
+    coding_agent: not_applicable

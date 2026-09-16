@@ -32,7 +32,9 @@ import io
 import json
 import os
 import random
+from bisect import bisect_right
 from collections.abc import Iterable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar, Literal, cast
 
@@ -276,6 +278,196 @@ class TIDMADEpochDataset(Dataset):
             self.inputs[idx].astype(enc.compute_dtype) + enc.value_offset,
             self.targets[idx].astype(enc.compute_dtype) + enc.value_offset,
         )
+
+
+@dataclass(frozen=True)
+class _ValidationSegment:
+    """One selected PSD segment in the validation dataset's logical row map."""
+
+    file_path: str
+    sample_start: int
+    row_start: int
+    row_end: int
+
+
+class TIDMADValidationDataset(Dataset):
+    """Exact validation view that reads selected HDF5 rows on demand.
+
+    Construction validates file/channel presence, physical segment bounds and
+    the complete logical row map, but does not read signal arrays. Individual
+    ML rows are read when a DataLoader requests them, so peak resident data is
+    governed by the loader batch rather than the complete Formal scope.
+
+    HDF5 handles are cached per process. The PID check and ``__getstate__``
+    ensure a future worker process never reuses its parent's open handles.
+
+    This class remains in the task-data-path plugin module deliberately. File
+    plugins are cold-loaded without adding the experiment repository to
+    ``sys.path``; moving this implementation to an unpinned sibling import
+    would make the real training/inference children unable to load the task.
+    """
+
+    def __init__(
+        self,
+        *,
+        data_dir: str,
+        sample_set: dict,
+        seg_size: int,
+        profile: DatasetProfile,
+    ) -> None:
+        self.profile = profile
+        self.seg_size = seg_size
+        topology = tidmad_topology(profile)
+        self._dataset = topology.dataset
+        self._channels = topology.channels
+        self._encoding = topology.encoding
+        self._ml_segs_per_psd = self._dataset.psd_segment_length // seg_size
+        self.file_row_ranges: dict[int, tuple[int, int]] = {}
+        self._segments: list[_ValidationSegment] = []
+        self._segment_row_ends: list[int] = []
+        self._handles: dict[str, h5py.File] = {}
+        self._handle_pid = os.getpid()
+
+        rows_so_far = 0
+        for file_key in sorted(sample_set, key=int):
+            file_index = int(file_key)
+            file_path = os.path.join(
+                data_dir, self._dataset.validation_file_name(file_index)
+            )
+            if not os.path.exists(file_path):
+                continue
+
+            selected = tuple(int(segment) for segment in sample_set[file_key])
+            self._validate_segments(file_path, file_index, selected)
+            file_start = rows_so_far
+            for psd_index in selected:
+                row_end = rows_so_far + self._ml_segs_per_psd
+                self._segments.append(
+                    _ValidationSegment(
+                        file_path=file_path,
+                        sample_start=psd_index * self._dataset.psd_segment_length,
+                        row_start=rows_so_far,
+                        row_end=row_end,
+                    )
+                )
+                self._segment_row_ends.append(row_end)
+                rows_so_far = row_end
+            if rows_so_far > file_start:
+                self.file_row_ranges[file_index] = (file_start, rows_so_far)
+
+        self._row_count = rows_so_far
+
+    def _validate_segments(
+        self, file_path: str, file_index: int, selected: tuple[int, ...]
+    ) -> None:
+        with h5py.File(file_path, "r") as handle:
+            input_data = _h5_dataset(
+                handle, "timeseries", self._channels.input_channel, "timeseries"
+            )
+            target_data = _h5_dataset(
+                handle, "timeseries", self._channels.target_channel, "timeseries"
+            )
+            available = (
+                min(len(input_data), len(target_data))
+                // self._dataset.psd_segment_length
+            )
+        invalid = [segment for segment in selected if not 0 <= segment < available]
+        if invalid:
+            raise ValidationScopeError(
+                f"validation scope requests PSD segment(s) {invalid!r} of file "
+                f"{file_index}, but {file_path!r} holds only {available} complete "
+                "PSD segment(s)."
+            )
+
+    def __len__(self) -> int:
+        return self._row_count
+
+    def _reset_inherited_handles(self) -> None:
+        current_pid = os.getpid()
+        if current_pid != self._handle_pid:
+            self.close()
+            self._handle_pid = current_pid
+
+    def _handle(self, path: str) -> h5py.File:
+        self._reset_inherited_handles()
+        handle = self._handles.get(path)
+        if handle is None:
+            handle = h5py.File(path, "r")
+            self._handles[path] = handle
+        return handle
+
+    def _row_location(self, idx: int) -> tuple[_ValidationSegment, int, int]:
+        if idx < 0:
+            idx += self._row_count
+        if idx < 0 or idx >= self._row_count:
+            raise IndexError(idx)
+        segment = self._segments[bisect_right(self._segment_row_ends, idx)]
+        row_within_segment = idx - segment.row_start
+        start = segment.sample_start + row_within_segment * self.seg_size
+        return segment, start, start + self.seg_size
+
+    def _storage_row(self, idx: int, channel: str) -> np.ndarray:
+        segment, start, end = self._row_location(idx)
+        dataset = _h5_dataset(
+            self._handle(segment.file_path), "timeseries", channel, "timeseries"
+        )
+        return np.asarray(dataset[start:end], dtype=self._encoding.storage_dtype)
+
+    def __getitem__(self, idx: int) -> tuple[np.ndarray, np.ndarray]:
+        return (
+            self._storage_row(idx, self._channels.input_channel).astype(
+                self._encoding.compute_dtype
+            )
+            + self._encoding.value_offset,
+            self._storage_row(idx, self._channels.target_channel).astype(
+                self._encoding.compute_dtype
+            )
+            + self._encoding.value_offset,
+        )
+
+    def materialize_storage_targets(self, start: int, end: int) -> np.ndarray:
+        """Read a bounded contiguous logical target range in storage encoding."""
+        if start < 0 or end < start or end > self._row_count:
+            raise IndexError((start, end))
+        targets = np.empty(
+            (end - start, self.seg_size), dtype=self._encoding.storage_dtype
+        )
+        logical_row = start
+        output_row = 0
+        while logical_row < end:
+            segment = self._segments[bisect_right(self._segment_row_ends, logical_row)]
+            rows = min(end, segment.row_end) - logical_row
+            row_within_segment = logical_row - segment.row_start
+            sample_start = segment.sample_start + row_within_segment * self.seg_size
+            sample_end = sample_start + rows * self.seg_size
+            target_data = _h5_dataset(
+                self._handle(segment.file_path),
+                "timeseries",
+                self._channels.target_channel,
+                "timeseries",
+            )
+            targets[output_row : output_row + rows] = np.asarray(
+                target_data[sample_start:sample_end],
+                dtype=self._encoding.storage_dtype,
+            ).reshape(rows, self.seg_size)
+            logical_row += rows
+            output_row += rows
+        return targets
+
+    def close(self) -> None:
+        handles = getattr(self, "_handles", {})
+        for handle in handles.values():
+            handle.close()
+        handles.clear()
+
+    def __getstate__(self) -> dict[str, Any]:
+        self.close()
+        state = self.__dict__.copy()
+        state["_handles"] = {}
+        return state
+
+    def __del__(self) -> None:
+        self.close()
 
 
 def is_complete_trial_output(
@@ -1027,16 +1219,13 @@ class TidmadTaskDataPath:
         mid-run surfaces as materialized ≠ requested, exactly as before.
         """
         s = self._scope(scope)
-        ds = TIDMADEpochDataset(
+        profile = s.profile or resolve_dataset_profile()
+        ds = TIDMADValidationDataset(
             data_dir=params.data_dir,
             sample_set=s.sample_set,
             seg_size=s.seg_size,
-            train_portion=None,
-            rng=None,
-            profile=s.profile,
-            file_family="validation",
+            profile=profile,
         )
-        profile = s.profile or resolve_dataset_profile()
         ml_segs_per_psd = (
             tidmad_topology(profile).dataset.psd_segment_length // s.seg_size
         )
@@ -1158,7 +1347,11 @@ class TidmadTaskDataPath:
             self._persist_file(
                 file_index=file_index,
                 denoised=denoised,
-                injected=dataset.targets[start:end],
+                injected=(
+                    dataset.materialize_storage_targets(start, end)
+                    if isinstance(dataset, TIDMADValidationDataset)
+                    else dataset.targets[start:end]
+                ),
                 request=request,
                 spec=spec,
             )
