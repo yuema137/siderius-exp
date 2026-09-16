@@ -21,7 +21,7 @@ def _resolve(name: str, adapter: str):
 
 def test_tidmad_advice_on_and_off_share_one_task_package():
     enabled = _resolve("prerelease-with-advice.yaml", "siderius")
-    disabled = _resolve("coding-agent-no-advice.yaml", "coding_agent")
+    disabled = _resolve("prerelease-without-advice.yaml", "coding_agent")
 
     assert enabled.task_package_path == disabled.task_package_path
     assert enabled.task_package_path == REPOSITORY_ROOT / "tasks/tidmad"
@@ -31,7 +31,7 @@ def test_tidmad_advice_on_and_off_share_one_task_package():
 
 def test_tidmad_advice_identity_and_module_treatment_are_explicit():
     enabled = _resolve("prerelease-with-advice.yaml", "siderius")
-    disabled = _resolve("coding-agent-no-advice.yaml", "coding_agent")
+    disabled = _resolve("prerelease-without-advice.yaml", "coding_agent")
 
     assert enabled.advice_path == (
         REPOSITORY_ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json"

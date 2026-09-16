@@ -1,4 +1,5 @@
 version: siderius-exp-information-treatment-v1
+treatment_id: tidmad-prerelease-advice-on-v1
 task_package: tasks/tidmad
 advice:
   mode: enabled
@@ -8,4 +9,3 @@ modules:
   literature_review:
     siderius: disabled
     coding_agent: not_applicable
-

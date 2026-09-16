@@ -58,6 +58,7 @@ class InformationTreatment(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     version: Literal["siderius-exp-information-treatment-v1"]
+    treatment_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]{0,127}$")
     task_package: str
     advice: AdviceTreatment
     modules: dict[str, dict[str, ModuleState]] = Field(default_factory=dict)
@@ -94,7 +95,7 @@ class ResolvedInformationTreatment(BaseModel):
         if self.adapter != "siderius":
             raise ValueError(f"cannot render SIDERIUS arguments for adapter {self.adapter!r}")
 
-        arguments: list[str] = []
+        arguments = ["--experiment_arm", self.declaration.treatment_id]
         module_flags = {
             "literature_review": {
                 ModuleState.ENABLED: "--ml_lit_review_enabled",
@@ -130,6 +131,7 @@ class ResolvedInformationTreatment(BaseModel):
         advice = self.declaration.advice
         return {
             "version": self.declaration.version,
+            "treatment_id": self.declaration.treatment_id,
             "manifest_sha256": self.manifest_sha256,
             "task_package": self.declaration.task_package,
             "advice": {

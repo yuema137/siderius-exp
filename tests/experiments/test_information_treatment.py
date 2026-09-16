@@ -30,6 +30,7 @@ def _write_treatment(
         yaml.safe_dump(
             {
                 "version": "siderius-exp-information-treatment-v1",
+                "treatment_id": "demo-treatment-v1",
                 "task_package": "tasks/demo",
                 "advice": {"mode": mode, "artifact": artifact, "sha256": digest},
                 "modules": modules
@@ -73,6 +74,8 @@ def test_enabled_treatment_certifies_one_artifact_and_renders_both_adapters(tmp_
 
     assert siderius.declaration.advice.mode is AdviceMode.ENABLED
     assert siderius.siderius_args() == [
+        "--experiment_arm",
+        "demo-treatment-v1",
         "--no-ml_lit_review_enabled",
         "--advice",
         str(advice),
@@ -105,7 +108,11 @@ def test_disabled_treatment_materializes_absence_without_collapsing_module_state
         required_modules=("literature_review",),
     )
 
-    assert siderius.siderius_args() == ["--no-ml_lit_review_enabled"]
+    assert siderius.siderius_args() == [
+        "--experiment_arm",
+        "demo-treatment-v1",
+        "--no-ml_lit_review_enabled",
+    ]
     assert coding.receipt()["advice"] == {
         "mode": "disabled",
         "artifact": None,
@@ -258,4 +265,5 @@ def test_cli_receipt_is_stable_json(tmp_path):
     )
     receipt = json.loads(completed.stdout)
     assert receipt["advice"]["mode"] == "disabled"
+    assert receipt["treatment_id"] == "demo-treatment-v1"
     assert receipt["modules"]["literature_review"] == "not_applicable"

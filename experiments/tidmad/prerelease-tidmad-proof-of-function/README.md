@@ -21,6 +21,12 @@ The launcher validates that declaration and the advice checksum before it calls
 SIDERIUS. It does not keep a second copy of the advice path, digest, or
 literature-review setting.
 
+The default is the reviewed advice-on treatment. To reproduce the otherwise
+identical explicit advice-off treatment, add `--advice-treatment off`; the
+launcher selects the repository-owned off manifest and a separate run name.
+It does not accept an arbitrary advice path. Use a fresh workspace for each
+treatment.
+
 The advice presents the strongest committed reference as the roughly
 300M-parameter FCNet, encourages active exploration across roughly 10M--500M
 parameters, and asks the agent to use the available VRAM and time envelopes

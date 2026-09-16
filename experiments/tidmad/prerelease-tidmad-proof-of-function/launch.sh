@@ -4,17 +4,28 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 fail() { echo "prerelease-tidmad-proof-of-function: $1" >&2; exit 2; }
 EXP_PYTHON="$ROOT/.venv/bin/python"
-TREATMENT="$ROOT/experiments/tidmad/information_treatments/prerelease-with-advice.yaml"
 [[ -x "$EXP_PYTHON" ]] || fail "run uv sync --group dev --frozen in this exact siderius-exp checkout"
-checkout=""; workspace=""; data_dir=""; dry_run=0
+checkout=""; workspace=""; data_dir=""; dry_run=0; advice_treatment="on"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --siderius-checkout|--workspace|--data_dir) [[ $# -ge 2 ]] || fail "missing value for $1"; case "$1" in --siderius-checkout) checkout="$2";; --workspace) workspace="$2";; --data_dir) data_dir="$2";; esac; shift 2;;
+    --advice-treatment) [[ $# -ge 2 ]] || fail "missing value for $1"; advice_treatment="$2"; shift 2;;
     --dry-run) dry_run=1; shift;;
-    -h|--help) echo "Usage: $0 --siderius-checkout DIR --workspace DIR --data_dir DIR [--dry-run]"; exit 0;;
+    -h|--help) echo "Usage: $0 --siderius-checkout DIR --workspace DIR --data_dir DIR [--advice-treatment on|off] [--dry-run]"; exit 0;;
     *) fail "locked treatment cannot be overridden: $1";;
   esac
 done
+case "$advice_treatment" in
+  on)
+    TREATMENT="$ROOT/experiments/tidmad/information_treatments/prerelease-with-advice.yaml"
+    RUN_NAME="prerelease-tidmad-proof-of-function"
+    ;;
+  off)
+    TREATMENT="$ROOT/experiments/tidmad/information_treatments/prerelease-without-advice.yaml"
+    RUN_NAME="prerelease-tidmad-proof-of-function-no-advice"
+    ;;
+  *) fail "--advice-treatment must be 'on' or 'off'";;
+esac
 [[ -d "$checkout" ]] || fail "--siderius-checkout must name a directory"
 [[ -n "$workspace" ]] || fail "missing --workspace"
 [[ ! -e "$workspace" || -d "$workspace" ]] || fail "workspace must be new or a directory"
@@ -41,7 +52,7 @@ mapfile -t treatment_args <<< "$treatment_output"
 args=(
   --mode lilab --task_composition "$ROOT/tasks/tidmad/compositions/continuous_regression.yaml"
   --workspace "$workspace" --data_dir "$data_dir"
-  --run_name prerelease-tidmad-proof-of-function
+  --run_name "$RUN_NAME"
   --llm_config "$checkout/configs/llm/openai_tiered_pro.json"
   --num_iterations 10 --max_rounds 2 --max_epochs 1
   --trial_max_epochs 1 --formal_max_epochs 1

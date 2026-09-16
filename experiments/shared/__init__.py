@@ -1,17 +1,5 @@
-"""Shared, task-neutral experiment treatment helpers."""
+"""Shared, task-neutral experiment helpers.
 
-from .information_treatment import (
-    AdviceMode,
-    InformationTreatment,
-    ModuleState,
-    ResolvedInformationTreatment,
-    resolve_information_treatment,
-)
-
-__all__ = [
-    "AdviceMode",
-    "InformationTreatment",
-    "ModuleState",
-    "ResolvedInformationTreatment",
-    "resolve_information_treatment",
-]
+Import concrete helpers from their modules so command-line module execution
+does not preload the module it is about to run.
+"""

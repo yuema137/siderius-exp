@@ -50,7 +50,7 @@ checkout:
   deployments.tidmad_coding_agent_baseline.tools.build_bundle \
   --task-md deployments/tidmad_coding_agent_baseline/task.md \
   --information-treatment \
-    experiments/tidmad/information_treatments/coding-agent-no-advice.yaml \
+    experiments/tidmad/information_treatments/prerelease-without-advice.yaml \
   --siderius-checkout /path/to/exact-pinned-SIDERIUS \
   --output /safe/bundles/tidmad-coding-agent-baseline.tar.gz
 sha256sum /safe/bundles/tidmad-coding-agent-baseline.tar.gz
@@ -59,6 +59,13 @@ sha256sum /safe/bundles/tidmad-coding-agent-baseline.tar.gz
 Use the same reported archive hash on both machines. The builder refuses a
 dirty TIDMAD task tree or a SIDERIUS checkout that differs from
 [`SIDERIUS_REVISION`](../../SIDERIUS_REVISION).
+
+The command above builds the explicit advice-off condition. To build the
+otherwise identical advice-on condition, change only the treatment path to
+`experiments/tidmad/information_treatments/prerelease-with-advice.yaml`.
+The resulting `treatment.json` records the selected arm and advice identity;
+the public task-view hash remains the same. Codex and Claude must receive the
+same archive bytes when they belong to the same arm.
 
 ## VM contract
 

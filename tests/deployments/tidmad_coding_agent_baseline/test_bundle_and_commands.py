@@ -13,6 +13,12 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 TREATMENTS = REPOSITORY_ROOT / "experiments/tidmad/information_treatments"
 
 
+def _archive_json(archive: tarfile.TarFile, name: str) -> dict:
+    stream = archive.extractfile(archive.getmember(name))
+    assert stream is not None
+    return json.load(stream)
+
+
 def test_product_commands_pin_models_effort_and_noninteractive_permissions(tmp_path):
     prompt = tmp_path / "task.md"
     codex = command_for("codex", prompt)
@@ -35,7 +41,7 @@ def test_bundle_splits_public_task_view_from_exact_private_task_snapshot(tmp_pat
     with pytest.raises(ValueError, match="operator-approved"):
         build_bundle(
             missing,
-            TREATMENTS / "coding-agent-no-advice.yaml",
+            TREATMENTS / "prerelease-without-advice.yaml",
             siderius_checkout,
             tmp_path / "missing.tar.gz",
         )
@@ -51,7 +57,7 @@ def test_bundle_splits_public_task_view_from_exact_private_task_snapshot(tmp_pat
 
     task = tmp_path / "task.md"
     task.write_text("operator-approved kickoff\n")
-    treatment = TREATMENTS / "coding-agent-no-advice.yaml"
+    treatment = TREATMENTS / "prerelease-without-advice.yaml"
     output = build_bundle(task, treatment, siderius_checkout, tmp_path / "bundle.tar.gz")
     second = build_bundle(task, treatment, siderius_checkout, tmp_path / "bundle-second.tar.gz")
     assert output.read_bytes() == second.read_bytes()
@@ -147,8 +153,17 @@ def test_advice_enabled_bundle_contains_one_certified_canonical_artifact(tmp_pat
         siderius_checkout,
         tmp_path / "bundle.tar.gz",
     )
+    off_output = build_bundle(
+        task,
+        TREATMENTS / "prerelease-without-advice.yaml",
+        siderius_checkout,
+        tmp_path / "bundle-off.tar.gz",
+    )
 
-    with tarfile.open(output, "r:gz") as archive:
+    with (
+        tarfile.open(output, "r:gz") as archive,
+        tarfile.open(off_output, "r:gz") as off_archive,
+    ):
         advice_name = "tidmad-coding-agent-baseline/input/advice.json"
         advice_file = archive.extractfile(archive.getmember(advice_name))
         assert advice_file is not None
@@ -159,13 +174,33 @@ def test_advice_enabled_bundle_contains_one_certified_canonical_artifact(tmp_pat
                 / "experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json"
             ).read_bytes()
         )
-        receipt_file = archive.extractfile(
-            archive.getmember("tidmad-coding-agent-baseline/input/treatment.json")
-        )
-        assert receipt_file is not None
-        receipt = json.load(receipt_file)
+        receipt = _archive_json(archive, "tidmad-coding-agent-baseline/input/treatment.json")
         assert receipt["advice"]["mode"] == "enabled"
         assert receipt["advice"]["artifact"] == "advice.json"
+        on_provenance = _archive_json(archive, "tidmad-coding-agent-baseline/input/provenance.json")
+        off_provenance = _archive_json(
+            off_archive, "tidmad-coding-agent-baseline/input/provenance.json"
+        )
+        assert on_provenance["public_task_view_sha256"] == off_provenance["public_task_view_sha256"]
+
+        advice_sentinel = b"10M-500M trainable-parameter range"
+        for member in off_archive.getmembers():
+            if not member.isfile() or "/input/" not in member.name:
+                continue
+            stream = off_archive.extractfile(member)
+            assert stream is not None
+            assert advice_sentinel not in stream.read(), member.name
+
+
+def test_advice_prose_is_not_duplicated_into_kickoff_or_adapter_source():
+    sentinel = "10M-500M trainable-parameter range"
+    task_md = (REPOSITORY_ROOT / "deployments/tidmad_coding_agent_baseline/task.md").read_text()
+    adapter = (
+        REPOSITORY_ROOT / "deployments/tidmad_coding_agent_baseline/tools/build_bundle.py"
+    ).read_text()
+
+    assert sentinel not in task_md
+    assert sentinel not in adapter
 
 
 def test_canonical_task_md_separates_score_health_and_segment_model_contract():
