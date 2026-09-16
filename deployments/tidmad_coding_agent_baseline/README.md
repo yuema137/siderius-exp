@@ -20,16 +20,23 @@ scored candidates, back them up, and collect the final result.
 ## What the agent can see
 
 - the sanitized `tasks/tidmad` view and shared `task.md`;
-- 16 labelled training files;
-- four unlabelled held-out development inputs, one per band;
+- all 20 labelled training files;
 - its own 1 TiB local workspace and outbound internet;
 - the fixed `tidmad-score` command.
 
-It cannot read development truth, official validation inputs or truth, the
-private scorer assets, backup credentials, the other agent's machine, or any
-SIDERIUS campaign output. Each of the four bands is an independent search:
-architectures may differ. Every candidate that receives an eligible development
-score is retained.
+It cannot read official validation inputs or truth, the private scorer assets,
+backup credentials, the other agent's machine, or any SIDERIUS campaign output.
+Each of the four bands is an independent search: architectures may differ.
+Every candidate that receives an eligible complete-band score is retained.
+
+## Operator-owned evaluation contract
+
+Candidate evaluation covers every official validation file in the requested
+band: files 0--3, 4--9, 10--14 or 15--19. Final evaluation composes the four
+frozen band winners over all 20 files. Metric aggregation, band membership,
+Health eligibility and evaluation scope are scientific protocol decisions.
+They must not be narrowed, sampled or otherwise changed for runtime or cost
+reasons without explicit operator approval.
 
 ## Before renting GPUs
 
@@ -88,10 +95,10 @@ record is create-once and survives service and VM restarts.
 /work/state/       deadline, invocation receipts and retained candidates
 /work/submission/  final collection
 /work/logs/        structured CLI output
-/data/             public train/dev views plus evaluator-private dev/final views
+/data/             public training plus evaluator-private validation views
 ```
 
-Every validly scored development candidate is retained below
+Every validly scored complete-band candidate is retained below
 `/var/lib/tidmad-baseline/candidates/<band>/<candidate-id>/`. That tree is
 readable but not writable by the agent. A completed identity cannot be
 replaced. Temporary denoised HDF5 files are deleted only after score and
@@ -114,12 +121,11 @@ sudo /opt/tidmad-evaluator/venv/bin/python -I -m \
   --private-group baseline-evaluator
 ```
 
-Data preparation verifies the 40 repository-owned checksums. It withholds one
-training-family file per band as development data, leaving 16 labelled files
-for fitting. Its four public development copies contain only `channel0001`.
-The official validation inputs, all development/final targets, and exact
-frequency/anchor/scorer assets remain evaluator-only. Public inference files
-also omit release-identity attributes such as the original file number.
+Data preparation verifies the 40 repository-owned checksums. All 20 training
+files remain available for fitting. The 20 validation inputs and targets, plus
+the exact frequency/anchor/scorer assets, remain evaluator-only. Evaluator
+inference copies omit release-identity attributes such as the original file
+number.
 
 Put `BASELINE_PRODUCT` and the product API key in
 `/etc/tidmad-baseline/agent.env`, mode `0640`, owned by
@@ -207,9 +213,9 @@ recomputed after restart.
 
 The scorer owns the canonical TIDMAD formula. During search the agent may name
 only a candidate below `/work/agent` and one of the four bands. The evaluator
-chooses that band's fixed held-out development input, snapshots the candidate,
+selects every official validation file in that band, snapshots the candidate,
 runs its frozen model through evaluator-owned segmentation and output assembly,
-applies scoring and Health, and retains eligible
+applies scoring and Health across the complete band, and retains eligible
 candidates. It does not expose an official-final scoring command.
 
 The inference identity receives execute-only traversal through the retained
@@ -229,9 +235,10 @@ Evaluator code alone reads HDF5 files, slices fixed raw 40,000-sample segments,
 decodes model logits, and writes deliverables. The model runs under a root-owned,
 network-disabled inference identity and receives only segment tensors. At the
 immutable deadline the finalizer stops the
-agent, selects the best retained development candidate for each band, performs
-one hidden official-validation inference and score, and packages the result. A
-missing band remains a partial submission; the finalizer never invents scores.
+agent, selects the best retained complete-band candidate for each band, replays
+the four frozen winners over the same authoritative validation scopes, composes
+the 20-file result, and packages it. A missing band remains a partial
+submission; the finalizer never invents scores.
 
 The final `task.md`, cloud provisioning commands, model identity patterns and
 actual drill receipts remain launch-time inputs. A local test is not evidence

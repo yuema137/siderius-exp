@@ -11,7 +11,7 @@ from pathlib import Path
 import h5py
 
 from .io import atomic_write_json, fsync_directory, sha256_file
-from .model import DEVELOPMENT_FILE_BY_BAND, DEVELOPMENT_FILES, TRAINING_FILES
+from .model import ALL_FILE_INDICES
 
 
 def _manifest(path: Path) -> dict[str, str]:
@@ -80,10 +80,8 @@ def prepare(
     source_root.chmod(0o700)
     targets = {
         "training": data_root / "public-training",
-        "development_input": data_root / "public-development",
-        "development_truth": data_root / "private-development",
-        "validation_input": data_root / "private-validation-input",
-        "validation_truth": data_root / "private-validation",
+        "evaluation_input": data_root / "private-validation-input",
+        "evaluation_truth": data_root / "private-validation",
     }
     if any(path.exists() for path in targets.values()):
         raise FileExistsError("prepared data targets must all be absent")
@@ -91,40 +89,22 @@ def prepare(
     for path in targets.values():
         path.mkdir(mode=0o700)
     try:
-        public_development_manifest: dict[str, str] = {}
         private_validation_input_manifest: dict[str, str] = {}
-        for index in TRAINING_FILES:
+        for index in ALL_FILE_INDICES:
             training_name = f"abra_training_{index:04d}.h5"
             _verified_copy(
                 source_root / training_name,
                 targets["training"] / training_name,
                 entries[training_name],
             )
-        for index in DEVELOPMENT_FILES:
-            training_name = f"abra_training_{index:04d}.h5"
-            development_name = f"abra_validation_{index:04d}.h5"
-            _verified_copy(
-                source_root / training_name,
-                targets["development_truth"] / development_name,
-                entries[training_name],
-            )
-            band = next(
-                band for band, held_out in DEVELOPMENT_FILE_BY_BAND.items() if held_out == index
-            )
-            public_development = targets["development_input"] / f"development-band-{band}.h5"
-            _copy_validation_input(source_root / training_name, public_development)
-            with h5py.File(public_development, "r") as prepared:
-                if "timeseries/channel0002" in prepared:
-                    raise RuntimeError(f"development truth leaked into {public_development}")
-            public_development_manifest[public_development.name] = sha256_file(public_development)
-        for index in range(20):
+        for index in ALL_FILE_INDICES:
             validation_name = f"abra_validation_{index:04d}.h5"
             _verified_copy(
                 source_root / validation_name,
-                targets["validation_truth"] / validation_name,
+                targets["evaluation_truth"] / validation_name,
                 entries[validation_name],
             )
-            private_validation_input = targets["validation_input"] / validation_name
+            private_validation_input = targets["evaluation_input"] / validation_name
             _copy_validation_input(source_root / validation_name, private_validation_input)
             with h5py.File(private_validation_input, "r") as prepared:
                 if "timeseries/channel0002" in prepared:
@@ -133,18 +113,13 @@ def prepare(
                 private_validation_input
             )
         atomic_write_json(
-            data_root / "public-development-manifest.json",
-            public_development_manifest,
-        )
-        atomic_write_json(
             data_root / "private-validation-input-manifest.json",
             private_validation_input_manifest,
         )
         for path in (*targets.values(),):
             is_private = path in {
-                targets["development_truth"],
-                targets["validation_input"],
-                targets["validation_truth"],
+                targets["evaluation_input"],
+                targets["evaluation_truth"],
             }
             for child in path.iterdir():
                 child.chmod(0o440 if is_private else 0o444)
@@ -152,11 +127,7 @@ def prepare(
                     shutil.chown(child, user="root", group=private_group)
             path.chmod(0o550 if is_private else 0o555)
         if private_group:
-            for key in (
-                "development_truth",
-                "validation_input",
-                "validation_truth",
-            ):
+            for key in ("evaluation_input", "evaluation_truth"):
                 shutil.chown(targets[key], user="root", group=private_group)
     except BaseException:
         for path in targets.values():

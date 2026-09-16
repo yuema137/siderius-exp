@@ -19,10 +19,8 @@ outside the 24-hour evaluation window.
   is present for this run. If its advice mode is `enabled`, the one human-advice
   artifact is `/work/input/advice.json`; if the mode is `disabled`, no human
   advice was supplied. No other file is an implicit advice source.
-- `/data/public-training/`: 16 labelled training HDF5 files.
-- `/data/public-development/`: four unlabelled development inputs, one held-out
-  training-family file per band.
-- `/usr/local/bin/tidmad-score`: the development-scoring entry point.
+- `/data/public-training/`: all 20 labelled training HDF5 files.
+- `/usr/local/bin/tidmad-score`: the complete-band candidate-scoring entry point.
 - `/work/agent/`: your writable scientific workspace.
 - `/baseline/agent/environments/runtime/`: a prepared Python environment with
   PyTorch, HDF5, NumPy, and SciPy; you may use, extend, or replace it.
@@ -54,25 +52,26 @@ reassembly, and HDF5 writing are fixed evaluator operations; candidate-specific
 free-form preprocessing or postprocessing outside the submitted model is not
 part of this task.
 
-The permitted solution class is a learned ML model fitted from the provided
-labelled training data. A standalone hand-designed filter, analytic
-reconstruction rule, lookup table, or other free-form data-processing pipeline
-is not a valid solution merely because it is wrapped in model-shaped code.
-Within the fixed segment-model interface, you may choose the model architecture,
-loss, optimizer, hyperparameters, and training experiments.
+An eligible submission is a trained ML model fitted from the provided labelled
+training data. Its only inference input is the evaluator-provided raw segment
+tensor described above. Model architecture, fitting method and research process
+are not prescribed by this task; eligibility is determined from the submitted
+artifact, fixed interface, scoring contract and Health evidence.
 
 The exact injected frequencies, scoring anchors, official validation inputs,
 and official validation truth are not part of the information available to the
-research condition. The evaluator enforces that boundary through the mounted
-filesystem and the scoring interface.
+research condition. The evaluator owns those files and supplies only raw
+40,000-sample segment tensors to the frozen submitted model. It enforces that
+boundary through the mounted filesystem and the scoring interface.
 
 ## Evaluation and scientific validity
 
-During the 24-hour search, the evaluator reports a development metric separately
-from scientific eligibility. The four development files are held out from the
-provided labelled training split; they are not the official final validation
-set. The official final validation inputs and truth are inaccessible during the
-search and are evaluated once, automatically, after the deadline.
+During the 24-hour search, every candidate evaluation covers every official
+validation file in the requested band. The evaluator reports that complete-band
+metric separately from scientific eligibility. Validation inputs and truth are
+inaccessible to the agent; only the resulting score, file vector, Health
+evidence, and eligibility receipt are returned. All 20 labelled training files
+remain a separate training split.
 
 The evaluator reports the raw metric separately from scientific eligibility.
 A finite raw score alone is **not** a valid result. A candidate is valid,
@@ -90,7 +89,7 @@ result makes the candidate ineligible regardless of its raw score. The fixed
 evaluator, not the agent, is the authority for this decision. It returns the
 raw score, Health evidence, and eligibility separately.
 
-Public reference rulers are provided for interpreting development results:
+Public reference rulers are provided for interpreting candidate results:
 
 - `tasks/tidmad/reference_data/raw_and_ground_score.md` explains the common
   scoring ruler;
@@ -100,12 +99,7 @@ Public reference rulers are provided for interpreting development results:
 - `tasks/tidmad/reference_data/official_paper_result/` contains published-model
   reference results.
 
-An unexpectedly high raw score is a reason to inspect scientific validity; it
-does not override Health and is not, by itself, evidence of improvement.
-
-These are evaluation requirements, not a prescribed experiment schedule. You
-choose how to train and compare permitted ML models within the stated time,
-compute, storage, security, input, and deliverable constraints.
+These are evaluation requirements, not a prescribed experiment schedule.
 
 For every candidate that you want evaluated, retain enough material to reload
 and reproduce it: model source code, `weights.pth`, `architecture.json`,
@@ -135,15 +129,14 @@ additional architecture documentation):
 
 `inference_batch_size` may be from 1 through 32. Use `tidmad-score --help` for
 the exact scoring interface. The evaluator snapshots the candidate, runs its
-model on the held-out development input, and retains every
-candidate that obtains an eligible valid development score. Retained bytes
+model on every validation file in the requested band, and retains every
+candidate that obtains an eligible valid complete-band score. Retained bytes
 cannot be replaced or removed from storage accounting. The highest eligible
-development score becomes that band's final winner. Save useful candidates
-early so a partial submission remains available if the run ends unexpectedly.
+complete-band score becomes that band's final winner.
 
-The development scorer returns a finite higher-is-better scalar plus a
-20-position vector with one non-null held-out file for the requested band. For
-example:
+The candidate scorer returns a finite higher-is-better scalar plus a 20-position
+vector with one non-null entry for every file in the requested band. For
+example, band `4-9` produces six non-null entries at positions 4 through 9:
 
 ```bash
 tidmad-score \
@@ -153,19 +146,19 @@ tidmad-score \
 ```
 
 There is no agent-callable final-scoring command. After the immutable deadline,
-the evaluator stops the agent, takes the retained development winner for each
-band, runs its frozen trained model on the hidden official validation inputs,
-and computes the final score once. Before the deadline, keep reproduction
-instructions and any additional explanation you want preserved in each
-candidate directory. The evaluator's immutable retained copies are the
-authority for selection and finalization.
+the evaluator stops the agent, takes the retained complete-band winner for each
+band, replays each frozen trained model on the same authoritative full-band
+validation scope, and composes the final 20-file score once. Before the
+deadline, keep reproduction instructions and any additional explanation you
+want preserved in each candidate directory. The evaluator's immutable retained
+copies remain the authority for selection and finalization.
 
 ## Fixed resources
 
 You have one NVIDIA H100, 16 vCPUs, about 200 GB RAM, outbound internet, and a
 fixed 1 TiB scientific working-storage budget for this task.
 
-The frozen task package, the provided training and development data, and all
+The frozen task package, the provided training data, and all
 scientific artifacts created during the run share this capacity. This includes
 checkpoints, temporary files, caches, user-level environments, downloaded
 packages and models, generated datasets, denoised outputs, logs, evaluation
@@ -187,12 +180,9 @@ network-mounted storage, or any location outside the provided scientific
 working filesystem as additional working storage.
 
 You may use the installed command-line tools and outbound public internet for
-papers, documentation, public code, and package installation. Record enough
-dependency and source information to reproduce the final models. You have no
+papers, documentation, public code, and package installation. Final model
+artifacts must record enough dependency and source information for
+reproduction. You have no
 access to evaluator credentials, private validation targets, supervisor
 controls, or external artifact storage; those are not mounted into the agent
 environment.
-
-Do not stop merely because one reasonable solution works. Use the available
-time to test, compare, and improve candidates while keeping reproducible valid
-winners for every band.

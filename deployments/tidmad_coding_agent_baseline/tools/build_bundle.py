@@ -21,7 +21,7 @@ from experiments.shared.information_treatment import (
 )
 
 from .io import atomic_write_json, sha256_file
-from .model import BANDS, DEVELOPMENT_FILE_BY_BAND
+from .model import BANDS, FILES_BY_BAND
 
 _EVALUATOR_ONLY_TASK_FILES = {
     Path("tasks/tidmad/reference_data/segment_anchors.json"),
@@ -194,7 +194,7 @@ def _write_task_kickoff(
 
 
 def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
-    """Derive held-out development and final scopes from the frozen task profile."""
+    """Derive operator-approved full-band candidate and final scopes."""
 
     profile = json.loads((task_root / "tasks/tidmad/resolved/dataset_profile.json").read_text())
     count = int(profile["dataset"]["segments_per_file"])
@@ -204,8 +204,8 @@ def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
     for band in BANDS:
         low, high = (int(value) for value in band.split("-"))
         final_scope = {str(index): list(range(count)) for index in range(low, high + 1)}
-        development_scope = {str(DEVELOPMENT_FILE_BY_BAND[band]): list(range(count))}
-        atomic_write_json(scopes / f"band-{band}-development.json", development_scope)
+        candidate_scope = {str(index): list(range(count)) for index in FILES_BY_BAND[band]}
+        atomic_write_json(scopes / f"band-{band}-candidate.json", candidate_scope)
         atomic_write_json(scopes / f"band-{band}-final.json", final_scope)
         all_scope.update(final_scope)
     atomic_write_json(scopes / "all-final.json", all_scope)
@@ -269,7 +269,7 @@ def build_bundle(
         atomic_write_json(
             input_root / "provenance.json",
             {
-                "version": "tidmad-coding-agent-input-v5",
+                "version": "tidmad-coding-agent-input-v6",
                 "siderius_exp_revision": _git(repo, "rev-parse", "HEAD"),
                 "siderius_revision": siderius_revision,
                 "task_tree": _git(repo, "rev-parse", "HEAD:tasks/tidmad"),

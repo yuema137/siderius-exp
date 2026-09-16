@@ -38,14 +38,14 @@ def _candidate_args(tmp_path):
 def _policy(tmp_path):
     scope_root = tmp_path / "scopes"
     scope_root.mkdir(parents=True)
-    (scope_root / "band-0-3-development.json").write_text('{"3":[0]}')
+    (scope_root / "band-0-3-candidate.json").write_text(
+        '{"0":[0],"1":[0],"2":[0],"3":[0]}'
+    )
     return EvaluatorPolicy(
         input_root=tmp_path / "input",
         scope_root=scope_root,
-        development_truth_dir=tmp_path / "development-truth",
-        development_input_dir=tmp_path / "development-input",
-        final_input_dir=tmp_path / "final-input",
-        final_truth_dir=tmp_path / "final-truth",
+        evaluation_input_dir=tmp_path / "evaluation-input",
+        evaluation_truth_dir=tmp_path / "evaluation-truth",
         agent_root=tmp_path / "agent",
         archive_root=tmp_path / "state" / "candidates",
         evaluation_root=tmp_path / "state" / "evaluations",
@@ -71,7 +71,7 @@ def _health(*, eligible=True):
 
 
 def _deliverables(tmp_path):
-    paths = [tmp_path / "denoised-3.h5"]
+    paths = [tmp_path / f"denoised-{index}.h5" for index in range(4)]
     for path in paths:
         path.write_bytes(b"temporary")
     return paths
@@ -83,10 +83,17 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(tmp_p
     events = []
     monkeypatch.setenv("BASELINE_RUN_ID", "codex-100")
     monkeypatch.setenv("BASELINE_INVOCATION_ID", "codex-100-invocation-0001")
+
+    def infer(**kwargs):
+        assert kwargs["files_by_band"] == {"0-3": (0, 1, 2, 3)}
+        assert kwargs["input_root"] == tmp_path / "evaluation-input"
+        kwargs["output_root"].mkdir()
+        return kwargs["output_root"]
+
     monkeypatch.setattr(
         score,
         "run_candidate_inference",
-        lambda **kwargs: kwargs["output_root"].mkdir() or kwargs["output_root"],
+        infer,
     )
 
     monkeypatch.setattr(
@@ -97,7 +104,7 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(tmp_p
                 "scoreable": True,
                 "valid": False,
                 "scalar": 1.0,
-                "file_vector": [None, None, None, 1.0] + [None] * 16,
+                "file_vector": [1.0] * 4 + [None] * 16,
             },
             deliverables,
         ),
@@ -111,6 +118,7 @@ def test_candidate_scoring_deletes_deliverables_only_after_durable_archive(tmp_p
         assert receipt["score_utc"].endswith("Z")
         assert receipt["run_id"] == "codex-100"
         assert receipt["invocation_id"] == "codex-100-invocation-0001"
+        assert receipt["evaluation_scope"] == "complete-band"
         events.append("archive")
         return tmp_path / "published"
 
@@ -136,7 +144,7 @@ def test_candidate_scoring_keeps_deliverables_when_archive_fails(tmp_path, monke
                 "scoreable": True,
                 "valid": False,
                 "scalar": 1.0,
-                "file_vector": [None, None, None, 1.0] + [None] * 16,
+                "file_vector": [1.0] * 4 + [None] * 16,
             },
             deliverables,
         ),
@@ -168,7 +176,7 @@ def test_health_failure_returns_raw_feedback_but_never_archives_or_selects(tmp_p
                 "scoreable": True,
                 "valid": False,
                 "scalar": 22.0,
-                "file_vector": [None, None, None, 22.0] + [None] * 16,
+                "file_vector": [22.0] * 4 + [None] * 16,
             },
             deliverables,
         ),

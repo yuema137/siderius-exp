@@ -4,11 +4,7 @@ import hashlib
 
 import h5py
 import numpy as np
-from deployments.tidmad_coding_agent_baseline.tools.model import (
-    DEVELOPMENT_FILE_BY_BAND,
-    DEVELOPMENT_FILES,
-    TRAINING_FILES,
-)
+from deployments.tidmad_coding_agent_baseline.tools.model import ALL_FILE_INDICES
 from deployments.tidmad_coding_agent_baseline.tools.prepare_data import prepare
 
 
@@ -29,7 +25,7 @@ def _sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_prepared_splits_are_disjoint_and_final_validation_stays_private(tmp_path):
+def test_all_training_is_public_and_full_validation_stays_private(tmp_path):
     source = tmp_path / "source"
     data = tmp_path / "data"
     source.mkdir()
@@ -48,26 +44,12 @@ def test_prepared_splits_are_disjoint_and_final_validation_stays_private(tmp_pat
 
     prepare(source, data, manifest)
 
-    assert set(TRAINING_FILES).isdisjoint(DEVELOPMENT_FILES)
-    assert set(TRAINING_FILES) | set(DEVELOPMENT_FILES) == set(range(20))
-    for index in TRAINING_FILES:
+    for index in ALL_FILE_INDICES:
         assert (data / "public-training" / f"abra_training_{index:04d}.h5").is_file()
-    for index in DEVELOPMENT_FILES:
-        assert not (data / "public-training" / f"abra_training_{index:04d}.h5").exists()
-        name = f"abra_validation_{index:04d}.h5"
-        band = next(
-            band for band, held_out in DEVELOPMENT_FILE_BY_BAND.items() if held_out == index
-        )
-        public_name = f"development-band-{band}.h5"
-        with h5py.File(data / "public-development" / public_name, "r") as handle:
-            assert "timeseries/channel0001" in handle
-            assert "timeseries/channel0002" not in handle
-            assert "FilePartialNumber" not in handle.attrs
-            assert "FileCreation" not in handle.attrs
-        with h5py.File(data / "private-development" / name, "r") as handle:
-            assert "timeseries/channel0002" in handle
+    assert not (data / "public-development").exists()
+    assert not (data / "private-development").exists()
     assert not (data / "public-validation").exists()
-    for index in range(20):
+    for index in ALL_FILE_INDICES:
         name = f"abra_validation_{index:04d}.h5"
         with h5py.File(data / "private-validation-input" / name, "r") as handle:
             assert "timeseries/channel0001" in handle

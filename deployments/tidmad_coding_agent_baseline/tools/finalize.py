@@ -99,7 +99,7 @@ def finalize(
             denoised = run_candidate_inference(
                 winners=winners,
                 task_root=policy.input_root,
-                input_root=policy.final_input_dir,
+                input_root=policy.evaluation_input_dir,
                 output_root=policy.final_output_dir,
             )
             try:
