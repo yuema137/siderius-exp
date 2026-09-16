@@ -1,4 +1,4 @@
-# Experiment-owned full-band raw-data characterization; not a task default.
+# Full-band raw-data characterization for this bounded experiment only.
 schema_version: 1
 scientific_goal: >-
   Characterize sampling, spectral structure, and time-local behavior across
