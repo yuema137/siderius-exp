@@ -2,16 +2,37 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import shlex
 import tarfile
 from pathlib import Path
 
 import pytest
+
 from deployments.tidmad_coding_agent_baseline.tools import build_bundle as bundle_module
 from deployments.tidmad_coding_agent_baseline.tools.agent_command import command_for
 from deployments.tidmad_coding_agent_baseline.tools.build_bundle import build_bundle
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 TREATMENTS = REPOSITORY_ROOT / "experiments/tidmad/information_treatments"
+
+
+def test_operator_readme_names_the_single_band_route_and_live_score_command():
+    """Catch an operator copying the obsolete four-band or no-subcommand recipe."""
+
+    readme = (
+        REPOSITORY_ROOT / "deployments/tidmad_coding_agent_baseline/README.md"
+    ).read_text()
+    commands = [
+        shlex.split(block.replace("\\\n", ""))
+        for block in re.findall(r"```bash\n(.*?)\n```", readme, re.S)
+    ]
+    formal = next(command for command in commands if "task-main-band.md" in " ".join(command))
+    assert formal[formal.index("--band") + 1] == "4-9"
+    assert formal[formal.index("--information-treatment") + 1].endswith(
+        "main-cli-no-advice.yaml"
+    )
+    assert any(command[:2] == ["tidmad-score", "candidate"] for command in commands)
 
 
 def _archive_json(archive: tarfile.TarFile, name: str) -> dict:
