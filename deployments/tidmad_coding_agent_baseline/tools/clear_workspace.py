@@ -76,6 +76,9 @@ def clear_retained_state(
     root = retained_root.resolve()
     if root != expected_root.resolve():
         raise ValueError(f"unexpected retained-state root: {root}")
+    for target in root.iterdir():
+        if target.is_dir() and target.name.startswith(".") and ".snapshot." in target.name:
+            shutil.rmtree(target)
     for name in (
         "candidates",
         "evaluations",

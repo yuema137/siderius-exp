@@ -58,6 +58,12 @@ def test_clear_refuses_changed_frozen_input_before_deleting_drill(tmp_path):
 
 def test_clear_removes_external_drill_candidates_and_recreates_roots(tmp_path, monkeypatch):
     retained = tmp_path / "var" / "lib" / "tidmad-baseline"
+    transient = retained / ".candidate-001.snapshot.random"
+    transient.mkdir(parents=True)
+    (transient / "weights.pth").write_bytes(b"partial")
+    unrelated_hidden = retained / ".operator-note"
+    unrelated_hidden.mkdir()
+    (unrelated_hidden / "keep").write_text("yes")
     (retained / "candidates" / "drill").mkdir(parents=True)
     (retained / "candidates" / "drill" / "weights.pth").write_bytes(b"drill")
     (retained / "evaluations" / "0-3").mkdir(parents=True)
@@ -85,6 +91,8 @@ def test_clear_removes_external_drill_candidates_and_recreates_roots(tmp_path, m
     assert list((retained / "health-configs").iterdir()) == []
     assert list((retained / "backup-receipts").iterdir()) == []
     assert list((retained / "inference-sessions").iterdir()) == []
+    assert not transient.exists()
+    assert (unrelated_hidden / "keep").read_text() == "yes"
     assert not (retained / "final_score.json").exists()
     assert not (retained / "final_attempt.json").exists()
     assert not (retained / "final_failure.json").exists()
