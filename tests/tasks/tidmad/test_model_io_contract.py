@@ -7,7 +7,9 @@ from agent.schemas.task_config import ForwardContract
 from execute_tools.dataset_config import bind_dataset_profile
 from workflows.task_config import load_task_config
 
-TASK_CONFIG = Path(__file__).resolve().parents[3] / "tasks" / "tidmad" / "declared" / "task_config.yaml"
+TASK_CONFIG = (
+    Path(__file__).resolve().parents[3] / "tasks" / "tidmad" / "declared" / "task_config.yaml"
+)
 
 
 def test_normalized_contract_matches_declared_forward_bytes(tidmad_profile) -> None:
@@ -42,7 +44,6 @@ def test_regression_contract_declares_standard_historical_inference(tidmad_profi
     ]
     assert inference.prediction_output_format == "siderius.numeric-array.v1"
     assert (
-        inference.prediction_semantic_id
-        == "tidmad.offset-encoded-continuous-waveform-segment.v1"
+        inference.prediction_semantic_id == "tidmad.offset-encoded-continuous-waveform-segment.v1"
     )
     assert inference.prediction_decoder_protocol_id == "siderius.identity-prediction-decoder.v1"
