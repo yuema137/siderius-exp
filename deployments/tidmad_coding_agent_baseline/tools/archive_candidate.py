@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .io import atomic_write_json, fsync_directory, fsync_tree, sha256_file
-from .model import BANDS, DEVELOPMENT_FILE_BY_BAND
+from .model import BANDS, FILES_BY_BAND
 
 _IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _REQUIRED = ("architecture.json", "train_config.json", "weights.pth", "model.pt")
@@ -54,12 +54,12 @@ def _validate_score(path: Path, band: str, expected_candidate_digest: str) -> di
         raise ValueError("score scalar must be finite")
     if not isinstance(vector, list) or len(vector) != 20:
         raise ValueError("score file_vector must have exactly 20 entries")
-    expected = {DEVELOPMENT_FILE_BY_BAND[band]}
+    expected = set(FILES_BY_BAND[band])
     present = {index for index, value in enumerate(vector) if value is not None}
     if present != expected:
         raise ValueError(
-            "development score vector identities "
-            f"{sorted(present)} differ from frozen holdout for band {band}"
+            "candidate score vector identities "
+            f"{sorted(present)} differ from the complete band {band}"
         )
     if payload.get("candidate_tree_sha256") != expected_candidate_digest:
         raise ValueError("score is not bound to these candidate bytes")
@@ -112,11 +112,11 @@ def archive_candidate(
         atomic_write_json(
             temporary / "candidate_manifest.json",
             {
-                "version": "tidmad-coding-agent-candidate-v1",
+                "version": "tidmad-coding-agent-candidate-v2",
                 "candidate_id": candidate_id,
                 "band": band,
                 "scalar": float(score["scalar"]),
-                "selection_split": "development",
+                "selection_split": "official-validation",
                 "candidate_tree_sha256": digest,
                 "files": files,
             },

@@ -9,9 +9,7 @@ from deployments.tidmad_coding_agent_baseline.tools.archive_candidate import (
     candidate_tree_digest,
 )
 from deployments.tidmad_coding_agent_baseline.tools.finalize import finalize
-from deployments.tidmad_coding_agent_baseline.tools.model import (
-    DEVELOPMENT_FILE_BY_BAND,
-)
+from deployments.tidmad_coding_agent_baseline.tools.model import FILES_BY_BAND
 
 
 def _source(root, tag):
@@ -26,7 +24,8 @@ def _source(root, tag):
 
 def _score(path, source, band, scalar):
     vector = [None] * 20
-    vector[DEVELOPMENT_FILE_BY_BAND[band]] = scalar
+    for index in FILES_BY_BAND[band]:
+        vector[index] = scalar
     path.write_text(
         json.dumps(
             {
@@ -101,17 +100,19 @@ def test_finalizer_collects_partial_results_without_fabricating_score(tmp_path):
 def test_archive_refuses_score_with_wrong_band_identities(tmp_path):
     candidate = _source(tmp_path / "candidate", "bad")
     bad = tmp_path / "bad-score.json"
+    old_single_anchor_vector = [None] * 20
+    old_single_anchor_vector[3] = 1.0
     bad.write_text(
         json.dumps(
             {
                 "valid": True,
                 "scalar": 1.0,
-                "file_vector": [1.0] * 20,
+                "file_vector": old_single_anchor_vector,
                 "candidate_tree_sha256": candidate_tree_digest(candidate),
             }
         )
     )
-    with pytest.raises(ValueError, match="differ from frozen holdout"):
+    with pytest.raises(ValueError, match="differ from the complete band"):
         archive_candidate(
             source=candidate,
             score_path=bad,

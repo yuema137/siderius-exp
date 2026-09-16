@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from .model import BANDS
+from .model import ALL_FILE_INDICES, BANDS, FILES_BY_BAND
 
 _SCOPE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
@@ -18,10 +18,8 @@ class EvaluatorPolicy:
 
     input_root: Path = Path("/opt/tidmad-evaluator/assets/task_snapshot")
     scope_root: Path = Path("/opt/tidmad-evaluator/assets/evaluation_scopes")
-    development_truth_dir: Path = Path("/data/private-development")
-    development_input_dir: Path = Path("/data/public-development")
-    final_input_dir: Path = Path("/data/private-validation-input")
-    final_truth_dir: Path = Path("/data/private-validation")
+    evaluation_input_dir: Path = Path("/data/private-validation-input")
+    evaluation_truth_dir: Path = Path("/data/private-validation")
     agent_root: Path = Path("/work/agent")
     archive_root: Path = Path("/var/lib/tidmad-baseline/candidates")
     evaluation_root: Path = Path("/var/lib/tidmad-baseline/evaluations")
@@ -42,7 +40,7 @@ class EvaluatorPolicy:
         expected = "all" if band is None else band
         if expected not in (*BANDS, "all"):
             raise ValueError(f"unsupported evaluation scope band: {expected}")
-        if phase not in {"development", "final"}:
+        if phase not in {"candidate", "final"}:
             raise ValueError(f"unsupported evaluation phase: {phase}")
         required_name = f"{'all' if band is None else f'band-{band}'}-{phase}"
         if scope_name != required_name:
@@ -52,14 +50,12 @@ class EvaluatorPolicy:
             raise ValueError(f"frozen evaluation scope is missing: {scope_name}")
         payload = json.loads(path.read_text())
         observed = {int(value) for value in payload}
-        if phase == "development":
-            from .model import DEVELOPMENT_FILE_BY_BAND
-
+        if phase == "candidate":
             if band is None:
-                raise ValueError("development evaluation requires one band")
-            required = {DEVELOPMENT_FILE_BY_BAND[band]}
+                raise ValueError("candidate evaluation requires one band")
+            required = set(FILES_BY_BAND[band])
         elif expected == "all":
-            required = set(range(20))
+            required = set(ALL_FILE_INDICES)
         else:
             low, high = (int(value) for value in expected.split("-"))
             required = set(range(low, high + 1))

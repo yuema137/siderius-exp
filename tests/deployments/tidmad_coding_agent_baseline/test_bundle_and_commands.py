@@ -116,7 +116,7 @@ def test_bundle_splits_public_task_view_from_exact_private_task_snapshot(tmp_pat
         provenance_file = archive.extractfile(provenance_member)
         assert provenance_file is not None
         provenance = json.load(provenance_file)
-        assert provenance["version"] == "tidmad-coding-agent-input-v5"
+        assert provenance["version"] == "tidmad-coding-agent-input-v6"
         assert provenance["task_visibility"] == "agent-public-view-v2"
         assert len(provenance["public_task_view_sha256"]) == 64
         assert len(provenance["information_treatment_sha256"]) == 64
@@ -228,9 +228,8 @@ def test_canonical_task_md_separates_score_health_and_segment_model_contract():
     assert "health_regression.yaml" in text
     assert "Health error, missing Health evidence" in text
     assert "must be a trained ML denoising model" in text
-    assert "learned ML model fitted from the provided" in text
-    assert "standalone hand-designed filter" in text
-    assert "merely because it is wrapped in model-shaped code" in text
+    assert "trained ML model fitted from the provided" in text
+    assert "Model architecture, fitting method and research process" in text
     assert "raw, non-overlapping 40,000-sample" in text
     assert "candidate-specific\nfree-form preprocessing or postprocessing" in text
     assert "TorchScript `model.pt`" in text
@@ -240,6 +239,32 @@ def test_canonical_task_md_separates_score_health_and_segment_model_contract():
     assert "matched filter" not in text
     assert "There is no agent-callable final-scoring command" in text
     assert "raw_and_ground_score.md" in text
+
+
+def test_candidate_scopes_cover_every_file_in_each_band(tmp_path):
+    task_root = tmp_path / "task"
+    resolved = task_root / "tasks/tidmad/resolved"
+    resolved.mkdir(parents=True)
+    (resolved / "dataset_profile.json").write_text(
+        json.dumps({"dataset": {"segments_per_file": 2}})
+    )
+    evaluator = tmp_path / "evaluator"
+    evaluator.mkdir()
+
+    bundle_module._write_evaluation_scopes(task_root, evaluator)
+
+    expected = {
+        "0-3": {"0", "1", "2", "3"},
+        "4-9": {"4", "5", "6", "7", "8", "9"},
+        "10-14": {"10", "11", "12", "13", "14"},
+        "15-19": {"15", "16", "17", "18", "19"},
+    }
+    for band, files in expected.items():
+        scope = json.loads(
+            (evaluator / "evaluation_scopes" / f"band-{band}-candidate.json").read_text()
+        )
+        assert set(scope) == files
+        assert all(segments == [0, 1] for segments in scope.values())
 
 
 def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():

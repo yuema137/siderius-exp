@@ -24,7 +24,7 @@ from .evaluator_policy import EvaluatorPolicy
 from .final_inference import run_candidate_inference
 from .health import evaluate_candidate_health
 from .io import atomic_write_json, fsync_directory
-from .model import BANDS, DEVELOPMENT_FILE_BY_BAND, utc_text
+from .model import BANDS, FILES_BY_BAND, utc_text
 
 
 def _load_runtime(input_root: Path):
@@ -109,7 +109,7 @@ def compute_score(
     scoreable = math.isfinite(float(scalar))
     return (
         {
-            "version": "tidmad-coding-agent-score-v2",
+            "version": "tidmad-coding-agent-score-v3",
             "scoreable": scoreable,
             # Eligibility is established only after task-owned Health runs.
             "valid": False,
@@ -131,9 +131,9 @@ def score_candidate(args: argparse.Namespace, policy: EvaluatorPolicy | None = N
     validate_candidate_identity(args.candidate_id)
     candidate_source = policy.agent_path(args.candidate_source, label="candidate source")
     sample_set = policy.scope_path(
-        f"band-{args.band}-development",
+        f"band-{args.band}-candidate",
         band=args.band,
-        phase="development",
+        phase="candidate",
     )
     policy.archive_root.parent.mkdir(parents=True, exist_ok=True)
     snapshot_root = Path(
@@ -149,14 +149,13 @@ def score_candidate(args: argparse.Namespace, policy: EvaluatorPolicy | None = N
         denoised_dir = run_candidate_inference(
             winners={args.band: (args.candidate_id, snapshot_root)},
             task_root=policy.input_root,
-            input_root=policy.development_input_dir,
+            input_root=policy.evaluation_input_dir,
             output_root=snapshot_root / "denoised",
-            files_by_band={args.band: (DEVELOPMENT_FILE_BY_BAND[args.band],)},
-            opaque_band_inputs=True,
+            files_by_band={args.band: FILES_BY_BAND[args.band]},
         )
         score, deliverables = compute_score(
             input_root=policy.input_root,
-            raw_data_dir=policy.development_truth_dir,
+            raw_data_dir=policy.evaluation_truth_dir,
             denoised_dir=denoised_dir,
             sample_set_path=sample_set,
             workers=args.workers,
@@ -166,7 +165,7 @@ def score_candidate(args: argparse.Namespace, policy: EvaluatorPolicy | None = N
         }
         health = evaluate_candidate_health(
             input_root=policy.input_root,
-            raw_data_dir=policy.development_truth_dir,
+            raw_data_dir=policy.evaluation_truth_dir,
             denoised_paths=denoised_paths,
             file_vector=score["file_vector"],
             scalar=float(score["scalar"]),
@@ -176,7 +175,8 @@ def score_candidate(args: argparse.Namespace, policy: EvaluatorPolicy | None = N
         )
         score.update(
             {
-                "evaluation_split": "development",
+                "evaluation_split": "official-validation",
+                "evaluation_scope": "complete-band",
                 "health_status": health.status,
                 "health_passed": health.eligible,
                 "health_gate_results": health.gate_results,
@@ -278,7 +278,7 @@ def score_final(args: argparse.Namespace, policy: EvaluatorPolicy | None = None)
     sample_set = policy.scope_path("all-final", band=None, phase="final")
     score, deliverables = compute_score(
         input_root=policy.input_root,
-        raw_data_dir=policy.final_truth_dir,
+        raw_data_dir=policy.evaluation_truth_dir,
         denoised_dir=denoised_dir,
         sample_set_path=sample_set,
         workers=args.workers,
@@ -288,7 +288,7 @@ def score_final(args: argparse.Namespace, policy: EvaluatorPolicy | None = None)
     }
     health = evaluate_candidate_health(
         input_root=policy.input_root,
-        raw_data_dir=policy.final_truth_dir,
+        raw_data_dir=policy.evaluation_truth_dir,
         denoised_paths=denoised_paths,
         file_vector=score["file_vector"],
         scalar=float(score["scalar"]),
@@ -299,6 +299,7 @@ def score_final(args: argparse.Namespace, policy: EvaluatorPolicy | None = None)
     score.update(
         {
             "evaluation_split": "final",
+            "evaluation_scope": "complete-task",
             "health_status": health.status,
             "health_passed": health.eligible,
             "health_gate_results": health.gate_results,

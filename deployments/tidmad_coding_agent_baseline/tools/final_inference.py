@@ -1,4 +1,4 @@
-"""Run frozen segment models on hidden final inputs after the agent deadline."""
+"""Run frozen segment models on evaluator-owned validation inputs."""
 
 from __future__ import annotations
 
@@ -96,9 +96,8 @@ def run_candidate_inference(
     output_root: Path,
     runtime: FinalInferenceRuntime | None = None,
     files_by_band: Mapping[str, tuple[int, ...]] = FILES_BY_BAND,
-    opaque_band_inputs: bool = False,
 ) -> Path:
-    """Evaluate immutable winners without exposing final inputs to the agent."""
+    """Evaluate immutable candidates without exposing validation files to the agent."""
 
     runtime = runtime or FinalInferenceRuntime()
     if output_root.exists():
@@ -110,11 +109,7 @@ def run_candidate_inference(
             if not (source / "model.pt").is_file():
                 raise ValueError(f"winner lacks required model.pt: {source}")
             for file_index in files_by_band[band]:
-                input_name = (
-                    f"development-band-{band}.h5"
-                    if opaque_band_inputs
-                    else f"abra_validation_{file_index:04d}.h5"
-                )
+                input_name = f"abra_validation_{file_index:04d}.h5"
                 raw_input = input_root / input_name
                 if not raw_input.is_file():
                     raise FileNotFoundError(f"evaluation input missing: {raw_input}")
