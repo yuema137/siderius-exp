@@ -1,20 +1,22 @@
+# Experiment-owned full-band Data Analysis treatment; not a task default.
 schema_version: 1
 scientific_goal: >-
-  Characterize the sampling, spectral structure, and time-local behavior of a
-  small authorized subset of real TIDMAD SQUID validation waveforms.
+  Characterize sampling, spectral structure, and time-local behavior across
+  the complete TIDMAD high-frequency validation band (files 15 through 19).
 input_description: >-
   Integer-coded SQUID detector waveform samples at the task-declared physical
   cadence. The view contains one input channel and performs no interpolation,
   resampling, filtering, or repair.
 target_description: Clean injected waveform, not visible in the initial raw-data analysis.
 scientific_constraints:
-  - Findings apply only to the explicitly sampled validation windows from file 4.
+  - Findings apply only to the explicitly sampled validation windows from files 15 through 19.
+  - Every file in the high-frequency band must contribute to the certified selection.
   - Frequencies are physical Hz derived from the task-owned 10 MHz cadence.
   - Generic skills must not assume TIDMAD-specific frequency bands.
 available_assets:
-  - asset_id: tidmad-validation-input
+  - asset_id: tidmad-high-band-validation-input
     asset_type: dataset
-    description: Authorized real TIDMAD validation input waveform windows from file 4.
+    description: Authorized real TIDMAD validation input waveform windows across files 15 through 19.
     location:
       kind: task_data
       task_data_path_id: tidmad
@@ -25,22 +27,24 @@ available_assets:
     authorized_scope:
       kind: legacy_partitions
       data_scope:
-        file_indices: [4]
+        file_indices: [15, 16, 17, 18, 19]
     split_id: validation
     metadata:
       sample_rate_hz: 10000000.0
       window_samples: 262144
       window_duration_seconds: 0.0262144
       channel_semantics: raw_detector_input
+      band_file_indices: [15, 16, 17, 18, 19]
     metadata_sources:
       sample_rate_hz: {information_class: identity}
       window_samples: {information_class: identity}
       window_duration_seconds: {information_class: identity}
       channel_semantics: {information_class: identity}
+      band_file_indices: {information_class: identity}
 access_policy:
-  policy_id: tidmad-real-data-smoke-v1
+  policy_id: tidmad-high-band-analysis-v1
   policy_version: 1
-  purpose: Bounded pre-model scientific characterization of real validation inputs.
+  purpose: Bounded scientific characterization across the complete high-frequency band.
   split_rules:
     - split_id: validation
       data_visible: true
@@ -54,8 +58,8 @@ resource_envelope:
   preferred_device: cpu
   sampling_policy:
     mode: fixed
-    max_items: 4
-    strategy: uniform
+    max_items: 10
+    strategy: task_defined
     seed: 20260915
 builtin_skill_packs:
   - core-analysis
