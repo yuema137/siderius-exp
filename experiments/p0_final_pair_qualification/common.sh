@@ -32,8 +32,10 @@ p0_qualification_main() {
     [[ -d "$data_dir" ]] || { echo "--data_dir must name a directory" >&2; return 2; }
     "$data_check" "$data_dir" || { echo "required task data is missing" >&2; return 2; }
     local expected_revision actual_revision
-    expected_revision="$(tr -d '[:space:]' < "$exp_root/SIDERIUS_REVISION")"
-    [[ "$expected_revision" == "e5ace318cf007c02f9c3286a8224a6a634433372" ]] || { echo "unexpected SIDERIUS_REVISION" >&2; return 2; }
+    local pin_file="$exp_root/experiments/p0_final_pair_qualification/SIDERIUS_REVISION"
+    [[ -f "$pin_file" ]] || { echo "missing historical SIDERIUS_REVISION" >&2; return 2; }
+    expected_revision="$(tr -d '[:space:]' < "$pin_file")"
+    [[ "$expected_revision" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid historical SIDERIUS_REVISION" >&2; return 2; }
     actual_revision="$(git -C "$siderius_checkout" rev-parse HEAD 2>/dev/null)" || { echo "cannot inspect SIDERIUS checkout" >&2; return 2; }
     [[ "$actual_revision" == "$expected_revision" ]] || { echo "Siderius checkout revision mismatch" >&2; return 2; }
     [[ -f "$siderius_checkout/scripts/launch/run_chain.sh" && -f "$siderius_checkout/configs/llm/openai_tiered_pro.json" ]] || { echo "required SIDERIUS launch resources are missing" >&2; return 2; }
