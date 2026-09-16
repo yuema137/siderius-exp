@@ -42,6 +42,8 @@ import h5py
 import numpy as np
 import torch
 from agent.schemas.data_analysis.assets import (
+    AnalysisAsset,
+    AssetProvenance,
     LegacyPartitionScope,
     MaterializedAnalysisView,
     TaskDataAssetLocation,
@@ -50,7 +52,10 @@ from agent.schemas.data_analysis.assets import (
 from agent.schemas.data_analysis.common import CertifiedArtifactRef, canonical_sha256
 from agent.schemas.data_analysis.resources import CertifiedSelectionIdentity
 from agent.schemas.data_analysis.view_formats import NUMERIC_ARRAY_V1, TIMESERIES_ARRAY_V1
-from execute_tools.analysis_materialization import AuthorizedAnalysisMaterializationRequest
+from execute_tools.analysis_materialization import (
+    AuthorizedAnalysisMaterializationRequest,
+    HistoricalInferenceInputDerivationRequest,
+)
 from pydantic import BaseModel, ConfigDict, Field
 from torch.utils.data import Dataset
 
@@ -97,6 +102,35 @@ def _h5_dataset(f: h5py.File, *path: str) -> h5py.Dataset:
     for k in path:
         node = node[k]
     return cast(h5py.Dataset, node)
+
+
+def _stratified_analysis_indices(
+    available_by_file: dict[int, int], selected_count: int, rng: np.random.Generator
+) -> dict[int, np.ndarray]:
+    """The task-owned per-file coverage rule shared by both analysis layouts."""
+
+    if not available_by_file or any(count <= 0 for count in available_by_file.values()):
+        raise ValueError("every requested TIDMAD analysis file must contain available rows")
+    if selected_count < len(available_by_file):
+        raise ValueError(
+            "stratified TIDMAD band sampling requires at least one item per requested file"
+        )
+    remaining = selected_count
+    active = list(available_by_file)
+    allocations = {index: 0 for index in available_by_file}
+    while remaining and active:
+        for file_index in tuple(active):
+            if remaining == 0:
+                break
+            if allocations[file_index] >= available_by_file[file_index]:
+                active.remove(file_index)
+                continue
+            allocations[file_index] += 1
+            remaining -= 1
+    return {
+        file_index: np.sort(rng.choice(available, size=allocations[file_index], replace=False))
+        for file_index, available in available_by_file.items()
+    }
 
 
 class TIDMADEpochDataset(Dataset):
@@ -558,6 +592,60 @@ class TidmadTaskDataPath:
 
     task_data_path_id: ClassVar[str] = _TIDMAD_TASK_DATA_PATH_ID
 
+    def derive_historical_inference_input_asset(
+        self, request: HistoricalInferenceInputDerivationRequest
+    ) -> AnalysisAsset:
+        """Translate certified candidate geometry within the declared validation region.
+
+        This pure task-owned step does not open data or choose a sample. The
+        downstream materializer owns bounded row selection and retains target
+        isolation; the model artifact owns the effective segmentation size.
+        """
+
+        base = request.base_asset
+        if not isinstance(base.authorized_scope, LegacyPartitionScope):
+            raise ValueError("TIDMAD historical inference requires a declared partition region")
+        location = base.location
+        if not isinstance(location, TaskDataAssetLocation) or (
+            location.logical_role != "validation_input_windows"
+        ):
+            raise ValueError("TIDMAD historical inference base must be validation input data")
+        profile = DatasetProfile.model_validate_json(request.dataset_profile_json)
+        topology = tidmad_topology(profile)
+        config = json.loads(request.model_config_json)
+        seg_size = config.get("segmentation_size")
+        if not isinstance(seg_size, int) or isinstance(seg_size, bool) or seg_size <= 0:
+            raise ValueError("certified TIDMAD model config lacks a valid segmentation_size")
+        if topology.dataset.psd_segment_length % seg_size:
+            raise ValueError("candidate segmentation_size does not divide the PSD segment length")
+        files = base.authorized_scope.data_scope.resolve(profile.partition_count)
+        sample_set = {
+            file_index: list(range(topology.dataset.segments_per_file)) for file_index in files
+        }
+        scope = TidmadScope(sample_set=sample_set, seg_size=seg_size, profile=profile)
+        serialized = self.serialize_scope(scope)
+        return AnalysisAsset(
+            asset_id=f"tidmad-historical-input-{request.model_artifact.model_artifact_id}",
+            asset_type="dataset",
+            description="Candidate-compatible validation input segments in the declared region.",
+            location=TaskDataAssetLocation(
+                task_data_path_id=self.task_data_path_id,
+                dataset_profile_sha256=location.dataset_profile_sha256,
+                logical_role="validation_model_input_segments",
+            ),
+            provenance=AssetProvenance(
+                producer="tidmad-task-owned-input-derivation",
+                source_asset_ids=(base.asset_id,),
+            ),
+            authorized_scope=TaskOpaqueScopeRef(
+                task_data_path_id=self.task_data_path_id,
+                serialized_scope=serialized,
+                sha256=hashlib.sha256(serialized.encode("utf-8")).hexdigest(),
+            ),
+            split_id=base.split_id,
+            allowed_operations=("materialize",),
+        )
+
     def _analysis_payload_store(self) -> dict[str, bytes]:
         store = getattr(self, "_analysis_payloads", None)
         if store is None:
@@ -664,31 +752,7 @@ class TidmadTaskDataPath:
         rng = np.random.default_rng(policy.seed)
         selected_by_file: dict[int, np.ndarray]
         if policy.strategy in {"stratified", "task_defined"}:
-            if selected_count < len(resolved_file_indices):
-                raise ValueError(
-                    "stratified TIDMAD band sampling requires at least one item "
-                    "per requested file"
-                )
-            selected_by_file = {
-                index: np.empty(0, dtype=np.int64) for index in resolved_file_indices
-            }
-            remaining = selected_count
-            active = list(resolved_file_indices)
-            allocations = {index: 0 for index in resolved_file_indices}
-            while remaining and active:
-                for file_index in tuple(active):
-                    if remaining == 0:
-                        break
-                    if allocations[file_index] >= available_by_file[file_index]:
-                        active.remove(file_index)
-                        continue
-                    allocations[file_index] += 1
-                    remaining -= 1
-            for file_index in resolved_file_indices:
-                count = allocations[file_index]
-                selected_by_file[file_index] = np.sort(
-                    rng.choice(available_by_file[file_index], size=count, replace=False)
-                )
+            selected_by_file = _stratified_analysis_indices(available_by_file, selected_count, rng)
         else:
             population = [
                 (file_index, window_index)
@@ -816,15 +880,16 @@ class TidmadTaskDataPath:
         location = request.asset.location
         if not isinstance(location, TaskDataAssetLocation):
             raise ValueError("TIDMAD model-segment analysis requires a task-data asset")
-        role_to_information = {
-            "validation_model_input_segments": ("data", "input_channel"),
-            "validation_model_target_segments": ("target", "target_channel"),
+        role_to_channels = {
+            "validation_model_input_segments": {
+                "data": "input_channel",
+                "target": "target_channel",
+            },
+            "validation_model_target_segments": {"target": "target_channel"},
         }
-        expected = role_to_information.get(location.logical_role)
-        requested_classes = tuple(
-            item.information_class for item in request.requested_information
-        )
-        if expected is None or requested_classes != (expected[0],):
+        channels = role_to_channels.get(location.logical_role)
+        requested_classes = tuple(item.information_class for item in request.requested_information)
+        if channels is None or len(requested_classes) != 1 or requested_classes[0] not in channels:
             raise ValueError("requested information does not match TIDMAD model-segment role")
 
         scope = self.deserialize_scope(request.requested_scope.serialized_scope)
@@ -856,7 +921,26 @@ class TidmadTaskDataPath:
         if policy.mode == "representative" and policy.max_items is None and policy.fraction is None:
             selected_count = min(4, total_available)
         rng = np.random.default_rng(policy.seed)
-        if selected_count == total_available:
+        if policy.strategy in {"stratified", "task_defined"}:
+            available_by_file = {
+                int(file_index): len(scope.sample_set[file_index]) * rows_per_psd
+                for file_index in sorted(scope.sample_set, key=int)
+            }
+            per_file = _stratified_analysis_indices(available_by_file, selected_count, rng)
+            offsets: dict[int, int] = {}
+            offset = 0
+            for file_index, count in available_by_file.items():
+                offsets[file_index] = offset
+                offset += count
+            selected_indices = np.asarray(
+                [
+                    offsets[file_index] + int(local_index)
+                    for file_index, local_indices in per_file.items()
+                    for local_index in local_indices
+                ],
+                dtype=np.int64,
+            )
+        elif selected_count == total_available:
             selected_indices = np.arange(total_available, dtype=np.int64)
         else:
             selected_indices = np.sort(
@@ -866,7 +950,7 @@ class TidmadTaskDataPath:
         selected_rows: list[np.ndarray] = []
         selected_ids: list[str] = []
         data_root = resolve_physical_data_root()
-        channel_name = getattr(topology.channels, expected[1])
+        channel_name = getattr(topology.channels, channels[requested_classes[0]])
         handles: dict[int, h5py.File] = {}
         try:
             for selected_index in selected_indices.tolist():
@@ -911,7 +995,7 @@ class TidmadTaskDataPath:
         np.savez(
             buffer,
             example_ids=example_ids,
-            **{f"information__{expected[0]}": rows},
+            **{f"information__{requested_classes[0]}": rows},
         )
         payload = buffer.getvalue()
         digest = hashlib.sha256(payload).hexdigest()

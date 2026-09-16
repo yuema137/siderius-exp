@@ -32,7 +32,13 @@ candidate configuration remains the sole owner of `segmentation_size`; the
 task adapter consumes the resolved value and never supplies a hidden default.
 Historical inference inputs use the exact serialized task scope and expose
 only the requested input channel. Targets are materialized through a separate
-authorization path.
+authorization path. For active model-aware analysis, the task derives that
+scope from the digest-verified candidate configuration and the caller's
+declared validation files; it does not choose a new segmentation size or read
+data during derivation. A target-dependent diagnostic may request the same
+candidate-sized rows separately, subject to target authorization; inference
+workers still receive data only. `task_defined` sampling preserves at least
+one selected row per declared file when the budget permits it.
 
 ## Quickstart
 

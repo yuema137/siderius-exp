@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import hashlib
+import json
+from types import SimpleNamespace
 
 import h5py
 import numpy as np
@@ -124,8 +126,126 @@ def _model_segment_profile(profile, *, psd_segment_length: int):
     return profile.model_copy(update={"topology": topology})
 
 
+def test_historical_input_derivation_preserves_declared_band_and_candidate_size(
+    tidmad_profile,
+) -> None:
+    """The task derives geometry, never a hidden file selection or target grant."""
+
+    profile = _model_segment_profile(tidmad_profile, psd_segment_length=8)
+    base = _authorized_request(profile=profile, window_samples=8, file_indices=[2, 3]).request.asset
+    capability = TidmadTaskDataPath()
+    request = SimpleNamespace(
+        base_asset=base,
+        model_artifact=SimpleNamespace(model_artifact_id="candidate-1"),
+        model_config_json=json.dumps({"segmentation_size": 4}),
+        dataset_profile_json=profile.model_dump_json(),
+    )
+
+    derived = capability.derive_historical_inference_input_asset(request)
+    assert derived.split_id == "validation"
+    assert derived.allowed_operations == ("materialize",)
+    assert derived.provenance.source_asset_ids == (base.asset_id,)
+    assert isinstance(derived.location, TaskDataAssetLocation)
+    assert derived.location.logical_role == "validation_model_input_segments"
+    assert isinstance(derived.authorized_scope, TaskOpaqueScopeRef)
+    scope = capability.deserialize_scope(derived.authorized_scope.serialized_scope)
+    assert isinstance(scope, TidmadScope)
+    assert scope.seg_size == 4
+    assert scope.sample_set == {2: [0], 3: [0]}
+
+    request.model_config_json = json.dumps({"segmentation_size": 3})
+    with pytest.raises(ValueError, match="does not divide"):
+        capability.derive_historical_inference_input_asset(request)
+
+
+def test_derived_model_segments_materialize_data_and_target_on_separate_requests(
+    tmp_path, tidmad_profile
+) -> None:
+    """Target analysis is separately authorized; inference-input view stays target-free."""
+
+    profile = _model_segment_profile(tidmad_profile, psd_segment_length=8)
+    _write_validation_file(tmp_path, profile=profile, samples=8)
+    base = _authorized_request(profile=profile, window_samples=8).request.asset
+    capability = TidmadTaskDataPath()
+    derived = capability.derive_historical_inference_input_asset(
+        SimpleNamespace(
+            base_asset=base,
+            model_artifact=SimpleNamespace(model_artifact_id="candidate-1"),
+            model_config_json=json.dumps({"segmentation_size": 4}),
+            dataset_profile_json=profile.model_dump_json(),
+        )
+    )
+    data_request = _authorized_model_segment_request(
+        profile=profile, capability=capability, information_class="data", asset_override=derived
+    )
+    target_request = _authorized_model_segment_request(
+        profile=profile, capability=capability, information_class="target", asset_override=derived
+    )
+
+    with bind_dataset_profile(profile), bind_physical_data_root(str(tmp_path)):
+        data_view = capability.materialize_analysis_view(data_request)
+        target_view = capability.materialize_analysis_view(target_request)
+    assert data_view.selection_identity.selection_sha256 == (
+        target_view.selection_identity.selection_sha256
+    )
+    data_path = tmp_path / "model-data.npz"
+    target_path = tmp_path / "model-target.npz"
+    capability.export_analysis_materialization(data_view.content_ref, data_path)
+    capability.export_analysis_materialization(target_view.content_ref, target_path)
+    with (
+        np.load(data_path, allow_pickle=False) as data,
+        np.load(target_path, allow_pickle=False) as target,
+    ):
+        assert "information__target" not in data.files
+        assert "information__data" not in target.files
+        np.testing.assert_array_equal(data["example_ids"], target["example_ids"])
+        assert data["information__data"].shape == target["information__target"].shape
+
+
+def test_task_defined_model_segment_sampling_covers_every_declared_file(
+    tmp_path, tidmad_profile
+) -> None:
+    profile = _model_segment_profile(tidmad_profile, psd_segment_length=8)
+    for file_index in (2, 3):
+        _write_validation_file(tmp_path, profile=profile, samples=8, file_index=file_index)
+    base = _authorized_request(profile=profile, window_samples=8, file_indices=[2, 3]).request.asset
+    capability = TidmadTaskDataPath()
+    derived = capability.derive_historical_inference_input_asset(
+        SimpleNamespace(
+            base_asset=base,
+            model_artifact=SimpleNamespace(model_artifact_id="candidate-1"),
+            model_config_json=json.dumps({"segmentation_size": 4}),
+            dataset_profile_json=profile.model_dump_json(),
+        )
+    )
+    authorized = _authorized_model_segment_request(
+        profile=profile,
+        capability=capability,
+        information_class="data",
+        asset_override=derived,
+        sampling_policy=SamplingPolicy(mode="fixed", strategy="task_defined", max_items=2, seed=17),
+    )
+    with bind_dataset_profile(profile), bind_physical_data_root(str(tmp_path)):
+        view = capability.materialize_analysis_view(authorized)
+    path = tmp_path / "band-model-input.npz"
+    capability.export_analysis_materialization(view.content_ref, path)
+    with np.load(path, allow_pickle=False) as payload:
+        file_ids = {int(item.split("-")[1]) for item in payload["example_ids"].tolist()}
+    assert file_ids == {2, 3}
+
+    with pytest.raises(ValueError, match="available rows"):
+        tidmad_data_path_module._stratified_analysis_indices(
+            {2: 0, 3: 2}, 2, np.random.default_rng(17)
+        )
+
+
 def _authorized_model_segment_request(
-    *, profile, capability: TidmadTaskDataPath, information_class: str
+    *,
+    profile,
+    capability: TidmadTaskDataPath,
+    information_class: str,
+    asset_override: AnalysisAsset | None = None,
+    sampling_policy: SamplingPolicy | None = None,
 ):
     scope = TidmadScope(sample_set={0: [0]}, seg_size=4, profile=profile)
     serialized_scope = capability.serialize_scope(scope)
@@ -139,7 +259,7 @@ def _authorized_model_segment_request(
         if information_class == "data"
         else "validation_model_target_segments"
     )
-    asset = AnalysisAsset(
+    asset = asset_override or AnalysisAsset(
         asset_id=f"tidmad-validation-{information_class}",
         asset_type="dataset",
         description="Exact candidate-sized TIDMAD validation rows.",
@@ -154,6 +274,9 @@ def _authorized_model_segment_request(
         authorized_scope=scope_ref,
         split_id="validation",
     )
+    if asset_override is not None:
+        assert isinstance(asset_override.authorized_scope, TaskOpaqueScopeRef)
+        scope_ref = asset_override.authorized_scope
     policy = AnalysisAccessPolicy(
         policy_id="tidmad-model-segment-test",
         policy_version=1,
@@ -177,9 +300,8 @@ def _authorized_model_segment_request(
         requested_information=(RequestedInformation(information_class=information_class),),
         requested_format_id="siderius.numeric-array.v1",
         operation="materialize",
-        sampling_policy=SamplingPolicy(
-            mode="fixed", strategy="uniform", max_items=2, seed=17
-        ),
+        sampling_policy=sampling_policy
+        or SamplingPolicy(mode="fixed", strategy="uniform", max_items=2, seed=17),
         access_policy=policy,
     )
     receipt = AnalysisAuthorizationReceipt(
