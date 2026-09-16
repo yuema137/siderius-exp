@@ -35,8 +35,10 @@ for n in 15 16 17 18 19; do
   [[ -f "$data_dir/abra_training_00${n}.h5" && -f "$data_dir/abra_validation_00${n}.h5" ]] || fail "required TIDMAD file $n is missing"
 done
 cmp -s "$data_dir/segment_anchors.json" "$ROOT/tasks/tidmad/reference_data/segment_anchors.json" || fail "staged segment_anchors.json is missing or differs from the approved ruler"
-expected="$(tr -d '[:space:]' < "$ROOT/SIDERIUS_REVISION")"
-[[ "$expected" == "e5ace318cf007c02f9c3286a8224a6a634433372" ]] || fail "unexpected SIDERIUS_REVISION"
+pin_file="$ROOT/experiments/tidmad/prerelease-tidmad-proof-of-function/SIDERIUS_REVISION"
+[[ -f "$pin_file" ]] || fail "missing historical SIDERIUS_REVISION"
+expected="$(tr -d '[:space:]' < "$pin_file")"
+[[ "$expected" =~ ^[0-9a-f]{40}$ ]] || fail "invalid historical SIDERIUS_REVISION"
 actual="$(git -C "$checkout" rev-parse HEAD 2>/dev/null)" || fail "cannot inspect SIDERIUS checkout"
 [[ "$actual" == "$expected" ]] || fail "SIDERIUS checkout revision mismatch"
 launcher="$checkout/scripts/launch/run_chain.sh"; [[ -f "$launcher" ]] || fail "run_chain.sh is missing"
