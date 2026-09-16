@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import hashlib
 import io
 import json
 import os
@@ -12,6 +13,12 @@ import subprocess
 import tarfile
 import tempfile
 from pathlib import Path
+
+from experiments.shared.information_treatment import (
+    AdviceMode,
+    ResolvedInformationTreatment,
+    resolve_information_treatment,
+)
 
 from .io import atomic_write_json, sha256_file
 from .model import BANDS, DEVELOPMENT_FILE_BY_BAND
@@ -148,6 +155,44 @@ def _write_checksums(root: Path, output: Path) -> None:
     output.write_text("\n".join(lines) + "\n")
 
 
+def _content_tree_identity(root: Path) -> str:
+    """Identify a materialized tree without depending on host paths or metadata."""
+
+    digest = hashlib.sha256()
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        relative = path.relative_to(root).as_posix().encode()
+        digest.update(len(relative).to_bytes(8, "big"))
+        digest.update(relative)
+        digest.update(bytes.fromhex(sha256_file(path)))
+    return digest.hexdigest()
+
+
+def _write_task_kickoff(
+    source: Path,
+    destination: Path,
+    treatment: ResolvedInformationTreatment,
+) -> None:
+    """Render treatment state without copying advice content into the kickoff."""
+
+    if treatment.declaration.advice.mode is AdviceMode.ENABLED:
+        advice_status = (
+            "Human advice is enabled. Read the sole human-advice artifact at "
+            "`/work/input/advice.json`."
+        )
+    else:
+        advice_status = (
+            "Human advice is disabled. No human-advice artifact is supplied for this run."
+        )
+    base = source.read_text(encoding="utf-8").rstrip()
+    destination.write_text(
+        f"{base}\n\n"
+        "## Frozen information treatment for this run\n\n"
+        f"Treatment: `{treatment.declaration.treatment_id}`.\n\n"
+        f"{advice_status}\n",
+        encoding="utf-8",
+    )
+
+
 def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
     """Derive held-out development and final scopes from the frozen task profile."""
 
@@ -168,6 +213,7 @@ def _write_evaluation_scopes(task_root: Path, evaluator_root: Path) -> None:
 
 def build_bundle(
     task_md: Path,
+    information_treatment: Path,
     siderius_checkout: Path,
     output: Path,
     repo: Path | None = None,
@@ -177,6 +223,18 @@ def build_bundle(
         raise ValueError("an operator-approved, non-empty task.md is required")
     if not siderius_checkout.is_dir():
         raise ValueError("an exact-pin SIDERIUS checkout is required")
+    treatment = resolve_information_treatment(
+        information_treatment,
+        repository_root=repo,
+        adapter="coding_agent",
+        required_modules=("literature_review",),
+    )
+    expected_task = (repo / "tasks/tidmad").resolve()
+    if treatment.task_package_path != expected_task:
+        raise ValueError(
+            "the TIDMAD coding-agent deployment requires the tasks/tidmad package, "
+            f"not {treatment.declaration.task_package!r}"
+        )
     deployment = repo / "deployments" / "tidmad_coding_agent_baseline"
     data_manifest = repo / "campaigns" / "tidmad_gold" / "inputs" / "q3_data_manifest.sha256"
     with tempfile.TemporaryDirectory(prefix="tidmad-coding-agent-bundle-") as raw:
@@ -189,7 +247,11 @@ def build_bundle(
         evaluator_root.mkdir()
         private_task_root = evaluator_root / "task_snapshot"
         _copy_task_views(_tracked_task_files(repo), repo, input_root, private_task_root)
-        shutil.copy2(task_md, input_root / "task.md")
+        _write_task_kickoff(task_md, input_root / "task.md", treatment)
+        atomic_write_json(input_root / "treatment.json", treatment.receipt())
+        if treatment.declaration.advice.mode is AdviceMode.ENABLED:
+            assert treatment.advice_path is not None
+            shutil.copy2(treatment.advice_path, input_root / "advice.json")
         for source in sorted((deployment / "tools").glob("*.py")):
             shutil.copy2(source, harness_root / source.name)
         shutil.copytree(deployment / "systemd", staging / "harness" / "systemd")
@@ -207,13 +269,15 @@ def build_bundle(
         atomic_write_json(
             input_root / "provenance.json",
             {
-                "version": "tidmad-coding-agent-input-v4",
+                "version": "tidmad-coding-agent-input-v5",
                 "siderius_exp_revision": _git(repo, "rev-parse", "HEAD"),
                 "siderius_revision": siderius_revision,
                 "task_tree": _git(repo, "rev-parse", "HEAD:tasks/tidmad"),
                 "task_visibility": "agent-public-view-v2",
+                "public_task_view_sha256": _content_tree_identity(input_root / "tasks/tidmad"),
+                "information_treatment_sha256": treatment.manifest_sha256,
                 "siderius_wheel_sha256": wheel_sha,
-                "task_md_sha256": sha256_file(task_md),
+                "task_md_sha256": sha256_file(input_root / "task.md"),
             },
         )
         _write_checksums(input_root, input_root / "bundle.sha256")
@@ -245,10 +309,18 @@ def _canonical_tar_info(info: tarfile.TarInfo) -> tarfile.TarInfo:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--task-md", type=Path, required=True)
+    parser.add_argument("--information-treatment", type=Path, required=True)
     parser.add_argument("--siderius-checkout", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    print(build_bundle(args.task_md, args.siderius_checkout, args.output))
+    print(
+        build_bundle(
+            args.task_md,
+            args.information_treatment,
+            args.siderius_checkout,
+            args.output,
+        )
+    )
     return 0
 
 

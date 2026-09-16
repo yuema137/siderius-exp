@@ -89,6 +89,44 @@ def test_advice_digest_and_schema_are_verified_by_framework_loader() -> None:
     assert set(artifact.content) == {"propose", "tune"}
 
 
+def test_framework_projects_advice_to_declared_recipients_and_off_to_none(
+    tmp_path: Path,
+) -> None:
+    from workflows import run_one_iteration as runner
+
+    advice_path = (
+        ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json"
+    )
+    advice = json.loads(advice_path.read_text())
+    digest = hashlib.sha256(advice_path.read_bytes()).hexdigest()
+    common = [
+        "--workspace",
+        str(tmp_path / "workspace"),
+        "--run_name",
+        "treatment-witness",
+        "--start_iteration",
+        "1",
+        "--task_composition",
+        str(COMPOSITION),
+        "--data_dir",
+        str(tmp_path),
+    ]
+
+    enabled = runner.normalize_args(
+        runner.build_parser().parse_args(
+            [*common, "--advice", str(advice_path), "--advice_sha256", digest]
+        )
+    )
+    disabled = runner.normalize_args(runner.build_parser().parse_args(common))
+
+    assert enabled.human_advice_propose == "\n".join(advice["propose"])
+    assert enabled.human_advice_tune == "\n".join(advice["tune"])
+    assert enabled.advice_artifact.sha256 == digest
+    for recipient in ("interpret", "propose", "implement", "validate", "tune"):
+        assert getattr(disabled, f"human_advice_{recipient}") is None
+    assert getattr(disabled, "advice_artifact", None) is None
+
+
 def _fake_checkout(tmp_path: Path, *, revision: str) -> tuple[Path, Path]:
     checkout = tmp_path / "fake-siderius"
     (checkout / "scripts/launch").mkdir(parents=True)
@@ -157,6 +195,7 @@ def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
         return argv[argv.index(flag) + 1]
 
     assert value("--run_name") == "prerelease-tidmad-proof-of-function"
+    assert value("--experiment_arm") == "tidmad-prerelease-advice-on-v1"
     assert value("--task_composition") == str(COMPOSITION)
     assert value("--llm_config") == str(checkout / "configs/llm/openai_tiered_pro.json")
     assert value("--num_iterations") == "10" and value("--max_rounds") == "2"
@@ -183,12 +222,55 @@ def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
     assert value("--data_scope") == "15-19" and value("--health_gate_files") == "15-19"
     assert value("--order_strategy_override") == "sequential"
     assert value("--file_order_override") == "15,16,17,18,19"
+    assert "--no-ml_lit_review_enabled" in argv
     assert (
         "--force_fresh" in argv and "--no_auto_resume" in argv and "--dry-run" in argv
     )
     advice = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/advice.json"
     assert value("--advice") == str(advice)
     assert value("--advice_sha256") == hashlib.sha256(advice.read_bytes()).hexdigest()
+
+
+def test_launcher_materializes_explicit_advice_off_without_an_ambient_route(
+    tmp_path: Path,
+) -> None:
+    revision = "e5ace318cf007c02f9c3286a8224a6a634433372"
+    checkout, capture = _fake_checkout(tmp_path, revision=revision)
+    data = _data_root(tmp_path)
+    result = subprocess.run(
+        [
+            "bash",
+            str(ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/launch.sh"),
+            "--siderius-checkout",
+            str(checkout),
+            "--workspace",
+            str(tmp_path / "workspace"),
+            "--data_dir",
+            str(data),
+            "--advice-treatment",
+            "off",
+            "--dry-run",
+        ],
+        env={
+            **os.environ,
+            "PATH": f"{tmp_path}:{os.environ['PATH']}",
+            "CAPTURE": str(capture),
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    argv = capture.read_text().splitlines()
+    assert "--advice" not in argv
+    assert "--advice_sha256" not in argv
+    assert "--no-ml_lit_review_enabled" in argv
+    assert argv[argv.index("--run_name") + 1].endswith("-no-advice")
+    assert (
+        argv[argv.index("--experiment_arm") + 1]
+        == "tidmad-prerelease-advice-off-v1"
+    )
 
 
 @pytest.mark.parametrize(
@@ -200,6 +282,7 @@ def test_launcher_subprocess_binds_every_locked_value(tmp_path: Path) -> None:
         ("missing_anchor", "segment_anchors"),
         ("revision", "revision mismatch"),
         ("hdf5", "required TIDMAD file"),
+        ("bad_treatment", "--advice-treatment must be"),
     ],
 )
 def test_launcher_refuses_stale_inputs_and_overrides(
@@ -233,6 +316,8 @@ def test_launcher_refuses_stale_inputs_and_overrides(
         (data / "segment_anchors.json").unlink()
     if kind == "hdf5":
         (data / "abra_training_0015.h5").unlink()
+    if kind == "bad_treatment":
+        command += ["--advice-treatment", "maybe"]
     result = subprocess.run(
         command,
         env={**os.environ, "PATH": f"{tmp_path}:{os.environ['PATH']}"},
