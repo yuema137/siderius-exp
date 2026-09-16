@@ -39,7 +39,8 @@ Run the two arms in **separate terminal sessions** against the same committed
 experiment checkout and the exact SIDERIUS revision in
 [`SIDERIUS_REVISION`](SIDERIUS_REVISION). Use two distinct fresh workspaces
 outside both repositories. The launcher requires the same frozen experiment
-SHA for both sessions and refuses a dirty checkout. It also checks that all
+SHA for both sessions and refuses a dirty checkout or a workspace inside the
+raw data directory. It also checks that all
 five training and validation HDF5 files and the approved scoring anchor are
 present. Do not replace this scope with a lone file.
 

@@ -118,3 +118,32 @@ def test_effectful_pair_launch_refuses_without_frozen_experiment_sha(tmp_path: P
     assert result.returncode == 2
     assert "effectful launch requires --expected-exp-sha" in result.stderr
     assert not workspace.exists()
+
+
+def test_pair_launch_refuses_workspace_inside_source_data_even_in_dry_run(tmp_path: Path) -> None:
+    """Fails if a run could write generated outputs beneath its raw dataset root."""
+
+    data_root = tmp_path / "raw-data"
+    data_root.mkdir()
+    workspace = data_root / "run-output"
+    result = subprocess.run(
+        [
+            "bash",
+            str(PAIR / "launch_arm.sh"),
+            "--arm",
+            "on",
+            "--siderius-checkout",
+            os.environ["SIDERIUS_CHECKOUT"],
+            "--workspace",
+            str(workspace),
+            "--data_dir",
+            str(data_root),
+            "--dry-run",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 2
+    assert "workspace must be outside the source data directory" in result.stderr
+    assert not workspace.exists()

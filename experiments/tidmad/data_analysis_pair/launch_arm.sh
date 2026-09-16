@@ -43,6 +43,11 @@ esac
 [[ -n "$workspace" ]] || fail "--workspace is required"
 [[ -n "$data_dir" ]] || fail "--data_dir is required"
 checkout="$(cd "$checkout" && pwd -P)"
+canonical_workspace="$(realpath -m "$workspace")"
+canonical_data_dir="$(realpath -m "$data_dir")"
+case "$canonical_workspace/" in
+    "$canonical_data_dir/"*) fail "workspace must be outside the source data directory" ;;
+esac
 
 pin="$(tr -d '[:space:]' < "$EXPERIMENT_DIR/SIDERIUS_REVISION")"
 [[ "$pin" =~ ^[0-9a-f]{40}$ ]] || fail "invalid experiment SIDERIUS_REVISION"
