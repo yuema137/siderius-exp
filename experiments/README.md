@@ -26,6 +26,14 @@ The workflow owns the execution procedure, including Trial/Formal roles and
 their progression. The experiment may set approved values for that workflow;
 it does not redefine what Trial or Formal means.
 
+For a fixed workflow, keep shared launch parameters in one experiment JSON
+and per-agent model settings in one referenced JSON. Select the information
+treatment separately: one advice JSON may give different named guidance to
+different agents, while the advice-off arm receives no advice file. The
+TIDMAD prerelease launcher demonstrates this split; its advice switch is not
+the later `Full`/`NoPrior` comparison, which also requires a real data-analysis
+agent.
+
 Experiment records identify the exact SIDERIUS revision, this repository
 revision, resolved task identity, configuration and plugin hashes, dataset
 identity, executable argv, and runtime budgets. Changing any treatment value

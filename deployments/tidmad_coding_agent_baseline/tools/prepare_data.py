@@ -23,6 +23,26 @@ def _manifest(path: Path) -> dict[str, str]:
     return entries
 
 
+def _staged_indices(entries: dict[str, str]) -> tuple[int, ...]:
+    """Derive one complete training/validation file scope from frozen digests."""
+
+    allowed = set(ALL_FILE_INDICES)
+    training = {
+        index for index in allowed if f"abra_training_{index:04d}.h5" in entries
+    }
+    validation = {
+        index for index in allowed if f"abra_validation_{index:04d}.h5" in entries
+    }
+    expected_names = {
+        f"abra_{kind}_{index:04d}.h5"
+        for index in training | validation
+        for kind in ("training", "validation")
+    }
+    if not training or training != validation or set(entries) != expected_names:
+        raise ValueError("data manifest must contain exactly matching train/validation files")
+    return tuple(sorted(training))
+
+
 def _verified_copy(source: Path, destination: Path, expected: str) -> None:
     if sha256_file(source) != expected:
         raise ValueError(f"source checksum mismatch: {source.name}")
@@ -86,18 +106,19 @@ def prepare(
     if any(path.exists() for path in targets.values()):
         raise FileExistsError("prepared data targets must all be absent")
     entries = _manifest(manifest_path)
+    indices = _staged_indices(entries)
     for path in targets.values():
         path.mkdir(mode=0o700)
     try:
         private_validation_input_manifest: dict[str, str] = {}
-        for index in ALL_FILE_INDICES:
+        for index in indices:
             training_name = f"abra_training_{index:04d}.h5"
             _verified_copy(
                 source_root / training_name,
                 targets["training"] / training_name,
                 entries[training_name],
             )
-        for index in ALL_FILE_INDICES:
+        for index in indices:
             validation_name = f"abra_validation_{index:04d}.h5"
             _verified_copy(
                 source_root / validation_name,

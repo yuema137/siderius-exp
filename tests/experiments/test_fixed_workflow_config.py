@@ -1,0 +1,172 @@
+"""A fixed workflow has one JSON authority shared by its treatment arms."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from experiments.shared.fixed_workflow_config import render_siderius_args
+
+ROOT = Path(__file__).resolve().parents[2]
+WORKFLOW = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/workflow.json"
+
+
+def _fixture(
+    tmp_path: Path, *, parameters: dict[str, object]
+) -> tuple[Path, Path, Path]:
+    experiment_root = tmp_path / "exp"
+    siderius_root = tmp_path / "infra"
+    composition = experiment_root / "tasks/demo/composition.yaml"
+    agent_config = siderius_root / "configs/llm/agents.json"
+    composition.parent.mkdir(parents=True)
+    agent_config.parent.mkdir(parents=True)
+    composition.write_text("task: demo\n")
+    agent_config.write_text('{"propose": {"model_id": "test"}}\n')
+    config = experiment_root / "experiments/demo/workflow.json"
+    config.parent.mkdir(parents=True)
+    config.write_text(
+        json.dumps(
+            {
+                "version": "siderius-exp-fixed-workflow-v1",
+                "task_composition": "tasks/demo/composition.yaml",
+                "agent_parameters": "configs/llm/agents.json",
+                "parameters": parameters,
+            }
+        )
+    )
+    return config, experiment_root, siderius_root
+
+
+def test_prerelease_both_advice_treatments_share_one_workflow_json() -> None:
+    from experiments.shared.information_treatment import resolve_information_treatment
+
+    treatment_root = ROOT / "experiments/tidmad/information_treatments"
+    on = resolve_information_treatment(
+        treatment_root / "prerelease-with-advice.yaml",
+        repository_root=ROOT,
+        adapter="siderius",
+    )
+    off = resolve_information_treatment(
+        treatment_root / "prerelease-without-advice.yaml",
+        repository_root=ROOT,
+        adapter="siderius",
+    )
+    workflow = json.loads(WORKFLOW.read_text())
+    assert workflow["parameters"]["--num_iterations"] == 10
+    assert on.task_package_path == off.task_package_path
+    assert "--advice" in on.siderius_args()
+    assert "--advice" not in off.siderius_args()
+    assert "--advice" not in workflow["parameters"]
+    assert "--ml_lit_review_enabled" not in workflow["parameters"]
+
+
+def test_renderer_binds_composition_agents_and_shared_workflow(tmp_path: Path) -> None:
+    config, experiment_root, siderius_root = _fixture(
+        tmp_path,
+        parameters={
+            "--num_iterations": 10,
+            "--trial_portion": 0.1,
+            "--force_fresh": True,
+        },
+    )
+    assert render_siderius_args(
+        config, repository_root=experiment_root, siderius_checkout=siderius_root
+    ) == [
+        "--task_composition",
+        str(experiment_root / "tasks/demo/composition.yaml"),
+        "--llm_config",
+        str(siderius_root / "configs/llm/agents.json"),
+        "--num_iterations",
+        "10",
+        "--trial_portion",
+        "0.1",
+        "--force_fresh",
+    ]
+
+
+def test_formal_segmentation_lock_uses_existing_generic_parameter_rules(tmp_path: Path) -> None:
+    from agent.schemas.parameter_rules import ParameterRules
+
+    config, experiment_root, siderius_root = _fixture(tmp_path, parameters={})
+    payload = json.loads(config.read_text())
+    payload["workflow_parameter_rules"] = {
+        "model_config.segmentation_size": {"exact": 40_000}
+    }
+    config.write_text(json.dumps(payload))
+    arguments = render_siderius_args(
+        config, repository_root=experiment_root, siderius_checkout=siderius_root
+    )
+    index = arguments.index("--workflow_parameter_rules")
+    assert ParameterRules.model_validate_json(arguments[index + 1]).rules[
+        "model_config.segmentation_size"
+    ].exact == 40_000
+    assert json.loads(
+        (ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json").read_text()
+    )["workflow_parameter_rules"] == payload["workflow_parameter_rules"]
+
+
+def test_no_prior_reserves_data_analysis_interface_and_fails_closed_until_wired() -> None:
+    from experiments.shared.information_treatment import (
+        ModuleState,
+        resolve_information_treatment,
+    )
+
+    treatment = resolve_information_treatment(
+        ROOT / "experiments/tidmad/information_treatments/main-fixed-no-prior.yaml",
+        repository_root=ROOT,
+        adapter="siderius",
+        required_modules=("literature_review", "data_analysis"),
+    )
+    assert treatment.module_states == {
+        "literature_review": ModuleState.ENABLED,
+        "data_analysis": ModuleState.DISABLED,
+    }
+    with pytest.raises(ValueError, match="data_analysis.*cannot be represented"):
+        treatment.siderius_args()
+
+
+@pytest.mark.parametrize(
+    ("parameters", "message"),
+    [
+        ({"--advice": "other.json"}, "launch-owned"),
+        ({"--human_advice_propose": "hidden hint"}, "launch-owned"),
+        ({"--no-ml_lit_review_enabled": True}, "launch-owned"),
+        ({"--workspace": "other"}, "launch-owned"),
+        ({"--force_fresh": False}, "must be true"),
+        ({"--num_iterations": "10\n--advice"}, "invalid workflow parameter value"),
+    ],
+)
+def test_workflow_json_cannot_override_treatment_or_launch_identity(
+    tmp_path: Path, parameters: dict[str, object], message: str
+) -> None:
+    config, experiment_root, siderius_root = _fixture(tmp_path, parameters=parameters)
+    with pytest.raises(ValueError, match=message):
+        render_siderius_args(
+            config, repository_root=experiment_root, siderius_checkout=siderius_root
+        )
+
+
+def test_duplicate_json_key_is_refused(tmp_path: Path) -> None:
+    config, experiment_root, siderius_root = _fixture(tmp_path, parameters={})
+    config.write_text(
+        config.read_text().replace(
+            '"parameters": {}', '"parameters": {}, "parameters": {}'
+        )
+    )
+    with pytest.raises(ValueError, match="duplicate JSON key"):
+        render_siderius_args(
+            config, repository_root=experiment_root, siderius_checkout=siderius_root
+        )
+
+
+def test_configuration_paths_cannot_escape_either_checkout(tmp_path: Path) -> None:
+    config, experiment_root, siderius_root = _fixture(tmp_path, parameters={})
+    payload = json.loads(config.read_text())
+    payload["agent_parameters"] = "../secrets.json"
+    config.write_text(json.dumps(payload))
+    with pytest.raises(ValueError, match="repository-relative"):
+        render_siderius_args(
+            config, repository_root=experiment_root, siderius_checkout=siderius_root
+        )

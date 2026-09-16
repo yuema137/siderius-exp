@@ -87,6 +87,8 @@ from execute_tools.task_data_path import (
     ValidationScopeError,
 )
 
+from tasks.tidmad.runtime.output_conversion import regression_to_storage
+
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
 
@@ -1360,7 +1362,16 @@ class TidmadTaskDataPath:
                         f"TIDMAD prediction has decoded shape {decoded.shape}; "
                         f"expected {(scope.seg_size,)}"
                     )
-                denoised[local_row] = (decoded - encoding.value_offset).astype(storage_np)
+                if np.issubdtype(decoded.dtype, np.floating):
+                    denoised[local_row] = regression_to_storage(
+                        decoded,
+                        value_offset=encoding.value_offset,
+                        storage_dtype=storage_np,
+                    )
+                else:
+                    denoised[local_row] = (decoded - encoding.value_offset).astype(
+                        storage_np
+                    )
                 consumed += 1
 
             self._persist_file(

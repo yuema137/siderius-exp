@@ -3,10 +3,14 @@ from __future__ import annotations
 import json
 
 import pytest
+
 from deployments.tidmad_coding_agent_baseline.tools import finalize as finalize_module
 from deployments.tidmad_coding_agent_baseline.tools.archive_candidate import (
     archive_candidate,
     candidate_tree_digest,
+)
+from deployments.tidmad_coding_agent_baseline.tools.evaluator_policy import (
+    EvaluatorPolicy,
 )
 from deployments.tidmad_coding_agent_baseline.tools.finalize import finalize
 from deployments.tidmad_coding_agent_baseline.tools.model import FILES_BY_BAND
@@ -95,6 +99,73 @@ def test_finalizer_collects_partial_results_without_fabricating_score(tmp_path):
     assert not (submission / "score_vector.json").exists()
     assert (submission / "band_0-3" / "weights.pth").is_file()
     assert (submission / "band_0-3" / "score.json").is_file()
+
+
+def test_single_band_finalizer_does_not_require_other_band_winners(tmp_path, monkeypatch):
+    archive = tmp_path / "state" / "candidates"
+    candidate = _source(tmp_path / "candidate", "single")
+    archive_candidate(
+        source=candidate,
+        score_path=_score(tmp_path / "score.json", candidate, "4-9", 1.5),
+        archive_root=archive,
+        band="4-9",
+        candidate_id="single",
+    )
+    unit = tmp_path / "unit.json"
+    unit.write_text(json.dumps({"version": "tidmad-baseline-unit-v1", "band": "4-9"}))
+    policy = EvaluatorPolicy(
+        unit_manifest=unit,
+        archive_root=archive,
+        final_score=tmp_path / "state" / "final_score.json",
+        final_output_dir=tmp_path / "state" / "final-denoised",
+    )
+    seen = []
+
+    def fake_inference(**kwargs):
+        seen.append(tuple(kwargs["winners"]))
+        assert kwargs["required_output_kind"] == "continuous_regression"
+        kwargs["output_root"].mkdir(parents=True)
+        return kwargs["output_root"]
+
+    def fake_score(args, actual_policy):
+        vector = [None] * 20
+        for index in FILES_BY_BAND["4-9"]:
+            vector[index] = 1.5
+        actual_policy.final_score.write_text(
+            json.dumps(
+                {
+                    "valid": True,
+                    "file_vector": vector,
+                    "winner_candidates": {"4-9": "single"},
+                }
+            )
+        )
+        return actual_policy.final_score
+
+    monkeypatch.setattr(finalize_module, "run_candidate_inference", fake_inference)
+    monkeypatch.setattr(finalize_module, "score_final", fake_score)
+    submission = finalize(
+        tmp_path,
+        "codex",
+        archive_root=archive,
+        final_score_path=policy.final_score,
+        policy=policy,
+    )
+    assert seen == [("4-9",)]
+    manifest = json.loads((submission / "manifest.json").read_text())
+    assert manifest["complete"] is True
+    assert manifest["unit_bands"] == ["4-9"]
+    assert manifest["missing_bands"] == []
+
+
+def test_single_band_policy_refuses_scoring_other_band_or_all(tmp_path):
+    unit = tmp_path / "unit.json"
+    unit.write_text(json.dumps({"version": "tidmad-baseline-unit-v1", "band": "4-9"}))
+    policy = EvaluatorPolicy(unit_manifest=unit, scope_root=tmp_path)
+    with pytest.raises(ValueError, match="outside this evaluator"):
+        policy.scope_path("band-0-3-candidate", band="0-3", phase="candidate")
+    with pytest.raises(ValueError, match="outside this single-band unit"):
+        policy.scope_path("all-final", band=None, phase="final")
 
 
 def test_archive_refuses_score_with_wrong_band_identities(tmp_path):

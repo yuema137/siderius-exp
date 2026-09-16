@@ -52,8 +52,9 @@ def _command(
     input_path: Path,
     output_path: Path,
     session_root: Path,
+    required_output_kind: str | None = None,
 ) -> list[str]:
-    return [
+    command = [
         str(runtime.systemd_run),
         "--quiet",
         "--wait",
@@ -86,6 +87,9 @@ def _command(
         "--output-file",
         str(output_path),
     ]
+    if required_output_kind is not None:
+        command.extend(("--required-output-kind", required_output_kind))
+    return command
 
 
 def run_candidate_inference(
@@ -96,6 +100,7 @@ def run_candidate_inference(
     output_root: Path,
     runtime: FinalInferenceRuntime | None = None,
     files_by_band: Mapping[str, tuple[int, ...]] = FILES_BY_BAND,
+    required_output_kind: str | None = None,
 ) -> Path:
     """Evaluate immutable candidates without exposing validation files to the agent."""
 
@@ -139,6 +144,7 @@ def run_candidate_inference(
                         input_path=input_path,
                         output_path=temporary_output,
                         session_root=session,
+                        required_output_kind=required_output_kind,
                     )
                     subprocess.run(
                         command,

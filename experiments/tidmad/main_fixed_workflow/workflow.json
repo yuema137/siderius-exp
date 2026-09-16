@@ -1,0 +1,9 @@
+{
+  "version": "siderius-exp-fixed-workflow-v1",
+  "task_composition": "tasks/tidmad/compositions/continuous_regression.yaml",
+  "agent_parameters": "configs/llm/openai_tiered_pro.json",
+  "parameters": {},
+  "workflow_parameter_rules": {
+    "model_config.segmentation_size": {"exact": 40000}
+  }
+}

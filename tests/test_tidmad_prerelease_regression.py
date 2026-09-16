@@ -240,7 +240,10 @@ def test_launcher_materializes_explicit_advice_off_without_an_ambient_route(
     result = subprocess.run(
         [
             "bash",
-            str(ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/launch.sh"),
+            str(
+                ROOT
+                / "experiments/tidmad/prerelease-tidmad-proof-of-function/launch.sh"
+            ),
             "--siderius-checkout",
             str(checkout),
             "--workspace",
@@ -267,10 +270,56 @@ def test_launcher_materializes_explicit_advice_off_without_an_ambient_route(
     assert "--advice_sha256" not in argv
     assert "--no-ml_lit_review_enabled" in argv
     assert argv[argv.index("--run_name") + 1].endswith("-no-advice")
-    assert (
-        argv[argv.index("--experiment_arm") + 1]
-        == "tidmad-prerelease-advice-off-v1"
+    assert argv[argv.index("--experiment_arm") + 1] == "tidmad-prerelease-advice-off-v1"
+
+
+def test_advice_arms_share_every_workflow_argument(tmp_path: Path) -> None:
+    checkout, _ = _fake_checkout(
+        tmp_path, revision="e5ace318cf007c02f9c3286a8224a6a634433372"
     )
+    data = _data_root(tmp_path)
+    launcher = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/launch.sh"
+
+    def capture(advice_mode: str) -> list[str]:
+        output = tmp_path / f"{advice_mode}.argv"
+        result = subprocess.run(
+            [
+                "bash",
+                str(launcher),
+                "--siderius-checkout",
+                str(checkout),
+                "--workspace",
+                str(tmp_path / f"{advice_mode}-workspace"),
+                "--data_dir",
+                str(data),
+                "--advice-treatment",
+                advice_mode,
+                "--dry-run",
+            ],
+            env={
+                **os.environ,
+                "PATH": f"{tmp_path}:{os.environ['PATH']}",
+                "CAPTURE": str(output),
+            },
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, result.stderr
+        return output.read_text().splitlines()
+
+    def without_arm_identity(argv: list[str]) -> list[str]:
+        result = list(argv)
+        for flag in ("--workspace", "--run_name", "--experiment_arm"):
+            position = result.index(flag)
+            del result[position : position + 2]
+        for flag in ("--advice", "--advice_sha256"):
+            if flag in result:
+                position = result.index(flag)
+                del result[position : position + 2]
+        return result
+
+    assert without_arm_identity(capture("on")) == without_arm_identity(capture("off"))
 
 
 @pytest.mark.parametrize(

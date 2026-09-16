@@ -271,6 +271,43 @@ def test_candidate_scopes_cover_every_file_in_each_band(tmp_path):
         assert all(segments == [0, 1] for segments in scope.values())
 
 
+def test_single_band_bundle_writes_only_its_frozen_scopes_and_file_pairs(tmp_path):
+    task_root = tmp_path / "task"
+    resolved = task_root / "tasks/tidmad/resolved"
+    resolved.mkdir(parents=True)
+    (resolved / "dataset_profile.json").write_text(
+        json.dumps({"dataset": {"segments_per_file": 2}})
+    )
+    evaluator = tmp_path / "evaluator"
+    evaluator.mkdir()
+    bundle_module._write_evaluation_scopes(task_root, evaluator, band="4-9")
+    scopes = evaluator / "evaluation_scopes"
+    assert sorted(path.name for path in scopes.iterdir()) == [
+        "band-4-9-candidate.json",
+        "band-4-9-final.json",
+    ]
+    assert set(json.loads((scopes / "band-4-9-final.json").read_text())) == {
+        str(index) for index in range(4, 10)
+    }
+
+    source = tmp_path / "all.sha256"
+    source.write_text(
+        "".join(
+            f"{'a' * 64}  abra_{kind}_{index:04d}.h5\n"
+            for index in range(20)
+            for kind in ("training", "validation")
+        )
+    )
+    target = tmp_path / "band.sha256"
+    bundle_module._write_data_manifest(source, target, band="4-9")
+    names = {line.split()[-1] for line in target.read_text().splitlines()}
+    assert names == {
+        f"abra_{kind}_{index:04d}.h5"
+        for index in range(4, 10)
+        for kind in ("training", "validation")
+    }
+
+
 def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():
     """A pin change can retain the package version and must still reinstall."""
 
