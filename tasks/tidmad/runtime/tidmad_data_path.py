@@ -251,9 +251,7 @@ class TIDMADEpochDataset(Dataset):
 
             with h5py.File(file_path, "r") as f:
                 ch1 = _h5_dataset(f, "timeseries", channels.input_channel, "timeseries")
-                ch2 = _h5_dataset(
-                    f, "timeseries", channels.target_channel, "timeseries"
-                )
+                ch2 = _h5_dataset(f, "timeseries", channels.target_channel, "timeseries")
                 for psd_idx in segments:
                     start = psd_idx * psd_len
                     end = start + psd_len
@@ -365,9 +363,7 @@ class TIDMADValidationDataset(Dataset):
         rows_so_far = 0
         for file_key in sorted(sample_set, key=int):
             file_index = int(file_key)
-            file_path = os.path.join(
-                data_dir, self._dataset.validation_file_name(file_index)
-            )
+            file_path = os.path.join(data_dir, self._dataset.validation_file_name(file_index))
             if not os.path.exists(file_path):
                 continue
 
@@ -401,10 +397,7 @@ class TIDMADValidationDataset(Dataset):
             target_data = _h5_dataset(
                 handle, "timeseries", self._channels.target_channel, "timeseries"
             )
-            available = (
-                min(len(input_data), len(target_data))
-                // self._dataset.psd_segment_length
-            )
+            available = min(len(input_data), len(target_data)) // self._dataset.psd_segment_length
         invalid = [segment for segment in selected if not 0 <= segment < available]
         if invalid:
             raise ValidationScopeError(
@@ -442,9 +435,7 @@ class TIDMADValidationDataset(Dataset):
 
     def _storage_row(self, idx: int, channel: str) -> np.ndarray:
         segment, start, end = self._row_location(idx)
-        dataset = _h5_dataset(
-            self._handle(segment.file_path), "timeseries", channel, "timeseries"
-        )
+        dataset = _h5_dataset(self._handle(segment.file_path), "timeseries", channel, "timeseries")
         return np.asarray(dataset[start:end], dtype=self._encoding.storage_dtype)
 
     def __getitem__(self, idx: int) -> tuple[np.ndarray, np.ndarray]:
@@ -463,9 +454,7 @@ class TIDMADValidationDataset(Dataset):
         """Read a bounded contiguous logical target range in storage encoding."""
         if start < 0 or end < start or end > self._row_count:
             raise IndexError((start, end))
-        targets = np.empty(
-            (end - start, self.seg_size), dtype=self._encoding.storage_dtype
-        )
+        targets = np.empty((end - start, self.seg_size), dtype=self._encoding.storage_dtype)
         logical_row = start
         output_row = 0
         while logical_row < end:
@@ -527,9 +516,7 @@ def is_complete_trial_output(
     resolved = storage if storage is not None else default_deliverable_storage()
     try:
         with h5py.File(path, "r") as handle:
-            channel1 = _h5_dataset(
-                handle, "timeseries", resolved.input_channel_group, "timeseries"
-            )
+            channel1 = _h5_dataset(handle, "timeseries", resolved.input_channel_group, "timeseries")
             channel2 = _h5_dataset(
                 handle, "timeseries", resolved.target_channel_group, "timeseries"
             )
@@ -679,8 +666,7 @@ class TidmadTaskDataPath:
             return self._materialize_model_segment_view(authorized)
         if request.requested_format_id not in {NUMERIC_ARRAY_V1, TIMESERIES_ARRAY_V1}:
             raise ValueError(
-                "TIDMAD analysis supports only numeric-array.v1 and "
-                "timeseries-array.v1"
+                "TIDMAD analysis supports only numeric-array.v1 and timeseries-array.v1"
             )
         if not isinstance(request.requested_scope, LegacyPartitionScope):
             raise ValueError("TIDMAD analysis requires a legacy-partition scope")
@@ -742,11 +728,7 @@ class TidmadTaskDataPath:
             selected_count = max(1, round(total_available * policy.fraction))
         if policy.max_items is not None:
             selected_count = min(selected_count, policy.max_items)
-        if (
-            policy.mode == "representative"
-            and policy.max_items is None
-            and policy.fraction is None
-        ):
+        if policy.mode == "representative" and policy.max_items is None and policy.fraction is None:
             selected_count = min(max(4, len(resolved_file_indices)), total_available)
 
         rng = np.random.default_rng(policy.seed)
@@ -765,9 +747,7 @@ class TidmadTaskDataPath:
                 chosen_positions = np.sort(
                     rng.choice(total_available, size=selected_count, replace=False)
                 )
-            selected_lists: dict[int, list[int]] = {
-                index: [] for index in resolved_file_indices
-            }
+            selected_lists: dict[int, list[int]] = {index: [] for index in resolved_file_indices}
             for position in chosen_positions:
                 file_index, window_index = population[int(position)]
                 selected_lists[file_index].append(window_index)
@@ -785,16 +765,12 @@ class TidmadTaskDataPath:
                 for index in selected_by_file[file_index]:
                     rows_list.append(
                         np.asarray(
-                            values[
-                                int(index) * window_samples : (int(index) + 1) * window_samples
-                            ],
+                            values[int(index) * window_samples : (int(index) + 1) * window_samples],
                             dtype=np.int16,
                         )
                         + topology.encoding.value_offset
                     )
-                    example_id_list.append(
-                        f"validation-{file_index:04d}-window-{int(index):06d}"
-                    )
+                    example_id_list.append(f"validation-{file_index:04d}-window-{int(index):06d}")
         rows = np.stack(rows_list)
 
         example_ids = np.asarray(example_id_list, dtype="U48")
@@ -957,18 +933,14 @@ class TidmadTaskDataPath:
                 file_index, psd_index, row_index = row_identities[int(selected_index)]
                 handle = handles.get(file_index)
                 if handle is None:
-                    source = (
-                        Path(data_root)
-                        / topology.dataset.validation_file_name(file_index)
-                    )
+                    source = Path(data_root) / topology.dataset.validation_file_name(file_index)
                     handle = h5py.File(source, "r")
                     handles[file_index] = handle
                 values = _h5_dataset(handle, "timeseries", channel_name, "timeseries")
                 start = psd_index * psd_length + row_index * scope.seg_size
                 stop = start + scope.seg_size
                 selected_rows.append(
-                    np.asarray(values[start:stop], dtype=np.int16)
-                    + topology.encoding.value_offset
+                    np.asarray(values[start:stop], dtype=np.int16) + topology.encoding.value_offset
                 )
                 selected_ids.append(
                     f"validation-{file_index:04d}-psd-{psd_index:06d}-ml-{row_index:04d}"
@@ -1050,16 +1022,12 @@ class TidmadTaskDataPath:
             )
         return scope
 
-    def training_dataset(
-        self, scope: object, params: EpochSamplingParams
-    ) -> Dataset[Any]:
+    def training_dataset(self, scope: object, params: EpochSamplingParams) -> Dataset[Any]:
         s = self._scope(scope)
         # The caller's freeze-subsample choice is already folded into
         # ``epoch_seed`` (child §3); a None seed preserves the class's own
         # unseeded default.
-        rng = (
-            random.Random(params.epoch_seed) if params.epoch_seed is not None else None
-        )
+        rng = random.Random(params.epoch_seed) if params.epoch_seed is not None else None
         return TIDMADEpochDataset(
             data_dir=params.data_dir,
             sample_set=s.sample_set,
@@ -1076,17 +1044,11 @@ class TidmadTaskDataPath:
         profile = s.profile or resolve_dataset_profile()
         dataset = tidmad_topology(profile).dataset
         paths = tuple(
-            os.path.abspath(
-                os.path.join(data_dir, dataset.training_file_name(int(file_index)))
-            )
+            os.path.abspath(os.path.join(data_dir, dataset.training_file_name(int(file_index))))
             for file_index in sorted(s.sample_set, key=int)
         )
         expected_bytes = sum(
-            round(
-                os.path.getsize(path)
-                * len(s.sample_set[file_index])
-                / dataset.segments_per_file
-            )
+            round(os.path.getsize(path) * len(s.sample_set[file_index]) / dataset.segments_per_file)
             for file_index, path in zip(sorted(s.sample_set, key=int), paths, strict=True)
             if os.path.isfile(path)
         )
@@ -1111,9 +1073,7 @@ class TidmadTaskDataPath:
     #: request's OPAQUE `task_parameters` (D-BC-1 extension, B3).
     _SEG_SIZE_PARAMETER: ClassVar[str] = "seg_size"
 
-    def _build_scope(
-        self, request: ScopeBuildRequest, *, strategy: str, seed: int | None
-    ):
+    def _build_scope(self, request: ScopeBuildRequest, *, strategy: str, seed: int | None):
         profile = resolve_dataset_profile()
         seg_size = request.task_parameters.get(self._SEG_SIZE_PARAMETER)
         if not isinstance(seg_size, int) or seg_size <= 0:
@@ -1133,18 +1093,14 @@ class TidmadTaskDataPath:
             trial_portion=request.portion,
             target_files=list(request.target_partitions) or None,
             seed=seed,
-            scope=DataScope.from_cli(request.subset_ref)
-            if request.subset_ref
-            else None,
+            scope=DataScope.from_cli(request.subset_ref) if request.subset_ref else None,
             profile=profile,
         )
         return TidmadScope(sample_set=sample_set, seg_size=seg_size, profile=profile)
 
     def build_training_scope(self, request: ScopeBuildRequest) -> object:
         """The attempt's TRAINING scope, through the existing authority."""
-        return self._build_scope(
-            request, strategy=request.selection_strategy, seed=request.seed
-        )
+        return self._build_scope(request, strategy=request.selection_strategy, seed=request.seed)
 
     def build_eval_scope(self, request: ScopeBuildRequest) -> object:
         """The attempt's EVALUATION scope.
@@ -1153,13 +1109,9 @@ class TidmadTaskDataPath:
         (``policy.py:1169``); the CALLER resolves that and hands it here, so
         this method does not re-decide policy it does not own.
         """
-        return self._build_scope(
-            request, strategy=request.selection_strategy, seed=request.seed
-        )
+        return self._build_scope(request, strategy=request.selection_strategy, seed=request.seed)
 
-    def validate_health_coverage(
-        self, request: HealthCoverageRequest
-    ) -> HealthCoverageResult:
+    def validate_health_coverage(self, request: HealthCoverageRequest) -> HealthCoverageResult:
         """Confirm every effective Health-monitored file is in this scope.
 
         An explicit monitored-file override is transparently transported by
@@ -1188,8 +1140,7 @@ class TidmadTaskDataPath:
                 applicable=True,
                 covered=False,
                 reason=(
-                    "TIDMAD Health monitored files are absent from the exact "
-                    f"scope: {missing}"
+                    f"TIDMAD Health monitored files are absent from the exact scope: {missing}"
                 ),
             )
         return HealthCoverageResult(
@@ -1202,16 +1153,12 @@ class TidmadTaskDataPath:
         )
 
     @staticmethod
-    def _health_files_from_binding(
-        binding: object, scope: TidmadScope
-    ) -> tuple[int, ...] | None:
+    def _health_files_from_binding(binding: object, scope: TidmadScope) -> tuple[int, ...] | None:
         """Resolve default monitored files through the public Health loader."""
         if not isinstance(binding, str):
             return None
         try:
-            config, _task_config, _plugins = load_composed_health_config(
-                None, binding
-            )
+            config, _task_config, _plugins = load_composed_health_config(None, binding)
         except (OSError, TypeError, ValueError):
             return None
         demand: set[int] = set()
@@ -1265,9 +1212,7 @@ class TidmadTaskDataPath:
         try:
             decoded = json.loads(payload)
         except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"TIDMAD scope payload is not valid JSON ({exc})."
-            ) from exc
+            raise ValueError(f"TIDMAD scope payload is not valid JSON ({exc}).") from exc
         if not isinstance(decoded, dict):
             raise ValueError(
                 f"TIDMAD scope payload must be a JSON object, got {type(decoded).__name__}."
@@ -1287,17 +1232,13 @@ class TidmadTaskDataPath:
                 sample_set={int(k): list(v) for k, v in decoded["sample_set"].items()},
                 seg_size=decoded["seg_size"],
                 profile=(
-                    DatasetProfile.model_validate(raw_profile)
-                    if raw_profile is not None
-                    else None
+                    DatasetProfile.model_validate(raw_profile) if raw_profile is not None else None
                 ),
             )
         except (TypeError, ValueError, AttributeError) as exc:
             raise ValueError(f"TIDMAD scope payload is malformed ({exc}).") from exc
 
-    def validation_dataset(
-        self, scope: object, params: EvalMaterializationParams
-    ) -> Dataset[Any]:
+    def validation_dataset(self, scope: object, params: EvalMaterializationParams) -> Dataset[Any]:
         """Materialize the validation scope EXACTLY, failing closed.
 
         The exact-materialization check relocated verbatim from the engine's
@@ -1315,22 +1256,16 @@ class TidmadTaskDataPath:
             seg_size=s.seg_size,
             profile=profile,
         )
-        ml_segs_per_psd = (
-            tidmad_topology(profile).dataset.psd_segment_length // s.seg_size
-        )
+        ml_segs_per_psd = tidmad_topology(profile).dataset.psd_segment_length // s.seg_size
         per_file_requested = {
-            int(k): len(segments) * ml_segs_per_psd
-            for k, segments in s.sample_set.items()
+            int(k): len(segments) * ml_segs_per_psd for k, segments in s.sample_set.items()
         }
         requested_rows = sum(per_file_requested.values())
         materialized = len(ds)
         per_file_materialized = {
             idx: end - start for idx, (start, end) in ds.file_row_ranges.items()
         }
-        if (
-            materialized != requested_rows
-            or per_file_materialized != per_file_requested
-        ):
+        if materialized != requested_rows or per_file_materialized != per_file_requested:
             raise ValidationScopeError(
                 f"validation scope materialized {materialized} ML rows "
                 f"({per_file_materialized!r}) but {requested_rows} were requested "
@@ -1409,10 +1344,7 @@ class TidmadTaskDataPath:
                     prediction_array = prediction.detach().cpu().numpy()
                 else:
                     prediction_array = np.asarray(prediction)
-                if (
-                    prediction_array.ndim == 2
-                    and prediction_array.shape[0] == encoding.num_classes
-                ):
+                if prediction_array.ndim == 2 and prediction_array.shape[0] == encoding.num_classes:
                     decoded = prediction_array.argmax(axis=0)
                 elif prediction_array.ndim == 2 and prediction_array.shape[0] == 1:
                     decoded = prediction_array[0]
@@ -1428,9 +1360,7 @@ class TidmadTaskDataPath:
                         f"TIDMAD prediction has decoded shape {decoded.shape}; "
                         f"expected {(scope.seg_size,)}"
                     )
-                denoised[local_row] = (decoded - encoding.value_offset).astype(
-                    storage_np
-                )
+                denoised[local_row] = (decoded - encoding.value_offset).astype(storage_np)
                 consumed += 1
 
             self._persist_file(

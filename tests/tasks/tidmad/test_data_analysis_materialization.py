@@ -97,9 +97,7 @@ def _with_requested_format(authorized, format_id: str):
     receipt = authorized.authorization_receipt.model_copy(
         update={"request_digest": canonical_sha256(request)}
     )
-    return AuthorizedAnalysisMaterializationRequest(
-        request=request, authorization_receipt=receipt
-    )
+    return AuthorizedAnalysisMaterializationRequest(request=request, authorization_receipt=receipt)
 
 
 def _write_validation_file(root, *, profile, samples: int, file_index: int = 0) -> np.ndarray:
@@ -313,9 +311,7 @@ def _authorized_model_segment_request(
         asset_digest=canonical_sha256(asset),
         authorized_at="2026-09-15T00:00:00+00:00",
     )
-    return AuthorizedAnalysisMaterializationRequest(
-        request=request, authorization_receipt=receipt
-    )
+    return AuthorizedAnalysisMaterializationRequest(request=request, authorization_receipt=receipt)
 
 
 def test_task_adapter_emits_bounded_regular_view_without_target(tmp_path, tidmad_profile) -> None:
@@ -473,9 +469,7 @@ def test_model_input_segments_match_ordinary_row_geometry_without_target_read(
         opened_channels.append(path[1])
         return original(handle, *path)
 
-    monkeypatch.setattr(
-        "tasks.tidmad.runtime.tidmad_data_path._h5_dataset", recording_h5_dataset
-    )
+    monkeypatch.setattr("tasks.tidmad.runtime.tidmad_data_path._h5_dataset", recording_h5_dataset)
     with bind_dataset_profile(profile), bind_physical_data_root(str(tmp_path)):
         view = capability.materialize_analysis_view(authorized)
 
