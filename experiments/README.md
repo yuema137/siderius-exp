@@ -9,6 +9,7 @@ workspace; use `--dry-run` where the launcher supports it.
 |---|---|---|
 | TIDMAD | [`two_iteration_qualification/`](tidmad/two_iteration_qualification/) | engineering qualification; not Gold |
 | TIDMAD raw Data Analysis | [`data_analysis_raw_characterization/`](tidmad/data_analysis_raw_characterization/) | full high-frequency band, raw-data smoke only; not the matched ON/OFF treatment |
+| TIDMAD Data Analysis pair | [`data_analysis_pair/`](tidmad/data_analysis_pair/) | bounded local ON/OFF qualification; Literature Review runs first |
 | Oxford-IIIT Pet | [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | consumer-pair qualification |
 | DAVIS | [`two_iteration_qualification/`](davis_future_prediction/two_iteration_qualification/) | consumer-pair qualification |
 | Cancer MTG | [`p0_final_pair_qualification/`](cancer_gene_identification/p0_final_pair_qualification/) | consumer-pair qualification |

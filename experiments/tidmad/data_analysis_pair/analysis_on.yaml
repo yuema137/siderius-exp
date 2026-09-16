@@ -1,0 +1,74 @@
+schema_version: 1
+scientific_goal: >-
+  On a bounded, file-stratified sample of the complete TIDMAD high-frequency
+  validation band, characterize raw input structure and, when a certified
+  previous model exists, investigate its predictions and any authorized
+  target-dependent failure modes. Distinguish measurements from hypotheses.
+input_description: >-
+  Integer-coded SQUID waveform input sampled at the task-declared 10 MHz
+  cadence; materialization neither filters nor repairs the signal.
+target_description: >-
+  Clean injected waveform. Validation targets are separately authorized for
+  diagnostics and are never inputs to historical model inference.
+scientific_constraints:
+  - Every requested analysis selection must cover files 15 through 19 or explicitly refuse.
+  - Findings describe only sampled validation windows or model segments, not the full dataset.
+  - Use physical seconds and Hz; choose spectral resolution for the actual cadence and question.
+  - Compare model outputs and targets only at certified aligned selections.
+  - Prefer reference skills when sufficient; generated analysis remains sandboxed and experiment-local.
+available_assets:
+  - asset_id: tidmad-high-band-validation-input
+    asset_type: dataset
+    description: Caller-declared validation input windows across complete files 15 through 19.
+    location:
+      kind: task_data
+      task_data_path_id: tidmad
+      dataset_profile_sha256: a7801aba3058dbca35523b5d1a0f76afcaf31709c7717087a355371f5a525e74
+      logical_role: validation_input_windows
+    provenance:
+      producer: tidmad-task-package
+    authorized_scope:
+      kind: legacy_partitions
+      data_scope:
+        file_indices: [15, 16, 17, 18, 19]
+    split_id: validation
+    metadata:
+      sample_rate_hz: 10000000.0
+      window_samples: 262144
+      window_duration_seconds: 0.0262144
+      channel_semantics: raw_detector_input
+      band_file_indices: [15, 16, 17, 18, 19]
+    metadata_sources:
+      sample_rate_hz: {information_class: identity}
+      window_samples: {information_class: identity}
+      window_duration_seconds: {information_class: identity}
+      channel_semantics: {information_class: identity}
+      band_file_indices: {information_class: identity}
+historical_inference_base_asset_id: tidmad-high-band-validation-input
+access_policy:
+  policy_id: tidmad-high-band-model-aware-analysis-v1
+  policy_version: 1
+  purpose: Bounded validation-only raw and certified historical-model diagnostics.
+  allow_model_inference: true
+  split_rules:
+    - split_id: validation
+      data_visible: true
+      targets_visible: true
+      predictions_visible: true
+      residuals_visible: false
+resource_envelope:
+  wall_time_budget_s: 180
+  per_skill_timeout_s: 45
+  max_host_memory_gb: 10
+  max_vram_gb: 8
+  preferred_device: either
+  sampling_policy:
+    mode: fixed
+    max_items: 10
+    strategy: task_defined
+    seed: 20260915
+builtin_skill_packs:
+  - core-analysis
+  - time-series
+allow_generated_skill_promotion: true
+report_schema_version: 1
