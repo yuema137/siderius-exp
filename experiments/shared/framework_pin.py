@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import tomllib
+from importlib.metadata import distribution
 from pathlib import Path
 
 _SHA = re.compile(r"[0-9a-f]{40}\Z")
@@ -46,3 +48,12 @@ def verify_framework_pin(repository_root: Path, checkout: Path) -> str:
     if actual != expected:
         raise ValueError(f"SIDERIUS checkout revision differs from SIDERIUS_REVISION: {actual}")
     return expected
+
+
+def verify_installed_framework(expected: str) -> None:
+    """Require this exp virtualenv's installed SIDERIUS package to match."""
+
+    direct_url = distribution("siderius").read_text("direct_url.json")
+    installed = json.loads(direct_url or "{}").get("vcs_info", {}).get("commit_id")
+    if installed != expected:
+        raise ValueError("installed SIDERIUS revision differs from SIDERIUS_REVISION")

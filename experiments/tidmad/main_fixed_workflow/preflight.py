@@ -9,7 +9,7 @@ from pathlib import Path
 
 from experiments.shared.checksum_manifest import sha256_file
 from experiments.shared.fixed_workflow_config import render_siderius_args
-from experiments.shared.framework_pin import verify_framework_pin
+from experiments.shared.framework_pin import verify_framework_pin, verify_installed_framework
 from experiments.shared.information_treatment import (
     AdviceMode,
     ModuleState,
@@ -45,6 +45,7 @@ def resolve_no_prior_launch(
         raise ValueError("workspace must be a directory or not yet exist")
 
     revision = verify_framework_pin(root, checkout)
+    verify_installed_framework(revision)
     launcher = checkout / "scripts/launch/run_chain.sh"
     if not launcher.is_file():
         raise ValueError(f"framework chain launcher is missing: {launcher}")

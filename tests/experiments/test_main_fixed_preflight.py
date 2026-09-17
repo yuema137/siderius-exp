@@ -99,6 +99,7 @@ def test_framework_pin_requires_dependency_and_checkout_identity(tmp_path: Path)
 
 def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr(preflight, "verify_framework_pin", lambda *_: "a" * 40)
+    monkeypatch.setattr(preflight, "verify_installed_framework", lambda *_: None)
     monkeypatch.setattr(
         preflight,
         "verify_band_inputs",
