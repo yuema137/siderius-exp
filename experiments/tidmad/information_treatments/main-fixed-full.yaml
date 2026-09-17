@@ -4,7 +4,7 @@ task_package: tasks/tidmad
 advice:
   mode: enabled
   artifact: experiments/tidmad/main_fixed_workflow/advice.json
-  sha256: 8a3b674d0e8628388217948868ad3bdd469b333b7bdf675dffe0b3e28e3fa6c9
+  sha256: 0961f7b0a55ddd1cfa018e82992e52f9fd4bccbf3046849b24c222f87f87a2c9
   content_type: application/json
 modules:
   literature_review:
