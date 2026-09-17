@@ -103,7 +103,11 @@ class ResolvedInformationTreatment(BaseModel):
             "literature_review": {
                 ModuleState.ENABLED: "--ml_lit_review_enabled",
                 ModuleState.DISABLED: "--no-ml_lit_review_enabled",
-            }
+            },
+            "data_analysis": {
+                ModuleState.ENABLED: "--data_analysis_enabled",
+                ModuleState.DISABLED: "--no-data_analysis_enabled",
+            },
         }
         for module, state in sorted(self.module_states.items()):
             try:

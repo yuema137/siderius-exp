@@ -13,7 +13,6 @@ import re
 from pathlib import Path, PurePosixPath
 from typing import Literal
 
-from agent.schemas.parameter_rules import ParameterRules
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -22,6 +21,8 @@ from pydantic import (
     StrictInt,
     StrictStr,
 )
+
+from agent.schemas.parameter_rules import ParameterRules
 
 _FLAG = re.compile(r"--[a-z][a-z0-9_-]*\Z")
 _LAUNCH_OWNED = frozenset(
@@ -38,6 +39,8 @@ _LAUNCH_OWNED = frozenset(
         "--human_advice_file",
         "--ml_lit_review_enabled",
         "--no-ml_lit_review_enabled",
+        "--data_analysis_enabled",
+        "--no-data_analysis_enabled",
         "--workflow_parameter_rules",
         "--dry-run",
         "--help",
@@ -81,9 +84,7 @@ def render_siderius_args(
 ) -> list[str]:
     """Validate and render arguments without choosing an information treatment."""
 
-    payload = json.loads(
-        config_path.read_text(encoding="utf-8"), object_pairs_hook=_unique_object
-    )
+    payload = json.loads(config_path.read_text(encoding="utf-8"), object_pairs_hook=_unique_object)
     config = FixedWorkflowConfig.model_validate(payload)
     composition = _contained_file(
         repository_root, config.task_composition, label="task_composition"
@@ -93,9 +94,7 @@ def render_siderius_args(
     )
     # Check the agent file now, not after the run starts. Its detailed schema
     # remains owned by SIDERIUS at the pinned checkout.
-    json.loads(
-        agent_config.read_text(encoding="utf-8"), object_pairs_hook=_unique_object
-    )
+    json.loads(agent_config.read_text(encoding="utf-8"), object_pairs_hook=_unique_object)
     arguments = [
         "--task_composition",
         str(composition),
@@ -110,11 +109,7 @@ def render_siderius_args(
             )
         )
     for flag, value in config.parameters.items():
-        if (
-            not _FLAG.fullmatch(flag)
-            or flag in _LAUNCH_OWNED
-            or flag.startswith("--human_advice_")
-        ):
+        if not _FLAG.fullmatch(flag) or flag in _LAUNCH_OWNED or flag.startswith("--human_advice_"):
             raise ValueError(f"invalid or launch-owned workflow parameter: {flag!r}")
         if isinstance(value, bool):
             if not value:

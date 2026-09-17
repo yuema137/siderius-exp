@@ -15,9 +15,8 @@ ML literature review stays enabled in both treatments. No run should be
 started from this directory until those contracts and the launch gate are
 completed and qualified.
 
-The `main-fixed-no-prior.yaml` manifest already reserves an explicit
-`data_analysis: disabled` state. The current SIDERIUS argument renderer refuses
-that module because the runtime adapter is not landed yet. This is deliberate:
-it prevents a nominal NoPrior launch from silently becoming an advice-only
-ablation. The separately developed module can connect through this named
-treatment state without changing the shared workflow JSON.
+The `main-fixed-no-prior.yaml` manifest declares `data_analysis: disabled`.
+The treatment renderer forwards that state as `--no-data_analysis_enabled`;
+it does not invent a second switch or alter the shared workflow JSON. The
+Full arm still requires a band-scoped analysis binding and a qualified launch
+gate before the workflow becomes effectful.

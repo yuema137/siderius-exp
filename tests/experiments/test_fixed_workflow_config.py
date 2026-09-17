@@ -6,16 +6,14 @@ import json
 from pathlib import Path
 
 import pytest
-
+import yaml
 from experiments.shared.fixed_workflow_config import render_siderius_args
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/workflow.json"
 
 
-def _fixture(
-    tmp_path: Path, *, parameters: dict[str, object]
-) -> tuple[Path, Path, Path]:
+def _fixture(tmp_path: Path, *, parameters: dict[str, object]) -> tuple[Path, Path, Path]:
     experiment_root = tmp_path / "exp"
     siderius_root = tmp_path / "infra"
     composition = experiment_root / "tasks/demo/composition.yaml"
@@ -91,23 +89,27 @@ def test_formal_segmentation_lock_uses_existing_generic_parameter_rules(tmp_path
 
     config, experiment_root, siderius_root = _fixture(tmp_path, parameters={})
     payload = json.loads(config.read_text())
-    payload["workflow_parameter_rules"] = {
-        "model_config.segmentation_size": {"exact": 40_000}
-    }
+    payload["workflow_parameter_rules"] = {"model_config.segmentation_size": {"exact": 40_000}}
     config.write_text(json.dumps(payload))
     arguments = render_siderius_args(
         config, repository_root=experiment_root, siderius_checkout=siderius_root
     )
     index = arguments.index("--workflow_parameter_rules")
-    assert ParameterRules.model_validate_json(arguments[index + 1]).rules[
-        "model_config.segmentation_size"
-    ].exact == 40_000
-    assert json.loads(
-        (ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json").read_text()
-    )["workflow_parameter_rules"] == payload["workflow_parameter_rules"]
+    assert (
+        ParameterRules.model_validate_json(arguments[index + 1])
+        .rules["model_config.segmentation_size"]
+        .exact
+        == 40_000
+    )
+    assert (
+        json.loads((ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json").read_text())[
+            "workflow_parameter_rules"
+        ]
+        == payload["workflow_parameter_rules"]
+    )
 
 
-def test_no_prior_reserves_data_analysis_interface_and_fails_closed_until_wired() -> None:
+def test_no_prior_uses_the_declared_data_analysis_treatment_interface() -> None:
     from experiments.shared.information_treatment import (
         ModuleState,
         resolve_information_treatment,
@@ -123,8 +125,48 @@ def test_no_prior_reserves_data_analysis_interface_and_fails_closed_until_wired(
         "literature_review": ModuleState.ENABLED,
         "data_analysis": ModuleState.DISABLED,
     }
-    with pytest.raises(ValueError, match="data_analysis.*cannot be represented"):
-        treatment.siderius_args()
+    assert treatment.siderius_args() == [
+        "--experiment_arm",
+        "tidmad-main-fixed-no-prior-v1",
+        "--no-data_analysis_enabled",
+        "--ml_lit_review_enabled",
+    ]
+
+
+def test_tidmad_full_no_prior_pair_differs_only_in_analysis_treatment(
+    tmp_path: Path,
+) -> None:
+    """The paired renderer uses PR #80's module state, not a second switch.
+
+    Full is a structural test fixture until its band-scoped analysis binding
+    and effectful launcher are qualified by the experiment package.
+    """
+    from experiments.shared.information_treatment import resolve_information_treatment
+
+    no_prior_path = ROOT / "experiments/tidmad/information_treatments/main-fixed-no-prior.yaml"
+    full_payload = yaml.safe_load(no_prior_path.read_text(encoding="utf-8"))
+    full_payload["treatment_id"] = "tidmad-main-fixed-full-test-v1"
+    full_payload["modules"]["data_analysis"]["siderius"] = "enabled"
+    full_path = tmp_path / "main-fixed-full-test.yaml"
+    full_path.write_text(yaml.safe_dump(full_payload), encoding="utf-8")
+
+    no_prior = resolve_information_treatment(
+        no_prior_path,
+        repository_root=ROOT,
+        adapter="siderius",
+        required_modules=("literature_review", "data_analysis"),
+    )
+    full = resolve_information_treatment(
+        full_path,
+        repository_root=ROOT,
+        adapter="siderius",
+        required_modules=("literature_review", "data_analysis"),
+    )
+    assert no_prior.task_package_path == full.task_package_path
+    assert no_prior.declaration.advice == full.declaration.advice
+    assert no_prior.module_states["literature_review"] == full.module_states["literature_review"]
+    assert no_prior.siderius_args()[2:] == ["--no-data_analysis_enabled", "--ml_lit_review_enabled"]
+    assert full.siderius_args()[2:] == ["--data_analysis_enabled", "--ml_lit_review_enabled"]
 
 
 @pytest.mark.parametrize(
@@ -133,6 +175,8 @@ def test_no_prior_reserves_data_analysis_interface_and_fails_closed_until_wired(
         ({"--advice": "other.json"}, "launch-owned"),
         ({"--human_advice_propose": "hidden hint"}, "launch-owned"),
         ({"--no-ml_lit_review_enabled": True}, "launch-owned"),
+        ({"--data_analysis_enabled": True}, "launch-owned"),
+        ({"--no-data_analysis_enabled": True}, "launch-owned"),
         ({"--workspace": "other"}, "launch-owned"),
         ({"--force_fresh": False}, "must be true"),
         ({"--num_iterations": "10\n--advice"}, "invalid workflow parameter value"),
@@ -151,9 +195,7 @@ def test_workflow_json_cannot_override_treatment_or_launch_identity(
 def test_duplicate_json_key_is_refused(tmp_path: Path) -> None:
     config, experiment_root, siderius_root = _fixture(tmp_path, parameters={})
     config.write_text(
-        config.read_text().replace(
-            '"parameters": {}', '"parameters": {}, "parameters": {}'
-        )
+        config.read_text().replace('"parameters": {}', '"parameters": {}, "parameters": {}')
     )
     with pytest.raises(ValueError, match="duplicate JSON key"):
         render_siderius_args(
