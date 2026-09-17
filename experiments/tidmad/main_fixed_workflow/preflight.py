@@ -58,6 +58,8 @@ def resolve_no_prior_launch(
         adapter="siderius",
         required_modules=("literature_review", "data_analysis"),
     )
+    if treatment.task_package_path != root / "tasks/tidmad":
+        raise ValueError("NoPrior treatment must bind the frozen tasks/tidmad package")
     if (
         treatment.declaration.advice.mode is not AdviceMode.DISABLED
         or treatment.module_states["data_analysis"] is not ModuleState.DISABLED

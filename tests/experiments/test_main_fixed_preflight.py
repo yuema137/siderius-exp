@@ -136,3 +136,20 @@ def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_p
             workspace=tmp_path / "data/workspace",
             run_name="reviewed-run-name",
         )
+
+    resolve_treatment = preflight.resolve_information_treatment
+
+    def wrong_task_package(*args, **kwargs):
+        resolved = resolve_treatment(*args, **kwargs)
+        return resolved.model_copy(update={"task_package_path": tmp_path / "other-task"})
+
+    monkeypatch.setattr(preflight, "resolve_information_treatment", wrong_task_package)
+    with pytest.raises(ValueError, match="frozen tasks/tidmad package"):
+        preflight.resolve_no_prior_launch(
+            ROOT,
+            checkout,
+            band="4-9",
+            data_dir=tmp_path / "data",
+            workspace=tmp_path / "workspace",
+            run_name="reviewed-run-name",
+        )
