@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import sys
 import tomllib
 from importlib.metadata import distribution
 from pathlib import Path
@@ -50,9 +51,11 @@ def verify_framework_pin(repository_root: Path, checkout: Path) -> str:
     return expected
 
 
-def verify_installed_framework(expected: str) -> None:
-    """Require this exp virtualenv's installed SIDERIUS package to match."""
+def verify_installed_framework(expected: str, repository_root: Path) -> None:
+    """Require this exact exp virtualenv and its installed SIDERIUS revision."""
 
+    if Path(sys.prefix).resolve() != (repository_root / ".venv").resolve():
+        raise ValueError("preflight must use this experiment checkout's .venv/bin/python")
     direct_url = distribution("siderius").read_text("direct_url.json")
     installed = json.loads(direct_url or "{}").get("vcs_info", {}).get("commit_id")
     if installed != expected:

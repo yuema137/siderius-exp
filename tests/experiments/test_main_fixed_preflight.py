@@ -6,10 +6,15 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from experiments.shared.framework_pin import verify_framework_pin
+from experiments.shared.framework_pin import verify_framework_pin, verify_installed_framework
 from experiments.tidmad.main_fixed_workflow import preflight
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_preflight_rejects_foreign_experiment_environment(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="this experiment checkout's"):
+        verify_installed_framework("a" * 40, tmp_path)
 
 
 def test_framework_pin_requires_dependency_and_checkout_identity(tmp_path: Path) -> None:

@@ -47,7 +47,7 @@ def resolve_no_prior_launch(
         raise ValueError("workspace must be a directory or not yet exist")
 
     revision = verify_framework_pin(root, checkout)
-    verify_installed_framework(revision)
+    verify_installed_framework(revision, root)
     launcher = checkout / "scripts/launch/run_chain.sh"
     if not launcher.is_file():
         raise ValueError(f"framework chain launcher is missing: {launcher}")
