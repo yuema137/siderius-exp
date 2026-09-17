@@ -10,9 +10,8 @@ be presented as tests executed from this repository.
 ## Maturity: **production-backed task package; separated qualification pending**
 
 The active framework revision for new work is the exact value in the repository
-[`SIDERIUS_REVISION`](../../SIDERIUS_REVISION):
-`14494576671ad6f6b1a772d966b1fced02fab2a9`. Older SHAs in this document are
-evidence labels for completed migration witnesses.
+[`SIDERIUS_REVISION`](../../SIDERIUS_REVISION). Older SHAs in this document are
+dated evidence labels for completed migration witnesses, not current pins.
 
 The task-owned validation adapter is memory-bounded: it validates the complete
 declared HDF5 scope from metadata, then reads signal rows lazily as the
@@ -24,7 +23,7 @@ selection or ordering.
 | projected in this pack (PR0) | how | verified by |
 |---|---|---|
 | `DatasetProfile` | `resolved/dataset_profile.json` — GENERATED, DO NOT EDIT | `tests/unit/examples/test_tidmad_projection.py` (deep-compare vs `resolve_dataset_profile()`) |
-| `ModelIOContract` | `resolved/model_io_contract.json` — GENERATED | deep-compare vs `run_bound_model_io_contract()`; class axis fixed 256 pinned |
+| historical classification `ModelIOContract` | `resolved/model_io_contract.json` — GENERATED | deep-compare vs `run_bound_model_io_contract()`; class axis fixed 256 pinned for the historical classification projection, not the continuous-regression composition |
 | `DeliverableSpec` | `resolved/deliverable_spec.json` — GENERATED | deep-compare vs `derive_tidmad_deliverable_spec()` |
 | `MetricSpec` (golden metric) | `resolved/metric_spec.json` — GENERATED | task-owned `runtime/scoring.py`; `id == tidmad_denoising_score`, `direction == higher` pinned as literals |
 | identity (file indices + file families) | `resolved/identity.json` — GENERATED | deep-compare |

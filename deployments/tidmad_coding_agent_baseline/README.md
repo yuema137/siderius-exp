@@ -23,7 +23,8 @@ scored candidates, back them up, and collect the final result.
 - the sanitized `tasks/tidmad` view and shared `task.md`;
 - the labelled training files selected by the frozen unit: all 20 for the
   diagnostic pilot, or only the chosen band's 4, 6, 5, or 5 files;
-- its own 1 TiB local workspace and outbound internet;
+- its own local working filesystem and outbound internet (1 TiB in the
+  historical four-band diagnostic pilot; 500 GiB in each main single-band run);
 - the fixed `tidmad-score` command.
 
 It cannot read official validation inputs or truth, the private scorer assets,
@@ -52,7 +53,8 @@ reasons without explicit operator approval.
 3. Build one archive and copy those exact bytes to both machines.
 4. Prepare a distinct agent API credential and append-only backup credential
    for each machine.
-5. Create two isolated Nebius VMs only after the archive is ready.
+5. Create isolated Nebius VMs only after the archive is ready: two for the
+   historical four-band pilot, or one per independent band/agent main unit.
 
 From this checkout, using its own environment and the exact pinned SIDERIUS
 checkout:
@@ -102,8 +104,11 @@ freeze the remaining launch inputs and complete the H100 drill first.
 
 ## VM contract
 
-Each condition receives one Nebius H100 VM, 16 vCPU, 200 GB RAM and one
-condition-local 1 TiB persistent disk. Do not mount shared storage. Use a
+Each main single-band condition receives one Nebius H100 VM, 16 vCPU, 200 GB
+RAM and one condition-local 500 GiB persistent scientific working disk. Its
+frozen task package and staged inputs count within that disk. The historical
+four-band diagnostic pilot used 1 TiB; do not rewrite its recorded resource
+contract. Do not mount shared storage. Use a
 different API key, backup credential and create-only object-storage prefix on
 each VM. Neither agent credential may reach the backup destination or the
 other condition.

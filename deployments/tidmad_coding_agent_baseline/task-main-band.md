@@ -15,6 +15,15 @@ dataset paper is Fry et al., *TIDMAD: Time Series Dataset for Discovering Dark
 Matter with AI Denoising*, arXiv:2406.04378. Read the task package before
 building a model.
 
+The active task declaration for this run is
+`/work/input/tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml`,
+which binds `declared/task_config_regression.yaml` and
+`framework_configs/health_regression.yaml`. The package also retains historical
+classification material, including `resolved/model_io_contract.json` with a
+256-class output. That snapshot is **not** this run's model interface. The
+continuous-regression interface stated below and enforced by `tidmad-score`
+is the submission contract for this run.
+
 For this main single-band condition, each public training file contains only
 the same fixed 20 of its original 200 PSD segments selected in
 `/work/input/tasks/tidmad/declared/frozen_training_pool_v1.json`. The public
@@ -90,7 +99,7 @@ your workspace.
 
 The 24-hour clock starts at official launch and survives invocations and
 restarts. You have one H100, 16 vCPUs, about 200 GB RAM, outbound internet,
-and a fixed 1 TiB scientific working filesystem. The frozen inputs and task
+and a fixed 500 GiB scientific working filesystem. The frozen inputs and task
 package, environments, caches, checkpoints, temporary data, logs, retained
 candidates, and outputs all share that capacity. Frozen inputs are read-only.
 You may manage your own intermediate files, but no additional scientific
