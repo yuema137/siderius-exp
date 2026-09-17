@@ -98,6 +98,9 @@ cp -a "$BUNDLE_ROOT/harness/." /work/harness/
 find /work/input -type d -exec chmod 0555 {} +
 find /work/input -type f -exec chmod 0444 {} +
 chown -R root:root /work/input /work/harness
+# The staging directory can be root-only. Preserve executable bits while
+# making the immutable harness traversable by the baseline-agent service.
+chmod -R a+rX /work/harness
 
 for child in agent state submission logs; do
     install -d -o baseline-agent -g baseline-results -m 2770 "/work/$child"
@@ -150,6 +153,11 @@ find /opt/tidmad-inference/venv/bin -type f -exec chmod 0555 {} +
 install -d -o root -g root -m 0755 /usr/local/libexec
 cat >/usr/local/libexec/tidmad-score-candidate <<'EOF'
 #!/bin/sh
+# Accept the documented `tidmad-score candidate ...` form and the earlier
+# `tidmad-score ...` form through the same candidate-only sudo boundary.
+if [ "${1-}" = candidate ]; then
+    shift
+fi
 exec /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score candidate "$@"
 EOF
 chmod 0755 /usr/local/libexec/tidmad-score-candidate

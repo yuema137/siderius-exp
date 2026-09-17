@@ -4,6 +4,7 @@ import hashlib
 import json
 import re
 import shlex
+import subprocess
 import tarfile
 from pathlib import Path
 
@@ -391,6 +392,35 @@ def test_vm_install_replaces_same_version_wheel_with_exact_bundle_wheel():
     assert "rm -rf -- /work/harness /work/input" in install
 
 
+def test_installed_score_command_accepts_documented_candidate_subcommand():
+    """Catch a duplicated `candidate` token before a live band evaluation."""
+
+    install = (
+        REPOSITORY_ROOT
+        / "deployments/tidmad_coding_agent_baseline/machine/install_vm.sh"
+    ).read_text()
+    wrapper = install.split("cat >/usr/local/libexec/tidmad-score-candidate <<'EOF'\n", 1)[
+        1
+    ].split("\nEOF", 1)[0]
+    wrapper = wrapper.replace(
+        "exec /opt/tidmad-evaluator/venv/bin/python -I -m baseline_harness.score candidate \"$@\"",
+        "printf '%s\\n' candidate \"$@\"",
+    )
+    assert "printf '%s\\n' candidate" in wrapper
+
+    for arguments in (
+        ["candidate", "--band", "0-3"],
+        ["--band", "0-3"],
+    ):
+        result = subprocess.run(
+            ["sh", "-c", wrapper, "tidmad-score", *arguments],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert result.stdout.splitlines() == ["candidate", "--band", "0-3"]
+
+
 def test_vm_install_binds_noninteractive_agent_state_to_working_disk():
     """Catch systemd losing the CLI and silently using boot-disk HOME/cache state."""
 
@@ -407,6 +437,18 @@ def test_vm_install_binds_noninteractive_agent_state_to_working_disk():
     assert "UV_CACHE_DIR=/baseline/agent/cache/uv" in install
     assert "NPM_CONFIG_CACHE=/baseline/agent/cache/npm" in install
     assert "PATH=/baseline/agent/home/.local/bin:" in install
+
+
+def test_vm_install_harness_is_reachable_after_root_only_staging():
+    """Catch cp -a preserving root-only staging modes into the agent runtime."""
+
+    install = (
+        REPOSITORY_ROOT
+        / "deployments/tidmad_coding_agent_baseline/machine/install_vm.sh"
+    ).read_text()
+    assert install.index("cp -a \"$BUNDLE_ROOT/harness/.\" /work/harness/") < install.index(
+        "chmod -R a+rX /work/harness"
+    ) < install.index('"$PYTHON_BIN" -m venv /work/harness/venv')
 
 
 def test_vm_install_makes_inference_session_reachable_without_results_membership():
