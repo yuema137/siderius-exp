@@ -91,7 +91,9 @@ def test_analysis_on_is_bounded_model_aware_and_full_band() -> None:
     assert asset.authorized_scope.data_scope.file_indices == [15, 16, 17, 18, 19]
     assert config.access_policy.allow_model_inference is True
     assert config.access_policy.permits(split_id="validation", information_class="data")
-    assert config.access_policy.permits(split_id="validation", information_class="target")
+    assert config.declared_scope.raw_input_asset_ids == ("tidmad-high-band-validation-input",)
+    assert config.declared_scope.historical_model_asset_ids == ()
+    assert not config.access_policy.permits(split_id="validation", information_class="target")
     assert config.access_policy.permits(split_id="validation", information_class="prediction")
     assert not config.access_policy.permits(split_id="validation", information_class="residual")
 

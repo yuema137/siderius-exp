@@ -2,19 +2,16 @@ schema_version: 1
 scientific_goal: >-
   On a bounded, file-stratified sample of the complete TIDMAD high-frequency
   validation band, characterize raw input structure and, when a certified
-  previous model exists, investigate its predictions and any authorized
-  target-dependent failure modes. Distinguish measurements from hypotheses.
+  previous model exists, investigate its predictions without exposing ground
+  truth to Data Analysis. Distinguish measurements from hypotheses.
 input_description: >-
   Integer-coded SQUID waveform input sampled at the task-declared 10 MHz
   cadence; materialization neither filters nor repairs the signal.
-target_description: >-
-  Clean injected waveform. Validation targets are separately authorized for
-  diagnostics and are never inputs to historical model inference.
 scientific_constraints:
   - Every requested analysis selection must cover files 15 through 19 or explicitly refuse.
   - Findings describe only sampled validation windows or model segments, not the full dataset.
   - Use physical seconds and Hz; choose spectral resolution for the actual cadence and question.
-  - Compare model outputs and targets only at certified aligned selections.
+  - Historical inference uses only certified aligned input selections.
   - Prefer reference skills when sufficient; generated analysis remains sandboxed and experiment-local.
 available_assets:
   - asset_id: tidmad-high-band-validation-input
@@ -45,15 +42,18 @@ available_assets:
       channel_semantics: {information_class: identity}
       band_file_indices: {information_class: identity}
 historical_inference_base_asset_id: tidmad-high-band-validation-input
+declared_scope:
+  raw_input_asset_ids: [tidmad-high-band-validation-input]
+  historical_model_asset_ids: []
 access_policy:
   policy_id: tidmad-high-band-model-aware-analysis-v1
   policy_version: 1
-  purpose: Bounded validation-only raw and certified historical-model diagnostics.
+  purpose: Bounded validation-only raw and certified historical-model diagnostics without target access.
   allow_model_inference: true
   split_rules:
     - split_id: validation
       data_visible: true
-      targets_visible: true
+      targets_visible: false
       predictions_visible: true
       residuals_visible: false
 resource_envelope:

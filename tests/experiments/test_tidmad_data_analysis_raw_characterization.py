@@ -24,4 +24,6 @@ def test_data_analysis_treatment_is_experiment_owned_and_covers_full_band() -> N
     asset = config.available_assets[0]
     assert isinstance(asset.authorized_scope, LegacyPartitionScope)
     assert asset.authorized_scope.data_scope.file_indices == [15, 16, 17, 18, 19]
+    assert config.declared_scope.raw_input_asset_ids == (asset.asset_id,)
+    assert config.declared_scope.historical_model_asset_ids == ()
     assert config.resource_envelope.sampling_policy.max_items >= 5
