@@ -33,3 +33,31 @@ The treatment renderer forwards that state as `--no-data_analysis_enabled`;
 it does not invent a second switch or alter the shared workflow JSON. The
 Full arm still requires a band-scoped analysis binding and a qualified launch
 gate before the workflow becomes effectful.
+
+## NoPrior preparation check
+
+`preflight.py` resolves a single NoPrior unit without starting an experiment.
+It checks the repository, dependency, installed package and framework checkout
+revisions; requires a fresh external workspace; and verifies that the selected
+band's data directory contains only its training/validation HDF5 pairs and the
+approved `segment_anchors.json`. Each HDF5 byte stream is checked against the
+existing `campaigns/tidmad_gold/inputs/q3_data_manifest.sha256`. Its JSON output
+records the resolved chain arguments and input digests. It does not write a
+workspace or launch a chain.
+
+From the exact exp checkout after installing its frozen environment:
+
+```bash
+.venv/bin/python -m experiments.tidmad.main_fixed_workflow.preflight \
+  --siderius-checkout /path/to/pinned/SIDERIUS \
+  --band 0-3 \
+  --data_dir /path/to/isolated/band-0-3-data \
+  --workspace /path/to/new/no-prior-0-3-workspace \
+  --run_name YOUR_REVIEWED_RUN_NAME
+```
+
+The root `SIDERIUS_REVISION` currently differs from the dependency revision in
+`pyproject.toml` and `uv.lock`, so this check intentionally refuses until one
+compatible revision is frozen across all three. A separate main launcher,
+24-hour deadline, H100 qualification and real one-band smoke are still required
+before any paper run.
