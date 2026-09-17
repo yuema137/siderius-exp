@@ -1,0 +1,62 @@
+{
+  "version": "tidmad-cli-main-launch-record-v1",
+  "experiment_id": "tidmad-codex-main-no-advice-2026-09-17",
+  "task_package": "tasks/tidmad",
+  "task_tree": "15bf13fcc7bcfb98308f60b46ce135bff5702ab4",
+  "task_visibility": "agent-public-view-v2",
+  "information_treatment": "experiments/tidmad/information_treatments/main-cli-no-advice.yaml",
+  "frozen_bundle_manifest": "frozen_bundle_manifest.json",
+  "raw_data_manifest_source": "campaigns/tidmad_gold/inputs/q3_data_manifest.sha256",
+  "agent_product": "codex",
+  "model_requested": "gpt-5.6-sol",
+  "reasoning_effort_requested": "medium",
+  "human_advice": "disabled",
+  "data_analysis": "not_applicable",
+  "resource_contract": {
+    "gpu_per_unit": "NVIDIA H100",
+    "vcpu_per_unit": 16,
+    "memory_gb_approx_per_unit": 200,
+    "boot_disk_gib_per_unit": 128,
+    "scientific_work_disk_gib_per_unit": 500,
+    "duration_seconds_per_unit": 86400,
+    "shared_filesystem": false
+  },
+  "launch_utc": "2026-09-17T16:23:21Z",
+  "agent_deadline_utc": "2026-09-18T16:23:21Z",
+  "systemd_ceiling_utc": "2026-09-18T16:38:21Z",
+  "supervisor_run_id": "codex-1789662201",
+  "runtime_installation": {
+    "score_wrapper_correction_exp_commit": "6fd61c7909975d99db5e1970f6c2b50cf3aefbb9",
+    "installed_score_wrapper_sha256": "65d7dd307538b275ddfeb66e0b5a054bbedbea044736b0169f88af044b11cd5a",
+    "backup_temporary_directory": "/baseline/backup-tmp",
+    "backup_drop_in_sha256": "06770e3e16dceef255d2f4c0abdf4d42a72ac1ed8c1548ec75d8a46c39828db9",
+    "note": "Identical non-scientific runtime corrections on all four machines; frozen input archives were not rebuilt."
+  },
+  "units": {
+    "0-3": {
+      "unit_id": "tidmad-codex-main-0-3-2026-09-17",
+      "nebius_instance_id": "computeinstance-e00vbsyta82ne2cf9k",
+      "bucket": "tidmad-codex-main-0-3-a7f3",
+      "data_manifest_sha256": "92158b18cc85750349f646aab43abd38d78a2681166dc17c8d7b2f04654fde22"
+    },
+    "4-9": {
+      "unit_id": "tidmad-codex-main-4-9-2026-09-17",
+      "nebius_instance_id": "computeinstance-e00p3gg3q6kb7nk0yr",
+      "bucket": "tidmad-codex-main-4-9-a7f3",
+      "data_manifest_sha256": "4089cc23b26b5dbbb26c9667c181cbe94283f76a71e14c784354f227bdbc8ff5"
+    },
+    "10-14": {
+      "unit_id": "tidmad-codex-main-10-14-2026-09-17",
+      "nebius_instance_id": "computeinstance-e00tr3zvqmzw28g42j",
+      "bucket": "tidmad-codex-main-10-14-a7f3",
+      "data_manifest_sha256": "52ea6e5000e356f3c592ad6069c1a8c4bd06ae755204fa279b35bb4c90e51f71"
+    },
+    "15-19": {
+      "unit_id": "tidmad-codex-main-15-19-2026-09-17",
+      "nebius_instance_id": "computeinstance-e00qzr4m5w854zcdz7",
+      "bucket": "tidmad-codex-main-15-19-a7f3",
+      "data_manifest_sha256": "9a39a1eec32d9b84fd8cd75410424e77ba397a5f4b5f8215b401714987d24774"
+    }
+  },
+  "result_status": "not_recorded_at_launch"
+}

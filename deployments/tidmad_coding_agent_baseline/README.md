@@ -1,12 +1,18 @@
 # TIDMAD coding-agent baseline
 
 This folder prepares coding-agent baselines for Codex and Claude Code. The
-existing four-band, one-clock package is a diagnostic pilot; the planned main
-experiment gives each agent one band and a separate 24-hour clock. Neither
-mode defines a second version of TIDMAD. The builder derives both an agent-visible
-view and an evaluator-private snapshot from the same tracked
-[`tasks/tidmad`](../../tasks/tidmad/) authority. Both machines receive the same
-bundle bytes and the same operator-approved kickoff file, `task.md`.
+older four-band, one-clock package is a diagnostic pilot; the main experiment
+gives each agent one band and a separate 24-hour clock. Neither mode defines
+a second version of TIDMAD. The builder derives both an agent-visible view
+and an evaluator-private snapshot from the same tracked
+[`tasks/tidmad`](../../tasks/tidmad/) authority. Conditions compared within
+one band receive identical bundle bytes and the same kickoff text; different
+bands have distinct scoped archives.
+
+The four Codex single-band main units launched on 2026-09-17 are recorded under
+[`experiments/tidmad/coding_agent_baseline`](../../experiments/tidmad/coding_agent_baseline/).
+That historical run pins its own input archives and framework revision; the
+repository's current dependency pin must not be substituted for them.
 
 The bundle also requires one explicit information treatment. The treatment
 records whether the run receives human advice and whether optional workflow

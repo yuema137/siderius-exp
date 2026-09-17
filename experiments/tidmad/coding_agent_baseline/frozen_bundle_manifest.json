@@ -1,0 +1,40 @@
+{
+  "version": "tidmad-main-cli-frozen-bundles-v1",
+  "built_utc": "2026-09-17 08:47:42 UTC",
+  "exp_revision": "8d21c2802690f1b67cc949f86f83e66e77acc048",
+  "siderius_revision": "cd1740e6bd73effa6fc9fbafba52a551545600d2",
+  "public_task_view_sha256": "334330bcd9e4476feda2bf6b4f0611e29b3461eb625e3bd05ab3482f35ba0eff",
+  "information_treatment_sha256": "9a2752c478fbc87708263f312d4ddf381a98eacfee1a705148960e6169ebabb0",
+  "working_storage_gib": 500,
+  "agent_product": "codex",
+  "bands": {
+    "0-3": {
+      "archive": "tidmad-band-0-3.tar.gz",
+      "archive_sha256": "66e80f5166a21f19831f1341f617e2c29d086cb4a151be687e63ccb24077f48d",
+      "archive_bytes": 2707565,
+      "data_manifest_entries": 8,
+      "task_md_sha256": "0bef44dbb5f45828902f22037684e0dfe3eea95e4fbc5b653943ae1116b972d0"
+    },
+    "4-9": {
+      "archive": "tidmad-band-4-9.tar.gz",
+      "archive_sha256": "29558c8d8174b176f3b78ac58fc7ad4df3801a9921e26ca03842a72316e0726a",
+      "archive_bytes": 2707766,
+      "data_manifest_entries": 12,
+      "task_md_sha256": "90f63cb44047e28ba0ae318c594aac60f173bae46d03b1121c14c419a2bf0c19"
+    },
+    "10-14": {
+      "archive": "tidmad-band-10-14.tar.gz",
+      "archive_sha256": "c68e327b257cc6426aea5fd3cc9ebbfd037829187bb92fce6ea491e0ef19ac06",
+      "archive_bytes": 2707665,
+      "data_manifest_entries": 10,
+      "task_md_sha256": "8037c0500801ffae5488a388c295315211b67208f7278181807984d3adac6dce"
+    },
+    "15-19": {
+      "archive": "tidmad-band-15-19.tar.gz",
+      "archive_sha256": "b1c78fb1759b426afab0471b8062d0d0c5a0ab93c2cd1a696151e3bc5788ab05",
+      "archive_bytes": 2707666,
+      "data_manifest_entries": 10,
+      "task_md_sha256": "4fbb43b0f1573b48afc64cbf1a7379db6cca7f5c01dc6e8b012e91c70e9891d6"
+    }
+  }
+}
