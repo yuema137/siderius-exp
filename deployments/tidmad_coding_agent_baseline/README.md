@@ -146,11 +146,16 @@ sudo bash tidmad-coding-agent-baseline/harness/machine/install_vm.sh \
 sudo /opt/tidmad-evaluator/venv/bin/python -I -m \
   baseline_harness.prepare_data \
   --source-root /data/raw-staging \
+  --training-pool-manifest /opt/tidmad-evaluator/assets/task_snapshot/tasks/tidmad/declared/frozen_training_pool_v1.json \
   --private-group baseline-evaluator
 ```
 
+For the main single-band condition this flag is required: it exposes only the
+frozen 20/200 training PSD segments per file while retaining the verified full
+raw staging source in a root-only directory. Do not omit it when staging a
+main run. Legacy diagnostic staging without the flag remains unchanged.
 Data preparation verifies every selected repository-owned checksum. The
-selected band's training files remain available for fitting. Validation inputs
+selected band's bounded training files remain available for fitting. Validation inputs
 and targets, plus
 the exact frequency/anchor/scorer assets, remain evaluator-only. Evaluator
 inference copies omit release-identity attributes such as the original file

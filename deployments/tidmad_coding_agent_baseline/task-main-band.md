@@ -15,6 +15,15 @@ dataset paper is Fry et al., *TIDMAD: Time Series Dataset for Discovering Dark
 Matter with AI Denoising*, arXiv:2406.04378. Read the task package before
 building a model.
 
+For this main single-band condition, each public training file contains only
+the same fixed 20 of its original 200 PSD segments selected in
+`/work/input/tasks/tidmad/declared/frozen_training_pool_v1.json`. The public
+file packs those segments consecutively; its local segment positions 0–19 are
+not the original positions. This is the complete permitted fitting pool for
+the band. You may choose smaller Trial samples from it, but every fitted
+candidate must use training examples only from this pool. Validation scoring
+still uses every validation file in the band at full scope.
+
 Your result must be a trained ML model that maps each evaluator-provided raw,
 non-overlapping segment to a cleaned waveform. The evaluator supplies the
 segment as an `int64` tensor of shape `[B, 40000]`, with raw ADC values shifted

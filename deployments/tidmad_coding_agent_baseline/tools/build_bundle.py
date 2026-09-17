@@ -297,10 +297,12 @@ def build_bundle(
         shutil.copytree(deployment / "systemd", staging / "harness" / "systemd")
         shutil.copytree(deployment / "machine", staging / "harness" / "machine")
         _write_data_manifest(data_manifest, evaluator_root / "data_manifest.sha256", band=band)
-        atomic_write_json(
-            evaluator_root / "unit.json",
-            {"version": "tidmad-baseline-unit-v1", "band": band},
-        )
+        unit = {"version": "tidmad-baseline-unit-v1", "band": band}
+        if band is not None:
+            unit["training_pool_sha256"] = sha256_file(
+                repo / "tasks/tidmad/declared/frozen_training_pool_v1.json"
+            )
+        atomic_write_json(evaluator_root / "unit.json", unit)
         _write_evaluation_scopes(private_task_root, evaluator_root, band=band)
         siderius_revision, wheel_sha = _build_evaluator(
             repo, siderius_checkout.resolve(), evaluator_root

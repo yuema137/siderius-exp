@@ -107,9 +107,6 @@ def test_formal_segmentation_lock_uses_existing_generic_parameter_rules(tmp_path
         ]
         == payload["workflow_parameter_rules"]
     )
-
-
-def test_no_prior_uses_the_declared_data_analysis_treatment_interface() -> None:
     from experiments.shared.information_treatment import (
         ModuleState,
         resolve_information_treatment,
@@ -212,3 +209,14 @@ def test_configuration_paths_cannot_escape_either_checkout(tmp_path: Path) -> No
         render_siderius_args(
             config, repository_root=experiment_root, siderius_checkout=siderius_root
         )
+
+
+def test_main_workflow_opts_into_frozen_parent_and_unchanged_eval_scope() -> None:
+    main = json.loads(
+        (ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json").read_text()
+    )
+    assert main["task_composition"] == (
+        "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml"
+    )
+    assert main["parameters"]["--formal_portion"] == 0.1
+    assert "--formal_eval_portion" not in main["parameters"]
