@@ -257,14 +257,18 @@ def test_configuration_paths_cannot_escape_either_checkout(tmp_path: Path) -> No
         )
 
 
-def test_main_workflow_opts_into_frozen_parent_and_unchanged_eval_scope() -> None:
+def test_main_workflow_keeps_training_agent_chosen_and_formal_eval_full() -> None:
     main = json.loads(
         (ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json").read_text()
     )
     assert main["task_composition"] == (
-        "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml"
+        "tasks/tidmad/compositions/continuous_regression.yaml"
     )
-    assert main["parameters"]["--formal_portion"] == 0.1
+    assert main["parameters"]["--formal_training_scope_source"] == "agent"
+    assert "--formal_portion" not in main["parameters"]
+    assert "--trial_portion" not in main["parameters"]
+    assert "--train_portion" not in main["parameters"]
+    assert "--eval_portion" not in main["parameters"]
     assert main["parameters"]["--formal_eval_portion"] == 1.0
 
 

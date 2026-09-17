@@ -3,16 +3,14 @@
 This is a partial, non-launchable starting point for the planned one-band,
 24-hour main experiment. `workflow.json` pins the continuous-regression task,
 the experiment-owned `iclr_official_v1.json` for every current LLM role,
-the exact 40,000-sample segment length, and the frozen training parent
-declared by the task-owned composition.
-Each file contributes the same 20 of 200 PSD segments to its parent pool;
-Formal uses all 20 and Trial samples its proposed portion from those 20.
-The file-index restriction still comes from the selected band. Formal
-evaluation scores the full validation band. The pool manifest is content-pinned
-by the task data path and shared by all four bands. The shared configuration
+the exact 40,000-sample segment length, and the ordinary continuous-regression
+task composition. Trial and Formal training strategy and portions are chosen by the agent
+from the selected band's training files; Trial validation portion is also
+agent-chosen. No frozen 10% parent pool applies to this experiment. Formal
+evaluation scores the complete validation band regardless of training portion.
+The shared configuration
 sets a 100-iteration ceiling, three rounds, two epochs, 30/120-minute
-Trial/Formal time-admission budgets, and 40-GiB VRAM limits. Trial chooses
-its own portion inside the parent pool. The workspace, band, and 24-hour
+Trial/Formal time-admission budgets, and 40-GiB VRAM limits. The workspace, band, and 24-hour
 run deadline remain launch-owned.
 
 `advice.json` is the one reviewed Full-arm advice artifact for every band.
