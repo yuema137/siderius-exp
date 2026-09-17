@@ -436,6 +436,7 @@ class TestManifestAndInvariants:
         assert "baseline_isolation" not in manifest
 
     def test_compute_expected_invariants_locks_the_flag(self, tmp_path):
+        from execute_tools.task_registration_scope import run_registration_scope
         from workflows.task_composition import (
             bind_run_task_composition,
             compose_run_task_bindings,
@@ -458,7 +459,8 @@ class TestManifestAndInvariants:
         )
         args.health_gate_enabled = False
         args.health_gate_files = None
-        composition = compose_run_task_bindings(str(_TASK_COMPOSITION))
-        with bind_run_task_composition(composition, physical_data_root=str(tmp_path)):
-            invariants = roi.compute_expected_invariants(args, run_composition=composition)
+        with run_registration_scope():
+            composition = compose_run_task_bindings(str(_TASK_COMPOSITION))
+            with bind_run_task_composition(composition, physical_data_root=str(tmp_path)):
+                invariants = roi.compute_expected_invariants(args, run_composition=composition)
         assert invariants.baseline_isolation is True

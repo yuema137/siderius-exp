@@ -4,6 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from execute_tools.evaluation_metric import MetricSpec
+from execute_tools.task_registration_scope import run_registration_scope
 from workflows.task_composition import compose_run_task_bindings
 
 
@@ -18,4 +19,5 @@ def load_declared_tidmad_metric_spec() -> MetricSpec:
         / "compositions"
         / "bounded_qualification.yaml"
     )
-    return compose_run_task_bindings(str(manifest)).metric.spec
+    with run_registration_scope():
+        return compose_run_task_bindings(str(manifest)).metric.spec

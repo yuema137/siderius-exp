@@ -1494,6 +1494,8 @@ class TidmadTaskDataPath:
 class TidmadFrozenPoolDataPath(TidmadTaskDataPath):
     """Opt-in fixed training parent; legacy TIDMAD bindings stay unchanged."""
 
+    task_data_path_id: ClassVar[str] = "tidmad_frozen_training_pool"
+
     _POOL_PATH = (
         Path(__file__).resolve().parents[1] / "declared/frozen_training_pool_v1.json"
     )

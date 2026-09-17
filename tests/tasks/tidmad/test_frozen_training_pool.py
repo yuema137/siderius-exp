@@ -105,6 +105,6 @@ def test_composition_loads_opt_in_capability_from_the_public_manifest() -> None:
         implementation = compose_task_data_path_from_manifest(
             str(ROOT / "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml")
         )
-    assert implementation.task_data_path_id == "tidmad"
+    assert implementation.task_data_path_id == "tidmad_frozen_training_pool"
     assert callable(implementation.build_frozen_training_pool)
     assert callable(implementation.sample_training_pool)

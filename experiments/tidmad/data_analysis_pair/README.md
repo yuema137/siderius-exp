@@ -45,6 +45,9 @@ five training and validation HDF5 files and the approved scoring anchor are
 present. Do not replace this scope with a lone file.
 
 Prepare the exact checkout environments with `uv sync --group dev --frozen`.
+When running the repository's full test suite against a newer framework pin,
+set `SIDERIUS_DA_PAIR_CHECKOUT` to a separate checkout of this experiment's
+own `SIDERIUS_REVISION`; its launcher tests intentionally fail on a mismatch.
 Export `OPENAI_API_KEY` and `DEEPSEEK_API_KEY` from a trusted external secret
 source in each launch session; the script checks only their presence and does
 not print them. Dry-run requires neither credentials nor data/GPU access:

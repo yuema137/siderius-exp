@@ -7,12 +7,41 @@ import shlex
 import subprocess
 from pathlib import Path
 
+import pytest
 import yaml
 from agent.schemas.data_analysis.assets import LegacyPartitionScope
 from workflows.data_analysis_composition import DataAnalysisWorkflowConfig
 
 ROOT = Path(__file__).resolve().parents[2]
 PAIR = ROOT / "experiments/tidmad/data_analysis_pair"
+
+
+def _pair_checkout() -> str:
+    """Qualify this frozen experiment against its own pin, not the repo-wide pin."""
+
+    configured = os.environ.get("SIDERIUS_DA_PAIR_CHECKOUT") or os.environ.get(
+        "SIDERIUS_CHECKOUT"
+    )
+    if not configured:
+        pytest.fail(
+            "SIDERIUS_DA_PAIR_CHECKOUT must name the frozen experiment checkout"
+        )
+    if not Path(configured).is_dir():
+        pytest.fail(f"Data Analysis pair checkout does not exist: {configured}")
+    expected = (PAIR / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
+    actual = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=configured,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    if actual != expected:
+        pytest.fail(
+            "Data Analysis pair requires its experiment-local infra pin; "
+            "set SIDERIUS_DA_PAIR_CHECKOUT to that exact checkout"
+        )
+    return configured
 
 
 def _manifest(arm: str) -> dict:
@@ -65,7 +94,7 @@ def test_pair_uses_one_static_task_and_one_literature_first_launch_contract(tmp_
     assert on["data_analysis"] == {"enabled": True, "config": "analysis_on.yaml"}
     assert off["data_analysis"] == {"enabled": False}
 
-    checkout = os.environ["SIDERIUS_CHECKOUT"]
+    checkout = _pair_checkout()
     on_argv = _dry_run("on", checkout=checkout, workspace=tmp_path / "on")
     off_argv = _dry_run("off", checkout=checkout, workspace=tmp_path / "off")
     assert _without_arm_fields(on_argv) == _without_arm_fields(off_argv)
@@ -107,7 +136,7 @@ def test_effectful_pair_launch_refuses_without_frozen_experiment_sha(tmp_path: P
             "--arm",
             "on",
             "--siderius-checkout",
-            os.environ["SIDERIUS_CHECKOUT"],
+            _pair_checkout(),
             "--workspace",
             str(workspace),
             "--data_dir",
@@ -135,7 +164,7 @@ def test_pair_launch_refuses_workspace_inside_source_data_even_in_dry_run(tmp_pa
             "--arm",
             "on",
             "--siderius-checkout",
-            os.environ["SIDERIUS_CHECKOUT"],
+            _pair_checkout(),
             "--workspace",
             str(workspace),
             "--data_dir",

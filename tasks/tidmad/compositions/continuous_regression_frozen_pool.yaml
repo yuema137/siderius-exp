@@ -2,7 +2,7 @@
 task_data_path:
   file: ../runtime/tidmad_data_path.py
   symbol: TidmadFrozenPoolDataPath
-  id: tidmad
+  id: tidmad_frozen_training_pool
 
 dataset_profile:
   config: ../resolved/dataset_profile.json
