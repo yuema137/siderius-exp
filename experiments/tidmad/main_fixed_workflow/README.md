@@ -2,14 +2,24 @@
 
 This is a partial, non-launchable starting point for the planned one-band,
 24-hour main experiment. `workflow.json` pins the continuous-regression task,
-the shared OpenAI agent configuration, the exact 40,000-sample segment
-length, and the frozen training parent declared by the task-owned composition.
+the experiment-owned `iclr_official_v1.json` for every current LLM role,
+the exact 40,000-sample segment length, and the frozen training parent
+declared by the task-owned composition.
 Each file contributes the same 20 of 200 PSD segments to its parent pool;
 Formal uses all 20 and Trial samples its proposed portion from those 20.
-The file-index restriction still comes from the selected band. Evaluation
-remains independently full-scope. The pool manifest is content-pinned by the
-task data path and shared by all four bands. This directory still does not
-choose Trial/Formal budgets, an iteration schedule, a workspace, or a band.
+The file-index restriction still comes from the selected band. Formal
+evaluation scores the full validation band. The pool manifest is content-pinned
+by the task data path and shared by all four bands. The shared configuration
+sets a 100-iteration ceiling, three rounds, two epochs, 30/120-minute
+Trial/Formal time-admission budgets, and 40-GiB VRAM limits. Trial chooses
+its own portion inside the parent pool. The workspace, band, and 24-hour
+run deadline remain launch-owned.
+
+`advice.json` is the one reviewed Full-arm advice artifact for every band.
+It describes the paper's FC Net layers and the agreed time/VRAM context;
+it does not require FC Net or forbid other model families. The no-prior arm
+does not receive it. The Full treatment remains non-launchable until the
+dedicated data-analysis binding and gate are qualified.
 
 The future launcher will accept one treatment selector (`full` or `no-prior`).
 Both treatments must use the same workflow and agent-parameter JSON. The
