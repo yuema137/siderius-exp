@@ -26,6 +26,7 @@ def resolve_no_prior_launch(
     data_dir: Path,
     workspace: Path,
     run_name: str,
+    require_fresh_workspace: bool = True,
 ) -> dict[str, object]:
     """Build one reviewed command and its frozen-input receipt, fail closed."""
 
@@ -41,7 +42,7 @@ def resolve_no_prior_launch(
         raise ValueError("data_dir and workspace must live outside the framework checkout")
     if run_workspace.is_relative_to(data) or data.is_relative_to(run_workspace):
         raise ValueError("data_dir and workspace must be separate directories")
-    if run_workspace.is_dir() and any(run_workspace.iterdir()):
+    if require_fresh_workspace and run_workspace.is_dir() and any(run_workspace.iterdir()):
         raise ValueError("workspace must be fresh and empty")
     if run_workspace.exists() and not run_workspace.is_dir():
         raise ValueError("workspace must be a directory or not yet exist")
