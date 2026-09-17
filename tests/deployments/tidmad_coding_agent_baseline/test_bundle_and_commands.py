@@ -366,6 +366,10 @@ def test_single_band_bundle_has_regression_codec_without_private_truth(tmp_path,
         text = kickoff.read().decode()
         assert "band `4-9`" in text
         assert "continuous_regression" in text
+        assert "compositions/continuous_regression_frozen_pool.yaml" in text
+        assert "resolved/model_io_contract.json" in text
+        assert "not** this run's model interface" in text
+        assert "fixed 500 GiB scientific working filesystem" in text
         assert "{{BAND}}" not in text
         data_manifest = archive.extractfile(f"{root}/evaluator/data_manifest.sha256")
         assert data_manifest is not None
