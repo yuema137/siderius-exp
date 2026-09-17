@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from execute_tools.dataset_config import DatasetProfile, bind_dataset_profile
 from execute_tools.task_data_path import ScopeBuildRequest, bind_task_data_path
+from execute_tools.task_registration_scope import run_registration_scope
 from nodes.ml_hyperparameter_tune_agent.scope_acquisition import acquire_attempt_scopes
 from workflows.task_composition import compose_task_data_path_from_manifest
 
@@ -100,9 +101,10 @@ def test_tampered_manifest_refuses_before_scope_construction(tmp_path: Path) -> 
 
 
 def test_composition_loads_opt_in_capability_from_the_public_manifest() -> None:
-    implementation = compose_task_data_path_from_manifest(
-        str(ROOT / "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml")
-    )
+    with run_registration_scope():
+        implementation = compose_task_data_path_from_manifest(
+            str(ROOT / "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml")
+        )
     assert implementation.task_data_path_id == "tidmad"
     assert callable(implementation.build_frozen_training_pool)
     assert callable(implementation.sample_training_pool)
