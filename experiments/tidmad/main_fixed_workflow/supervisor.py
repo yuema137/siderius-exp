@@ -75,7 +75,7 @@ def _verify_execution_environment(root: Path) -> None:
 
 def _append_event(path: Path, event: dict[str, object]) -> None:
     data = (json.dumps(event, sort_keys=True) + "\n").encode()
-    descriptor = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+    descriptor = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     try:
         os.write(descriptor, data)
         os.fsync(descriptor)
@@ -97,7 +97,9 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
     environment.pop("PYTHONPATH", None)
     environment["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(unit_dir / "workspace/generated_library")
     logs = unit_dir / "logs"
-    logs.mkdir(exist_ok=True)
+    if logs.is_symlink():
+        raise ValueError("NoPrior log directory must not be a symlink")
+    logs.mkdir(mode=0o700, exist_ok=True)
     _append_event(
         unit_dir / "events.jsonl",
         {
@@ -106,7 +108,10 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
             "deadline_epoch": record.deadline_epoch,
         },
     )
-    with (logs / "chain.log").open("ab", buffering=0) as output:
+    log_descriptor = os.open(
+        logs / "chain.log", os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600
+    )
+    with os.fdopen(log_descriptor, "ab", buffering=0) as output:
         process = subprocess.Popen(
             command,
             stdout=output,
@@ -179,8 +184,13 @@ def run_unit(
         )
         return 0
 
-    unit_dir.mkdir(parents=True, exist_ok=True)
-    with (unit_dir / ".supervisor.lock").open("a+b") as lock:
+    unit_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if unit_dir.stat().st_mode & 0o077:
+        raise ValueError("NoPrior unit directory must be private to the service account")
+    lock_descriptor = os.open(
+        unit_dir / ".supervisor.lock", os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600
+    )
+    with os.fdopen(lock_descriptor, "a+b") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         existing = read_launch_record(record_path)
         if existing is None and set(unit_dir.iterdir()) != {unit_dir / ".supervisor.lock"}:

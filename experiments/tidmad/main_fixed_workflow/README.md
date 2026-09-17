@@ -67,7 +67,7 @@ preparation branch aligns these to `bb9c8cb40fd14956c1608557254104cd5b3f32bb`
 directory for that unit; the chain workspace is its `workspace/` child. For an
 effectful launch, the parent of the unit directory must already be the mounted
 persistent work volume, so a missing work disk cannot create a new clock on
-the VM boot disk:
+the VM boot disk. The unit directory is private to the service account:
 
 ```bash
 bash experiments/tidmad/main_fixed_workflow/launch.sh \

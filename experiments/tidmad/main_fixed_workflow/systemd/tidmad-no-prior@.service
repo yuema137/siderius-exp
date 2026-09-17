@@ -14,6 +14,7 @@ ExecStart=/usr/bin/env /bin/bash ${EXP_CHECKOUT}/experiments/tidmad/main_fixed_w
 Restart=on-failure
 RestartPreventExitStatus=2
 KillMode=control-group
+UMask=0077
 
 [Install]
 WantedBy=multi-user.target

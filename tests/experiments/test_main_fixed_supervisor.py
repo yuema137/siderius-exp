@@ -50,6 +50,8 @@ def test_no_prior_clock_is_created_once_and_reused_after_restart(
     )
     assert supervisor.run_unit(**arguments) == 0
     first_bytes = (unit / "launch.json").read_bytes()
+    assert unit.stat().st_mode & 0o777 == 0o700
+    assert (unit / "launch.json").stat().st_mode & 0o777 == 0o600
     assert read_launch_record(unit / "launch.json").deadline_utc.endswith("+00:00")
 
     (unit / "workspace").mkdir()
@@ -157,5 +159,6 @@ def test_no_prior_supervisor_kills_chain_group_at_deadline(
     monkeypatch.setattr(supervisor.subprocess, "Popen", lambda *_, **__: process)
     assert supervisor._run_chain(record, tmp_path) == 0
     assert killed == [(321, supervisor.signal.SIGKILL)]
+    assert (tmp_path / "logs/chain.log").stat().st_mode & 0o777 == 0o600
     events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text().splitlines()]
     assert [event["event"] for event in events] == ["chain_start", "deadline_stop"]
