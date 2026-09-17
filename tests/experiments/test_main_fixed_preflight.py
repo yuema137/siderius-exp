@@ -126,3 +126,13 @@ def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_p
     assert command[command.index("--formal_eval_portion") + 1] == "1.0"
     assert "--trial_portion" not in command
     assert "--train_portion" not in command
+
+    with pytest.raises(ValueError, match="separate directories"):
+        preflight.resolve_no_prior_launch(
+            ROOT,
+            checkout,
+            band="4-9",
+            data_dir=tmp_path / "data",
+            workspace=tmp_path / "data/workspace",
+            run_name="reviewed-run-name",
+        )

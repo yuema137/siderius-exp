@@ -39,6 +39,8 @@ def resolve_no_prior_launch(
         raise ValueError("data_dir and workspace must live outside the experiment checkout")
     if data.is_relative_to(checkout) or run_workspace.is_relative_to(checkout):
         raise ValueError("data_dir and workspace must live outside the framework checkout")
+    if run_workspace.is_relative_to(data) or data.is_relative_to(run_workspace):
+        raise ValueError("data_dir and workspace must be separate directories")
     if run_workspace.is_dir() and any(run_workspace.iterdir()):
         raise ValueError("workspace must be fresh and empty")
     if run_workspace.exists() and not run_workspace.is_dir():
