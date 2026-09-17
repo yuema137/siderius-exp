@@ -13,16 +13,13 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from tasks.supernemo_signal_background.plugins._supernemo_data import _balanced_cap
 
 EXP_ROOT = Path(__file__).resolve().parents[3]
 PACK = EXP_ROOT / "tasks" / "supernemo_signal_background"
 COMPOSITION = PACK / "compositions" / "signal_background.yaml"
 LAUNCHER = EXP_ROOT / "experiments" / "supernemo_signal_background" / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = (
-    (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
-)
+EXPECTED_FRAMEWORK_REVISION = (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
 
 COMPOSE_CHILD = textwrap.dedent(
     """
@@ -33,7 +30,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    assert Path(sys.prefix).resolve() == checkout / ".venv"
+    assert Path(sys.prefix).resolve() == (checkout / ".venv").resolve()
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -164,9 +161,7 @@ def test_max_samples_retains_per_bin_class_balance() -> None:
         assert int(labels[selected][in_bin].sum()) * 2 == int(in_bin.sum())
 
 
-def test_copied_helper_drift_refuses_before_child_target(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_copied_helper_drift_refuses_before_child_target(tmp_path: Path, monkeypatch) -> None:
     """Catch entry-only pinning or a child that silently recaptures edited helpers."""
     from core.generated_library import bind_generated_library_to_workspace
     from core.local_code import LocalCodeError
@@ -187,15 +182,11 @@ def test_copied_helper_drift_refuses_before_child_target(
     target = tmp_path / "target.py"
     target.write_text(f"from pathlib import Path\nPath({str(marker)!r}).touch()\n")
     environment: dict[str, str] = {}
-    bind_generated_library_to_workspace(
-        str(tmp_path / "workspace"), environ=environment
-    )
+    bind_generated_library_to_workspace(str(tmp_path / "workspace"), environ=environment)
     for key, value in environment.items():
         monkeypatch.setenv(key, value)
     with run_registration_scope():
-        composition = compose_run_task_bindings(
-            str(copied / "compositions/signal_background.yaml")
-        )
+        composition = compose_run_task_bindings(str(copied / "compositions/signal_background.yaml"))
         with bind_run_task_composition(composition, physical_data_root=str(tmp_path)):
             invocation = prepare_child([sys.executable, str(target)], subprocess_env())
             assert "PYTHONPATH" not in invocation.env
@@ -213,9 +204,7 @@ def test_copied_helper_drift_refuses_before_child_target(
                     check=False,
                 )
                 assert completed.returncode == REFUSAL_EXIT, completed.stderr
-                with pytest.raises(
-                    LocalCodeError, match="energy_matched_auc.py"
-                ) as refusal:
+                with pytest.raises(LocalCodeError, match=r"energy_matched_auc\.py") as refusal:
                     invocation.check(completed.returncode)
                 assert "member digest mismatch" in str(refusal.value)
                 assert not marker.exists()

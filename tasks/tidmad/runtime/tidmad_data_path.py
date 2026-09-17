@@ -85,6 +85,7 @@ from execute_tools.task_data_path import (
     ScopeBuildRequest,
     StorageReadScope,
     TaskEvaluationPayload,
+    TaskOutputArtifactInventory,
     ValidationScopeError,
 )
 
@@ -1383,9 +1384,7 @@ class TidmadTaskDataPath:
                         storage_dtype=storage_np,
                     )
                 else:
-                    denoised[local_row] = (decoded - encoding.value_offset).astype(
-                        storage_np
-                    )
+                    denoised[local_row] = (decoded - encoding.value_offset).astype(storage_np)
                 consumed += 1
 
             self._persist_file(
@@ -1470,3 +1469,20 @@ class TidmadTaskDataPath:
                 continue
             payload[file_index] = os.path.join(request.deliverable_dir, entry)
         return TaskEvaluationPayload(value=payload, deliverables=payload)
+
+    def enumerate_output_artifacts(
+        self, request: EvaluationReadRequest
+    ) -> TaskOutputArtifactInventory:
+        """List only this attempt's ABRA files through the scoring naming authority."""
+        payload = self.read_evaluation_payload(request)
+        paths = (
+            tuple(sorted(Path(path).name for path in payload.deliverables.values()))
+            if isinstance(payload, TaskEvaluationPayload)
+            else ()
+        )
+        return TaskOutputArtifactInventory(
+            run_name=request.run_name,
+            exp_id=request.exp_id,
+            model_type=request.model_type,
+            relative_paths=paths,
+        )

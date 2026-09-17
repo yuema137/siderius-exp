@@ -11,7 +11,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from tasks.majorana_low_avse.plugins._majorana_data import _balanced_indices
 
 EXP_ROOT = Path(__file__).resolve().parents[3]
@@ -26,7 +25,7 @@ COMPOSE_CHILD = textwrap.dedent(
     from pathlib import Path
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
-    assert Path(sys.prefix).resolve() == checkout / ".venv"
+    assert Path(sys.prefix).resolve() == (checkout / ".venv").resolve()
     from workflows.task_composition import compose_run_task_bindings
     composition = compose_run_task_bindings(str(manifest))
     from types import SimpleNamespace
@@ -243,14 +242,10 @@ def test_demo_locks_snapshot_scope_and_surfaces_resource_advice(
 @pytest.mark.real_data
 def test_official_train_and_test_event_ids_do_not_overlap() -> None:
     configured = os.environ.get("MAJORANA_DATA_DIR")
-    assert configured, (
-        "MAJORANA_DATA_DIR must explicitly name the verified official release"
-    )
+    assert configured, "MAJORANA_DATA_DIR must explicitly name the verified official release"
     data_dir = Path(configured).expanduser()
     if not data_dir.is_dir():
-        raise AssertionError(
-            "MAJORANA_DATA_DIR must name the verified official release"
-        )
+        raise AssertionError("MAJORANA_DATA_DIR must name the verified official release")
     import h5py
 
     train = []

@@ -14,6 +14,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pytest
+
 from execute_tools.task_data_path import (
     EpochSamplingParams,
     EvalMaterializationParams,
@@ -42,9 +43,7 @@ EXPECTED_NETWORKS = {
     ],
 }
 LAUNCHER = EXP_ROOT / "experiments" / "cancer_gene_identification" / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = (
-    (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
-)
+EXPECTED_FRAMEWORK_REVISION = (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
 
 
 def _task_module():
@@ -66,7 +65,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    assert Path(sys.prefix).resolve() == checkout / ".venv"
+    assert Path(sys.prefix).resolve() == (checkout / ".venv").resolve()
 
     from execute_tools.task_data_path import (
         ScopeBuildRequest,
@@ -123,9 +122,7 @@ COMPOSE_CHILD = textwrap.dedent(
 def _siderius_checkout() -> Path:
     configured = os.environ.get("SIDERIUS_CHECKOUT")
     if not configured:
-        raise AssertionError(
-            "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
-        )
+        raise AssertionError("SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test")
     checkout = Path(configured).resolve()
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -195,9 +192,7 @@ def test_mtg_size_treatment_changes_masks_without_changing_the_graph(
 
     task = module.CancerGeneTaskDataPath(instances=["mtg"])
     complete_scope = task.build_training_scope(
-        ScopeBuildRequest(
-            round_kind="formal", selection_strategy="snapshot", portion=1.0, seed=7
-        )
+        ScopeBuildRequest(round_kind="formal", selection_strategy="snapshot", portion=1.0, seed=7)
     )
     trial_input, trial_target = task.training_dataset(
         complete_scope,
@@ -208,14 +203,10 @@ def test_mtg_size_treatment_changes_masks_without_changing_the_graph(
         EpochSamplingParams(data_dir=str(tmp_path), train_portion=1.0, epoch_seed=11),
     )[0]
     trial_eval_scope = task.build_eval_scope(
-        ScopeBuildRequest(
-            round_kind="trial", selection_strategy="snapshot", portion=0.25, seed=13
-        )
+        ScopeBuildRequest(round_kind="trial", selection_strategy="snapshot", portion=0.25, seed=13)
     )
     formal_eval_scope = task.build_eval_scope(
-        ScopeBuildRequest(
-            round_kind="formal", selection_strategy="snapshot", portion=1.0, seed=13
-        )
+        ScopeBuildRequest(round_kind="formal", selection_strategy="snapshot", portion=1.0, seed=13)
     )
     _, trial_eval_target = task.validation_dataset(
         trial_eval_scope, EvalMaterializationParams(data_dir=str(tmp_path))
@@ -297,9 +288,7 @@ def test_experiment_dry_run_preserves_the_trial_formal_treatment(
     }
     for index, command in enumerate(commands, start=1):
         assert command[command.index("--start_iteration") + 1] == str(index)
-        assert command[command.index("--task_composition") + 1] == str(
-            COMPOSITIONS[experiment]
-        )
+        assert command[command.index("--task_composition") + 1] == str(COMPOSITIONS[experiment])
         assert "--no-runtime_watchdog" in command
         for flag, expected in expected_values.items():
             assert command[command.index(flag) + 1] == expected
@@ -351,15 +340,11 @@ def test_mtg_campaign_surfaces_locked_resource_treatment(tmp_path: Path) -> None
             "--runtime_verification_max_wall_seconds": "420",
             "--trial_vram_budget_gb": "20",
             "--formal_vram_budget_gb": "20",
-            "--advice_sha256": (
-                "c180d6a5238ccbabeb800c5c9bb539661a4f66c8bdced1b5cbff1cda14ab673f"
-            ),
+            "--advice_sha256": ("c180d6a5238ccbabeb800c5c9bb539661a4f66c8bdced1b5cbff1cda14ab673f"),
         }
         for flag, expected in expected_values.items():
             assert command[command.index(flag) + 1] == expected
-        assert Path(command[command.index("--advice") + 1]).name == (
-            "mtg_campaign_v5.json"
-        )
+        assert Path(command[command.index("--advice") + 1]).name == ("mtg_campaign_v5.json")
 
 
 def test_watchdog_replay_is_explicit_and_bounded(tmp_path: Path) -> None:

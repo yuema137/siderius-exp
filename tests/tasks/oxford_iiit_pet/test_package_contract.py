@@ -13,18 +13,13 @@ from pathlib import Path
 
 import yaml
 
-
 EXP_ROOT = Path(__file__).resolve().parents[3]
 PACK = EXP_ROOT / "tasks" / "oxford_iiit_pet"
 COMPOSITION = PACK / "compositions" / "bounded_qualification.yaml"
 MANIFESTS = PACK / "data" / "manifests"
-EXPERIMENT = (
-    EXP_ROOT / "experiments" / "oxford_iiit_pet" / "two_iteration_qualification"
-)
+EXPERIMENT = EXP_ROOT / "experiments" / "oxford_iiit_pet" / "two_iteration_qualification"
 LAUNCHER = EXPERIMENT / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = (
-    (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
-)
+EXPECTED_FRAMEWORK_REVISION = (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
 
 COMPOSE_CHILD = textwrap.dedent(
     """
@@ -35,7 +30,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    assert Path(sys.prefix).resolve() == checkout / ".venv"
+    assert Path(sys.prefix).resolve() == (checkout / ".venv").resolve()
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -84,9 +79,7 @@ COMPOSE_CHILD = textwrap.dedent(
 def _siderius_checkout() -> Path:
     configured = os.environ.get("SIDERIUS_CHECKOUT")
     if not configured:
-        raise AssertionError(
-            "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
-        )
+        raise AssertionError("SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test")
     checkout = Path(configured).resolve()
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -116,8 +109,11 @@ def test_composition_resolves_only_task_owned_science() -> None:
     checkout = _siderius_checkout()
     completed = subprocess.run(
         [
-            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
-            str(checkout), str(COMPOSITION),
+            str(checkout / ".venv/bin/python"),
+            "-c",
+            COMPOSE_CHILD,
+            str(checkout),
+            str(COMPOSITION),
         ],
         cwd=checkout,
         text=True,
@@ -215,8 +211,7 @@ def test_experiment_dry_run_reaches_the_selected_framework_checkout(
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "[DRY-RUN] would exec" in completed.stdout
     assert (
-        str((checkout / "src" / "workflows" / "run_one_iteration.py").resolve())
-        in completed.stdout
+        str((checkout / "src" / "workflows" / "run_one_iteration.py").resolve()) in completed.stdout
     )
     assert str(COMPOSITION.resolve()) in completed.stdout
     assert f"--workspace {workspace}" in completed.stdout

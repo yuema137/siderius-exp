@@ -11,18 +11,13 @@ import sys
 import textwrap
 from pathlib import Path
 
-
 EXP_ROOT = Path(__file__).resolve().parents[3]
 PACK = EXP_ROOT / "tasks" / "davis_future_prediction"
 COMPOSITION = PACK / "compositions" / "bounded_qualification.yaml"
 MANIFESTS = PACK / "data" / "manifests"
-EXPERIMENT = (
-    EXP_ROOT / "experiments" / "davis_future_prediction" / "two_iteration_qualification"
-)
+EXPERIMENT = EXP_ROOT / "experiments" / "davis_future_prediction" / "two_iteration_qualification"
 LAUNCHER = EXPERIMENT / "launch.sh"
-EXPECTED_FRAMEWORK_REVISION = (
-    (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
-)
+EXPECTED_FRAMEWORK_REVISION = (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
 
 COMPOSE_CHILD = textwrap.dedent(
     """
@@ -33,7 +28,7 @@ COMPOSE_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     pack = manifest.parent.parent
-    assert Path(sys.prefix).resolve() == checkout / ".venv"
+    assert Path(sys.prefix).resolve() == (checkout / ".venv").resolve()
 
     from workflows import task_composition as composition_module
     from workflows.task_composition import compose_run_task_bindings
@@ -87,7 +82,7 @@ ISOLATED_METRIC_CHILD = textwrap.dedent(
     checkout = Path(sys.argv[1]).resolve()
     manifest = Path(sys.argv[2]).resolve()
     deliverable = Path(sys.argv[3]).resolve()
-    assert Path(sys.prefix).resolve() == checkout / ".venv"
+    assert Path(sys.prefix).resolve() == (checkout / ".venv").resolve()
 
     import numpy as np
     from execute_tools.task_data_path import bind_task_data_path
@@ -113,9 +108,7 @@ ISOLATED_METRIC_CHILD = textwrap.dedent(
 def _siderius_checkout() -> Path:
     configured = os.environ.get("SIDERIUS_CHECKOUT")
     if not configured:
-        raise AssertionError(
-            "SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test"
-        )
+        raise AssertionError("SIDERIUS_CHECKOUT must name the exact SIDERIUS checkout under test")
     checkout = Path(configured).resolve()
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -137,8 +130,11 @@ def test_composition_resolves_only_task_owned_science() -> None:
     checkout = _siderius_checkout()
     completed = subprocess.run(
         [
-            str(checkout / ".venv/bin/python"), "-c", COMPOSE_CHILD,
-            str(checkout), str(COMPOSITION),
+            str(checkout / ".venv/bin/python"),
+            "-c",
+            COMPOSE_CHILD,
+            str(checkout),
+            str(COMPOSITION),
         ],
         cwd=checkout,
         text=True,

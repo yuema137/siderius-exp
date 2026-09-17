@@ -9,15 +9,17 @@ from typing import Any, ClassVar
 
 import numpy as np
 import torch
+from torch.utils.data import Dataset
+
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
     ScopeBuildRequest,
+    TaskOutputArtifactInventory,
     register_task_data_path,
 )
-from torch.utils.data import Dataset
 
 from ._majorana_data import MajoranaScope, MajoranaWaveformDataset, materialize_scope
 
@@ -45,9 +47,7 @@ class MajoranaTaskDataPath:
 
     def serialize_scope(self, scope: object) -> str:
         checked = self._scope(scope)
-        return json.dumps(
-            {"kind": self._SCOPE_KIND, "scope": checked.model_dump()}, sort_keys=True
-        )
+        return json.dumps({"kind": self._SCOPE_KIND, "scope": checked.model_dump()}, sort_keys=True)
 
     def deserialize_scope(self, payload: str) -> object:
         value = json.loads(payload)
@@ -61,23 +61,15 @@ class MajoranaTaskDataPath:
             raise TypeError("Majorana data path requires a MajoranaScope")
         return scope
 
-    def training_dataset(
-        self, scope: object, params: EpochSamplingParams
-    ) -> Dataset[Any]:
-        events = materialize_scope(
-            self._scope(scope), params.data_dir, params.train_portion or 1.0
-        )
+    def training_dataset(self, scope: object, params: EpochSamplingParams) -> Dataset[Any]:
+        events = materialize_scope(self._scope(scope), params.data_dir, params.train_portion or 1.0)
         return MajoranaWaveformDataset(events, params.data_dir)
 
-    def validation_dataset(
-        self, scope: object, params: EvalMaterializationParams
-    ) -> Dataset[Any]:
+    def validation_dataset(self, scope: object, params: EvalMaterializationParams) -> Dataset[Any]:
         events = materialize_scope(self._scope(scope), params.data_dir)
         return MajoranaWaveformDataset(events, params.data_dir)
 
-    def write_deliverable(
-        self, outputs: Iterable[Any], request: DeliverableWriteRequest
-    ) -> None:
+    def write_deliverable(self, outputs: Iterable[Any], request: DeliverableWriteRequest) -> None:
         path = Path(request.output_dir) / deliverable_name(request)
         with path.open("w", encoding="utf-8", newline="") as handle:
             handle.write("row_index,accepted_probability\n")
@@ -102,6 +94,19 @@ class MajoranaTaskDataPath:
                 raise ValueError("Majorana deliverable row order is not contiguous")
             values.append(float(score))
         return np.asarray(values, dtype=np.float64)
+
+    def enumerate_output_artifacts(
+        self, request: EvaluationReadRequest
+    ) -> TaskOutputArtifactInventory:
+        """List the exact attempt CSV, including a partially written file."""
+        name = deliverable_name(request)
+        path = Path(request.deliverable_dir) / name
+        return TaskOutputArtifactInventory(
+            run_name=request.run_name,
+            exp_id=request.exp_id,
+            model_type=request.model_type,
+            relative_paths=(name,) if path.exists() or path.is_symlink() else (),
+        )
 
 
 def deliverable_name(request: DeliverableWriteRequest | EvaluationReadRequest) -> str:

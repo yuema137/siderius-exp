@@ -17,16 +17,18 @@ from typing import Any, ClassVar, Literal
 import h5py
 import numpy as np
 import torch
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
+
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
     ScopeBuildRequest,
+    TaskOutputArtifactInventory,
     ValidationScopeError,
 )
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
 
 CANCER_GENE_TASK_ID = "naturebench_cancer_gene"
 INSTANCES = ("cpdb", "stringdb", "pcnet", "iref_v15", "iref_v9", "multinet", "mtg", "ltg")
@@ -53,9 +55,7 @@ class CancerGeneScope(BaseModel):
         if self.max_active_nodes is not None:
             keep = min(keep, self.max_active_nodes)
         if keep < active.size:
-            digest = hashlib.sha256(
-                f"{self.sampling_seed}:{network}:{split}".encode()
-            ).digest()
+            digest = hashlib.sha256(f"{self.sampling_seed}:{network}:{split}".encode()).digest()
             rng = np.random.default_rng(int.from_bytes(digest[:8], "big"))
             active = np.sort(rng.choice(active, size=keep, replace=False))
         selected = np.zeros(np.asarray(mask).size, dtype=bool)
@@ -158,12 +158,8 @@ class CancerGeneTaskDataPath:
     @staticmethod
     def custom_loss_validation_pair() -> tuple[torch.Tensor, torch.Tensor]:
         """Return a tiny labeled-node pair without reading NatureBench data."""
-        prediction = torch.tensor(
-            [[[1.0, 1.0, 0.25], [0.0, 1.0, 0.0]]], dtype=torch.float32
-        )
-        target = torch.tensor(
-            [[[1.0, 1.0, 1.0], [0.0, 1.0, -1.0]]], dtype=torch.float32
-        )
+        prediction = torch.tensor([[[1.0, 1.0, 0.25], [0.0, 1.0, 0.0]]], dtype=torch.float32)
+        target = torch.tensor([[[1.0, 1.0, 1.0], [0.0, 1.0, -1.0]]], dtype=torch.float32)
         return prediction, target
 
     def __init__(
@@ -212,14 +208,10 @@ class CancerGeneTaskDataPath:
         )
 
     def build_training_scope(self, request: ScopeBuildRequest) -> object:
-        return self._scope_from_request(
-            self._select(request), request, self._evaluation_split
-        )
+        return self._scope_from_request(self._select(request), request, self._evaluation_split)
 
     def build_eval_scope(self, request: ScopeBuildRequest) -> object:
-        return self._scope_from_request(
-            self._select(request), request, self._evaluation_split
-        )
+        return self._scope_from_request(self._select(request), request, self._evaluation_split)
 
     def max_inference_batch_size(self) -> int:
         """Whole-network records have variable lengths and cannot be stacked."""
@@ -309,3 +301,29 @@ class CancerGeneTaskDataPath:
             name: np.load(Path(request.deliverable_dir) / relative)
             for name, relative in manifest["files"].items()
         }
+
+    def enumerate_output_artifacts(
+        self, request: EvaluationReadRequest
+    ) -> TaskOutputArtifactInventory:
+        """List this attempt's manifest and any partially written nested arrays."""
+        root = Path(request.deliverable_dir)
+        manifest_name = deliverable_name(request)
+        manifest_path = root / manifest_name
+        arrays_root = root / manifest_name.removesuffix(".json")
+        paths = [manifest_name] if manifest_path.exists() or manifest_path.is_symlink() else []
+        if arrays_root.is_dir() and not arrays_root.is_symlink():
+            paths.extend(
+                str(path.relative_to(root))
+                for path in arrays_root.rglob("*")
+                if path.is_file() or path.is_symlink()
+            )
+        elif arrays_root.exists() or arrays_root.is_symlink():
+            # A non-directory attempt root is not a valid output; the generic
+            # validator will refuse it rather than ignore suspicious bytes.
+            paths.append(str(arrays_root.relative_to(root)))
+        return TaskOutputArtifactInventory(
+            run_name=request.run_name,
+            exp_id=request.exp_id,
+            model_type=request.model_type,
+            relative_paths=tuple(sorted(paths)),
+        )

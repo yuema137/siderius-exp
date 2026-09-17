@@ -29,6 +29,10 @@ from pathlib import Path
 from typing import Any, ClassVar
 
 import torch
+from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
+
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
@@ -37,13 +41,11 @@ from execute_tools.task_data_path import (
     HealthCoverageRequest,
     HealthCoverageResult,
     ScopeBuildRequest,
+    TaskOutputArtifactInventory,
     ValidationScopeError,
     deserialize_rows_scope,
     register_task_data_path,
 )
-from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
 
 #: Frozen preprocessing parameters (§22.9a; interpolation frozen by D14-2).
 RESIZE_SHORTER_SIDE = 160
@@ -334,9 +336,7 @@ class PetsTaskDataPath:
         """
         return self._select(request, source=self._eval_manifest_path or self._manifest_path)
 
-    def validate_health_coverage(
-        self, request: HealthCoverageRequest
-    ) -> HealthCoverageResult:
+    def validate_health_coverage(self, request: HealthCoverageRequest) -> HealthCoverageResult:
         """Declare whether this attempt has samples for Pets Health checks.
 
         Pets Health is prediction-dependent: the task-owned Health provider
@@ -443,6 +443,21 @@ class PetsTaskDataPath:
         if probabilities is None:
             return payload
         return PetsEvaluationPayload(labels=payload, probabilities=probabilities)
+
+    def enumerate_output_artifacts(
+        self, request: EvaluationReadRequest
+    ) -> TaskOutputArtifactInventory:
+        """Include both the label CSV and optional probability sidecar."""
+        root = Path(request.deliverable_dir)
+        names = (deliverable_name(request), probabilities_sidecar_name(request))
+        return TaskOutputArtifactInventory(
+            run_name=request.run_name,
+            exp_id=request.exp_id,
+            model_type=request.model_type,
+            relative_paths=tuple(
+                name for name in names if (root / name).exists() or (root / name).is_symlink()
+            ),
+        )
 
 
 class PetsEvaluationPayload(Mapping):

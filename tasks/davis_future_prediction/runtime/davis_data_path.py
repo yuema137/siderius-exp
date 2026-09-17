@@ -34,6 +34,10 @@ from typing import Any, ClassVar
 
 import numpy as np
 import torch
+from PIL import Image
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
+
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
@@ -42,13 +46,11 @@ from execute_tools.task_data_path import (
     HealthCoverageRequest,
     HealthCoverageResult,
     ScopeBuildRequest,
+    TaskOutputArtifactInventory,
     ValidationScopeError,
     deserialize_rows_scope,
     register_task_data_path,
 )
-from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
 
 #: Frozen geometry (§22.9a; resize rule frozen by D14-3).
 FRAME_WIDTH = 224
@@ -113,9 +115,7 @@ def load_davis_sequences(path: str | Path) -> tuple[SequenceRow, ...]:
     return tuple(rows)
 
 
-def load_davis_clips(
-    path: str | Path, *, scope: str | None = None
-) -> tuple[DavisClip, ...]:
+def load_davis_clips(path: str | Path, *, scope: str | None = None) -> tuple[DavisClip, ...]:
     """Parse the committed ``clips.csv``, optionally filtered to one scope.
 
     The scope filter is the LEAKAGE guard's reader half: a caller asks for
@@ -134,9 +134,7 @@ def load_davis_clips(
         sequence_name, start_frame, row_scope = line.split(",")
         if scope is not None and row_scope != scope:
             continue
-        rows.append(
-            DavisClip(sequence_name=sequence_name, start_frame=int(start_frame))
-        )
+        rows.append(DavisClip(sequence_name=sequence_name, start_frame=int(start_frame)))
     return tuple(rows)
 
 
@@ -213,14 +211,10 @@ def decode_frame(path: str | Path) -> torch.Tensor:
     return hwc.permute(2, 0, 1).contiguous().to(torch.float32).div_(255.0)
 
 
-def load_window(
-    data_dir: str | Path, clip: DavisClip
-) -> tuple[torch.Tensor, torch.Tensor]:
+def load_window(data_dir: str | Path, clip: DavisClip) -> tuple[torch.Tensor, torch.Tensor]:
     """``(context [3,8,128,224], target [3,4,128,224])`` for one clip."""
     frames = [
-        decode_frame(
-            frame_path(data_dir, clip.sequence_name, clip.start_frame + offset)
-        )
+        decode_frame(frame_path(data_dir, clip.sequence_name, clip.start_frame + offset))
         for offset in range(WINDOW_FRAMES)
     ]
     context = torch.stack(frames[:CONTEXT_FRAMES], dim=1)
@@ -371,9 +365,7 @@ class DavisTaskDataPath:
     # TaskScopeCapability (PR-12bc B8)
     # ------------------------------------------------------------------
 
-    def _select(
-        self, request: ScopeBuildRequest, *, source: str | None = None
-    ) -> DavisScope:
+    def _select(self, request: ScopeBuildRequest, *, source: str | None = None) -> DavisScope:
         source = source or self._clips_path
         if source is None:
             raise ValueError(
@@ -423,9 +415,7 @@ class DavisTaskDataPath:
         """
         return self._select(request, source=self._eval_clips_path or self._clips_path)
 
-    def validate_health_coverage(
-        self, request: HealthCoverageRequest
-    ) -> HealthCoverageResult:
+    def validate_health_coverage(self, request: HealthCoverageRequest) -> HealthCoverageResult:
         """Declare coverage for DAVIS' whole-output Health family."""
         scope = self._scope(request.evaluation_scope)
         if not scope.rows:
@@ -463,9 +453,7 @@ class DavisTaskDataPath:
             )
         return scope
 
-    def training_dataset(
-        self, scope: object, params: EpochSamplingParams
-    ) -> Dataset[Any]:
+    def training_dataset(self, scope: object, params: EpochSamplingParams) -> Dataset[Any]:
         s = self._scope(scope)
         if params.train_portion is not None and params.train_portion < 1.0:
             raise ValueError(
@@ -476,9 +464,7 @@ class DavisTaskDataPath:
         rows = s.rows if params.max_samples is None else s.rows[: params.max_samples]
         return _DavisWindowDataset(rows, Path(params.data_dir))
 
-    def validation_dataset(
-        self, scope: object, params: EvalMaterializationParams
-    ) -> Dataset[Any]:
+    def validation_dataset(self, scope: object, params: EvalMaterializationParams) -> Dataset[Any]:
         s = self._scope(scope)
         return _DavisWindowDataset(s.rows, Path(params.data_dir))
 
@@ -513,16 +499,25 @@ class DavisTaskDataPath:
         with np.load(path) as handle:
             return {key: handle[key] for key in handle.files}
 
-    def evaluation_truth(
-        self, scope: object, data_dir: str | Path
-    ) -> dict[str, np.ndarray]:
+    def enumerate_output_artifacts(
+        self, request: EvaluationReadRequest
+    ) -> TaskOutputArtifactInventory:
+        """List the exact attempt NPZ, including a partially written file."""
+        name = deliverable_name(request)
+        path = Path(request.deliverable_dir) / name
+        return TaskOutputArtifactInventory(
+            run_name=request.run_name,
+            exp_id=request.exp_id,
+            model_type=request.model_type,
+            relative_paths=(name,) if path.exists() or path.is_symlink() else (),
+        )
+
+    def evaluation_truth(self, scope: object, data_dir: str | Path) -> dict[str, np.ndarray]:
         """Decode evaluation targets through this task's single window reader."""
         return truth_windows(data_dir, self._scope(scope).rows)
 
 
-def truth_windows(
-    data_dir: str | Path, clips: Sequence[DavisClip]
-) -> dict[str, np.ndarray]:
+def truth_windows(data_dir: str | Path, clips: Sequence[DavisClip]) -> dict[str, np.ndarray]:
     """``{clip_key: target [3,4,128,224]}`` — the evaluation ground truth,
     decoded through the SAME frozen transform the reader uses (one
     authority; the metric never re-derives pixels)."""
