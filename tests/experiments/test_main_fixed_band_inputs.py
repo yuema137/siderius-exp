@@ -48,6 +48,11 @@ def test_main_band_refuses_other_band_visibility_and_wrong_anchor(tmp_path: Path
         verify_band_inputs(repository, data, "15-19")
 
     (data / "abra_training_0004.h5").unlink()
+    (data / "prior-results.json").write_text("{}")
+    with pytest.raises(ValueError, match="outside band"):
+        verify_band_inputs(repository, data, "15-19")
+
+    (data / "prior-results.json").unlink()
     (data / "segment_anchors.json").write_bytes(b"wrong")
     with pytest.raises(ValueError, match="staged segment_anchors"):
         verify_band_inputs(repository, data, "15-19")

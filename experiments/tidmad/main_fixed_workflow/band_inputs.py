@@ -28,8 +28,8 @@ def verify_band_inputs(repository_root: Path, data_dir: Path, band: str) -> dict
         for family in ("training", "validation")
         for index in BANDS[band]
     }
-    visible = {path.name for path in data_dir.glob("abra_*.h5")}
-    unexpected = visible - names
+    visible = {path.name for path in data_dir.iterdir()} if data_dir.is_dir() else set()
+    unexpected = visible - names - {"segment_anchors.json"}
     if unexpected:
         raise ValueError(f"data directory exposes files outside band {band}: {sorted(unexpected)}")
     manifest = repository_root / "campaigns/tidmad_gold/inputs/q3_data_manifest.sha256"
