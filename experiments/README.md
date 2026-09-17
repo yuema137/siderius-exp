@@ -8,6 +8,7 @@ workspace; use `--dry-run` where the launcher supports it.
 | Task family | Bounded qualification | Notes |
 |---|---|---|
 | TIDMAD | [`two_iteration_qualification/`](tidmad/two_iteration_qualification/) | engineering qualification; not Gold |
+| TIDMAD coding-agent baseline | [`coding_agent_baseline/`](tidmad/coding_agent_baseline/) | four independent no-advice Codex band units; launch record, not final results |
 | TIDMAD raw Data Analysis | [`data_analysis_raw_characterization/`](tidmad/data_analysis_raw_characterization/) | full high-frequency band, raw-data smoke only; not the matched ON/OFF treatment |
 | TIDMAD Data Analysis pair | [`data_analysis_pair/`](tidmad/data_analysis_pair/) | bounded local ON/OFF qualification; Literature Review runs first |
 | Oxford-IIIT Pet | [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | consumer-pair qualification |
