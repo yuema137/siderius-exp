@@ -52,14 +52,14 @@ from agent.schemas.data_analysis.assets import (
 )
 from agent.schemas.data_analysis.common import CertifiedArtifactRef, canonical_sha256
 from agent.schemas.data_analysis.resources import CertifiedSelectionIdentity
-from agent.schemas.data_analysis.view_formats import NUMERIC_ARRAY_V1, TIMESERIES_ARRAY_V1
+from agent.schemas.data_analysis.view_formats import (
+    NUMERIC_ARRAY_V1,
+    TIMESERIES_ARRAY_V1,
+)
 from execute_tools.analysis_materialization import (
     AuthorizedAnalysisMaterializationRequest,
     HistoricalInferenceInputDerivationRequest,
 )
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.array2h5 import create_abra_file
 from execute_tools.data_paths import resolve_physical_data_root
 from execute_tools.dataset_config import (
@@ -88,6 +88,9 @@ from execute_tools.task_data_path import (
     TaskOutputArtifactInventory,
     ValidationScopeError,
 )
+from execute_tools.training_pool import FrozenTrainingPool
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
@@ -1485,4 +1488,102 @@ class TidmadTaskDataPath:
             exp_id=request.exp_id,
             model_type=request.model_type,
             relative_paths=paths,
+        )
+
+
+class TidmadFrozenPoolDataPath(TidmadTaskDataPath):
+    """Opt-in fixed training parent; legacy TIDMAD bindings stay unchanged."""
+
+    _POOL_PATH = (
+        Path(__file__).resolve().parents[1] / "declared/frozen_training_pool_v1.json"
+    )
+    _POOL_SHA256 = "f74171c4bfee9f25d5f32fb4e3c5776af7114d4e46cf36af30798bef4c4e1fe5"
+
+    def _pool_indices(self, request: ScopeBuildRequest) -> dict[int, list[int]]:
+        payload = self._POOL_PATH.read_bytes()
+        if hashlib.sha256(payload).hexdigest() != self._POOL_SHA256:
+            raise ValueError("TIDMAD frozen training pool manifest digest mismatch")
+        manifest = json.loads(payload)
+        profile = resolve_dataset_profile()
+        topology = tidmad_topology(profile).dataset
+        expected = set(range(profile.partition_count))
+        declared = {int(key) for key in manifest["sample_set"]}
+        if (
+            declared != expected
+            or manifest["segments_per_file"] != topology.segments_per_file
+            or manifest["psd_segment_length"] != topology.psd_segment_length
+        ):
+            raise ValueError(
+                "TIDMAD frozen training pool does not match the dataset profile"
+            )
+        portion = manifest["source_portion"]
+        count = round(portion * topology.segments_per_file)
+        if portion != 0.1 or count <= 0:
+            raise ValueError(
+                "TIDMAD frozen training pool declares an unsupported portion"
+            )
+        for key, indices in manifest["sample_set"].items():
+            if (
+                len(indices) != count
+                or any(
+                    not isinstance(i, int) or i < 0 or i >= topology.segments_per_file
+                    for i in indices
+                )
+                or len(set(indices)) != count
+            ):
+                raise ValueError(
+                    f"TIDMAD frozen training pool has invalid indices for file {key}"
+                )
+        selected = build_sample_set(
+            is_trial=True,
+            trial_strategy=request.selection_strategy,
+            trial_portion=portion,
+            target_files=list(request.target_partitions) or None,
+            seed=manifest["seed"],
+            scope=DataScope.from_cli(request.subset_ref)
+            if request.subset_ref
+            else None,
+            profile=profile,
+        )
+        return {int(key): manifest["sample_set"][str(key)] for key in selected}
+
+    def build_frozen_training_pool(
+        self, request: ScopeBuildRequest
+    ) -> FrozenTrainingPool:
+        seg_size = request.task_parameters.get(self._SEG_SIZE_PARAMETER)
+        if not isinstance(seg_size, int) or seg_size <= 0:
+            raise ValueError(
+                "TIDMAD frozen pool requires a positive model segmentation size"
+            )
+        scope = TidmadScope(
+            sample_set=self._pool_indices(request),
+            seg_size=seg_size,
+            profile=resolve_dataset_profile(),
+        )
+        return FrozenTrainingPool(scope=scope, source_portion=0.1)
+
+    def sample_training_pool(self, pool: object, request: ScopeBuildRequest) -> object:
+        parent = self._scope(pool)
+        if request.seed is None:
+            raise ValueError("TIDMAD pooled Trial requires a recorded sampling seed")
+        sampled = {}
+        for file_index, indices in parent.sample_set.items():
+            count = max(1, round(request.portion * len(indices)))
+            rng = random.Random(f"{request.seed}:{file_index}")
+            sampled[file_index] = sorted(rng.sample(indices, count))
+        return TidmadScope(
+            sample_set=sampled, seg_size=parent.seg_size, profile=parent.profile
+        )
+
+    def training_scope_is_contained(self, child: object, pool: object) -> bool:
+        selected = self._scope(child)
+        parent = self._scope(pool)
+        return (
+            selected.seg_size == parent.seg_size
+            and selected.profile == parent.profile
+            and bool(selected.sample_set)
+            and all(
+                key in parent.sample_set and set(indices) <= set(parent.sample_set[key])
+                for key, indices in selected.sample_set.items()
+            )
         )

@@ -355,7 +355,12 @@ def test_single_band_bundle_has_regression_codec_without_private_truth(tmp_path,
         assert f"{root}/input/advice.json" not in names
         assert f"{root}/evaluator/evaluation_scopes/band-4-9-final.json" in names
         assert f"{root}/evaluator/evaluation_scopes/all-final.json" not in names
-        assert _archive_json(archive, f"{root}/evaluator/unit.json")["band"] == "4-9"
+        unit = _archive_json(archive, f"{root}/evaluator/unit.json")
+        assert unit["band"] == "4-9"
+        assert unit["training_pool_sha256"] == hashlib.sha256(
+            (REPOSITORY_ROOT / "tasks/tidmad/declared/frozen_training_pool_v1.json").read_bytes()
+        ).hexdigest()
+        assert f"{root}/input/tasks/tidmad/declared/frozen_training_pool_v1.json" in names
         kickoff = archive.extractfile(f"{root}/input/task.md")
         assert kickoff is not None
         text = kickoff.read().decode()

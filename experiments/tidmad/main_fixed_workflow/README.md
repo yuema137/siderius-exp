@@ -2,9 +2,14 @@
 
 This is a partial, non-launchable starting point for the planned one-band,
 24-hour main experiment. `workflow.json` pins the continuous-regression task,
-the shared OpenAI agent configuration, and the exact 40,000-sample segment
-length through SIDERIUS's existing workflow parameter-rule mechanism. It does
-not choose Trial/Formal budgets, an iteration schedule, a workspace, or a band.
+the shared OpenAI agent configuration, the exact 40,000-sample segment
+length, and the frozen training parent declared by the task-owned composition.
+Each file contributes the same 20 of 200 PSD segments to its parent pool;
+Formal uses all 20 and Trial samples its proposed portion from those 20.
+The file-index restriction still comes from the selected band. Evaluation
+remains independently full-scope. The pool manifest is content-pinned by the
+task data path and shared by all four bands. This directory still does not
+choose Trial/Formal budgets, an iteration schedule, a workspace, or a band.
 
 The future launcher will accept one treatment selector (`full` or `no-prior`).
 Both treatments must use the same workflow and agent-parameter JSON. The
