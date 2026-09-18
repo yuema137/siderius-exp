@@ -7,9 +7,9 @@
     "--no-runtime_watchdog": true,
     "--num_iterations": 100,
     "--max_rounds": 3,
-    "--max_epochs": 2,
-    "--trial_max_epochs": 2,
-    "--formal_max_epochs": 2,
+    "--max_epochs": 100,
+    "--trial_max_epochs": 100,
+    "--formal_max_epochs": 100,
     "--trial_time_budget_minutes": 30,
     "--formal_time_budget_minutes": 120,
     "--trial_vram_budget_gb": 40,
@@ -17,9 +17,12 @@
     "--formal_training_scope_source": "operator",
     "--formal_portion": 0.1,
     "--formal_train_portion": 1.0,
-    "--formal_eval_portion": 1.0
+    "--formal_eval_portion": 1.0,
+    "--training_budget_reserve_fraction": 0.2
   },
   "workflow_parameter_rules": {
-    "model_config.segmentation_size": {"exact": 40000}
+    "model_config.segmentation_size": {
+      "exact": 40000
+    }
   }
 }

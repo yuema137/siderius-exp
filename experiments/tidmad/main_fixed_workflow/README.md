@@ -15,8 +15,16 @@ parent. Trial validation portion remains agent-chosen. Formal evaluation
 scores the complete validation band. This changes the experiment binding,
 not any file in `tasks/tidmad`.
 The shared configuration
-sets a 100-iteration ceiling, three rounds, two epochs, 30/120-minute
-Trial/Formal time-admission budgets, and 40-GiB VRAM limits. The workspace, band, and 24-hour
+sets a 100-iteration ceiling, three rounds, at most 100 epochs, 30/120-minute
+Trial/Formal execution allowances, and 40-GiB VRAM limits. Cooperative training
+is explicitly enabled with `--training_budget_reserve_fraction 0.2`. After
+each full validation pass, training continues only if another complete epoch
+fits while preserving this operator allowance for final inference, scoring
+and saving. No scientific early stopping is enabled; the last completed
+weights are retained. Formal has its own allocation even when it inherits the
+Trial proposal. A time/cap stop does not establish convergence; a slow single
+epoch can overrun without the prediction watchdog. Actual receipts distinguish
+the proposal, executed epochs and stop reason. The workspace, band, and 24-hour
 run deadline remain launch-owned.
 The phase runtime watchdog is explicitly disabled (`--no-runtime_watchdog`)
 to avoid terminating candidates based on estimated phase duration. The
