@@ -24,13 +24,13 @@ def _unit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     return unit
 
 
-def _call(unit: Path) -> dict[str, object]:
+def _call(unit: Path, instance: str = "f-noprior-0-3") -> dict[str, object]:
     return backup.backup_unit(
         unit_dir=unit,
         bucket="tidmad-f-noprior-0-3-a7f3",
         prefix="f-noprior-0-3/run-1",
         endpoint="https://storage.eu-north1.nebius.cloud",
-        instance="f-noprior-0-3",
+        instance=instance,
     )
 
 
@@ -60,7 +60,10 @@ def test_backup_sync_is_additive_and_includes_certified_checkpoint(
     assert [row["event"] for row in rows] == ["backup_sync"]
 
 
-def test_low_space_stops_chain_before_sync(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+@pytest.mark.parametrize("instance", ["f-noprior-0-3", "f-noprior-0-3-v2"])
+def test_low_space_stops_chain_before_sync(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, instance: str
+) -> None:
     unit = _unit(monkeypatch, tmp_path)
     calls: list[list[str]] = []
     monkeypatch.setattr(backup.shutil, "disk_usage", lambda _: SimpleNamespace(free=40 * 1024**3))
@@ -70,8 +73,8 @@ def test_low_space_stops_chain_before_sync(monkeypatch: pytest.MonkeyPatch, tmp_
         return subprocess.CompletedProcess(command, 0, "", "")
 
     monkeypatch.setattr(backup.subprocess, "run", run)
-    _call(unit)
-    assert calls[0] == ["systemctl", "stop", "tidmad-no-prior@f-noprior-0-3.service"]
+    _call(unit, instance)
+    assert calls[0] == ["systemctl", "stop", f"tidmad-no-prior@{instance}.service"]
     assert calls[1][0] == "aws"
     rows = [json.loads(line) for line in (unit / "backup_receipts.jsonl").read_text().splitlines()]
     assert [row["event"] for row in rows] == ["low_space_stop", "backup_sync"]
@@ -105,3 +108,24 @@ def test_disk_guard_does_not_need_backup_credentials(
 
     monkeypatch.setattr(backup.subprocess, "run", unexpected)
     assert backup.check_space(unit_dir=unit, instance="f-noprior-0-3") == 80 * 1024**3
+
+
+@pytest.mark.parametrize(
+    "instance",
+    [
+        "f-noprior-0-3-v2/other",
+        "f-noprior-0-3-v2\n",
+        "f-noprior-0-3-",
+        "f-noprior-0-3;stop",
+        "other@f-noprior-0-3",
+    ],
+)
+def test_unsafe_instance_is_rejected_before_disk_or_service_access(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, instance: str
+) -> None:
+    def unexpected(*args, **kwargs):
+        raise AssertionError("invalid instance must fail before inspecting the unit")
+
+    monkeypatch.setattr(backup, "_validated_unit", unexpected)
+    with pytest.raises(ValueError, match="invalid NoPrior service instance"):
+        backup.check_space(unit_dir=tmp_path, instance=instance)

@@ -22,7 +22,8 @@ from experiments.tidmad.main_fixed_workflow.unit_clock import read_launch_record
 
 MIN_FREE_GIB = 50
 _BUCKET = re.compile(r"[a-z0-9][a-z0-9.-]{2,62}")
-_INSTANCE = re.compile(r"f-noprior-[0-9]+-[0-9]+")
+# Fresh units may append a version; preserve the complete systemd identity.
+_INSTANCE = re.compile(r"f-noprior-[0-9]+-[0-9]+(?:-[a-z0-9]+)*")
 _EXCLUDES = (
     "*.pth",
     "*.h5",
