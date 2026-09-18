@@ -6,6 +6,7 @@ import argparse
 import gzip
 import json
 import os
+import re
 import subprocess
 import tarfile
 import tempfile
@@ -14,6 +15,36 @@ from pathlib import Path
 
 from .io import create_json_once, sha256_file
 from .model import BANDS, utc_text
+
+
+def _is_create_conflict(message: str) -> bool:
+    """Recognize S3 conditional-create conflicts, including compatible providers."""
+    return re.search(r"\b(?:PreconditionFailed|KeyAlreadyExists|412)\b", message) is not None
+
+
+def _verify_existing_identity(
+    *, bucket: str, key: str, identity: str, digest: str, timeout_seconds: int
+) -> None:
+    """Require the original manifest identity before recovering a lost receipt."""
+    existing = _aws(
+        "s3api",
+        "head-object",
+        "--bucket",
+        bucket,
+        "--key",
+        key,
+        timeout_seconds=timeout_seconds,
+    )
+    if existing.returncode != 0:
+        raise RuntimeError("existing backup object could not be verified")
+    metadata: dict[str, str] = {}
+    for name, value in json.loads(existing.stdout).get("Metadata", {}).items():
+        normalized = name.lower()
+        if normalized in metadata and metadata[normalized] != value:
+            raise RuntimeError("existing backup object has conflicting metadata")
+        metadata[normalized] = value
+    if metadata.get(f"{identity}-manifest-sha256") != digest:
+        raise RuntimeError(f"existing backup object has different {identity} identity")
 
 
 def _aws(*args: str, timeout_seconds: int) -> subprocess.CompletedProcess[str]:
@@ -82,26 +113,15 @@ def _publish_one(
         )
         if result.returncode != 0:
             combined = f"{result.stdout}\n{result.stderr}"
-            if "PreconditionFailed" not in combined and "412" not in combined:
-                raise RuntimeError(
-                    f"append-only candidate upload failed: {combined.strip()}"
-                )
-            existing = _aws(
-                "s3api",
-                "head-object",
-                "--bucket",
-                bucket,
-                "--key",
-                key,
+            if not _is_create_conflict(combined):
+                raise RuntimeError(f"append-only candidate upload failed: {combined.strip()}")
+            _verify_existing_identity(
+                bucket=bucket,
+                key=key,
+                identity="candidate",
+                digest=digest,
                 timeout_seconds=timeout_seconds,
             )
-            if existing.returncode != 0:
-                raise RuntimeError("existing backup object could not be verified")
-            metadata = json.loads(existing.stdout).get("Metadata", {})
-            if metadata.get("candidate-manifest-sha256") != digest:
-                raise RuntimeError(
-                    "existing backup object has different candidate identity"
-                )
         create_json_once(
             receipt,
             {
@@ -175,10 +195,15 @@ def _publish_submission(
         )
         if result.returncode != 0:
             combined = f"{result.stdout}\n{result.stderr}"
-            if "PreconditionFailed" not in combined and "412" not in combined:
-                raise RuntimeError(
-                    f"append-only submission upload failed: {combined.strip()}"
-                )
+            if not _is_create_conflict(combined):
+                raise RuntimeError(f"append-only submission upload failed: {combined.strip()}")
+            _verify_existing_identity(
+                bucket=bucket,
+                key=key,
+                identity="submission",
+                digest=digest,
+                timeout_seconds=timeout_seconds,
+            )
         create_json_once(
             receipt,
             {
@@ -246,12 +271,8 @@ def backup_completed(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--archive-root", type=Path, default=Path("/work/state/candidates")
-    )
-    parser.add_argument(
-        "--receipt-root", type=Path, default=Path("/work/state/backup_receipts")
-    )
+    parser.add_argument("--archive-root", type=Path, default=Path("/work/state/candidates"))
+    parser.add_argument("--receipt-root", type=Path, default=Path("/work/state/backup_receipts"))
     parser.add_argument("--bucket", required=True)
     parser.add_argument("--prefix", required=True)
     parser.add_argument("--submission-root", type=Path, default=Path("/work/submission"))

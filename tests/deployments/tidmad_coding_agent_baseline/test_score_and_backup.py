@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 from dataclasses import replace
@@ -39,9 +40,7 @@ def _candidate_args(tmp_path):
 def _policy(tmp_path):
     scope_root = tmp_path / "scopes"
     scope_root.mkdir(parents=True)
-    (scope_root / "band-0-3-candidate.json").write_text(
-        '{"0":[0],"1":[0],"2":[0],"3":[0]}'
-    )
+    (scope_root / "band-0-3-candidate.json").write_text('{"0":[0],"1":[0],"2":[0],"3":[0]}')
     return EvaluatorPolicy(
         input_root=tmp_path / "input",
         scope_root=scope_root,
@@ -274,9 +273,9 @@ def test_single_band_final_score_uses_full_band_scope_and_sparse_vector(tmp_path
     payload = json.loads(result.read_text())
     assert payload["valid"] is True
     assert payload["evaluation_scope"] == "band-4-9-final"
-    assert {index for index, value in enumerate(payload["file_vector"]) if value is not None} == set(
-        range(4, 10)
-    )
+    assert {
+        index for index, value in enumerate(payload["file_vector"]) if value is not None
+    } == set(range(4, 10))
     assert not any(path.exists() for path in deliverables)
 
 
@@ -469,3 +468,100 @@ def test_backup_publishes_completed_final_submission(tmp_path, monkeypatch):
 
     assert outcomes == [(submission, "created")]
     assert "/submission/" in calls[0][0][calls[0][0].index("--key") + 1]
+
+
+@pytest.mark.parametrize("identity", ["candidate", "submission"])
+@pytest.mark.parametrize("conflict", ["PreconditionFailed 412", "KeyAlreadyExists"])
+@pytest.mark.parametrize("matches", [True, False])
+@pytest.mark.parametrize("metadata_case", ["lower", "title"])
+def test_lost_backup_receipt_checks_manifest_before_recovery(
+    tmp_path, monkeypatch, identity, conflict, matches, metadata_case
+):
+    """2026-09-18: Nebius uses KeyAlreadyExists; never accept an unrelated object."""
+    source = tmp_path / "source"
+    source.mkdir()
+    manifest_name = "candidate_manifest.json" if identity == "candidate" else "manifest.json"
+    manifest = source / manifest_name
+    manifest.write_text('{"complete":true}')
+    (source / "COMPLETE.json").write_text("{}")
+    digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
+    calls = []
+
+    def fake_aws(*args, timeout_seconds):
+        calls.append(args[1])
+        if args[1] == "put-object":
+            return subprocess.CompletedProcess(args, 1, "", conflict)
+        value = digest if matches else "foreign"
+        key = f"{identity}-manifest-sha256"
+        if metadata_case == "title":
+            key = key.title()
+        return subprocess.CompletedProcess(args, 0, json.dumps({"Metadata": {key: value}}), "")
+
+    monkeypatch.setattr(backup_completed, "_aws", fake_aws)
+    publisher = (
+        backup_completed._publish_one
+        if identity == "candidate"
+        else backup_completed._publish_submission
+    )
+    kwargs = dict(
+        bucket="private", prefix="unit", receipts=tmp_path / "receipts", timeout_seconds=10
+    )
+    if matches:
+        assert publisher(source, **kwargs) == "already-existed"
+    else:
+        with pytest.raises(RuntimeError, match=f"different {identity} identity"):
+            publisher(source, **kwargs)
+        assert not list((tmp_path / "receipts").rglob("*.json"))
+    assert calls == ["put-object", "head-object"]
+
+
+@pytest.mark.parametrize("error", ["AccessDenied", "NoSuchBucket", "NotKeyAlreadyExists"])
+def test_backup_does_not_treat_other_provider_errors_as_conflicts(tmp_path, monkeypatch, error):
+    """A loose compatibility match would wrongly HEAD/recover failed writes."""
+    candidate = tmp_path / "0-3" / "candidate-1"
+    candidate.mkdir(parents=True)
+    (candidate / "candidate_manifest.json").write_text("{}")
+    (candidate / "COMPLETE.json").write_text("{}")
+
+    def fake_aws(*args, timeout_seconds):
+        assert args[1] == "put-object", "non-conflict error reached recovery"
+        return subprocess.CompletedProcess(args, 1, "", error)
+
+    monkeypatch.setattr(backup_completed, "_aws", fake_aws)
+    with pytest.raises(RuntimeError, match="candidate upload failed"):
+        backup_completed._publish_one(
+            candidate,
+            bucket="private",
+            prefix="unit",
+            receipts=tmp_path / "receipts",
+            timeout_seconds=10,
+        )
+
+
+def test_conflicting_case_variants_of_metadata_fail_closed(monkeypatch):
+    """Normalization must not allow key order to choose a forged identity."""
+    monkeypatch.setattr(
+        backup_completed,
+        "_aws",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args,
+            0,
+            json.dumps(
+                {
+                    "Metadata": {
+                        "Candidate-Manifest-Sha256": "wanted",
+                        "candidate-manifest-sha256": "foreign",
+                    }
+                }
+            ),
+            "",
+        ),
+    )
+    with pytest.raises(RuntimeError, match="conflicting metadata"):
+        backup_completed._verify_existing_identity(
+            bucket="private",
+            key="object",
+            identity="candidate",
+            digest="wanted",
+            timeout_seconds=10,
+        )
