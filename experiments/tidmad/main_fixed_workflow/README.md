@@ -100,6 +100,8 @@ service must be enabled for boot recovery. No unit is installed or launched by
 this repository change.
 
 The ordinary output-retention default removes large per-sample deliverables
-after scoring and Health while retaining checkpoints and certified model
-artifacts. The main experiment still needs a demonstrated offline candidate
-replay and scorer/Health parity check before paper-run authorization.
+after scoring and Health. The tuner also removes raw training `.pth` files
+after each complete iteration by default, while retaining every scored
+certified `.pt` candidate. The main experiment still needs a demonstrated
+offline candidate replay and scorer/Health parity check before paper-run
+authorization.
