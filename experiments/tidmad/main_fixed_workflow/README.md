@@ -22,21 +22,22 @@ run deadline remain launch-owned.
 `advice.json` is the one reviewed Full-arm advice artifact for every band.
 It describes the paper's FC Net layers and the agreed time/VRAM context;
 it does not require FC Net or forbid other model families. The no-prior arm
-does not receive it. The Full treatment remains non-launchable until the
-dedicated data-analysis binding and gate are qualified.
+does not receive it. The Full treatment (Data Analysis plus human advice)
+has not been discussed and finalized for the main run; this preparation
+qualifies NoPrior only.
 
 The eventual shared launcher will accept one treatment selector (`full` or
 `no-prior`). Both treatments must use the same workflow and agent-parameter JSON. The
 information-treatment manifest owns human advice and the dedicated data-analysis
-state. `full` remains unavailable until the separately developed data-analysis
-component is wired and validated. The current `launch.sh` accepts only NoPrior
+state. `full` remains unavailable until its scientific configuration and
+launch binding are decided and qualified. The current `launch.sh` accepts only NoPrior
 and passes explicit disabled states. ML literature review remains enabled.
 
 The `main-fixed-no-prior.yaml` manifest declares `data_analysis: disabled`.
 The treatment renderer forwards that state as `--no-data_analysis_enabled`;
 it does not invent a second switch or alter the shared workflow JSON. The
-Full arm still requires a band-scoped analysis binding and a qualified launch
-gate before the workflow becomes effectful.
+Full arm still requires a separate decision and a qualified band-scoped
+analysis binding before any effectful launch.
 
 ## NoPrior preparation check
 
