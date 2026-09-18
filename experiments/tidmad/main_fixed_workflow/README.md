@@ -18,6 +18,9 @@ The shared configuration
 sets a 100-iteration ceiling, three rounds, two epochs, 30/120-minute
 Trial/Formal time-admission budgets, and 40-GiB VRAM limits. The workspace, band, and 24-hour
 run deadline remain launch-owned.
+The phase runtime watchdog is explicitly disabled (`--no-runtime_watchdog`)
+to avoid terminating candidates based on estimated phase duration. The
+supervisor's fixed 24-hour deadline and disk-space guard remain active.
 
 `advice.json` is the one reviewed Full-arm advice artifact for every band.
 It describes the paper's FC Net layers and the agreed time/VRAM context;

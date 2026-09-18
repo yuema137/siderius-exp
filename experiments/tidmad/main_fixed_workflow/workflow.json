@@ -4,6 +4,7 @@
   "agent_parameters": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json",
   "agent_parameters_owner": "experiment",
   "parameters": {
+    "--no-runtime_watchdog": true,
     "--num_iterations": 100,
     "--max_rounds": 3,
     "--max_epochs": 2,

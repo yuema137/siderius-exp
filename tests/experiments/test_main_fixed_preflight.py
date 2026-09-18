@@ -129,6 +129,9 @@ def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_p
     assert command[command.index("--data_scope") + 1] == "4-9"
     assert command[command.index("--health_gate_files") + 1] == "4-9"
     assert command[command.index("--formal_eval_portion") + 1] == "1.0"
+    assert "--no-runtime_watchdog" in command
+    assert "--runtime_watchdog" not in command
+    assert "--validation_max_phase_seconds" not in command
     assert "--trial_portion" not in command
     assert "--train_portion" not in command
 
