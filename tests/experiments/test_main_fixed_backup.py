@@ -110,7 +110,16 @@ def test_disk_guard_does_not_need_backup_credentials(
     assert backup.check_space(unit_dir=unit, instance="f-noprior-0-3") == 80 * 1024**3
 
 
-@pytest.mark.parametrize("instance", ["f-noprior-0-3-v2/other", "f-noprior-0-3-v2\n", "f-noprior-0-3-", "f-noprior-0-3;stop", "other@f-noprior-0-3"])
+@pytest.mark.parametrize(
+    "instance",
+    [
+        "f-noprior-0-3-v2/other",
+        "f-noprior-0-3-v2\n",
+        "f-noprior-0-3-",
+        "f-noprior-0-3;stop",
+        "other@f-noprior-0-3",
+    ],
+)
 def test_unsafe_instance_is_rejected_before_disk_or_service_access(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, instance: str
 ) -> None:
