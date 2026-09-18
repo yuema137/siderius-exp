@@ -5,11 +5,15 @@ This directory contains the NoPrior launch path for the planned one-band,
 the short smoke, candidate replay, and the final launch checkpoint remain open.
 `workflow.json` pins the continuous-regression task,
 the experiment-owned `iclr_official_v1.json` for every current LLM role,
-the exact 40,000-sample segment length, and the ordinary continuous-regression
-task composition. Trial and Formal training strategy and portions are chosen by the agent
-from the selected band's training files; Trial validation portion is also
-agent-chosen. No frozen 10% parent pool applies to this experiment. Formal
-evaluation scores the complete validation band regardless of training portion.
+the exact 40,000-sample segment length, and the existing frozen-pool
+continuous-regression composition. It selects the same content-pinned 20 of
+200 PSD segments per training file as the deployed single-band CLI baseline.
+Trial chooses a smaller sample from that parent. Formal uses the complete
+parent (`formal_portion=0.1`, `formal_train_portion=1.0`); its portion is
+operator-owned because the frozen-pool capability refuses a different Formal
+parent. Trial validation portion remains agent-chosen. Formal evaluation
+scores the complete validation band. This changes the experiment binding,
+not any file in `tasks/tidmad`.
 The shared configuration
 sets a 100-iteration ceiling, three rounds, two epochs, 30/120-minute
 Trial/Formal time-admission budgets, and 40-GiB VRAM limits. The workspace, band, and 24-hour
