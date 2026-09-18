@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodic NoPrior artifact backup for %i
+
+[Timer]
+OnCalendar=*:0/10
+RandomizedDelaySec=30s
+Persistent=true
+Unit=tidmad-no-prior-backup@%i.service
+
+[Install]
+WantedBy=timers.target

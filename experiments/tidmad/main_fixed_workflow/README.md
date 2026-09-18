@@ -58,8 +58,9 @@ From the exact exp checkout after installing its frozen environment:
 
 The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
 isolated framework checkout must all match the selected exact commit. The
-preparation branch aligns these to `9cd624dda43f39aa4105c0950204175376174cad`
-(the reviewed generic chain, checkpoint cleanup, and shared S2 key pacing fixes on infra master).
+preparation branch aligns these to `2df46e2298c017d9df850a85f870a55fbd40723d`
+(the reviewed generic chain, checkpoint cleanup, and shared S2 key pacing fixes,
+followed by a Data Analysis regression-test-only change on infra master).
 
 ## NoPrior unit control
 
@@ -105,3 +106,34 @@ after each complete iteration by default, while retaining every scored
 certified `.pt` candidate. The main experiment still needs a demonstrated
 offline candidate replay and scorer/Health parity check before paper-run
 authorization.
+
+## Retained-artifact backup and disk guard
+
+`backup.sh` is an exp-owned, independent service. Its systemd oneshot and
+10-minute timer are `systemd/tidmad-no-prior-backup@.*`; the separate 2-minute
+free-space guard is `systemd/tidmad-no-prior-disk-guard@.*`. Install both pairs
+with the same `@UNIT_MOUNT@` replacement as the workflow service, then enable
+both timers for each band. Both wait until immutable `launch.json` exists. Run
+one manual backup service invocation after launch to verify an actual upload
+and receipt before relying on the timer.
+
+Each instance needs a separate mode-600
+`/etc/tidmad-no-prior/%i-backup.env` with `BACKUP_BUCKET`, `BACKUP_PREFIX`,
+`BACKUP_ENDPOINT`, `AWS_DEFAULT_REGION`, `AWS_ACCESS_KEY_ID`, and
+`AWS_SECRET_ACCESS_KEY`; the
+ordinary `%i.env` still owns `UNIT_DIR` and `EXP_CHECKOUT`. Install AWS CLI
+1.46.1 in a separate `/opt/tidmad-no-prior/awscli-venv`; the backup service's
+PATH selects it without changing the frozen exp or infra environments. Grant
+the instance's writer group only `storage.uploader` and
+`storage.object-lister` for its own versioned bucket; these roles permit sync
+and multipart upload without object read or delete. Never put S3 keys in a
+repository or the workflow's LLM environment file.
+
+The sync includes certified `.pt` weights, model artifact documents, configs,
+source, scoring and Health receipts. It excludes retired training `.pth`,
+denoised HDF5, environment files, temporary files and logs, never uses S3 deletion, and appends
+local `backup_receipts.jsonl` after each attempt. Versioning protects earlier
+object revisions when a JSON record grows. If the mounted work volume falls
+below 50 GiB free, the backup service first stops that instance's workflow
+service and writes a `low_space_stop` receipt; the 24-hour deadline remains
+unchanged. Operators must inspect disk space and the receipt before resuming.
