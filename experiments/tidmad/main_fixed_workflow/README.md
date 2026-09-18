@@ -62,9 +62,12 @@ From the exact exp checkout after installing its frozen environment:
 ```
 
 The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
-isolated framework checkout must all match the selected exact commit. The
-The current pin is `6147969a12a6320615a0ac33acc175344a4b2a7b`, which also
-resolves one model input dtype for all sites of a composed workflow.
+isolated framework checkout must all match the selected exact commit.
+The current pin is `270098f00fd100300b396c56a9af0668b559c974`. Composed
+inference now passes the resolved model input dtype to the execution adapter.
+Before training, its resource worker also checks one real validation input
+through that adapter. This catches input-interface failures early; it does not
+replace scoring or Health, or guarantee that every validation sample succeeds.
 
 ## NoPrior unit control
 
