@@ -118,7 +118,8 @@ and receipt before relying on the timer.
 
 Each instance needs a separate mode-600
 `/etc/tidmad-no-prior/%i-backup.env` with `BACKUP_BUCKET`, `BACKUP_PREFIX`,
-`BACKUP_ENDPOINT`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`; the
+`BACKUP_ENDPOINT`, `AWS_DEFAULT_REGION`, `AWS_ACCESS_KEY_ID`, and
+`AWS_SECRET_ACCESS_KEY`; the
 ordinary `%i.env` still owns `UNIT_DIR` and `EXP_CHECKOUT`. Install AWS CLI
 1.46.1 in a separate `/opt/tidmad-no-prior/awscli-venv`; the backup service's
 PATH selects it without changing the frozen exp or infra environments. Grant
@@ -129,7 +130,7 @@ repository or the workflow's LLM environment file.
 
 The sync includes certified `.pt` weights, model artifact documents, configs,
 source, scoring and Health receipts. It excludes retired training `.pth`,
-denoised HDF5, temporary files and logs, never uses S3 deletion, and appends
+denoised HDF5, environment files, temporary files and logs, never uses S3 deletion, and appends
 local `backup_receipts.jsonl` after each attempt. Versioning protects earlier
 object revisions when a JSON record grows. If the mounted work volume falls
 below 50 GiB free, the backup service first stops that instance's workflow

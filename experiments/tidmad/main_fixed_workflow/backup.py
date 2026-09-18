@@ -30,6 +30,7 @@ _EXCLUDES = (
     "*.h5.complete",
     "*.hdf5.complete",
     "*.tmp",
+    "*.env",
     "*.log",
     "logs/*",
     ".supervisor.lock",
