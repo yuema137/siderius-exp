@@ -68,3 +68,14 @@ launch surface. Older framework revisions and result records in `STATUS.md`
 and `PROVENANCE.md` remain dated evidence. A new experiment must select this
 task explicitly and use its own workspace; no task default is inferred from a
 directory name.
+
+### Validation I/O diagnosis repair (pending release)
+
+The validation adapter uses the framework's bounded HDF5 dataset-handle cache
+for small row selections. This preserves the selected PSD segments, row order,
+storage/compute encoding and score semantics; the runtime adapter and dependency
+pin are nevertheless new code revisions and must be recorded at the next freeze.
+Formal/Trial portions and epoch limits are unchanged by this repair. Compressed
+noncontiguous selection and target-materialization parity are tested without
+requiring scientific datasets. Real-data timing qualification is recorded in
+the operator's local resource inventory before any campaign restart.

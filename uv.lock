@@ -1950,7 +1950,7 @@ wheels = [
 [[package]]
 name = "siderius"
 version = "0.2.0"
-source = { git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=7add8006fe6d9d80fa212c273171a62bc501ce03#7add8006fe6d9d80fa212c273171a62bc501ce03" }
+source = { git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=eb76f8b098feb9948ee7524798d9ecb50892c4e4#eb76f8b098feb9948ee7524798d9ecb50892c4e4" }
 dependencies = [
     { name = "fastapi" },
     { name = "h5py" },
@@ -1993,7 +1993,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "siderius", git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=7add8006fe6d9d80fa212c273171a62bc501ce03" },
+    { name = "siderius", git = "https://github.com/Galileo-Sandbox/SIDERIUS.git?rev=eb76f8b098feb9948ee7524798d9ecb50892c4e4" },
     { name = "torch", specifier = "==2.10.0" },
 ]
 

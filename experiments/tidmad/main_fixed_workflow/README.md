@@ -66,7 +66,7 @@ From the exact exp checkout after installing its frozen environment:
 
 The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
 isolated framework checkout must all match the selected exact commit.
-The current pin is `7add8006fe6d9d80fa212c273171a62bc501ce03`. Composed
+The exact current pin is recorded in the root `SIDERIUS_REVISION`. Composed
 inference now passes the resolved model input dtype to the execution adapter.
 Before training, its resource worker also checks one real validation input
 through that adapter. This catches input-interface failures early; it does not
@@ -112,7 +112,7 @@ this repository change.
 
 The ordinary output-retention default removes large per-sample deliverables
 after scoring and Health. The tuner also removes raw training `.pth` files
-after each complete iteration by default, while retaining every scored
+after each attempt by default (preserving the latest completed Formal training output), while retaining every scored
 certified `.pt` candidate. The main experiment still needs a demonstrated
 offline candidate replay and scorer/Health parity check before paper-run
 authorization.

@@ -60,6 +60,11 @@ from execute_tools.analysis_materialization import (
     AuthorizedAnalysisMaterializationRequest,
     HistoricalInferenceInputDerivationRequest,
 )
+from execute_tools.hdf5_reader import HDF5ReadCache
+from execute_tools.training_pool import FrozenTrainingPool
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
+
 from execute_tools.array2h5 import create_abra_file
 from execute_tools.data_paths import resolve_physical_data_root
 from execute_tools.dataset_config import (
@@ -88,9 +93,6 @@ from execute_tools.task_data_path import (
     TaskOutputArtifactInventory,
     ValidationScopeError,
 )
-from execute_tools.training_pool import FrozenTrainingPool
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
@@ -350,8 +352,9 @@ class TIDMADValidationDataset(Dataset):
     ML rows are read when a DataLoader requests them, so peak resident data is
     governed by the loader batch rather than the complete Formal scope.
 
-    HDF5 handles are cached per process. The PID check and ``__getstate__``
-    ensure a future worker process never reuses its parent's open handles.
+    A framework-owned bounded reader retains dataset handles and a raw chunk
+    cache sized from actual chunk geometry. It resets handles across process
+    boundaries; task selection and encoding remain owned here.
 
     This class remains in the task-data-path plugin module deliberately. File
     plugins are cold-loaded without adding the experiment repository to
@@ -377,8 +380,7 @@ class TIDMADValidationDataset(Dataset):
         self.file_row_ranges: dict[int, tuple[int, int]] = {}
         self._segments: list[_ValidationSegment] = []
         self._segment_row_ends: list[int] = []
-        self._handles: dict[str, h5py.File] = {}
-        self._handle_pid = os.getpid()
+        self._reader = HDF5ReadCache()
 
         rows_so_far = 0
         for file_key in sorted(sample_set, key=int):
@@ -429,20 +431,6 @@ class TIDMADValidationDataset(Dataset):
     def __len__(self) -> int:
         return self._row_count
 
-    def _reset_inherited_handles(self) -> None:
-        current_pid = os.getpid()
-        if current_pid != self._handle_pid:
-            self.close()
-            self._handle_pid = current_pid
-
-    def _handle(self, path: str) -> h5py.File:
-        self._reset_inherited_handles()
-        handle = self._handles.get(path)
-        if handle is None:
-            handle = h5py.File(path, "r")
-            self._handles[path] = handle
-        return handle
-
     def _row_location(self, idx: int) -> tuple[_ValidationSegment, int, int]:
         if idx < 0:
             idx += self._row_count
@@ -455,8 +443,10 @@ class TIDMADValidationDataset(Dataset):
 
     def _storage_row(self, idx: int, channel: str) -> np.ndarray:
         segment, start, end = self._row_location(idx)
-        dataset = _h5_dataset(self._handle(segment.file_path), "timeseries", channel, "timeseries")
-        return np.asarray(dataset[start:end], dtype=self._encoding.storage_dtype)
+        values = self._reader.read(
+            segment.file_path, f"timeseries/{channel}/timeseries", slice(start, end)
+        )
+        return np.asarray(values, dtype=self._encoding.storage_dtype)
 
     def __getitem__(self, idx: int) -> tuple[np.ndarray, np.ndarray]:
         return (
@@ -483,14 +473,13 @@ class TIDMADValidationDataset(Dataset):
             row_within_segment = logical_row - segment.row_start
             sample_start = segment.sample_start + row_within_segment * self.seg_size
             sample_end = sample_start + rows * self.seg_size
-            target_data = _h5_dataset(
-                self._handle(segment.file_path),
-                "timeseries",
-                self._channels.target_channel,
-                "timeseries",
+            values = self._reader.read(
+                segment.file_path,
+                f"timeseries/{self._channels.target_channel}/timeseries",
+                slice(sample_start, sample_end),
             )
             targets[output_row : output_row + rows] = np.asarray(
-                target_data[sample_start:sample_end],
+                values,
                 dtype=self._encoding.storage_dtype,
             ).reshape(rows, self.seg_size)
             logical_row += rows
@@ -498,16 +487,9 @@ class TIDMADValidationDataset(Dataset):
         return targets
 
     def close(self) -> None:
-        handles = getattr(self, "_handles", {})
-        for handle in handles.values():
-            handle.close()
-        handles.clear()
-
-    def __getstate__(self) -> dict[str, Any]:
-        self.close()
-        state = self.__dict__.copy()
-        state["_handles"] = {}
-        return state
+        reader = getattr(self, "_reader", None)
+        if reader is not None:
+            reader.close()
 
     def __del__(self) -> None:
         self.close()
