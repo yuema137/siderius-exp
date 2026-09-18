@@ -303,8 +303,9 @@ def test_main_workflow_freezes_shared_budget_and_exp_owned_openai_config() -> No
     assert main["parameters"]["--formal_time_budget_minutes"] == 120
     assert main["parameters"]["--trial_vram_budget_gb"] == 40
     assert main["parameters"]["--formal_vram_budget_gb"] == 40
-    assert main["parameters"]["--trial_max_epochs"] == 2
-    assert main["parameters"]["--formal_max_epochs"] == 2
+    assert main["parameters"]["--trial_max_epochs"] == 100
+    assert main["parameters"]["--formal_max_epochs"] == 100
+    assert main["parameters"]["--training_budget_reserve_fraction"] == 0.2
     assert (
         not {"--trial_portion", "--train_portion", "--eval_portion"}
         & main["parameters"].keys()
