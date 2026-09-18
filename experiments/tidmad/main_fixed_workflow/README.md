@@ -58,8 +58,9 @@ From the exact exp checkout after installing its frozen environment:
 
 The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
 isolated framework checkout must all match the selected exact commit. The
-preparation branch aligns these to `9cd624dda43f39aa4105c0950204175376174cad`
-(the reviewed generic chain, checkpoint cleanup, and shared S2 key pacing fixes on infra master).
+preparation branch aligns these to `2df46e2298c017d9df850a85f870a55fbd40723d`
+(the reviewed generic chain, checkpoint cleanup, and shared S2 key pacing fixes,
+followed by a Data Analysis regression-test-only change on infra master).
 
 ## NoPrior unit control
 
