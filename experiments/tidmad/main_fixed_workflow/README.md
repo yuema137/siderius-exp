@@ -5,11 +5,15 @@ This directory contains the NoPrior launch path for the planned one-band,
 the short smoke, candidate replay, and the final launch checkpoint remain open.
 `workflow.json` pins the continuous-regression task,
 the experiment-owned `iclr_official_v1.json` for every current LLM role,
-the exact 40,000-sample segment length, and the ordinary continuous-regression
-task composition. Trial and Formal training strategy and portions are chosen by the agent
-from the selected band's training files; Trial validation portion is also
-agent-chosen. No frozen 10% parent pool applies to this experiment. Formal
-evaluation scores the complete validation band regardless of training portion.
+the exact 40,000-sample segment length, and the existing frozen-pool
+continuous-regression composition. It selects the same content-pinned 20 of
+200 PSD segments per training file as the deployed single-band CLI baseline.
+Trial chooses a smaller sample from that parent. Formal uses the complete
+parent (`formal_portion=0.1`, `formal_train_portion=1.0`); its portion is
+operator-owned because the frozen-pool capability refuses a different Formal
+parent. Trial validation portion remains agent-chosen. Formal evaluation
+scores the complete validation band. This changes the experiment binding,
+not any file in `tasks/tidmad`.
 The shared configuration
 sets a 100-iteration ceiling, three rounds, two epochs, 30/120-minute
 Trial/Formal time-admission budgets, and 40-GiB VRAM limits. The workspace, band, and 24-hour
@@ -18,21 +22,22 @@ run deadline remain launch-owned.
 `advice.json` is the one reviewed Full-arm advice artifact for every band.
 It describes the paper's FC Net layers and the agreed time/VRAM context;
 it does not require FC Net or forbid other model families. The no-prior arm
-does not receive it. The Full treatment remains non-launchable until the
-dedicated data-analysis binding and gate are qualified.
+does not receive it. The Full treatment (Data Analysis plus human advice)
+has not been discussed and finalized for the main run; this preparation
+qualifies NoPrior only.
 
 The eventual shared launcher will accept one treatment selector (`full` or
 `no-prior`). Both treatments must use the same workflow and agent-parameter JSON. The
 information-treatment manifest owns human advice and the dedicated data-analysis
-state. `full` remains unavailable until the separately developed data-analysis
-component is wired and validated. The current `launch.sh` accepts only NoPrior
+state. `full` remains unavailable until its scientific configuration and
+launch binding are decided and qualified. The current `launch.sh` accepts only NoPrior
 and passes explicit disabled states. ML literature review remains enabled.
 
 The `main-fixed-no-prior.yaml` manifest declares `data_analysis: disabled`.
 The treatment renderer forwards that state as `--no-data_analysis_enabled`;
 it does not invent a second switch or alter the shared workflow JSON. The
-Full arm still requires a band-scoped analysis binding and a qualified launch
-gate before the workflow becomes effectful.
+Full arm still requires a separate decision and a qualified band-scoped
+analysis binding before any effectful launch.
 
 ## NoPrior preparation check
 
@@ -58,9 +63,8 @@ From the exact exp checkout after installing its frozen environment:
 
 The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
 isolated framework checkout must all match the selected exact commit. The
-preparation branch aligns these to `2df46e2298c017d9df850a85f870a55fbd40723d`
-(the reviewed generic chain, checkpoint cleanup, and shared S2 key pacing fixes,
-followed by a Data Analysis regression-test-only change on infra master).
+The current pin is `6147969a12a6320615a0ac33acc175344a4b2a7b`, which also
+resolves one model input dtype for all sites of a composed workflow.
 
 ## NoPrior unit control
 
