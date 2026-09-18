@@ -18,6 +18,9 @@ The shared configuration
 sets a 100-iteration ceiling, three rounds, two epochs, 30/120-minute
 Trial/Formal time-admission budgets, and 40-GiB VRAM limits. The workspace, band, and 24-hour
 run deadline remain launch-owned.
+The phase runtime watchdog is explicitly disabled (`--no-runtime_watchdog`)
+to avoid terminating candidates based on estimated phase duration. The
+supervisor's fixed 24-hour deadline and disk-space guard remain active.
 
 `advice.json` is the one reviewed Full-arm advice artifact for every band.
 It describes the paper's FC Net layers and the agreed time/VRAM context;
@@ -62,9 +65,12 @@ From the exact exp checkout after installing its frozen environment:
 ```
 
 The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
-isolated framework checkout must all match the selected exact commit. The
-The current pin is `6147969a12a6320615a0ac33acc175344a4b2a7b`, which also
-resolves one model input dtype for all sites of a composed workflow.
+isolated framework checkout must all match the selected exact commit.
+The current pin is `7add8006fe6d9d80fa212c273171a62bc501ce03`. Composed
+inference now passes the resolved model input dtype to the execution adapter.
+Before training, its resource worker also checks one real validation input
+through that adapter. This catches input-interface failures early; it does not
+replace scoring or Health, or guarantee that every validation sample succeeds.
 
 ## NoPrior unit control
 
