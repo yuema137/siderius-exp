@@ -62,9 +62,8 @@ From the exact exp checkout after installing its frozen environment:
 
 The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
 isolated framework checkout must all match the selected exact commit. The
-preparation branch aligns these to `2df46e2298c017d9df850a85f870a55fbd40723d`
-(the reviewed generic chain, checkpoint cleanup, and shared S2 key pacing fixes,
-followed by a Data Analysis regression-test-only change on infra master).
+The current pin is `6147969a12a6320615a0ac33acc175344a4b2a7b`, which also
+resolves one model input dtype for all sites of a composed workflow.
 
 ## NoPrior unit control
 
