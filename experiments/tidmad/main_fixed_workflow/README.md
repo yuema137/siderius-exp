@@ -155,3 +155,12 @@ object revisions when a JSON record grows. If the mounted work volume falls
 below 50 GiB free, the backup service first stops that instance's workflow
 service and writes a `low_space_stop` receipt; the 24-hour deadline remains
 unchanged. Operators must inspect disk space and the receipt before resuming.
+
+
+### Fresh-unit timing evidence
+
+The supervisor binds `SIDERIUS_CALIBRATION_DIR` to `<unit-dir>/calibration`,
+overriding any inherited host-wide value. A fresh unit starts with independent
+timing evidence; resuming the same unit keeps its evidence and immutable clock.
+The generated model library remains workspace-local. Raw data and machine-owned
+credentials can be reused without reusing a previous run's learned timing state.

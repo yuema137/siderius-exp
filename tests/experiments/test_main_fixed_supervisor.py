@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+
 from experiments.tidmad.main_fixed_workflow import supervisor
 from experiments.tidmad.main_fixed_workflow.unit_clock import (
     UNIT_SECONDS,
@@ -33,21 +34,23 @@ def test_no_prior_clock_is_created_once_and_reused_after_restart(
         return {"command": ["bash", "chain.sh"], "band": kwargs["band"]}
 
     def run_chain(record, unit_dir):
-        calls.append((record.deadline_epoch == 1_000_000 + UNIT_SECONDS, record.started_epoch))
+        calls.append(
+            (record.deadline_epoch == 1_000_000 + UNIT_SECONDS, record.started_epoch)
+        )
         assert unit_dir == unit
         return 0
 
     monkeypatch.setattr(supervisor, "resolve_no_prior_launch", preflight)
     monkeypatch.setattr(supervisor, "_run_chain", run_chain)
-    arguments = dict(
-        root=tmp_path / "exp",
-        checkout=tmp_path / "infra",
-        band="0-3",
-        data_dir=tmp_path / "data",
-        unit_dir=unit,
-        run_name="reviewed-run",
-        launch=True,
-    )
+    arguments = {
+        "root": tmp_path / "exp",
+        "checkout": tmp_path / "infra",
+        "band": "0-3",
+        "data_dir": tmp_path / "data",
+        "unit_dir": unit,
+        "run_name": "reviewed-run",
+        "launch": True,
+    }
     assert supervisor.run_unit(**arguments) == 0
     first_bytes = (unit / "launch.json").read_bytes()
     assert unit.stat().st_mode & 0o777 == 0o700
@@ -71,13 +74,17 @@ def test_no_prior_clock_refuses_changed_inputs_and_replacement(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     unit = tmp_path / "unit"
-    record = create_launch_record(unit / "launch.json", {"command": ["bash", "chain.sh"]}, 5)
+    record = create_launch_record(
+        unit / "launch.json", {"command": ["bash", "chain.sh"]}, 5
+    )
     assert record.deadline_epoch == 5 + UNIT_SECONDS
     with pytest.raises(FileExistsError):
         create_launch_record(unit / "launch.json", {"command": ["bash", "other.sh"]}, 6)
 
     monkeypatch.setattr(
-        supervisor, "resolve_no_prior_launch", lambda *_, **__: {"command": ["bash", "other.sh"]}
+        supervisor,
+        "resolve_no_prior_launch",
+        lambda *_, **__: {"command": ["bash", "other.sh"]},
     )
     with pytest.raises(ValueError, match="differ from the recorded launch"):
         supervisor.run_unit(
@@ -143,7 +150,9 @@ def test_no_prior_supervisor_kills_chain_group_at_deadline(
     )
     monkeypatch.setattr(supervisor.time, "time", lambda: 1000.0)
     killed: list[tuple[int, int]] = []
-    monkeypatch.setattr(supervisor.os, "killpg", lambda pid, sig: killed.append((pid, sig)))
+    monkeypatch.setattr(
+        supervisor.os, "killpg", lambda pid, sig: killed.append((pid, sig))
+    )
 
     class FakeProcess:
         pid = 321
@@ -160,5 +169,40 @@ def test_no_prior_supervisor_kills_chain_group_at_deadline(
     assert supervisor._run_chain(record, tmp_path) == 0
     assert killed == [(321, supervisor.signal.SIGKILL)]
     assert (tmp_path / "logs/chain.log").stat().st_mode & 0o777 == 0o600
-    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text().splitlines()]
+    events = [
+        json.loads(line)
+        for line in (tmp_path / "events.jsonl").read_text().splitlines()
+    ]
     assert [event["event"] for event in events] == ["chain_start", "deadline_stop"]
+
+
+def test_child_calibration_state_is_private_per_unit_and_persists_on_resume(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A real child must not reuse the previous unit's host-wide timing cache."""
+    import sys
+
+    stale = tmp_path / "inherited-calibration"
+    stale.mkdir()
+    (stale / "counter").write_text("99")
+    monkeypatch.setenv("SIDERIUS_CALIBRATION_DIR", str(stale))
+    monkeypatch.setattr(supervisor.time, "time", lambda: 1000.0)
+    child = (
+        "import os; from pathlib import Path; "
+        "p=Path(os.environ['SIDERIUS_CALIBRATION_DIR']); "
+        "p.mkdir(parents=True,exist_ok=True); c=p/'counter'; "
+        "n=int(c.read_text()) if c.exists() else 0; c.write_text(str(n+1))"
+    )
+    records = []
+    for name in ("first", "second"):
+        unit = tmp_path / name
+        record = create_launch_record(
+            unit / "launch.json", {"command": [sys.executable, "-c", child]}, 1000
+        )
+        assert supervisor._run_chain(record, unit) == 0
+        records.append((record, unit))
+    record, first = records[0]
+    assert supervisor._run_chain(record, first) == 0
+    assert (first / "calibration/counter").read_text() == "2"
+    assert (records[1][1] / "calibration/counter").read_text() == "1"
+    assert (stale / "counter").read_text() == "99"
