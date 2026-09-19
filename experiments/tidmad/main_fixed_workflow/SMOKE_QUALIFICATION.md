@@ -19,10 +19,20 @@ qualification. This is a test-selection and launch-readiness failure.
    in a fresh process through the native workflow loader and reconcile the full
    declaration. Changed aggregation, transform, references and contract parameters
    must still refuse. Restored declarations must remain non-executable.
-2. In an isolated real-task qualification unit, complete one valid Formal result
-   and demonstrate the next iteration consumes it and reaches its next agent
-   stage. A no-records iteration does not exercise this route. If the bounded
-   budget expires first, mark this gate pending and explicitly revise the setup.
+2. Split functional qualification into bounded witnesses (normally seconds to
+   minutes, with a 10–15 minute outer limit per batch):
+   - run native training, inference, scoring and persistence on explicitly
+     labelled small diagnostic fixtures, without modifying frozen task files;
+   - replay copies of actual valid Formal artifacts through the native next
+     iteration runner in a fresh process, including plugin/state restoration,
+     and verify the restored summaries reach the next agent's input boundary.
+     Record any relocation of fixture manifest paths and preserve original
+     output bytes and hashes. A boundary probe is evidence of dispatch, not
+     evidence of a live model response;
+   - check all deployed bands' frozen scopes and treatment using preflight.
+   Model convergence and scientific score quality are not functional gates.
+   No-records/timeout cannot substitute for a required success-path witness.
+   Diagnostic scopes/budgets and fixtures must never seed formal fresh starts.
 3. Provoke a deterministic contract refusal. Preserve its failed manifest and
    halt marker; verify no next candidate starts. The supervisor must return
    permanent exit 3; the actual service must end with no automatic restart.
