@@ -25,5 +25,7 @@ separately so a time-budget stop is not rewritten as the proposed epoch count.
 The component tests exercise certified restoration, scripting, saved weights,
 directory validation and actual frozen-evaluator HDF5 inference on synthetic
 data. This is not a real scientific score or an end-to-end orchestrator run.
-Training-precheck integration, isolated operation dispatch and real candidate
-replay still require qualification.
+The shared `scripted_implementation.implement_for_scripted_export` adapter now
+checks the native implementor result before returning it to a caller. Complete
+orchestrator dispatch, enforced training handoff, isolated execution and real
+scientific candidate replay still require qualification.

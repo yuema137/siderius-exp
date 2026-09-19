@@ -254,3 +254,72 @@ def test_certified_candidate_replays_through_frozen_evaluator(certified, tmp_pat
         json.loads((candidate / "native_provenance.json").read_text())["qualification"]
         == "serialization_only_not_scored"
     )
+
+
+def test_native_implementation_is_gated_before_training(certified):
+    from agent.schemas.implementor import ImplementorInput, ImplementorOutput
+
+    from experiments.shared.scripted_implementation import (
+        ImplementationExportError,
+        implement_for_scripted_export,
+    )
+
+    root, _, plugin = certified
+    request = ImplementorInput(
+        candidate_id="source-candidate",
+        model_name="export_synthetic",
+        model_description="Synthetic affine model",
+        mathematical_definition="y = scale * x",
+        task_description="Synthetic numeric regression",
+        output_type="regressor",
+        baseline_config={
+            "model_config": {"model_type": "export_synthetic"},
+            "loss_config": {"loss_type": "smooth_l1"},
+        },
+        plugin_dir=str(root),
+        test_dir=str(root),
+        loss_dir=str(root),
+    )
+    calls = []
+
+    class Native:
+        def run(self, inp):
+            calls.append(inp)
+            assert inp.human_advice is None
+            assert inp.expert_advice == request.expert_advice
+            assert "torch.jit.script" in inp.task_description
+            return ImplementorOutput(
+                candidate_id=inp.candidate_id,
+                model_type=inp.model_name,
+                model_file_path=str(plugin),
+                test_file_path=str(root / "test_model.py"),
+                description_file_path=str(root / "description.md"),
+                config_fields={},
+                model_description=inp.model_description,
+                mathematical_definition=inp.mathematical_definition,
+            )
+
+    with pytest.raises(ValueError, match="explicit CPU examples"):
+        implement_for_scripted_export(Native(), request, examples=[])
+    assert calls == []
+    result = implement_for_scripted_export(
+        Native(), request, examples=[(torch.ones(1, 23, dtype=torch.int64),)]
+    )
+    assert result.source_sha256 == hashlib.sha256(plugin.read_bytes()).hexdigest()
+    assert result.loss_type == "smooth_l1"
+    assert result.qualified_model_config == request.baseline_config["model_config"]
+    assert request.task_description == "Synthetic numeric regression"
+    # A real unsupported Python construct is rejected at the implementor boundary,
+    # without a training callback or checkpoint ever being required.
+    plugin.write_text(
+        plugin.read_text().replace(
+            "return x.float() * self.scale",
+            "operation = lambda value: value.float() * self.scale\n        return operation(x)",
+        )
+    )
+    with pytest.raises(
+        ImplementationExportError, match="Pre-training export qualification"
+    ):
+        implement_for_scripted_export(
+            Native(), request, examples=[(torch.ones(1, 23, dtype=torch.int64),)]
+        )
