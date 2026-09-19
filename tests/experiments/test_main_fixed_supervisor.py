@@ -34,9 +34,7 @@ def test_no_prior_clock_is_created_once_and_reused_after_restart(
         return {"command": ["bash", "chain.sh"], "band": kwargs["band"]}
 
     def run_chain(record, unit_dir):
-        calls.append(
-            (record.deadline_epoch == 1_000_000 + UNIT_SECONDS, record.started_epoch)
-        )
+        calls.append((record.deadline_epoch == 1_000_000 + UNIT_SECONDS, record.started_epoch))
         assert unit_dir == unit
         return 0
 
@@ -74,17 +72,13 @@ def test_no_prior_clock_refuses_changed_inputs_and_replacement(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     unit = tmp_path / "unit"
-    record = create_launch_record(
-        unit / "launch.json", {"command": ["bash", "chain.sh"]}, 5
-    )
+    record = create_launch_record(unit / "launch.json", {"command": ["bash", "chain.sh"]}, 5)
     assert record.deadline_epoch == 5 + UNIT_SECONDS
     with pytest.raises(FileExistsError):
         create_launch_record(unit / "launch.json", {"command": ["bash", "other.sh"]}, 6)
 
     monkeypatch.setattr(
-        supervisor,
-        "resolve_no_prior_launch",
-        lambda *_, **__: {"command": ["bash", "other.sh"]},
+        supervisor, "resolve_no_prior_launch", lambda *_, **__: {"command": ["bash", "other.sh"]}
     )
     with pytest.raises(ValueError, match="differ from the recorded launch"):
         supervisor.run_unit(
@@ -150,9 +144,7 @@ def test_no_prior_supervisor_kills_chain_group_at_deadline(
     )
     monkeypatch.setattr(supervisor.time, "time", lambda: 1000.0)
     killed: list[tuple[int, int]] = []
-    monkeypatch.setattr(
-        supervisor.os, "killpg", lambda pid, sig: killed.append((pid, sig))
-    )
+    monkeypatch.setattr(supervisor.os, "killpg", lambda pid, sig: killed.append((pid, sig)))
 
     class FakeProcess:
         pid = 321
@@ -169,10 +161,7 @@ def test_no_prior_supervisor_kills_chain_group_at_deadline(
     assert supervisor._run_chain(record, tmp_path) == 0
     assert killed == [(321, supervisor.signal.SIGKILL)]
     assert (tmp_path / "logs/chain.log").stat().st_mode & 0o777 == 0o600
-    events = [
-        json.loads(line)
-        for line in (tmp_path / "events.jsonl").read_text().splitlines()
-    ]
+    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text().splitlines()]
     assert [event["event"] for event in events] == ["chain_start", "deadline_stop"]
 
 

@@ -51,9 +51,7 @@ def _required_api_keys(config: Path) -> set[str]:
         raise ValueError("NoPrior LLM config declares no enabled provider")
     unknown = providers - provider_keys.keys()
     if unknown:
-        raise ValueError(
-            f"unsupported LLM provider in launch config: {sorted(unknown)}"
-        )
+        raise ValueError(f"unsupported LLM provider in launch config: {sorted(unknown)}")
     return {provider_keys[provider] for provider in providers}
 
 
@@ -61,9 +59,7 @@ def _verify_execution_environment(root: Path) -> None:
     """Require one H100 and name-only API key presence before starting a clock."""
 
     config = root / "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
-    missing = sorted(
-        key for key in _required_api_keys(config) if not os.environ.get(key)
-    )
+    missing = sorted(key for key in _required_api_keys(config) if not os.environ.get(key))
     if missing:
         raise ValueError(f"required provider keys are absent: {', '.join(missing)}")
     gpu = subprocess.run(
@@ -79,9 +75,7 @@ def _verify_execution_environment(root: Path) -> None:
 
 def _append_event(path: Path, event: dict[str, object]) -> None:
     data = (json.dumps(event, sort_keys=True) + "\n").encode()
-    descriptor = os.open(
-        path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600
-    )
+    descriptor = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     try:
         os.write(descriptor, data)
         os.fsync(descriptor)
@@ -97,15 +91,11 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
         _append_event(unit_dir / "events.jsonl", {"event": "deadline_already_elapsed"})
         return 0
     command = record.preflight["command"]
-    if not isinstance(command, list) or not all(
-        isinstance(arg, str) for arg in command
-    ):
+    if not isinstance(command, list) or not all(isinstance(arg, str) for arg in command):
         raise ValueError("stored NoPrior command is malformed")
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
-    environment["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(
-        unit_dir / "workspace/generated_library"
-    )
+    environment["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(unit_dir / "workspace/generated_library")
     # Fresh units cannot inherit host-wide timing evidence; resume reuses this path.
     environment["SIDERIUS_CALIBRATION_DIR"] = str(unit_dir / "calibration")
     logs = unit_dir / "logs"
@@ -121,9 +111,7 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
         },
     )
     log_descriptor = os.open(
-        logs / "chain.log",
-        os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW,
-        0o600,
+        logs / "chain.log", os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600
     )
     with os.fdopen(log_descriptor, "ab", buffering=0) as output:
         process = subprocess.Popen(
@@ -135,9 +123,7 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
             env=environment,
         )
         try:
-            returncode = process.wait(
-                timeout=max(0, record.deadline_epoch - time.time())
-            )
+            returncode = process.wait(timeout=max(0, record.deadline_epoch - time.time()))
         except subprocess.TimeoutExpired:
             with contextlib.suppress(ProcessLookupError):
                 os.killpg(process.pid, signal.SIGKILL)
@@ -149,11 +135,7 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
             return 0
     _append_event(
         unit_dir / "events.jsonl",
-        {
-            "event": "chain_exit",
-            "ended_epoch": int(time.time()),
-            "returncode": returncode,
-        },
+        {"event": "chain_exit", "ended_epoch": int(time.time()), "returncode": returncode},
     )
     return 0 if returncode == 0 else 1
 
@@ -180,9 +162,7 @@ def run_unit(
     ):
         raise ValueError("unit directory must be separate from checkouts and data")
     if launch and not unit_dir.parent.is_mount():
-        raise ValueError(
-            "NoPrior unit must be an immediate child of a mounted persistent volume"
-        )
+        raise ValueError("NoPrior unit must be an immediate child of a mounted persistent volume")
     record_path = unit_dir / "launch.json"
     if not launch:
         existing = read_launch_record(record_path)
@@ -199,10 +179,7 @@ def run_unit(
             raise ValueError("current NoPrior inputs differ from the recorded launch")
         print(
             json.dumps(
-                {
-                    "preflight": receipt,
-                    "launch": existing.model_dump() if existing else None,
-                },
+                {"preflight": receipt, "launch": existing.model_dump() if existing else None},
                 indent=2,
                 sort_keys=True,
             )
@@ -211,18 +188,14 @@ def run_unit(
 
     unit_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
     if unit_dir.stat().st_mode & 0o077:
-        raise ValueError(
-            "NoPrior unit directory must be private to the service account"
-        )
+        raise ValueError("NoPrior unit directory must be private to the service account")
     lock_descriptor = os.open(
         unit_dir / ".supervisor.lock", os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600
     )
     with os.fdopen(lock_descriptor, "a+b") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         existing = read_launch_record(record_path)
-        if existing is None and set(unit_dir.iterdir()) != {
-            unit_dir / ".supervisor.lock"
-        }:
+        if existing is None and set(unit_dir.iterdir()) != {unit_dir / ".supervisor.lock"}:
             raise ValueError("new NoPrior unit directory must be empty")
         receipt = resolve_no_prior_launch(
             root,
@@ -238,9 +211,7 @@ def run_unit(
         if existing is not None and existing.deadline_epoch <= time.time():
             return 0
         _verify_execution_environment(root)
-        record = existing or create_launch_record(
-            record_path, receipt, int(time.time())
-        )
+        record = existing or create_launch_record(record_path, receipt, int(time.time()))
         return _run_chain(record, unit_dir)
 
 
@@ -251,9 +222,7 @@ def main() -> int:
     parser.add_argument("--data_dir", type=Path, required=True)
     parser.add_argument("--unit-dir", type=Path, required=True)
     parser.add_argument("--run_name", required=True)
-    parser.add_argument(
-        "--launch", action="store_true", help="start or resume the 24-hour unit"
-    )
+    parser.add_argument("--launch", action="store_true", help="start or resume the 24-hour unit")
     args = parser.parse_args()
     try:
         return run_unit(
