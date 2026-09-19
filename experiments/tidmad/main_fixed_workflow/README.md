@@ -37,12 +37,13 @@ does not receive it. The Full treatment (Data Analysis plus human advice)
 has not been discussed and finalized for the main run; this preparation
 qualifies NoPrior only.
 
-The eventual shared launcher will accept one treatment selector (`full` or
-`no-prior`). Both treatments must use the same workflow and agent-parameter JSON. The
+The shared launcher accepts one treatment selector (`full` or
+`no-prior`, the default). Both treatments use the same workflow and agent-parameter JSON. The
 information-treatment manifest owns human advice and the dedicated data-analysis
-state. `full` remains unavailable until its scientific configuration and
-launch binding are decided and qualified. The current `launch.sh` accepts only NoPrior
-and passes explicit disabled states. ML literature review remains enabled.
+state. Full launch preparation requires explicit external analysis inputs;
+see [Full launch preparation](FULL_LAUNCH.md). Formal Full remains unqualified
+until its scientific configuration and deployment checks are complete.
+NoPrior passes explicit disabled states. ML literature review remains enabled.
 
 The `main-fixed-no-prior.yaml` manifest declares `data_analysis: disabled`.
 The treatment renderer forwards that state as `--no-data_analysis_enabled`;

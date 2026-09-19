@@ -1,4 +1,4 @@
-"""Resolve and certify one NoPrior fixed-workflow launch without starting it."""
+"""Resolve fixed-workflow launch inputs without starting an experiment."""
 
 from __future__ import annotations
 
@@ -9,16 +9,22 @@ from pathlib import Path
 
 from experiments.shared.checksum_manifest import sha256_file
 from experiments.shared.fixed_workflow_config import render_siderius_args
-from experiments.shared.framework_pin import verify_framework_pin, verify_installed_framework
-from experiments.shared.information_treatment import (
-    AdviceMode,
-    ModuleState,
-    resolve_information_treatment,
+from experiments.shared.framework_pin import (
+    verify_framework_pin,
+    verify_installed_framework,
+)
+from experiments.tidmad.information_treatments.prior_binding import (
+    Prior,
+    resolve_prior,
 )
 from experiments.tidmad.main_fixed_workflow.band_inputs import BANDS, verify_band_inputs
+from experiments.tidmad.main_fixed_workflow.full_binding import (
+    FullAnalysisInputs,
+    verify_full_analysis_binding,
+)
 
 
-def resolve_no_prior_launch(
+def _resolve_launch(
     repository_root: Path,
     siderius_checkout: Path,
     *,
@@ -27,6 +33,7 @@ def resolve_no_prior_launch(
     workspace: Path,
     run_name: str,
     require_fresh_workspace: bool = True,
+    full_analysis: FullAnalysisInputs | None = None,
 ) -> dict[str, object]:
     """Build one reviewed command and its frozen-input receipt, fail closed."""
 
@@ -34,15 +41,25 @@ def resolve_no_prior_launch(
     checkout = siderius_checkout.resolve()
     data = data_dir.resolve()
     run_workspace = workspace.resolve()
+    if full_analysis is not None:
+        full_analysis.require_external_to(root, checkout, data, run_workspace)
     if not run_name.strip():
         raise ValueError("run_name must be explicit and non-empty")
     if data.is_relative_to(root) or run_workspace.is_relative_to(root):
-        raise ValueError("data_dir and workspace must live outside the experiment checkout")
+        raise ValueError(
+            "data_dir and workspace must live outside the experiment checkout"
+        )
     if data.is_relative_to(checkout) or run_workspace.is_relative_to(checkout):
-        raise ValueError("data_dir and workspace must live outside the framework checkout")
+        raise ValueError(
+            "data_dir and workspace must live outside the framework checkout"
+        )
     if run_workspace.is_relative_to(data) or data.is_relative_to(run_workspace):
         raise ValueError("data_dir and workspace must be separate directories")
-    if require_fresh_workspace and run_workspace.is_dir() and any(run_workspace.iterdir()):
+    if (
+        require_fresh_workspace
+        and run_workspace.is_dir()
+        and any(run_workspace.iterdir())
+    ):
         raise ValueError("workspace must be fresh and empty")
     if run_workspace.exists() and not run_workspace.is_dir():
         raise ValueError("workspace must be a directory or not yet exist")
@@ -53,22 +70,25 @@ def resolve_no_prior_launch(
     if not launcher.is_file():
         raise ValueError(f"framework chain launcher is missing: {launcher}")
     data_receipt = verify_band_inputs(root, data, band)
-    treatment = resolve_information_treatment(
-        root / "experiments/tidmad/information_treatments/main-fixed-no-prior.yaml",
-        repository_root=root,
-        adapter="siderius",
-        required_modules=("literature_review", "data_analysis"),
-    )
-    if treatment.task_package_path != root / "tasks/tidmad":
-        raise ValueError("NoPrior treatment must bind the frozen tasks/tidmad package")
-    if (
-        treatment.declaration.advice.mode is not AdviceMode.DISABLED
-        or treatment.module_states["data_analysis"] is not ModuleState.DISABLED
-        or treatment.module_states["literature_review"] is not ModuleState.ENABLED
-    ):
-        raise ValueError("NoPrior requires advice OFF, Data Analysis OFF, literature review ON")
+    enabled = full_analysis is not None
+    suffix = "full" if enabled else "no-prior"
+    treatment = resolve_prior(root, Prior.ON if enabled else Prior.OFF)
     workflow = root / "experiments/tidmad/main_fixed_workflow/workflow.json"
-    workflow_args = render_siderius_args(workflow, repository_root=root, siderius_checkout=checkout)
+    workflow_args = render_siderius_args(
+        workflow, repository_root=root, siderius_checkout=checkout
+    )
+    analysis_receipt = None
+    if full_analysis is not None:
+        analysis_receipt = verify_full_analysis_binding(
+            root,
+            band=band,
+            policy_path=full_analysis.policy_path,
+            policy_sha256=full_analysis.policy_sha256,
+            composition_path=full_analysis.composition_path,
+        )
+        workflow_args[workflow_args.index("--task_composition") + 1] = analysis_receipt[
+            "composition_path"
+        ]
     literature = root / "tasks/tidmad/framework_configs/lit_review.yaml"
     if not literature.is_file():
         raise ValueError(f"literature-review config is missing: {literature}")
@@ -92,8 +112,8 @@ def resolve_no_prior_launch(
         *workflow_args,
         *treatment.siderius_args(),
     ]
-    return {
-        "version": "tidmad-main-fixed-no-prior-preflight-v1",
+    receipt: dict[str, object] = {
+        "version": f"tidmad-main-fixed-{suffix}-preflight-v1",
         "repository_revision": _git_revision(root),
         "task_package_tree": _git_revision(root, "HEAD:tasks/tidmad"),
         "siderius_revision": revision,
@@ -109,6 +129,55 @@ def resolve_no_prior_launch(
         "treatment": treatment.receipt(),
         "command": command,
     }
+    if analysis_receipt is not None:
+        receipt["analysis_binding"] = analysis_receipt
+    return receipt
+
+
+def resolve_no_prior_launch(
+    repository_root: Path,
+    siderius_checkout: Path,
+    *,
+    band: str,
+    data_dir: Path,
+    workspace: Path,
+    run_name: str,
+    require_fresh_workspace: bool = True,
+) -> dict[str, object]:
+    """Preserve the existing NoPrior command and receipt contract."""
+    return _resolve_launch(
+        repository_root,
+        siderius_checkout,
+        band=band,
+        data_dir=data_dir,
+        workspace=workspace,
+        run_name=run_name,
+        require_fresh_workspace=require_fresh_workspace,
+    )
+
+
+def resolve_full_launch(
+    repository_root: Path,
+    siderius_checkout: Path,
+    *,
+    band: str,
+    data_dir: Path,
+    workspace: Path,
+    run_name: str,
+    full_analysis: FullAnalysisInputs,
+    require_fresh_workspace: bool = True,
+) -> dict[str, object]:
+    """Resolve Full with explicit analysis authority; never start its clock."""
+    return _resolve_launch(
+        repository_root,
+        siderius_checkout,
+        band=band,
+        data_dir=data_dir,
+        workspace=workspace,
+        run_name=run_name,
+        full_analysis=full_analysis,
+        require_fresh_workspace=require_fresh_workspace,
+    )
 
 
 def _git_revision(root: Path, reference: str = "HEAD") -> str:
