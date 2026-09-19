@@ -33,6 +33,7 @@ class RestoredNativeModel:
     artifact: TrainedModelArtifact
     source: bytes
     config: bytes
+    descriptor: bytes
 
 
 @contextmanager
@@ -45,9 +46,8 @@ def restore_native_model(
     no private data access. This is not an authorization service or sandbox.
     Keep the context open through scripting: TorchScript needs the source file.
     """
-    artifact = TrainedModelArtifact.model_validate_json(
-        read_certified_artifact(root, reference.artifact_ref)
-    )
+    descriptor = read_certified_artifact(root, reference.artifact_ref)
+    artifact = TrainedModelArtifact.model_validate_json(descriptor)
     if (
         artifact.model_artifact_id != reference.model_artifact_id
         or artifact.executable_model_identity_sha256
@@ -103,4 +103,4 @@ def restore_native_model(
         state = torch.load(checkpoint, map_location="cpu", weights_only=True)
         model.load_state_dict(state, strict=True)
         model.cpu().eval()
-        yield RestoredNativeModel(model, artifact, source, config)
+        yield RestoredNativeModel(model, artifact, source, config, descriptor)

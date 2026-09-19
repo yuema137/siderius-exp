@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 import torch
@@ -46,7 +47,7 @@ class Model(torch.nn.Module):
             raise ValueError("construction lost certified loss")
         self.scale = torch.nn.Parameter(torch.tensor(0.0))
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return x * self.scale
+        return x.float() * self.scale
 PLUGIN_MODEL_TYPE = "export_synthetic"
 PLUGIN_OUTPUT_TYPE = "regressor"
 PLUGIN_CONFIG_CLASS = Config
@@ -59,13 +60,13 @@ PLUGIN_MODEL_CLASS = Model
     tensor = {
         "axes": [
             {"role": "batch", "dimension": {"symbolic": "B"}},
-            {"dimension": {"fixed": 2}},
+            {"role": "temporal", "dimension": {"symbolic": "T"}},
         ],
         "dtype": {"admissible": ["float32"]},
     }
     io = ModelIOContract.model_validate(
         {
-            "input": tensor,
+            "input": {**tensor, "dtype": {"admissible": ["int64"]}},
             "output": tensor,
             "inference": {
                 "accepted_input_view_formats": ["siderius.numeric-array.v1"],
@@ -159,3 +160,97 @@ def test_corruption_is_refused_before_plugin_import(certified, monkeypatch, corr
         ),
     ):
         pytest.fail("corrupted model restored")
+
+
+def test_certified_candidate_replays_through_frozen_evaluator(certified, tmp_path):
+    """Catch a package that passes component checks but cannot replay real HDF5 input."""
+    import h5py
+    import numpy as np
+    from agent.schemas.hyperparam_tuning import ExperimentRecord
+
+    from deployments.tidmad_coding_agent_baseline.tools.archive_candidate import (
+        candidate_tree_digest,
+    )
+    from deployments.tidmad_coding_agent_baseline.tools.segment_inference import (
+        SegmentModelContract,
+        run_segment_model,
+    )
+    from experiments.tidmad.orchestrator_wrapper.native_candidate import (
+        package_native_candidate,
+    )
+
+    root, reference, plugin = certified
+    record = ExperimentRecord(
+        exp_id="candidate-1",
+        status="success",
+        model_type="export_synthetic",
+        timestamp="2026-09-19T00:00:00+00:00",
+        file_index=0,
+        params={
+            "model_config": {"model_type": "export_synthetic"},
+            "train_config": {"epochs": 1},
+            "loss_config": {"loss_type": "smooth_l1"},
+        },
+        trained_model_artifact_ref=reference,
+    )
+    contract = SegmentModelContract(
+        version="tidmad-segment-model-v2",
+        segment_size=40000,
+        input_dtype="int64",
+        output_kind="continuous_regression",
+        inference_batch_size=2,
+    )
+    examples = [
+        (torch.zeros(1, 40000, dtype=torch.int64),),
+        (torch.full((2, 40000), 128, dtype=torch.int64),),
+    ]
+    candidate = tmp_path / "candidate"
+    digest = package_native_candidate(
+        root=root,
+        record=record,
+        approved_plugin=plugin,
+        contract=contract,
+        examples=examples,
+        destination=candidate,
+    )
+    assert digest == candidate_tree_digest(candidate)
+    assert (
+        hashlib.sha256((candidate / "native_artifact.json").read_bytes()).hexdigest()
+        == reference.artifact_ref.sha256
+    )
+    rejected = tmp_path / "mixed-record"
+    with pytest.raises(ValueError, match="does not identify"):
+        package_native_candidate(
+            root=root,
+            record=record.model_copy(update={"exp_id": "another-experiment"}),
+            approved_plugin=plugin,
+            contract=contract,
+            examples=examples,
+            destination=rejected,
+        )
+    assert not rejected.exists()
+    raw = np.resize(np.arange(-8, 9, dtype=np.int8), 80000)
+    source, output = tmp_path / "input.h5", tmp_path / "output.h5"
+    with h5py.File(source, "w") as handle:
+        group = handle.require_group("timeseries/channel0001")
+        group.attrs["sampling_frequency"] = 10000000
+        group.attrs["voltage_range_mV"] = 80
+        group.create_dataset("timeseries", data=raw)
+    run_segment_model(
+        candidate=candidate,
+        input_file=source,
+        output_file=output,
+        device=torch.device("cpu"),
+        task_root=Path(__file__).resolve().parents[2],
+        required_output_kind="continuous_regression",
+    )
+    with h5py.File(output) as handle:
+        assert np.array_equal(
+            handle["timeseries/channel0001/timeseries"][:],
+            (3 * (raw.astype(np.int64) + 128) - 128).astype(np.int8),
+        )
+    assert output.with_suffix(".h5.complete").is_file()
+    assert (
+        json.loads((candidate / "native_provenance.json").read_text())["qualification"]
+        == "serialization_only_not_scored"
+    )
