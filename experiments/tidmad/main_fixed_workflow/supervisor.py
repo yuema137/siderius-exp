@@ -12,6 +12,8 @@ import subprocess
 import time
 from pathlib import Path
 
+from workflows.llm_config import WorkflowLLMConfig
+
 from experiments.tidmad.main_fixed_workflow.band_inputs import BANDS
 from experiments.tidmad.main_fixed_workflow.preflight import resolve_no_prior_launch
 from experiments.tidmad.main_fixed_workflow.unit_clock import (
@@ -19,8 +21,6 @@ from experiments.tidmad.main_fixed_workflow.unit_clock import (
     create_launch_record,
     read_launch_record,
 )
-
-from workflows.llm_config import WorkflowLLMConfig
 
 
 def _required_api_keys(config: Path) -> set[str]:
@@ -96,6 +96,8 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
     environment["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(unit_dir / "workspace/generated_library")
+    # Fresh units cannot inherit host-wide timing evidence; resume reuses this path.
+    environment["SIDERIUS_CALIBRATION_DIR"] = str(unit_dir / "calibration")
     logs = unit_dir / "logs"
     if logs.is_symlink():
         raise ValueError("NoPrior log directory must not be a symlink")
