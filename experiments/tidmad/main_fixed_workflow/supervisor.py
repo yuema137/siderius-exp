@@ -1,4 +1,4 @@
-"""Run one NoPrior chain under its write-once 24-hour UTC deadline."""
+"""Run one explicitly bound fixed-workflow unit under its continuing UTC deadline."""
 
 from __future__ import annotations
 
@@ -10,12 +10,16 @@ import os
 import signal
 import subprocess
 import time
+from functools import partial
 from pathlib import Path
 
-from workflows.llm_config import WorkflowLLMConfig
-
+from experiments.shared.workflow_credentials import required_workflow_api_keys
 from experiments.tidmad.main_fixed_workflow.band_inputs import BANDS
-from experiments.tidmad.main_fixed_workflow.preflight import resolve_no_prior_launch
+from experiments.tidmad.main_fixed_workflow.full_binding import FullAnalysisInputs
+from experiments.tidmad.main_fixed_workflow.preflight import (
+    resolve_full_launch,
+    resolve_no_prior_launch,
+)
 from experiments.tidmad.main_fixed_workflow.unit_clock import (
     LaunchRecord,
     create_launch_record,
@@ -24,46 +28,24 @@ from experiments.tidmad.main_fixed_workflow.unit_clock import (
 
 
 def _required_api_keys(config: Path) -> set[str]:
-    """Read enabled provider names without displaying credentials."""
-
-    provider_keys = {
-        "openai": "OPENAI_API_KEY",
-        "gemini": "GEMINI_API_KEY",
-        "deepseek": "DEEPSEEK_API_KEY",
-    }
-    payload = WorkflowLLMConfig.from_json(str(config)).model_dump(exclude_none=True)
-    payload.pop("data_analysis", None)  # NoPrior disables this role explicitly.
-    providers: set[str] = set()
-
-    def visit(value: object) -> None:
-        if isinstance(value, dict):
-            provider = value.get("provider")
-            if isinstance(provider, str):
-                providers.add(provider)
-            for child in value.values():
-                visit(child)
-        elif isinstance(value, list):
-            for child in value:
-                visit(child)
-
-    visit(payload)
-    if not providers:
-        raise ValueError("NoPrior LLM config declares no enabled provider")
-    unknown = providers - provider_keys.keys()
-    if unknown:
-        raise ValueError(
-            f"unsupported LLM provider in launch config: {sorted(unknown)}"
-        )
-    return {provider_keys[provider] for provider in providers}
+    """Keep NoPrior's explicit analysis exclusion at its treatment boundary."""
+    return required_workflow_api_keys(
+        config, disabled_roles=frozenset({"data_analysis"})
+    )
 
 
-def _verify_execution_environment(root: Path) -> None:
+def _verify_execution_environment(
+    root: Path, *, include_analysis: bool = False
+) -> None:
     """Require one H100 and name-only API key presence before starting a clock."""
 
     config = root / "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
-    missing = sorted(
-        key for key in _required_api_keys(config) if not os.environ.get(key)
+    required = (
+        required_workflow_api_keys(config)
+        if include_analysis
+        else _required_api_keys(config)
     )
+    missing = sorted(key for key in required if not os.environ.get(key))
     if missing:
         raise ValueError(f"required provider keys are absent: {', '.join(missing)}")
     gpu = subprocess.run(
@@ -74,7 +56,9 @@ def _verify_execution_environment(root: Path) -> None:
     )
     names = [line.strip() for line in gpu.stdout.splitlines() if line.strip()]
     if len(names) != 1 or "H100" not in names[0]:
-        raise ValueError(f"NoPrior unit requires exactly one H100; observed {names}")
+        raise ValueError(
+            f"fixed-workflow unit requires exactly one H100; observed {names}"
+        )
 
 
 def _append_event(path: Path, event: dict[str, object]) -> None:
@@ -105,7 +89,7 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
     if not isinstance(command, list) or not all(
         isinstance(arg, str) for arg in command
     ):
-        raise ValueError("stored NoPrior command is malformed")
+        raise ValueError("stored fixed-workflow command is malformed")
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
     environment["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(
@@ -115,7 +99,7 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
     environment["SIDERIUS_CALIBRATION_DIR"] = str(unit_dir / "calibration")
     logs = unit_dir / "logs"
     if logs.is_symlink():
-        raise ValueError("NoPrior log directory must not be a symlink")
+        raise ValueError("fixed-workflow log directory must not be a symlink")
     logs.mkdir(mode=0o700, exist_ok=True)
     _append_event(
         unit_dir / "events.jsonl",
@@ -174,6 +158,7 @@ def run_unit(
     unit_dir: Path,
     run_name: str,
     launch: bool,
+    full_analysis: FullAnalysisInputs | None = None,
 ) -> int:
     """Preview or supervise one external unit, preserving its first clock."""
 
@@ -181,6 +166,8 @@ def run_unit(
     root = root.resolve()
     checkout = checkout.resolve()
     data_dir = data_dir.resolve()
+    if full_analysis is not None:
+        full_analysis.require_external_to(root, checkout, data_dir, unit_dir)
     if any(
         unit_dir.is_relative_to(source) or source.is_relative_to(unit_dir)
         for source in (root, checkout, data_dir)
@@ -188,12 +175,17 @@ def run_unit(
         raise ValueError("unit directory must be separate from checkouts and data")
     if launch and not unit_dir.parent.is_mount():
         raise ValueError(
-            "NoPrior unit must be an immediate child of a mounted persistent volume"
+            "fixed-workflow unit must be an immediate child of a mounted persistent volume"
         )
+    resolver = (
+        partial(resolve_full_launch, full_analysis=full_analysis)
+        if full_analysis is not None
+        else resolve_no_prior_launch
+    )
     record_path = unit_dir / "launch.json"
     if not launch:
         existing = read_launch_record(record_path)
-        receipt = resolve_no_prior_launch(
+        receipt = resolver(
             root,
             checkout,
             band=band,
@@ -203,7 +195,9 @@ def run_unit(
             require_fresh_workspace=existing is None,
         )
         if existing is not None and existing.preflight != receipt:
-            raise ValueError("current NoPrior inputs differ from the recorded launch")
+            raise ValueError(
+                "current fixed-workflow inputs differ from the recorded launch"
+            )
         print(
             json.dumps(
                 {
@@ -219,7 +213,7 @@ def run_unit(
     unit_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
     if unit_dir.stat().st_mode & 0o077:
         raise ValueError(
-            "NoPrior unit directory must be private to the service account"
+            "fixed-workflow unit directory must be private to the service account"
         )
     lock_descriptor = os.open(
         unit_dir / ".supervisor.lock", os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600
@@ -230,8 +224,8 @@ def run_unit(
         if existing is None and set(unit_dir.iterdir()) != {
             unit_dir / ".supervisor.lock"
         }:
-            raise ValueError("new NoPrior unit directory must be empty")
-        receipt = resolve_no_prior_launch(
+            raise ValueError("new fixed-workflow unit directory must be empty")
+        receipt = resolver(
             root,
             checkout,
             band=band,
@@ -241,10 +235,15 @@ def run_unit(
             require_fresh_workspace=existing is None,
         )
         if existing is not None and existing.preflight != receipt:
-            raise ValueError("current NoPrior inputs differ from the recorded launch")
+            raise ValueError(
+                "current fixed-workflow inputs differ from the recorded launch"
+            )
         if existing is not None and existing.deadline_epoch <= time.time():
             return 0
-        _verify_execution_environment(root)
+        if full_analysis is None:
+            _verify_execution_environment(root)
+        else:
+            _verify_execution_environment(root, include_analysis=True)
         record = existing or create_launch_record(
             record_path, receipt, int(time.time())
         )
@@ -261,8 +260,31 @@ def main() -> int:
     parser.add_argument(
         "--launch", action="store_true", help="start or resume the 24-hour unit"
     )
+    parser.add_argument("--condition", choices=("no-prior", "full"), default="no-prior")
+    parser.add_argument("--analysis-policy", type=Path)
+    parser.add_argument("--analysis-policy-sha256")
+    parser.add_argument("--analysis-composition", type=Path)
     args = parser.parse_args()
     try:
+        supplied = (
+            args.analysis_policy,
+            args.analysis_policy_sha256,
+            args.analysis_composition,
+        )
+        if args.condition == "full":
+            if not all(supplied):
+                raise ValueError(
+                    "Full requires explicit analysis policy, digest and composition"
+                )
+            full_analysis = FullAnalysisInputs(
+                policy_path=args.analysis_policy,
+                policy_sha256=args.analysis_policy_sha256,
+                composition_path=args.analysis_composition,
+            )
+        else:
+            if any(supplied):
+                raise ValueError("NoPrior cannot accept analysis launch inputs")
+            full_analysis = None
         return run_unit(
             root=Path(__file__).resolve().parents[3],
             checkout=args.siderius_checkout,
@@ -271,9 +293,10 @@ def main() -> int:
             unit_dir=args.unit_dir,
             run_name=args.run_name,
             launch=args.launch,
+            full_analysis=full_analysis,
         )
     except (ValueError, OSError, subprocess.CalledProcessError) as exc:
-        parser.exit(2, f"NoPrior launch refused: {exc}\n")
+        parser.exit(2, f"fixed-workflow launch refused: {exc}\n")
 
 
 if __name__ == "__main__":

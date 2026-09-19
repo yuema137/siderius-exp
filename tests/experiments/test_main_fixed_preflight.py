@@ -6,7 +6,12 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from experiments.shared.framework_pin import verify_framework_pin, verify_installed_framework
+
+from experiments.shared.framework_pin import (
+    verify_framework_pin,
+    verify_installed_framework,
+)
+from experiments.tidmad.information_treatments import prior_binding
 from experiments.tidmad.main_fixed_workflow import preflight
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -145,14 +150,14 @@ def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_p
             run_name="reviewed-run-name",
         )
 
-    resolve_treatment = preflight.resolve_information_treatment
+    resolve_treatment = prior_binding.resolve_information_treatment
 
     def wrong_task_package(*args, **kwargs):
         resolved = resolve_treatment(*args, **kwargs)
         return resolved.model_copy(update={"task_package_path": tmp_path / "other-task"})
 
-    monkeypatch.setattr(preflight, "resolve_information_treatment", wrong_task_package)
-    with pytest.raises(ValueError, match="frozen tasks/tidmad package"):
+    monkeypatch.setattr(prior_binding, "resolve_information_treatment", wrong_task_package)
+    with pytest.raises(ValueError, match="common TIDMAD task"):
         preflight.resolve_no_prior_launch(
             ROOT,
             checkout,

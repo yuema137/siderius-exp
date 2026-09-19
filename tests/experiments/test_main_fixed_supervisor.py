@@ -247,3 +247,136 @@ def test_child_calibration_state_is_private_per_unit_and_persists_on_resume(
     assert (first / "calibration/counter").read_text() == "2"
     assert (records[1][1] / "calibration/counter").read_text() == "1"
     assert (stale / "counter").read_text() == "99"
+
+
+def test_full_restart_keeps_clock_and_rejects_policy_or_condition_change(
+    monkeypatch, tmp_path
+):
+    from experiments.tidmad.main_fixed_workflow.full_binding import FullAnalysisInputs
+
+    monkeypatch.setattr(Path, "is_mount", lambda *_: True)
+    now = [1000000]
+    monkeypatch.setattr(supervisor.time, "time", lambda: now[0])
+    checks, executions = [], []
+    monkeypatch.setattr(
+        supervisor,
+        "_verify_execution_environment",
+        lambda root, *, include_analysis=False: checks.append(include_analysis),
+    )
+    monkeypatch.setattr(
+        supervisor,
+        "_run_chain",
+        lambda record, unit: executions.append(record.deadline_epoch) or 0,
+    )
+    monkeypatch.setattr(
+        supervisor,
+        "resolve_full_launch",
+        lambda *args, full_analysis, **kwargs: {
+            "condition": "full",
+            "analysis": full_analysis.model_dump(mode="json"),
+            "command": ["bash", "chain.sh"],
+        },
+    )
+    monkeypatch.setattr(
+        supervisor,
+        "resolve_no_prior_launch",
+        lambda *args, **kwargs: {
+            "condition": "no-prior",
+            "command": ["bash", "chain.sh"],
+        },
+    )
+    binding = FullAnalysisInputs(
+        policy_path=tmp_path / "policy",
+        policy_sha256="a" * 64,
+        composition_path=tmp_path / "composition",
+    )
+    unit = tmp_path / "unit"
+    kwargs = {
+        "root": tmp_path / "exp",
+        "checkout": tmp_path / "infra",
+        "band": "0-3",
+        "data_dir": tmp_path / "data",
+        "unit_dir": unit,
+        "run_name": "full",
+        "launch": True,
+        "full_analysis": binding,
+    }
+    assert supervisor.run_unit(**kwargs) == 0
+    receipt = (unit / "launch.json").read_bytes()
+    now[0] += 60
+    assert supervisor.run_unit(**kwargs) == 0
+    assert (unit / "launch.json").read_bytes() == receipt
+    assert executions == [1000000 + UNIT_SECONDS, 1000000 + UNIT_SECONDS]
+    assert checks == [True, True]
+    for altered in [None, binding.model_copy(update={"policy_sha256": "b" * 64})]:
+        with pytest.raises(ValueError, match="differ from the recorded launch"):
+            supervisor.run_unit(**{**kwargs, "full_analysis": altered})
+    assert len(executions) == 2
+
+
+@pytest.mark.parametrize("owner", ["exp", "infra", "data", "unit"])
+def test_full_inputs_inside_managed_directories_fail_before_unit_creation(
+    tmp_path, owner
+):
+    """A symlink must not hide an input that source/run cleanup could delete."""
+    from experiments.tidmad.main_fixed_workflow.full_binding import FullAnalysisInputs
+
+    alias = tmp_path / "external-looking.yaml"
+    alias.symlink_to(tmp_path / owner / "analysis.yaml")
+    binding = FullAnalysisInputs(
+        policy_path=alias,
+        policy_sha256="a" * 64,
+        composition_path=tmp_path / "composition.yaml",
+    )
+    with pytest.raises(ValueError, match="outside checkouts, data and run"):
+        supervisor.run_unit(
+            root=tmp_path / "exp",
+            checkout=tmp_path / "infra",
+            band="0-3",
+            data_dir=tmp_path / "data",
+            unit_dir=tmp_path / "unit",
+            run_name="full",
+            launch=True,
+            full_analysis=binding,
+        )
+    assert not (tmp_path / "unit").exists()
+
+
+@pytest.mark.parametrize(
+    "flags",
+    [
+        ["--condition", "full"],
+        ["--analysis-policy", "policy.yaml"],
+    ],
+)
+def test_cli_rejects_incomplete_or_no_prior_analysis_before_execution(
+    monkeypatch, flags
+):
+    """Condition/flag mistakes must never reach the effectful supervisor."""
+    import sys
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "supervisor",
+            "--siderius-checkout",
+            "/infra",
+            "--band",
+            "0-3",
+            "--data_dir",
+            "/data",
+            "--unit-dir",
+            "/unit",
+            "--run_name",
+            "test",
+            "--launch",
+            *flags,
+        ],
+    )
+    monkeypatch.setattr(
+        supervisor, "run_unit", lambda **_: pytest.fail("unexpected launch")
+    )
+    with pytest.raises(SystemExit) as exc:
+        supervisor.main()
+    assert exc.value.code == 2
