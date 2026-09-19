@@ -1,5 +1,8 @@
 # TIDMAD main fixed-workflow configuration
 
+Before launch, complete the [workflow qualification gates](SMOKE_QUALIFICATION.md),
+including scored-output recovery into the next iteration and service-level halt propagation.
+
 This directory contains the NoPrior launch path for the planned one-band,
 24-hour main experiment. The paper run is not qualified yet: real H100 data,
 the short smoke, candidate replay, and the final launch checkpoint remain open.

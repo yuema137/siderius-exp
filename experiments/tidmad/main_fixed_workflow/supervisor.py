@@ -80,6 +80,11 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
     if remaining <= 0:
         _append_event(unit_dir / "events.jsonl", {"event": "deadline_already_elapsed"})
         return 0
+    # A permanent framework halt must survive service/operator restarts. Never
+    # erase the marker or reset the immutable clock to retry an invalid chain.
+    if (unit_dir / "workspace/.chain_halted").exists():
+        _append_event(unit_dir / "events.jsonl", {"event": "chain_halt_preserved"})
+        return 3
     command = record.preflight["command"]
     if not isinstance(command, list) or not all(
         isinstance(arg, str) for arg in command
@@ -139,6 +144,8 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
             "returncode": returncode,
         },
     )
+    if returncode == 3 or (unit_dir / "workspace/.chain_halted").exists():
+        return 3
     return 0 if returncode == 0 else 1
 
 

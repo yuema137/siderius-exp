@@ -12,7 +12,8 @@ Group=@NO_PRIOR_GROUP@
 EnvironmentFile=/etc/tidmad-no-prior/%i.env
 ExecStart=/usr/bin/env /bin/bash ${EXP_CHECKOUT}/experiments/tidmad/main_fixed_workflow/launch.sh --launch --siderius-checkout ${SIDERIUS_CHECKOUT} --band ${BAND} --data_dir ${DATA_DIR} --unit-dir ${UNIT_DIR} --run_name ${RUN_NAME}
 Restart=on-failure
-RestartPreventExitStatus=2
+RestartPreventExitStatus=2 3
+RestartSec=10s
 KillMode=control-group
 UMask=0077
 
