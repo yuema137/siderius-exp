@@ -1,0 +1,25 @@
+{
+  "version": "full-prior-v7",
+  "advice": {
+    "path": "experiments/tidmad/information_treatments/full-prior-v7/advice.json",
+    "sha256": "5435314ae7627a80567aab658595b3bf04bcd84cdb04ee7d8c287a270f0f3db4"
+  },
+  "analysis_policies": {
+    "0-3": {
+      "path": "experiments/tidmad/information_treatments/full-prior-v6/0-3/analysis-policy.yaml",
+      "sha256": "6a4109a287d93743ed68e2be254117c54d8755773c39e5be881cbaff0e60d7d7"
+    },
+    "4-9": {
+      "path": "experiments/tidmad/information_treatments/full-prior-v6/4-9/analysis-policy.yaml",
+      "sha256": "7e61c1607bf795b9ecb2a43d9d1efc5abd2f78f5e27e166095b1e36c5b9517ab"
+    },
+    "10-14": {
+      "path": "experiments/tidmad/information_treatments/full-prior-v6/10-14/analysis-policy.yaml",
+      "sha256": "7094430e0cc67cb74132396f9c6f2965c670583df92aa1e3888971b68ce6966c"
+    },
+    "15-19": {
+      "path": "experiments/tidmad/information_treatments/full-prior-v6/15-19/analysis-policy.yaml",
+      "sha256": "e1c92373755811a5d54fd8216f21b8395b87fabd032e21599c62012622f56f8f"
+    }
+  }
+}

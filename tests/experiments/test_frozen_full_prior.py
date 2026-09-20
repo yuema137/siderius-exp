@@ -24,7 +24,7 @@ def test_shared_prior_materializes_frozen_policy_and_refuses_budget_drift(
     receipt = prepare_full(ROOT, band, tmp_path / band)
     assert (
         receipt["advice_sha256"]
-        == "38532a602504d3169b5a0e30fd92ae82ce386004722e6d4cd064b1709ec6b62e"
+        == "5435314ae7627a80567aab658595b3bf04bcd84cdb04ee7d8c287a270f0f3db4"
     )
     assert full_analysis_policy(ROOT, band).resource_envelope.wall_time_budget_s == 600
     assert resolve_prior(ROOT, Prior.OFF).advice_path is None
@@ -32,7 +32,7 @@ def test_shared_prior_materializes_frozen_policy_and_refuses_budget_drift(
     policy = yaml.safe_load(policy_path.read_text())
     policy["resource_envelope"]["wall_time_budget_s"] = 300
     policy_path.write_text(yaml.safe_dump(policy))
-    with pytest.raises(ValueError, match="frozen V6"):
+    with pytest.raises(ValueError, match="frozen V7"):
         verify_full_analysis_binding(
             ROOT,
             band=band,

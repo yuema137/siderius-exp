@@ -33,13 +33,13 @@ The phase runtime watchdog is explicitly disabled (`--no-runtime_watchdog`)
 to avoid terminating candidates based on estimated phase duration. The
 supervisor's fixed 24-hour deadline and disk-space guard remain active.
 
-`advice.json` is the frozen English V6 Full-arm artifact shared by every band
+[V7 advice](../information_treatments/full-prior-v7/advice.json) is the English Full-arm artifact shared by every band
 and by the orchestration prior binding. It asks the agent to start from useful
 published encoder-decoder principles at comparable reference capacity, then
 explore controlled changes and comparable/greater capacity; it does not supply
 exact winner code or require a specific layer sequence. NoPrior never receives
 it. Full prior settings are frozen; deployment/execution qualification is a
-separate gate. See [the shared frozen prior](../information_treatments/full-prior-v6/README.md).
+separate gate. See [the shared frozen prior](../information_treatments/full-prior-v7/README.md).
 
 The shared launcher accepts one treatment selector (`full` or
 `no-prior`, the default). Both treatments use the same workflow and agent-parameter JSON. The

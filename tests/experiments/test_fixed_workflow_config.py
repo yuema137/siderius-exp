@@ -199,7 +199,7 @@ def test_main_full_treatment_binds_reviewed_advice_and_explicit_analysis() -> No
     )
     assert treatment.declaration.advice.mode is AdviceMode.ENABLED
     assert treatment.advice_path == (
-        ROOT / "experiments/tidmad/main_fixed_workflow/advice.json"
+        ROOT / "experiments/tidmad/information_treatments/full-prior-v7/advice.json"
     )
     assert treatment.module_states == {
         "literature_review": ModuleState.ENABLED,
