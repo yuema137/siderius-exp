@@ -128,6 +128,54 @@ def test_the_advice_artifact_uses_only_recognised_keys():
         assert joined.strip(), f"advice key {key!r} is present but injects nothing"
 
 
+#: The benchmark's published R-squared figures. COMMON KNOWLEDGE: they belong
+#: to the task package, where both arms see them. Hardcoded here rather than
+#: read from the baselines file, so this test compares two independent copies
+#: instead of comparing the advice artifact to itself.
+PUBLISHED_FIGURES = ("0.665", "0.617", "0.612", "-0.017", "0.522", "926,536", "926536")
+
+
+def test_the_advice_does_not_restate_common_knowledge():
+    """The prior/common-knowledge boundary, made executable.
+
+    The published baselines, their parameter counts and the capacity sweep are
+    facts anyone reading the benchmark has. They live in the task package so
+    BOTH arms see them. Restating a figure in the advice artifact would not
+    create a prior — it would make the no-prior arm ignorant of the
+    benchmark's published context rather than merely unadvised, which is a
+    different and weaker contrast than the one under study.
+
+    Nothing else catches this. The advice loads, the treatment resolves, and
+    the run would proceed; only the meaning of the experiment would have
+    changed.
+    """
+    text = ADVICE.read_text(encoding="utf-8")
+    body = "\n".join(line for line in text.splitlines() if '"_meta"' not in line)
+    leaked = [figure for figure in PUBLISHED_FIGURES if figure in body]
+    assert not leaked, (
+        f"advice.json restates published figures {leaked}; those are common "
+        "knowledge and belong in the task package, which both arms read"
+    )
+
+
+def test_the_task_package_carries_the_common_knowledge():
+    """The other half: it must actually be somewhere both arms see.
+
+    Moving a figure out of the advice artifact is only correct if it landed in
+    the task description, which is what reaches the node prompts. A figure in
+    `reference_baselines.json` alone reaches no agent: the composition has no
+    section that loads it.
+    """
+    description = (
+        EXP_ROOT / "tasks" / "phyts_tess" / "declared" / "task_config.yaml"
+    ).read_text(encoding="utf-8")
+    for figure in ("0.665", "0.617", "0.612", "-0.017"):
+        assert figure in description, (
+            f"published figure {figure} reaches no arm: it is not in the task "
+            "description, and the composition loads no baselines file"
+        )
+
+
 def test_required_keys_follow_the_arm():
     """Derived from module state, never from a constant.
 

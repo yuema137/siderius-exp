@@ -44,6 +44,7 @@ Read [`STATUS.md`](STATUS.md) before treating any of this as qualified, and
 | [`runtime/scoring.py`](runtime/scoring.py) | R-squared, RMSE and MAE |
 | [`runtime/scoreability.py`](runtime/scoreability.py) | whether a deliverable is scoreable at all |
 | [`declared/`](declared/) | dataset profile, task description and forward contract, metric declarations, Health family |
+| [`declared/reference_baselines.json`](declared/reference_baselines.json) | the benchmark's published results, baseline architectures, and three recorded paper/repository discrepancies |
 | [`plugins/`](plugins/) | reference model, Health view provider |
 | [`data/manifests/`](data/manifests/) | the committed split authority |
 | [`tools/stage_data.py`](tools/stage_data.py) | staging, and the test-split isolation |
@@ -67,6 +68,22 @@ eventually saturates against.
 **No training objective is declared.** The agent chooses its own loss. The
 selection metric is unaffected: training objective and selection metric are
 separate declarations, and only the latter orders candidates.
+
+## Published baselines are common knowledge, not a prior
+
+The benchmark's own numbers and baseline architectures live in
+[`declared/reference_baselines.json`](declared/reference_baselines.json), and
+a summary reaches the agents through the task description. Anyone reading the
+benchmark has them, so **both** information treatments do — a no-prior arm
+that did not know the published context would be ignorant rather than merely
+unadvised, which is a different contrast. What to *do* about them is advice,
+and belongs to an experiment.
+
+They do not line up cleanly with the repository, and the discrepancies are
+recorded rather than smoothed: the committed configs measure near ~700k
+parameters against a reported 300K, use a 70/15/15 split rather than the
+released 80/10/10, and cover only the classification task. See
+[`PROVENANCE.md`](PROVENANCE.md).
 
 ## Not declared, deliberately
 

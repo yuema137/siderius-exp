@@ -44,6 +44,64 @@ task_description: |
   retained unfiltered because the task definition is the released data, but
   a model is not expected to reproduce it.
 
+  Published reference points. These are the benchmark's own numbers, known
+  to anyone who reads it, and they describe the task rather than recommend
+  an approach. All were computed on a TEST split while a run here is scored
+  on VALIDATION, and R-squared is normalized by the evaluation set's own
+  variance, so they are not a target to beat on the same footing.
+
+    supervised baselines, all at 300K parameters:
+      S4D                 R-squared 0.665   diagonal state-space model
+      CNN                 R-squared 0.617   described only as a vanilla CNN
+      LinOSS              R-squared 0.612   oscillatory state-space model
+      mean predictor      R-squared -0.017  predicts the training mean
+
+    the same three across a capacity sweep (~10k / ~100k / ~300k / ~700k),
+    each cell the top-3 mean of a 100-iteration hyperparameter sweep:
+      LinOSS   0.536 / 0.589 / 0.612 / 0.598
+      S4D      0.581 / 0.624 / 0.665 / 0.522
+      CNN      0.573 / 0.580 / 0.617 / 0.591
+
+    six pretrained time-series foundation models, zero-shot, on the paper's
+    own re-split rather than this one: 0.074 to 0.305, with the strongest
+    being Chronos at 0.3049 and MOMENT at 0.2631. Fine-tuning raises the
+    best of them to 0.4095.
+
+  Baseline architectures, read from the benchmark's code repository rather
+  than the paper, which publishes only family names:
+
+    CNN     five blocks of Conv1d(kernel 15, same padding) -> BatchNorm1d
+            -> GELU -> MaxPool1d(2) -> Dropout(0.4), channels
+            64/64/128/128/256, then a global average pool over time and one
+            Linear to the output. An optional validity mask multiplies the
+            input first.
+    S4D     Linear encoder to d_model 64, then 4 residual blocks of
+            S4D(d_state 16, dt 0.001-0.1) -> dropout 0.2 -> residual add
+            -> LayerNorm, then a mask-aware mean pool over time and one
+            Linear to the output.
+    LinOSS  4 blocks, each a BatchNorm, an oscillatory state-space layer
+            with diagonal A/B/C/D and learnable step sizes, a GLU, dropout
+            and a residual connection. ssm_size 100, H 200, IM
+            discretization.
+
+  All three pool over the whole sequence and then read a single linear head,
+  and all three are mask-aware or made so, which is what lets them handle the
+  padded tail.
+
+  Three things about those published numbers do not line up, and are worth
+  knowing before treating any of them as a target. The committed configs
+  measure far larger than the 300K the paper reports: the CNN config counts
+  926,536 parameters and the LinOSS config's own comment targets S4D near
+  662K, which places them at the sweep's ~700k point rather than the ~300k
+  point the headline results come from, and at ~700k the sweep shows S4D
+  falling to 0.522. The committed configs also use a 70/15/15 split rather
+  than the released 80/10/10 one used here. And the repository commits no
+  regression config for TESS at all, only a classification one.
+
+  The full record, including the foundation-model architectures, the
+  published training setup and the exact discrepancies above, is in
+  `declared/reference_baselines.json`.
+
 forward_contract:
   model_io:
     input:

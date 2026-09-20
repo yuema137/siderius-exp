@@ -99,8 +99,45 @@ series" without specifying the method. Per-curve z-scoring is the operator's
 frozen choice for this package (2026-09-20), consistent with the explicit
 rule PhyTS documents for its Project 8 subset.
 
-## Reference figures, quoted not reproduced
+## Reference figures and architectures
 
 PhyTS Table 2, TESS regression (R-squared): mean baseline `-0.017`, CNN
-`0.617`, LinOSS `0.612`, S4D `0.665`. Table 10 reports per-model-size sweeps.
-Nothing in this repository has reproduced any of these numbers.
+`0.617`, LinOSS `0.612`, S4D `0.665`. Table 10 reports a per-size sweep.
+**Nothing in this repository has reproduced any of these numbers.**
+
+They are treated as **common knowledge rather than as a prior**: anyone who
+reads the benchmark has them, so they belong to the task and both information
+treatments see them. The full record is `declared/reference_baselines.json`,
+and a summary reaches the agents through `declared/task_config.yaml`, which is
+the field the framework routes into node prompts. An executable guard keeps
+these figures out of the experiments' advice artifact, because restating them
+there would make the no-prior arm ignorant of the published context rather
+than merely unadvised.
+
+Baseline architectures come from the benchmark's **code repository**
+(`github.com/kyoon-mit/PhyTS`, `src/models/` and `configs/TESS/`, read
+2026-09-20). The paper publishes only family names and calls its
+convolutional baseline "a vanilla CNN".
+
+### Three discrepancies between that repository and the paper
+
+Recorded rather than resolved; each is checkable against the cited files.
+
+**Parameter count.** Table 8 reports 300K for all three supervised baselines
+on this dataset. The committed CNN config measures **926,536** parameters —
+constructed from the config and counted, not quoted — and the LinOSS config's
+own comment targets S4D at approximately 662K. The committed configs
+therefore sit near the sweep's ~700k point, not the ~300k point the headline
+results come from. That matters because Table 10 shows S4D **falling from
+0.665 at ~300k to 0.522 at ~700k**: the committed config is not the
+configuration that produced the best published number.
+
+**Split.** The committed conv and S4D configs use `train_frac 0.7` /
+`val_frac 0.15` — appendix D.2's 70/15/15 re-split, not the released 80/10/10
+grouped by Gaia DR3 identifier that this package uses.
+
+**Task coverage.** The repository commits **no regression config for TESS at
+all**, only classification. The backbones and code paths are the same three
+families; only the output width and loss differ. So the recorded structures
+describe the rotation-regression baselines' shape, but not a configuration
+that was literally run for Task B.
