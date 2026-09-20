@@ -62,7 +62,11 @@ run-invariants lock violation:
 ```
 
 Observed live on unit `nop_002`, and confirmed by constructing both call
-sites. Any composed run using `agent` hits it.
+sites. Any composed run using `agent` hits it. Tracked upstream as
+[SIDERIUS#563](https://github.com/Galileo-Sandbox/SIDERIUS/issues/563); it is
+still present on that repository's `master`. Restore `agent` here only once
+that issue is closed **and** a two-iteration run has been seen to survive,
+since a single-iteration run cannot detect it.
 
 What the fallback costs, stated plainly: the agent can no longer **shrink**
 the formal training portion. It costs nothing else — `--formal_portion 1.0`
