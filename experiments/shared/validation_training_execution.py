@@ -37,7 +37,10 @@ from experiments.shared.validation_epoch_execution import (
     ValidationProgressRelay,
     execute_admitted_epoch,
 )
-from experiments.shared.validation_epoch_protocol import ValidationEpochMetadata
+from experiments.shared.validation_epoch_protocol import (
+    NativeValidationCancelled,
+    ValidationEpochMetadata,
+)
 from experiments.shared.validation_epoch_service import (
     AdmittedValidationWorkload,
     EpochExecutor,
@@ -271,15 +274,21 @@ def run_admitted_native_training(
                         timeout=max(0.001, deadline - time.monotonic())
                     )
                     break
-                sequence = serve_validation_epoch(
-                    job.channel,
-                    workload=workload,
-                    sequence=sequence,
-                    execute=execute,
-                    deadline=deadline,
-                    max_metadata_bytes=max_metadata_bytes,
-                    max_snapshot_bytes=max_snapshot_bytes,
-                )
+                try:
+                    sequence = serve_validation_epoch(
+                        job.channel,
+                        workload=workload,
+                        sequence=sequence,
+                        execute=execute,
+                        deadline=deadline,
+                        max_metadata_bytes=max_metadata_bytes,
+                        max_snapshot_bytes=max_snapshot_bytes,
+                    )
+                except NativeValidationCancelled:
+                    code = job.process.wait(
+                        timeout=max(0.001, deadline - time.monotonic())
+                    )
+                    break
             elif (code := job.process.poll()) is not None:
                 break
     return NativeValidationRunResult(code, sequence, time.monotonic() - started)

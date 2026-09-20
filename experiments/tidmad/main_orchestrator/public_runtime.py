@@ -36,6 +36,7 @@ PUBLIC_FILES = (
             "objective_source_check",
             "reviewed_objective_worker",
             "scripted_model_export",
+            "scripted_implementation",
             "validation_client_factory",
             "validation_descriptor_transport",
             "validation_epoch_protocol",
@@ -58,6 +59,8 @@ PUBLIC_FILES = (
         )
     ),
     "experiments/tidmad/main_orchestrator/SUBMISSION.md",
+    "experiments/shared/scripted_implementation.md",
+    "experiments/shared/scripted_model_export.md",
     *(
         f"deployments/tidmad_coding_agent_baseline/tools/{name}.py"
         for name in (

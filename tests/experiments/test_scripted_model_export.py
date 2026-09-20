@@ -161,3 +161,69 @@ def test_native_fcnet_regression_exports_by_explicit_trace(tmp_path, monkeypatch
         assert receipt.example_count == 2
     finally:
         torch.set_num_threads(old_threads)
+
+
+class DeviceCreated(Affine):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        positions = torch.arange(x.shape[-1], device=x.device)
+        return x.float() * self.scale + positions
+
+
+class NonpersistentBuffer(Affine):
+    def __init__(self):
+        super().__init__()
+        self.register_buffer("positions", torch.arange(7), persistent=False)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x.float() * self.scale + self.positions
+
+
+def test_nonpersistent_buffer_is_rejected_before_training():
+    from experiments.shared.scripted_model_export import qualify_scripted_model
+
+    with pytest.raises(ValueError, match="changed state_dict keys"):
+        qualify_scripted_model(
+            NonpersistentBuffer().eval(),
+            [(torch.zeros(1, 7),), (torch.ones(2, 7),)],
+            method="trace",
+        )
+
+
+def test_explicit_cpu_execution_qualification_keeps_native_state(tmp_path):
+    model = Affine().eval()
+    receipt = export_scripted_model(
+        model,
+        examples=[(torch.ones(1, 7),), (torch.zeros(2, 7),)],
+        destination=tmp_path / "candidate",
+        method="trace",
+        execution_devices=("cpu",),
+    )
+    assert receipt.execution_devices == ("cpu",)
+    assert model.scale.device.type == "cpu"
+    assert model.scale.item() == 1.5
+
+
+@pytest.mark.skipif(
+    not torch.cuda.is_available(), reason="real CUDA execution required"
+)
+def test_cpu_trace_device_constant_rejected_before_training():
+    from experiments.shared.scripted_model_export import qualify_scripted_model
+
+    examples = [(torch.zeros(1, 7),), (torch.ones(2, 7),)]
+    # The previous CPU-only gate passes, reproducing the deployment coverage gap.
+    qualify_scripted_model(DeviceCreated().eval(), examples, method="trace")
+    with pytest.raises(ValueError, match="CPU-load/device-move on cuda"):
+        qualify_scripted_model(
+            DeviceCreated().eval(),
+            examples,
+            method="trace",
+            execution_devices=("cpu", "cuda:0"),
+        )
+    good = Affine().eval()
+    qualify_scripted_model(
+        good,
+        examples,
+        method="trace",
+        execution_devices=("cpu", "cuda:0"),
+    )
+    assert good.scale.device.type == "cpu"

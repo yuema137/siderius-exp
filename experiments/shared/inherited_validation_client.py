@@ -12,6 +12,7 @@ import time
 from collections.abc import Callable
 from typing import Annotated
 
+from execute_tools.training_budget_execution import TrainingAllocationRejected
 from execute_tools.validation_execution import (
     ValidationCallbacks,
     ValidationExecutionRequest,
@@ -22,6 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, StrictInt, TypeA
 from experiments.shared.validation_descriptor_transport import send_snapshots
 from experiments.shared.validation_epoch_protocol import (
     ValidationBatchProgress,
+    ValidationCancelled,
     ValidationContinue,
     ValidationEpochMetadata,
     ValidationEpochRefusal,
@@ -149,25 +151,42 @@ class InheritedValidationClient:
                 raise ValueError("validation reply sequence mismatch")
             if isinstance(reply, ValidationEpochRefusal):
                 raise RuntimeError(f"validation refused: {reply.code}")  # noqa: TRY004 -- typed service refusal, not a bad Python type
-            if callbacks.check_allocation is not None:
-                callbacks.check_allocation()
-            if isinstance(reply, ValidationEpochResult):
-                if rows != request.expected_rows or reply.result.rows != rows:
-                    raise ValueError(
-                        "validation progress/result rows differ from declaration"
+            try:
+                if callbacks.check_allocation is not None:
+                    callbacks.check_allocation()
+                if isinstance(reply, ValidationEpochResult):
+                    if rows != request.expected_rows or reply.result.rows != rows:
+                        raise ValueError(
+                            "validation progress/result rows differ from declaration"
+                        )
+                    return reply.result
+                rows += reply.rows
+                if rows > request.expected_rows:
+                    raise ValueError("validation progress exceeds declared rows")
+                if verifier is not None:
+                    verifier.feed(
+                        reply.elapsed_ms / reply.rows, elapsed_ms=reply.elapsed_ms
                     )
-                return reply.result
-            rows += reply.rows
-            if rows > request.expected_rows:
-                raise ValueError("validation progress exceeds declared rows")
-            if verifier is not None:
-                verifier.feed(
-                    reply.elapsed_ms / reply.rows, elapsed_ms=reply.elapsed_ms
-                )
-                if verifier.is_terminal:
-                    if callbacks.on_verified is not None:
-                        callbacks.on_verified()
-                    verifier = None
+                    if verifier.is_terminal:
+                        if callbacks.on_verified is not None:
+                            callbacks.on_verified()
+                        verifier = None
+            except TrainingAllocationRejected:
+                # Preserve the native rejection/sidecar; explicitly release the
+                # server waiting for an acknowledgement instead of causing EOF.
+                if isinstance(reply, ValidationBatchProgress):
+                    try:
+                        write_frame(
+                            self.channel.fileno(),
+                            ValidationCancelled(sequence=self.sequence)
+                            .model_dump_json()
+                            .encode(),
+                            max_bytes=self.settings.max_metadata_bytes,
+                            deadline=self.deadline,
+                        )
+                    except (OSError, EOFError, TimeoutError, ValueError):
+                        pass  # A broken channel must not replace the budget cause.
+                raise
             # The server waits for this acknowledgement before the next batch,
             # so refreshed native deadlines are visible during the pass.
             write_frame(

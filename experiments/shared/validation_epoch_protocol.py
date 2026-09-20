@@ -51,6 +51,17 @@ class ValidationContinue(EpochMessage):
     kind: Literal["continue"] = "continue"
 
 
+class ValidationCancelled(EpochMessage):
+    """Client budget cancellation; conveys no private worker diagnostics."""
+
+    kind: Literal["cancelled"] = "cancelled"
+    reason: Literal["training_allocation"] = "training_allocation"
+
+
+class NativeValidationCancelled(RuntimeError):
+    """An incomplete epoch was cancelled by the native budget controller."""
+
+
 class ValidationEpochResult(EpochMessage):
     kind: Literal["result"] = "result"
     result: ValidationExecutionResult

@@ -48,6 +48,7 @@ def export_native_model(
     *,
     examples: Sequence[tuple[torch.Tensor, ...]],
     method: Literal["script", "trace"],
+    execution_devices: Sequence[torch.device | str] = (),
 ) -> ScriptedExportReceipt:
     """Restore exact checkpoint state, then export and retain reconstruction facts.
 
@@ -87,7 +88,11 @@ def export_native_model(
         path = Path(source)
         sources[role] = (path, path.read_bytes())
     receipt = export_scripted_model(
-        adapted, examples=examples, destination=destination, method=method
+        adapted,
+        examples=examples,
+        destination=destination,
+        method=method,
+        execution_devices=execution_devices,
     )
     try:
         source_dir = destination / "model"

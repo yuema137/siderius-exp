@@ -5,6 +5,8 @@ and filesystem boundary, never as a privileged evaluator. It does not load task
 data, construct native models, choose examples, or decide scientific eligibility.
 """
 
+import copy
+import io
 import shutil
 from collections.abc import Sequence
 from pathlib import Path
@@ -25,6 +27,7 @@ class ScriptedExportReceipt(BaseModel):
     example_count: int
     serialization_method: Literal["script", "trace"] = "script"
     format: str = "torchscript-with-matching-state-dict-v1"
+    execution_devices: tuple[str, ...] = ()
 
 
 def _check_state(expected: dict[str, torch.Tensor], model: torch.nn.Module) -> None:
@@ -65,11 +68,39 @@ def _serialize(model, examples, method):
         raise ValueError("explicit trace qualification failed") from error
 
 
+def _check_execution_devices(model, scripted, examples, devices, snapshot) -> None:
+    """Exercise the evaluator's CPU-load then device-move on isolated copies."""
+    if not devices:
+        return
+    serialized = io.BytesIO()
+    torch.jit.save(scripted, serialized)
+    for device in devices:
+        device = torch.device(device)
+        try:
+            eager = copy.deepcopy(model).eval().to(device)
+            serialized.seek(0)
+            restored = torch.jit.load(serialized, map_location="cpu").eval().to(device)
+            with torch.inference_mode():
+                for args in examples:
+                    inputs = tuple(value.to(device) for value in args)
+                    torch.testing.assert_close(
+                        restored(*inputs), eager(*inputs), rtol=1e-5, atol=1e-6
+                    )
+                    _check_state(snapshot, restored)
+                    _check_state(snapshot, eager)
+        except Exception as error:
+            raise ValueError(
+                f"scripted model fails evaluator CPU-load/device-move on {device}: "
+                f"{str(error)[-2000:]}"
+            ) from error
+
+
 def qualify_scripted_model(
     model: torch.nn.Module,
     examples: Sequence[tuple[torch.Tensor, ...]],
     *,
     method: Literal["script", "trace"] = "script",
+    execution_devices: Sequence[torch.device | str] = (),
 ) -> torch.jit.ScriptModule:
     """Check scripting, example-output parity and absence of state mutation.
 
@@ -102,6 +133,7 @@ def qualify_scripted_model(
                 ) from error
             _check_state(snapshot, model)
             _check_state(snapshot, scripted)
+    _check_execution_devices(model, scripted, examples, execution_devices, snapshot)
     return scripted
 
 
@@ -111,6 +143,7 @@ def export_scripted_model(
     examples: Sequence[tuple[torch.Tensor, ...]],
     destination: Path,
     method: Literal["script", "trace"] = "script",
+    execution_devices: Sequence[torch.device | str] = (),
 ) -> ScriptedExportReceipt:
     """Write a fresh model/weights pair and verify its serialized round trip.
 
@@ -121,7 +154,9 @@ def export_scripted_model(
     """
     if destination.exists() or destination.is_symlink():
         raise FileExistsError(destination)
-    scripted = qualify_scripted_model(model, examples, method=method)
+    scripted = qualify_scripted_model(
+        model, examples, method=method, execution_devices=execution_devices
+    )
     expected = {k: v.detach().clone() for k, v in model.state_dict().items()}
     destination.mkdir(mode=0o700)
     try:
@@ -142,6 +177,9 @@ def export_scripted_model(
             weights_sha256=sha256_file(weights_path),
             example_count=len(examples),
             serialization_method=method,
+            execution_devices=tuple(
+                str(torch.device(device)) for device in execution_devices
+            ),
         )
         (destination / "export_receipt.json").write_text(
             receipt.model_dump_json(indent=2) + "\n"

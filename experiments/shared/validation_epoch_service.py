@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field, JsonValue, StrictInt
 from experiments.shared.validation_descriptor_transport import receive_snapshots
 from experiments.shared.validation_epoch_execution import ValidationProgressRelay
 from experiments.shared.validation_epoch_protocol import (
+    NativeValidationCancelled,
     ValidationEpochMetadata,
     ValidationEpochRefusal,
     ValidationEpochResult,
@@ -122,6 +123,10 @@ def serve_validation_epoch(
                 deadline=deadline,
             )
         return sequence + 1
+    except NativeValidationCancelled:
+        # No aggregate/result for this incomplete epoch; the child owns its
+        # budget rejection record and is already unwinding its native call.
+        raise
     except Exception as error:
         if isinstance(error, TimeoutError):
             code = "deadline_exhausted"

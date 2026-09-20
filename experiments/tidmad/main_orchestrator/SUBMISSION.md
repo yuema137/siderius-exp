@@ -71,6 +71,52 @@ baseline loader and checks synthetic ADC inputs with the original decoder. This
 adds no task-data access or new scoring formula. The full native call still needs
 deployed qualification; local export success alone is not formal launch readiness.
 
+## Check deployment compatibility before training
+
+A native validator pass establishes its tested model contract; it does not certify
+this deployment's serialized submission. Read the published
+[`scripted_implementation`](../../shared/scripted_implementation.md) and
+[`scripted_model_export`](../../shared/scripted_model_export.md) contracts when
+connecting implementation to training. Both helpers run in the research worker,
+without private data access. Use them before a substantial training attempt.
+
+The H100 evaluator loads on CPU and moves the model to CUDA for inference. A trace
+can pass CPU comparisons but freeze a CPU device constant and fail after that
+move. Check both `execution_devices=("cpu", "cuda:0")`, with the selected script
+or trace method, on an untrained copy and again during final export. This is a
+submission-format check, not a requirement to choose a different architecture,
+loss, search strategy or validation fraction. Do not change the frozen task.
+
+For a new implementation, the existing native implementor can be called through:
+
+```python
+from experiments.shared.scripted_implementation import implement_for_scripted_export
+
+qualified = implement_for_scripted_export(
+    native_implementor, validated_implementor_request,
+    examples=cpu_examples,  # explicit legal inputs; at least two for trace
+    method="trace", execution_devices=("cpu", "cuda:0"),
+)
+implementation = qualified.implementation  # ordinary native ImplementorOutput
+```
+
+The wrapper returns no trained model and does not replace the native validator.
+For a model already generated, construct its exact selected configuration with
+the native registry and call `qualify_scripted_model(model.cpu().eval(),
+cpu_examples, method=selected_method, execution_devices=("cpu", "cuda:0"))`.
+This avoids another implementor/model-provider call just to run the check.
+Persist the source/configuration and qualification result in the run workspace.
+Changed model/configuration bytes need their own check; a result is not a blanket
+claim about every future tuner configuration.
+
+An evaluation-command failure retains its exported candidate and writes bounded
+stdout/stderr to `<workspace>/evaluation_diagnostics/<invocation>.json`.
+Inspect that evidence before deciding to retrain. If only evaluation transport
+failed, the already trained candidate can be sent through the existing scorer
+again with a new candidate ID. A model-code change requires fresh compatibility
+and provenance checks; do not declare altered code equivalent to certified
+training merely because weights still load.
+
 ## Public task composition
 
 `public_composition.public_candidate_composition(frozen_input, analysis_path=None)`
@@ -216,7 +262,10 @@ validation = ValidationDeployment.model_validate_json(
 )
 evaluator = BaselineCandidateEvaluator(
     evaluation,
-    NativeTidmadExporter(method="trace", inference_batch_size=32),
+    NativeTidmadExporter(
+        method="trace", inference_batch_size=32,
+        execution_devices=("cpu", "cuda:0"),
+    ),
 )
 # request_fields holds the agent's native input fields: model, scope, budgets,
 # storage, provider, seed/model-I/O, etc. Its storage workspace must be workspace.

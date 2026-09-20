@@ -8,16 +8,19 @@ It consumes task-owned data access only after those deployment checks.
 import math
 import socket
 from types import SimpleNamespace
-from typing import Literal
+from typing import Annotated, Literal
 
 import torch
 from execute_tools.observables import DynamicObservableEpoch
 from execute_tools.task_data_path import TaskDataPath
 from execute_tools.train_engine_sandbox import observe_validation
 from execute_tools.validation_execution import ValidationExecutionResult
+from pydantic import Field, TypeAdapter
 
 from experiments.shared.validation_epoch_protocol import (
+    NativeValidationCancelled,
     ValidationBatchProgress,
+    ValidationCancelled,
     ValidationContinue,
     ValidationEpochMetadata,
 )
@@ -26,6 +29,10 @@ from experiments.shared.validation_module_peer import ModulePeer
 from experiments.shared.validation_rng import (
     capture_validation_rng,
     restore_validation_rng,
+)
+
+_ACK = TypeAdapter(
+    Annotated[ValidationContinue | ValidationCancelled, Field(discriminator="kind")]
 )
 
 
@@ -70,7 +77,7 @@ class ValidationProgressRelay:
             max_bytes=self.max_metadata_bytes,
             deadline=self.deadline,
         )
-        reply = ValidationContinue.model_validate_json(
+        reply = _ACK.validate_json(
             read_frame(
                 self.channel.fileno(),
                 max_bytes=self.max_metadata_bytes,
@@ -79,6 +86,10 @@ class ValidationProgressRelay:
         )
         if reply.sequence != self.sequence:
             raise ValueError("validation acknowledgement sequence mismatch")
+        if isinstance(reply, ValidationCancelled):
+            raise NativeValidationCancelled(
+                "native training cancelled validation: training_allocation"
+            )
         self.rows += rows
 
 

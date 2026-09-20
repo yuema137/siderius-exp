@@ -54,3 +54,15 @@ observation. It is not privileged training certification. As with model export,
 run constructors and forwards only in the research boundary; bind the same
 registry as the training invocation. Historical inference's separate single-file
 plugin/sidecar requirements do not apply to this path.
+
+## Deployment device qualification
+
+`qualify_scripted_model` and `export_scripted_model` accept optional
+`execution_devices`. For each explicit device they load a serialized copy on CPU,
+move it to that device, compare against an eager copy on the same device and
+check state preservation. This catches traces with device constants that pass
+CPU tests but fail GPU inference. The original caller model stays on CPU.
+No devices are guessed; the default preserves the existing CPU-only behavior.
+The export receipt records the checked devices. This tests supplied examples,
+not all possible inputs or future configurations. Use the same checker before
+training and after loading the trained weights.

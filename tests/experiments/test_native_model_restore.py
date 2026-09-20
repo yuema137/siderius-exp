@@ -360,7 +360,8 @@ def test_certified_candidate_replays_through_frozen_evaluator(certified, tmp_pat
     )
 
 
-def test_native_implementation_is_gated_before_training(certified):
+@pytest.mark.parametrize("method", ["script", "trace"])
+def test_native_implementation_is_gated_before_training(certified, method):
     from agent.schemas.implementor import ImplementorInput, ImplementorOutput
 
     from experiments.shared.scripted_implementation import (
@@ -391,7 +392,11 @@ def test_native_implementation_is_gated_before_training(certified):
             calls.append(inp)
             assert inp.human_advice is None
             assert inp.expert_advice == request.expert_advice
-            assert "torch.jit.script" in inp.task_description
+            assert (
+                "torch.jit.script"
+                if method == "script"
+                else "explicitly selected TorchScript trace"
+            ) in inp.task_description
             return ImplementorOutput(
                 candidate_id=inp.candidate_id,
                 model_type=inp.model_name,
@@ -407,12 +412,23 @@ def test_native_implementation_is_gated_before_training(certified):
         implement_for_scripted_export(Native(), request, examples=[])
     assert calls == []
     result = implement_for_scripted_export(
-        Native(), request, examples=[(torch.ones(1, 23, dtype=torch.int64),)]
+        Native(),
+        request,
+        examples=[
+            (torch.ones(1, 23, dtype=torch.int64),),
+            (torch.zeros(2, 23, dtype=torch.int64),),
+        ],
+        method=method,
+        execution_devices=("cpu",),
     )
     assert result.source_sha256 == hashlib.sha256(plugin.read_bytes()).hexdigest()
     assert result.loss_type == "smooth_l1"
     assert result.qualified_model_config == request.baseline_config["model_config"]
     assert request.task_description == "Synthetic numeric regression"
+    assert result.serialization_method == method
+    assert result.execution_devices == ("cpu",)
+    if method == "trace":
+        return
     # A real unsupported Python construct is rejected at the implementor boundary,
     # without a training callback or checkpoint ever being required.
     plugin.write_text(
@@ -425,5 +441,12 @@ def test_native_implementation_is_gated_before_training(certified):
         ImplementationExportError, match="Pre-training export qualification"
     ):
         implement_for_scripted_export(
-            Native(), request, examples=[(torch.ones(1, 23, dtype=torch.int64),)]
+            Native(),
+            request,
+            examples=[
+                (torch.ones(1, 23, dtype=torch.int64),),
+                (torch.zeros(2, 23, dtype=torch.int64),),
+            ],
+            method=method,
+            execution_devices=("cpu",),
         )

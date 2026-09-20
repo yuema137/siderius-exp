@@ -49,6 +49,17 @@ class BaselineEvaluationSettings(BaseModel):
     evaluator_uid: int = Field(default=0, ge=0)
 
 
+class BaselineCommandDiagnostic(BaseModel):
+    """Bounded public-command output; no environment or private files are read."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    returncode: int
+    candidate_path: str
+    candidate_sha256: Sha256
+    stdout: str = Field(max_length=32768)
+    stderr: str = Field(max_length=32768)
+
+
 def receipt_result(
     request: CandidateEvaluationRequest,
     receipt: BaselineEvaluationReceipt,
@@ -176,8 +187,28 @@ class BaselineCandidateEvaluator:
             env=environment,
             capture_output=True,
             text=True,
-            check=True,
+            check=False,
         )
+        diagnostic = BaselineCommandDiagnostic(
+            returncode=completed.returncode,
+            candidate_path=str(candidate),
+            candidate_sha256=digest,
+            stdout=completed.stdout[-32768:],
+            stderr=completed.stderr[-32768:],
+        )
+        diagnostic_path = (
+            Path(request.workspace) / "evaluation_diagnostics" / f"{invocation}.json"
+        )
+        diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
+        diagnostic_path.write_text(diagnostic.model_dump_json(indent=2) + "\n")
+        if completed.returncode:
+            detail = diagnostic.stderr[-6000:] or diagnostic.stdout[-6000:]
+            raise RuntimeError(
+                f"baseline evaluator failed (exit {completed.returncode}); "
+                f"trained candidate retained at {candidate}; "
+                f"diagnostic: {diagnostic_path}; "
+                f"evaluation may be retried with the existing candidate: {detail}"
+            )
         lines = completed.stdout.strip().splitlines()
         if len(lines) != 1:
             raise ValueError(

@@ -60,6 +60,10 @@ for name in json.loads((root / 'public-runtime.json').read_text())['source_sha25
         assert Path(module.__file__).is_relative_to(root), module.__file__
 from workflows.task_composition import compose_run_task_bindings
 from execute_tools.evaluation_metric import CandidateEvaluationMetric
+from experiments.shared.scripted_implementation import implement_for_scripted_export
+from experiments.shared.scripted_model_export import qualify_scripted_model
+assert callable(implement_for_scripted_export) and callable(qualify_scripted_model)
+assert (root / "experiments/shared/scripted_implementation.md").is_file()
 c = compose_run_task_bindings(sys.argv[2])
 assert isinstance(c.metric, CandidateEvaluationMetric)
 assert c.data_analysis is None

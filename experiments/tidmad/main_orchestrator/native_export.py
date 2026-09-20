@@ -25,6 +25,7 @@ class NativeTidmadExporter(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     method: Literal["script", "trace"]
     inference_batch_size: int = Field(default=32, ge=1, le=32)
+    execution_devices: tuple[str, ...] = ("cpu",)
 
     def __call__(self, request: CandidateEvaluationRequest, destination: Path) -> None:
         contract = SegmentModelContract(
@@ -43,7 +44,13 @@ class NativeTidmadExporter(BaseModel):
                 % 256,
             ),
         ]
-        export_native_model(request, destination, examples=examples, method=self.method)
+        export_native_model(
+            request,
+            destination,
+            examples=examples,
+            method=self.method,
+            execution_devices=self.execution_devices,
+        )
         try:
             (destination / "architecture.json").write_text(
                 contract.model_dump_json(indent=2) + "\n"

@@ -120,3 +120,24 @@ def test_metric_mismatch_fails_before_export_or_scoring(tmp_path):
     with pytest.raises(ValueError, match="frozen evaluator declaration"):
         client.evaluate(wrong)
     assert not client.settings.candidate_root.exists()
+
+
+def test_scorer_failure_preserves_diagnostic_and_trained_candidate(tmp_path):
+    client, request = _client(tmp_path, "valid")
+    script = Path(client.settings.command[1])
+    script.write_text(
+        "import sys\nprint('model device mismatch: cpu versus cuda',file=sys.stderr)\nraise SystemExit(7)\n"
+    )
+    with pytest.raises(RuntimeError, match="model device mismatch") as failure:
+        client.evaluate(request)
+    candidate = next(p for p in client.settings.candidate_root.iterdir() if p.is_dir())
+    assert (candidate / "model.pt").is_file()
+    assert str(candidate) in str(failure.value)
+    diagnostic = json.loads(
+        next(
+            (Path(request.workspace) / "evaluation_diagnostics").glob("*.json")
+        ).read_text()
+    )
+    assert diagnostic["returncode"] == 7
+    assert "model device mismatch" in diagnostic["stderr"]
+    assert diagnostic["candidate_sha256"]

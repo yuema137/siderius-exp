@@ -765,3 +765,15 @@ coordinator receipts, and does not duplicate checkpoint weights. A changed
 source fails publication instead of changing its declared identity. Ordinary
 framework/workflow training without this deployment entry keeps its existing
 sidecar behavior and filenames.
+
+### Native budget cancellation and diagnostics
+
+When native validation timing or allocation callbacks reject a training budget,
+the inherited client sends a typed cancellation acknowledgement before unwinding.
+The private relay stops its incomplete epoch and reaps its workers; the launcher
+preserves the native process exit code and does not count that epoch as completed.
+The existing native runtime sidecar retains the budget reason. Cancellation carries
+only the fixed `training_allocation` code, not exception text or private data.
+Unexpected EOF, malformed acknowledgement, private execution failure and deadline
+exhaustion retain their existing failure behavior. A cancellation is not a score,
+completed training history or a way to authorize further private work.
