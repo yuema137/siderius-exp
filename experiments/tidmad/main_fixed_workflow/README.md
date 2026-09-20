@@ -35,9 +35,10 @@ supervisor's fixed 24-hour deadline and disk-space guard remain active.
 
 [V7 advice](../information_treatments/full-prior-v7/advice.json) is the English Full-arm artifact shared by every band
 and by the orchestration prior binding. It asks the agent to start from useful
-published encoder-decoder principles at comparable reference capacity, then
-explore controlled changes and comparable/greater capacity; it does not supply
-exact winner code or require a specific layer sequence. NoPrior never receives
+published encoder-decoder principles in a new FCNet-informed variant, preferably
+above 100M parameters and near or beyond the approximately 323M reference scale
+when feasible, then explore incremental changes before bolder alternatives; it
+does not supply exact winner code or require a specific layer sequence. NoPrior never receives
 it. Full prior settings are frozen; deployment/execution qualification is a
 separate gate. See [the shared frozen prior](../information_treatments/full-prior-v7/README.md).
 

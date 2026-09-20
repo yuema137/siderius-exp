@@ -15,6 +15,11 @@ research-level guidance shared by fixed workflow and orchestration consumers:
   use authorized controls, without rewriting receipts or eligibility.
 - Respect useful optimization, existing budgets, task rules and data access;
   neither parameter count nor resource consumption is a target by itself.
+- Prefer an FCNet-informed encoder-decoder variant and incremental improvement
+  before bolder departures. Start above 100M parameters when feasible, with the
+  approximately 323M published reference as the preferred comparable scale and
+  greater capacity as a legitimate option. These are recommendations, not hard
+  acceptance thresholds.
 
 `manifest.json` binds the English advice bytes and references the unchanged
 four V6 DA policies (600 seconds per invocation). Original V6 artifacts remain
