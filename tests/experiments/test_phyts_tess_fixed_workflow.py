@@ -68,10 +68,14 @@ def test_the_two_arms_differ_only_in_information():
         "workflow.json"
     ]
 
+    # The property is AGREEMENT, not a particular state. Literature review is
+    # a second information channel, so the two arms must hold the same value
+    # for it whatever that value is; differing would make the contrast a
+    # two-variable change rather than the single operator-prior comparison.
     lit = {arm: _resolve(arm).module_states["literature_review"] for arm in ARMS}
-    assert set(lit.values()) == {ModuleState.ENABLED}, (
-        f"literature review must be enabled in BOTH arms, got {lit}; otherwise "
-        "the contrast is a two-variable change"
+    assert len(set(lit.values())) == 1, (
+        f"literature review must hold the SAME state in both arms, got {lit}; "
+        "otherwise the contrast is a two-variable change"
     )
 
 
@@ -183,16 +187,31 @@ def test_required_keys_follow_the_arm():
     arm enabled it, and the run would start missing a key it needs and fail
     only once the clock had begun.
     """
+    from experiments.phyts_tess.main_fixed_workflow.supervisor import _disabled_roles
+
     for arm in ARMS:
         treatment = _resolve(arm)
-        disabled = frozenset(
+        modules = {
             module
             for module, state in treatment.module_states.items()
             if state is ModuleState.DISABLED
-        )
-        expected_disabled = {"data_analysis"} if arm == "no-prior" else set()
-        assert set(disabled) == expected_disabled, (arm, disabled)
-        assert required_workflow_api_keys(AGENTS, disabled_roles=disabled)
+        }
+        # Literature review is disabled in both arms; Data Analysis is the
+        # module that actually differs, which is the contrast under study.
+        expected_modules = {"literature_review"}
+        if arm == "no-prior":
+            expected_modules |= {"data_analysis"}
+        assert modules == expected_modules, (arm, modules)
+
+        # The supervisor's own translation, exercised rather than reimplemented.
+        # Module names and routing-config role names are different vocabularies
+        # — `literature_review` versus `lit_review` — and passing a module name
+        # straight through raises `unknown disabled workflow roles` before the
+        # run starts. That is a launch-time crash no other case here reaches.
+        roles = _disabled_roles(treatment)
+        assert "lit_review" in roles
+        assert ("data_analysis" in roles) == (arm == "no-prior")
+        assert required_workflow_api_keys(AGENTS, disabled_roles=roles)
 
     # The full arm enables Data Analysis, so the agent config must describe
     # that role. Enabling a module the config cannot route is a launch-time

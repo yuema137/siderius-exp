@@ -22,15 +22,20 @@ becomes `--data_analysis_enabled` / `--no-data_analysis_enabled`, and an
 enabled advice block becomes `--advice` plus `--advice_sha256` — so the two
 can never disagree with each other.
 
-Literature review stays **enabled in both arms**. It is a different
-information channel from human advice, and turning it off in one arm would
-make the contrast a two-variable change rather than the single "operator
-prior present or absent" comparison it is meant to be.
+Literature review is **disabled in both arms**, and what matters is that the
+two agree: it is a second information channel, so a state that differed
+between them would make the contrast a two-variable change rather than the
+single "operator prior present or absent" comparison it is meant to be.
+
+It is off rather than on because enabling it requires a task-owned
+literature-review config naming curated root papers and domain confidence
+criteria — task science, and a separate decision. The framework refuses the
+launch outright without one, which is how the first launch attempt failed.
 
 ## The advice artifact
 
 [`../main_fixed_workflow/advice.json`](../main_fixed_workflow/advice.json),
-sha256 `b4ec769dce62ca2c2f22a705f0dffd212827d7fd97258f1fdb90f23960780a08`,
+sha256 `c3ec1514d08d392086b556c820b65cd270c8f41ffee04c2ca1c4f1bf2dcf3aae`,
 carrying per-node guidance under `interpret`, `analysis`, `propose`,
 `implement` and `tune`.
 

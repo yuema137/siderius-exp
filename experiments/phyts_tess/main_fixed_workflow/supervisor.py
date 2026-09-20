@@ -67,8 +67,19 @@ ARMS = {
 REQUIRED_GPU_SUBSTRING = "RTX 5090"
 
 
+#: Treatment MODULE name -> the role name the agent-routing config uses.
+#: They are not the same vocabulary: the module is `literature_review` while
+#: the routing field is `lit_review`, and passing the module name straight
+#: through raises `unknown disabled workflow roles` before the run starts. A
+#: module with no entry here has no LLM role to disable and contributes none.
+_MODULE_TO_LLM_ROLE = {
+    "literature_review": "lit_review",
+    "data_analysis": "data_analysis",
+}
+
+
 def _disabled_roles(treatment: ResolvedInformationTreatment) -> frozenset[str]:
-    """Roles the TREATMENT switched off, so their keys are not demanded.
+    """Routing roles the TREATMENT switched off, so their keys are not demanded.
 
     Derived from the treatment's own module states rather than from a second
     constant. A hardcoded exclusion would keep excluding Data Analysis after
@@ -76,9 +87,10 @@ def _disabled_roles(treatment: ResolvedInformationTreatment) -> frozenset[str]:
     and fail after the clock had already begun.
     """
     return frozenset(
-        module
+        role
         for module, state in treatment.module_states.items()
         if state is ModuleState.DISABLED
+        and (role := _MODULE_TO_LLM_ROLE.get(module)) is not None
     )
 
 

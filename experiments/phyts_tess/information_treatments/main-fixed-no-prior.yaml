@@ -7,8 +7,12 @@ advice:
   sha256: null
   content_type: null
 modules:
+  # Disabled in BOTH arms, so the contrast stays single-variable.
+  # Enabling it requires a task-owned lit-review config naming curated
+  # root papers and domain confidence criteria — task science, and a
+  # separate decision. The framework refuses the launch without one.
   literature_review:
-    siderius: enabled
+    siderius: disabled
     coding_agent: not_applicable
   data_analysis:
     siderius: disabled
