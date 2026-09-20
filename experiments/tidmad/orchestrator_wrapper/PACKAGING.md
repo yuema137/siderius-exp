@@ -87,6 +87,19 @@ Do not prescribe serial order, number of proposers/implementers, branching or
 parallelism. Shared paths still need an actual collision-free ownership plan.
 The generic toolkit documents those effects without selecting a strategy.
 
+## Approved TIDMAD advice-scope declaration
+
+For O-Full/O-NoPrior, also copy
+[`TREATMENT_SCOPE.md`](../main_orchestrator/TREATMENT_SCOPE.md) into `agent/`
+and require reading it via an explicit link in `SIDERIUS-RUN.md`. The operator
+approved this experiment-level interpretation on 2026-09-18: the common
+package's no-advice restrictions describe CLI; the added orchestrator treatment
+authorizes O-Full advice outside `input/`. Preserve all original input bytes.
+Declare the exact on/off state and advice identity; the scope document is not
+itself a treatment selector or a general task-override rule. It belongs to the
+TIDMAD experiment, never the generic toolbox payload. Runtime readiness remains
+a separate requirement.
+
 ## Scientific and execution boundaries
 
 The current common main package declares the frozen training pool in

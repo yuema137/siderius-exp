@@ -9,7 +9,7 @@ import json
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 import torch
 from agent.schemas.implementor import ImplementorInput, ImplementorOutput
@@ -39,6 +39,8 @@ class QualifiedImplementation(BaseModel):
     source_sha256: str
     example_count: int
     loss_type: str
+    serialization_method: Literal["script", "trace"] = "script"
+    execution_devices: tuple[str, ...] = ()
 
 
 class ImplementationExportError(ValueError):
@@ -50,6 +52,8 @@ def implement_for_scripted_export(
     request: ImplementorInput,
     *,
     examples: Sequence[tuple[torch.Tensor, ...]],
+    method: Literal["script", "trace"] = "script",
+    execution_devices: Sequence[torch.device | str] = (),
 ) -> QualifiedImplementation:
     """Run the native implementor, then gate its concrete initial configuration.
 
@@ -63,6 +67,8 @@ def implement_for_scripted_export(
         for args in examples
     ):
         raise ValueError("implementation qualification requires explicit CPU examples")
+    if method not in ("script", "trace") or (method == "trace" and len(examples) < 2):
+        raise ValueError("explicit trace requires at least two comparison examples")
     # Fail before a provider call if the caller has not supplied construction inputs.
     config = dict(request.baseline_config["model_config"])
     loss_type = request.baseline_config["loss_config"]["loss_type"]
@@ -70,7 +76,17 @@ def implement_for_scripted_export(
         raise ValueError("implementation qualification requires an explicit loss_type")
     values = request.model_dump()
     values["task_description"] = (
-        request.task_description + "\n\n" + _DELIVERY_REQUIREMENT
+        request.task_description
+        + "\n\n"
+        + (
+            _DELIVERY_REQUIREMENT
+            if method == "script"
+            else "Deployment deliverable: explicitly selected TorchScript trace, with "
+            "matching state_dict and outputs on the declared inputs. Preserve "
+            "the proposed architecture and scientific settings. Device-dependent "
+            "tensor creation must survive CPU loading and movement to the declared "
+            f"execution devices {tuple(str(d) for d in execution_devices)}."
+        )
     )
     bound = ImplementorInput.model_validate(values)
     output = ImplementorOutput.model_validate(implementor.run(bound))
@@ -100,7 +116,12 @@ def implement_for_scripted_export(
             model = construct_registered_model(
                 output.model_type, validated, loss_type=loss_type
             )
-            qualify_scripted_model(model.cpu().eval(), examples)
+            qualify_scripted_model(
+                model.cpu().eval(),
+                examples,
+                method=method,
+                execution_devices=execution_devices,
+            )
         except Exception as error:
             detail = str(error.__cause__ or error)[-3000:]
             raise ImplementationExportError(
@@ -114,4 +135,6 @@ def implement_for_scripted_export(
         source_sha256=hashlib.sha256(source).hexdigest(),
         example_count=len(examples),
         loss_type=loss_type,
+        serialization_method=method,
+        execution_devices=tuple(str(torch.device(d)) for d in execution_devices),
     )

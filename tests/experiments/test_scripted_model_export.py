@@ -98,3 +98,132 @@ def test_failed_serialization_removes_only_new_destination(tmp_path, monkeypatch
             Affine().eval(), examples=[(torch.ones(3),)], destination=destination
         )
     assert not destination.exists()
+
+
+class DataDependent(Affine):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if bool(x.sum() > 0):
+            return x.float() * self.scale + 1
+        return x.float() * self.scale
+
+
+def test_explicit_trace_rejects_data_dependent_graph_on_comparison_input(tmp_path):
+    destination = tmp_path / "candidate"
+    with (
+        pytest.warns(torch.jit.TracerWarning),
+        pytest.raises(ValueError, match="trace qualification"),
+    ):
+        export_scripted_model(
+            DataDependent().eval(),
+            examples=[(torch.zeros(1, 7),), (torch.ones(2, 7),)],
+            destination=destination,
+            method="trace",
+        )
+    assert not destination.exists()
+
+
+def test_native_fcnet_regression_exports_by_explicit_trace(tmp_path, monkeypatch):
+    # This catches the real conditional-attribute FCNet script failure without
+    # changing its native class or substituting a lookalike synthetic model.
+    monkeypatch.setenv("SIDERIUS_PLUGIN_DIRS", str(tmp_path))
+    from ml_models.models_format_sandbox import get_config_class
+    from ml_models.models_sandbox import construct_registered_model
+
+    from deployments.tidmad_coding_agent_baseline.tools.segment_inference import (
+        load_candidate_model,
+    )
+
+    old_threads = torch.get_num_threads()
+    torch.set_num_threads(1)
+    try:
+        config = get_config_class("fcnet")(segmentation_size=40000, latent_dims=[2])
+        model = (
+            construct_registered_model("fcnet", config, loss_type="smooth_l1")
+            .cpu()
+            .eval()
+        )
+        examples = [
+            (torch.zeros(1, 40000, dtype=torch.int64),),
+            (torch.arange(80000, dtype=torch.int64).reshape(2, 40000) % 256,),
+        ]
+        destination = tmp_path / "candidate"
+        receipt = export_scripted_model(
+            model, examples=examples, destination=destination, method="trace"
+        )
+        (destination / "architecture.json").write_text(
+            '{"version":"tidmad-segment-model-v2","segment_size":40000,'
+            '"input_dtype":"int64","output_kind":"continuous_regression"}'
+        )
+        restored, _ = load_candidate_model(destination, torch.device("cpu"))
+        held_out = torch.full((3, 40000), 127, dtype=torch.int64)
+        torch.testing.assert_close(restored(held_out), model(held_out))
+        assert receipt.serialization_method == "trace"
+        assert receipt.example_count == 2
+    finally:
+        torch.set_num_threads(old_threads)
+
+
+class DeviceCreated(Affine):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        positions = torch.arange(x.shape[-1], device=x.device)
+        return x.float() * self.scale + positions
+
+
+class NonpersistentBuffer(Affine):
+    def __init__(self):
+        super().__init__()
+        self.register_buffer("positions", torch.arange(7), persistent=False)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x.float() * self.scale + self.positions
+
+
+def test_nonpersistent_buffer_is_rejected_before_training():
+    from experiments.shared.scripted_model_export import qualify_scripted_model
+
+    with pytest.raises(ValueError, match="changed state_dict keys"):
+        qualify_scripted_model(
+            NonpersistentBuffer().eval(),
+            [(torch.zeros(1, 7),), (torch.ones(2, 7),)],
+            method="trace",
+        )
+
+
+def test_explicit_cpu_execution_qualification_keeps_native_state(tmp_path):
+    model = Affine().eval()
+    receipt = export_scripted_model(
+        model,
+        examples=[(torch.ones(1, 7),), (torch.zeros(2, 7),)],
+        destination=tmp_path / "candidate",
+        method="trace",
+        execution_devices=("cpu",),
+    )
+    assert receipt.execution_devices == ("cpu",)
+    assert model.scale.device.type == "cpu"
+    assert model.scale.item() == 1.5
+
+
+@pytest.mark.skipif(
+    not torch.cuda.is_available(), reason="real CUDA execution required"
+)
+def test_cpu_trace_device_constant_rejected_before_training():
+    from experiments.shared.scripted_model_export import qualify_scripted_model
+
+    examples = [(torch.zeros(1, 7),), (torch.ones(2, 7),)]
+    # The previous CPU-only gate passes, reproducing the deployment coverage gap.
+    qualify_scripted_model(DeviceCreated().eval(), examples, method="trace")
+    with pytest.raises(ValueError, match="CPU-load/device-move on cuda"):
+        qualify_scripted_model(
+            DeviceCreated().eval(),
+            examples,
+            method="trace",
+            execution_devices=("cpu", "cuda:0"),
+        )
+    good = Affine().eval()
+    qualify_scripted_model(
+        good,
+        examples,
+        method="trace",
+        execution_devices=("cpu", "cuda:0"),
+    )
+    assert good.scale.device.type == "cpu"

@@ -10,15 +10,15 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pytest
-from tasks.tidmad.runtime import tidmad_data_path as data_path
-from tasks.tidmad.runtime.profile import tidmad_topology
-
 from execute_tools.dataset_config import DatasetProfile
 from execute_tools.task_data_path import (
     EpochSamplingParams,
     EvalMaterializationParams,
     ValidationScopeError,
 )
+
+from tasks.tidmad.runtime import tidmad_data_path as data_path
+from tasks.tidmad.runtime.profile import tidmad_topology
 
 TASK_ROOT = Path(__file__).resolve().parents[3] / "tasks" / "tidmad"
 ROW_LENGTH = 8
@@ -49,9 +49,13 @@ def fixture_data(tmp_path):
                     topology.channels.input_channel,
                     topology.channels.target_channel,
                 ):
-                    values = np.arange(SEGMENT_LENGTH * SEGMENTS_PER_FILE, dtype=np.int8)
+                    values = np.arange(
+                        SEGMENT_LENGTH * SEGMENTS_PER_FILE, dtype=np.int8
+                    )
                     values += index + (10 if family == "validation" else 0)
-                    handle.create_dataset(f"timeseries/{channel}/timeseries", data=values)
+                    handle.create_dataset(
+                        f"timeseries/{channel}/timeseries", data=values
+                    )
     scope = data_path.TidmadScope(
         sample_set={"0": [0, 1], "1": [0, 1]}, seg_size=ROW_LENGTH, profile=profile
     )
@@ -75,7 +79,9 @@ def test_full_scope_preserves_per_file_counts_and_uses_validation_family(fixture
     assert np.array_equal(validation[0][0] - training[0][0], np.full(ROW_LENGTH, 10))
 
 
-def test_validation_construction_reads_metadata_not_signal_arrays(fixture_data, monkeypatch):
+def test_validation_construction_reads_metadata_not_signal_arrays(
+    fixture_data, monkeypatch
+):
     """A full Formal scope must not be copied into host RAM at construction.
 
     The pre-fix adapter sliced both channels for every selected PSD segment
@@ -149,11 +155,15 @@ def test_data_disappearing_between_passes_cannot_shrink_the_next_pass(fixture_da
     root, profile, scope = fixture_data
     assert len(_materialize(root, scope)) == 8
     (root / tidmad_topology(profile).dataset.validation_file_name(1)).unlink()
-    with pytest.raises(ValidationScopeError, match=r"materialized 4 ML rows.*8 were requested"):
+    with pytest.raises(
+        ValidationScopeError, match=r"materialized 4 ML rows.*8 were requested"
+    ):
         _materialize(root, scope)
 
 
-def test_equal_total_does_not_hide_wrong_per_file_materialization(fixture_data, monkeypatch):
+def test_equal_total_does_not_hide_wrong_per_file_materialization(
+    fixture_data, monkeypatch
+):
     root, _profile, scope = fixture_data
     real_init = data_path.TIDMADValidationDataset.__init__
 
@@ -162,8 +172,12 @@ def test_equal_total_does_not_hide_wrong_per_file_materialization(fixture_data, 
         assert len(self) == 8  # Real HDF5 data and total remain intact.
         self.file_row_ranges = {0: (0, 3), 1: (3, 8)}
 
-    monkeypatch.setattr(data_path.TIDMADValidationDataset, "__init__", wrong_file_ranges)
-    with pytest.raises(ValidationScopeError, match=r"materialized 8 ML rows.*8 were requested"):
+    monkeypatch.setattr(
+        data_path.TIDMADValidationDataset, "__init__", wrong_file_ranges
+    )
+    with pytest.raises(
+        ValidationScopeError, match=r"materialized 8 ML rows.*8 were requested"
+    ):
         _materialize(root, scope)
 
 
@@ -174,12 +188,19 @@ def test_compressed_discontinuous_rows_keep_encoding_order_and_pickle(fixture_da
     root, profile, scope = fixture_data
     topology = tidmad_topology(profile)
     for index in range(2):
-        with h5py.File(root / topology.dataset.validation_file_name(index), "a") as handle:
-            for channel in (topology.channels.input_channel, topology.channels.target_channel):
+        with h5py.File(
+            root / topology.dataset.validation_file_name(index), "a"
+        ) as handle:
+            for channel in (
+                topology.channels.input_channel,
+                topology.channels.target_channel,
+            ):
                 name = f"timeseries/{channel}/timeseries"
                 values = handle[name][:]
                 del handle[name]
-                handle.create_dataset(name, data=values, chunks=(16,), compression="gzip")
+                handle.create_dataset(
+                    name, data=values, chunks=(16,), compression="gzip"
+                )
     scope = scope.model_copy(update={"sample_set": {"1": [1, 0], "0": [1]}})
     dataset = _materialize(root, scope)
     expected = [[], []]
@@ -200,9 +221,55 @@ def test_compressed_discontinuous_rows_keep_encoding_order_and_pickle(fixture_da
                     output.extend(values.reshape(-1, ROW_LENGTH))
     for index in range(len(dataset)):
         for channel in range(2):
-            np.testing.assert_array_equal(dataset[index][channel], expected[channel][index])
+            np.testing.assert_array_equal(
+                dataset[index][channel], expected[channel][index]
+            )
     restored = pickle.loads(pickle.dumps(dataset))
     np.testing.assert_array_equal(restored[-1][0], expected[0][-1])
     np.testing.assert_array_equal(dataset[-1][0], expected[0][-1])
     dataset.close()
     restored.close()
+
+
+@pytest.mark.parametrize("segment_size, expected", [(4, 16), (8, 8), (16, 4)])
+def test_orchestration_public_row_declaration_matches_materialization_without_io(
+    fixture_data, monkeypatch, segment_size, expected
+):
+    """Wrong ML/PSD conversion fails parity; accidental private I/O raises."""
+    from execute_tools.task_data_path import bind_task_data_path
+
+    from experiments.tidmad.main_orchestrator.validation_rows import declared_rows
+
+    root, _, scope = fixture_data
+    scope = scope.model_copy(update={"seg_size": segment_size})
+    materialized = len(_materialize(root, scope))
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("public row declaration attempted HDF5 access")
+
+    monkeypatch.setattr(h5py, "File", forbidden)
+    with bind_task_data_path(data_path.TidmadTaskDataPath()):
+        assert declared_rows(scope) == materialized == expected
+
+
+def test_orchestration_row_declaration_accepts_file_loaded_task_class(
+    fixture_data, monkeypatch
+):
+    """A plugin loaded by filename must not fail an imported-class identity check."""
+    import importlib.util
+    import sys
+
+    from execute_tools.task_data_path import bind_task_data_path
+
+    from experiments.tidmad.main_orchestrator.validation_rows import declared_rows
+
+    _, _, scope = fixture_data
+    name = "synthetic_cold_tidmad_rows"
+    spec = importlib.util.spec_from_file_location(name, data_path.__file__)
+    module = importlib.util.module_from_spec(spec)
+    monkeypatch.setitem(sys.modules, name, module)
+    spec.loader.exec_module(module)
+    foreign_scope = module.TidmadScope(**scope.model_dump())
+    assert not isinstance(foreign_scope, data_path.TidmadScope)
+    with bind_task_data_path(module.TidmadTaskDataPath()):
+        assert declared_rows(foreign_scope) == 8

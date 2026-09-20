@@ -30,3 +30,14 @@ isolation. Complete orchestration dispatch and enforced handoff to training are
 not provided by this component. The current test invokes the adapter with a
 controlled Implementor implementation and real plugin construction/scripting,
 not an external LLM or scientific training job.
+
+## Explicit method and deployment devices
+
+The default method remains `script`. An explicit `method="trace"` requires at
+least two CPU comparison examples and sends that chosen format to the native
+implementor. `execution_devices` names the actual deployment devices; each is
+checked by CPU-loading the serialized model and moving an isolated copy there.
+The default empty tuple preserves the original CPU-only qualification. The
+result records the selected method and checked devices. Device checks use small
+caller examples, perform no optimization, and require no extra model request.
+See the deployment submission guide for required devices and input contract.

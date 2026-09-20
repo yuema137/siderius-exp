@@ -2,7 +2,12 @@
 
 import hashlib
 import json
+import os
+import subprocess
+import sys
+import time
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import torch
@@ -21,6 +26,8 @@ from agent.schemas.task_config import ForwardContract
 from ml_models.models_sandbox import registered_model_construction_implementation_sha256
 
 from experiments.shared import native_model_restore as restore
+from experiments.shared.native_model_worker import NativeModelWorkerConfig
+from experiments.shared.validation_module_peer import ModulePeer
 
 
 def _ref(path):
@@ -143,6 +150,103 @@ def test_native_constructor_and_certified_weights_survive_restore(certified):
         assert json.loads(result.config)["model_type"] == "export_synthetic"
 
 
+def _model_worker(certified, *, expired=False):
+    root, reference, plugin = certified
+    config = NativeModelWorkerConfig(
+        root=root,
+        reference=reference,
+        approved_plugin=plugin,
+        device="cpu",
+        deadline_epoch=time.time() + (-1 if expired else 30),
+        max_frame_bytes=1048576,
+    )
+    path = root / "worker.json"
+    path.write_text(config.model_dump_json())
+    return subprocess.Popen(
+        [
+            sys.executable,
+            "-B",
+            "-m",
+            "experiments.shared.native_model_worker",
+            "--config",
+            str(path),
+        ],
+        cwd=Path(__file__).resolve().parents[2],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env={"PATH": os.defpath, "OMP_NUM_THREADS": "1"},
+    )
+
+
+def test_model_worker_runs_repeated_native_validation_with_unequal_last_batch(
+    certified,
+):
+    from execute_tools.train_engine_sandbox import observe_validation
+    from ml_models.models_format_sandbox import LossConfig
+    from torch.utils.data import TensorDataset
+
+    process = _model_worker(certified)
+    try:
+        peer = ModulePeer(
+            input_fd=process.stdin.fileno(),
+            output_fd=process.stdout.fileno(),
+            device=torch.device("cpu"),
+            deadline=time.monotonic() + 25,
+            max_frame_bytes=1048576,
+        )
+        root, _, _ = certified
+        artifact = TrainedModelArtifact.model_validate_json(
+            (root / "artifact.json").read_bytes()
+        )
+        inputs = torch.arange(14).reshape(7, 2)
+        targets = inputs.float() * 2
+        criterion = torch.nn.SmoothL1Loss()
+        expected = criterion(inputs.float() * 3, targets).item()
+        peer.train(True)
+        for _ in range(2):
+            value, rows, seconds = observe_validation(
+                model=peer,
+                criterion=criterion,
+                model_cfg=SimpleNamespace(model_type="export_synthetic"),
+                loss_cfg=LossConfig(loss_type="smooth_l1"),
+                model_io=artifact.model_io_contract,
+                device=torch.device("cpu"),
+                data_path=SimpleNamespace(
+                    validation_dataset=lambda *_: TensorDataset(inputs, targets)
+                ),
+                task_eval_scope=object(),
+                data_dir="synthetic",
+                batch_size=3,
+            )
+            assert value == pytest.approx(expected)
+            assert rows == 7 and seconds > 0
+            assert peer.training and process.poll() is None
+        process.stdin.close()
+        assert process.wait(timeout=5) == 0
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)
+        for stream in (process.stdin, process.stdout, process.stderr):
+            stream.close()
+
+
+@pytest.mark.parametrize("failure", ["corrupt", "expired"])
+def test_model_worker_refuses_before_serving_invalid_artifact(certified, failure):
+    if failure == "corrupt":
+        (certified[0] / "weights.pt").write_bytes(b"invalid checkpoint")
+    process = _model_worker(certified, expired=failure == "expired")
+    try:
+        stdout, _ = process.communicate(timeout=10)
+        assert process.returncode != 0
+        assert stdout == b""
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)
+
+
 @pytest.mark.parametrize("corrupted", ["source.py", "config.json", "weights.pt"])
 def test_corruption_is_refused_before_plugin_import(certified, monkeypatch, corrupted):
     root, reference, plugin = certified
@@ -256,7 +360,8 @@ def test_certified_candidate_replays_through_frozen_evaluator(certified, tmp_pat
     )
 
 
-def test_native_implementation_is_gated_before_training(certified):
+@pytest.mark.parametrize("method", ["script", "trace"])
+def test_native_implementation_is_gated_before_training(certified, method):
     from agent.schemas.implementor import ImplementorInput, ImplementorOutput
 
     from experiments.shared.scripted_implementation import (
@@ -287,7 +392,11 @@ def test_native_implementation_is_gated_before_training(certified):
             calls.append(inp)
             assert inp.human_advice is None
             assert inp.expert_advice == request.expert_advice
-            assert "torch.jit.script" in inp.task_description
+            assert (
+                "torch.jit.script"
+                if method == "script"
+                else "explicitly selected TorchScript trace"
+            ) in inp.task_description
             return ImplementorOutput(
                 candidate_id=inp.candidate_id,
                 model_type=inp.model_name,
@@ -303,12 +412,23 @@ def test_native_implementation_is_gated_before_training(certified):
         implement_for_scripted_export(Native(), request, examples=[])
     assert calls == []
     result = implement_for_scripted_export(
-        Native(), request, examples=[(torch.ones(1, 23, dtype=torch.int64),)]
+        Native(),
+        request,
+        examples=[
+            (torch.ones(1, 23, dtype=torch.int64),),
+            (torch.zeros(2, 23, dtype=torch.int64),),
+        ],
+        method=method,
+        execution_devices=("cpu",),
     )
     assert result.source_sha256 == hashlib.sha256(plugin.read_bytes()).hexdigest()
     assert result.loss_type == "smooth_l1"
     assert result.qualified_model_config == request.baseline_config["model_config"]
     assert request.task_description == "Synthetic numeric regression"
+    assert result.serialization_method == method
+    assert result.execution_devices == ("cpu",)
+    if method == "trace":
+        return
     # A real unsupported Python construct is rejected at the implementor boundary,
     # without a training callback or checkpoint ever being required.
     plugin.write_text(
@@ -321,5 +441,12 @@ def test_native_implementation_is_gated_before_training(certified):
         ImplementationExportError, match="Pre-training export qualification"
     ):
         implement_for_scripted_export(
-            Native(), request, examples=[(torch.ones(1, 23, dtype=torch.int64),)]
+            Native(),
+            request,
+            examples=[
+                (torch.ones(1, 23, dtype=torch.int64),),
+                (torch.zeros(2, 23, dtype=torch.int64),),
+            ],
+            method=method,
+            execution_devices=("cpu",),
         )
