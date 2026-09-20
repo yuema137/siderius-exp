@@ -190,6 +190,24 @@ def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
 
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
+    # Clear every ambient plugin overlay before binding this unit's own.
+    # Setting SIDERIUS_GENERATED_LIBRARY_DIR alone is NOT enough: the plugin
+    # loader also honours SIDERIUS_PLUGIN_DIRS and the legacy
+    # AGENT_GENERATED_DIR, so a launching shell that happened to carry either
+    # would hand this run another experiment's generated models. Observed
+    # concretely — with all of these unset the loader still reached the
+    # user-level default library at ~/.siderius/generated_library and
+    # registered two models from an unrelated housing run. Binding the unit's
+    # own directory displaces that default; unsetting the rest closes the
+    # inheritance path a 6-hour run cannot afford to discover late.
+    for inherited in (
+        "SIDERIUS_PLUGIN_DIRS",
+        "AGENT_GENERATED_DIR",
+        "SIDERIUS_MODEL_PLUGIN_PATH",
+        "SIDERIUS_LOSS_PLUGIN_PATH",
+        "SIDERIUS_LOSS_DIRS",
+    ):
+        environment.pop(inherited, None)
     environment["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(
         unit_dir / "workspace/generated_library"
     )
