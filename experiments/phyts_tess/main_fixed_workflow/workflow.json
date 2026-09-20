@@ -1,0 +1,24 @@
+{
+  "version": "siderius-exp-fixed-workflow-v1",
+  "task_composition": "tasks/phyts_tess/compositions/rotation_regression.yaml",
+  "agent_parameters": "experiments/phyts_tess/main_fixed_workflow/agents.json",
+  "agent_parameters_owner": "experiment",
+  "parameters": {
+    "--no-runtime_watchdog": true,
+    "--num_iterations": 100,
+    "--max_rounds": 2,
+    "--plan_overrides": "{\"is_trial\": true}",
+    "--max_epochs": 100,
+    "--trial_max_epochs": 100,
+    "--formal_max_epochs": 100,
+    "--trial_time_budget_minutes": 5,
+    "--formal_time_budget_minutes": 15,
+    "--trial_vram_budget_gb": 8,
+    "--formal_vram_budget_gb": 8,
+    "--formal_training_scope_source": "agent",
+    "--formal_portion": 1.0,
+    "--formal_train_portion": 1.0,
+    "--formal_eval_portion": 1.0,
+    "--training_budget_reserve_fraction": 0.2
+  }
+}

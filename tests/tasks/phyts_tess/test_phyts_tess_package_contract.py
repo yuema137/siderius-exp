@@ -389,6 +389,80 @@ def test_staging_refuses_a_data_root_holding_test_artifacts(tmp_path):
     )
 
 
+# --------------------------------------------------------------- composition
+
+
+def test_the_manifest_composes_into_the_declared_authorities():
+    """Every declaration binds, in the pinned framework, in one child process.
+
+    This is the case that found a real defect: contract resolution is PER
+    METRIC ENTRY, so the primary composed cleanly while the two secondaries
+    named a scoreability contract their own entries had not bound. Nothing
+    else here could see it — the declarations are individually valid JSON,
+    the implementations import, and the primary metric works. Only composing
+    the whole manifest fails.
+
+    It runs in the checkout's own interpreter because composition loads the
+    framework's plugin machinery, and a wrong interpreter would be testing a
+    different revision than the one this experiment pins.
+    """
+    configured = os.environ.get("SIDERIUS_CHECKOUT")
+    if not configured:
+        pytest.skip(
+            "SIDERIUS_CHECKOUT is not set. This case needs the pinned framework "
+            "checkout and its venv. Skipped means UNVERIFIED, not passed."
+        )
+    checkout = Path(configured).resolve()
+    interpreter = checkout / ".venv" / "bin" / "python"
+    assert interpreter.is_file(), f"pinned checkout has no venv: {interpreter}"
+
+    expected = (EXP_ROOT / "SIDERIUS_REVISION").read_text(encoding="utf-8").strip()
+    actual = subprocess.run(
+        ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    assert actual == expected, f"SIDERIUS_CHECKOUT is at {actual}, exp pins {expected}"
+
+    child = (
+        "import json, sys\n"
+        "from workflows.task_composition import compose_run_task_bindings\n"
+        f"bound = compose_run_task_bindings(manifest_path={str(COMPOSITION)!r})\n"
+        "print(json.dumps({\n"
+        "  'task_data_path_id': bound.task_data_path_id,\n"
+        "  'primary': type(bound.metric).__name__,\n"
+        "  'secondaries': [type(m).__name__ for m in bound.secondary_metrics],\n"
+        "  'required_models': list(bound.model_plugins.required_model_types),\n"
+        "  'objective_is_none': bound.objective is None,\n"
+        "  'deliverable_naming_is_none': bound.deliverable_naming is None,\n"
+        "  'health_bound': bound.task_health_binding is not None,\n"
+        "  'input_shape': bound.forward_contract.input_shape,\n"
+        "}))\n"
+    )
+    completed = subprocess.run(
+        [str(interpreter), "-c", child],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(checkout),
+    )
+    assert completed.returncode == 0, completed.stderr[-2000:]
+    result = json.loads(completed.stdout.strip().splitlines()[-1])
+
+    assert result["task_data_path_id"] == "phyts_tess_rotation"
+    assert result["primary"] == "TessRotationR2Metric"
+    assert result["secondaries"] == ["TessRotationRmseMetric", "TessRotationMaeMetric"]
+    assert result["required_models"] == ["tess_reference_cnn"]
+    assert result["health_bound"] is True
+    assert result["input_shape"] == "[B, 1, 1024] float32"
+    # Both absences are deliberate declarations, not omissions: the agent
+    # owns its training loss, and the task names its own deliverables rather
+    # than receiving an indexed template.
+    assert result["objective_is_none"] is True
+    assert result["deliverable_naming_is_none"] is True
+
+
 # ------------------------------------------------------ staged-data integration
 
 

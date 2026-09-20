@@ -1,0 +1,15 @@
+version: siderius-exp-information-treatment-v1
+treatment_id: phyts-tess-main-fixed-no-prior-v1
+task_package: tasks/phyts_tess
+advice:
+  mode: disabled
+  artifact: null
+  sha256: null
+  content_type: null
+modules:
+  literature_review:
+    siderius: enabled
+    coding_agent: not_applicable
+  data_analysis:
+    siderius: disabled
+    coding_agent: not_applicable

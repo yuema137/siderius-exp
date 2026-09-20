@@ -51,15 +51,32 @@ metric:
 # candidates or break a selection tie. RMSE carries the physical unit that
 # R-squared does not, and the gap between RMSE and MAE reads whether a
 # candidate's error is spread evenly or concentrated in a few curves.
+# Each entry repeats `scoreability_contracts:` because contract resolution is
+# PER ENTRY, not per manifest: `_compose_metric` runs the same way for the
+# primary and for each secondary, and a declaration naming a contract id the
+# entry has not bound is refused with UnknownScoreabilityContractError. Found
+# by composing rather than by reading — the primary alone composed cleanly.
+#
+# It is the SAME contract on purpose. All three metrics read the same
+# deliverable, so the same integrity conditions decide whether any of them
+# can be computed at all.
 secondary_metrics:
   - declaration: ../declared/metric_rmse.json
     implementation:
       file: ../runtime/scoring.py
       symbol: TessRotationRmseMetric
+    scoreability_contracts:
+      phyts_tess_rotation_predictions:
+        file: ../runtime/scoreability.py
+        symbol: TessRotationScoreabilityContract
   - declaration: ../declared/metric_mae.json
     implementation:
       file: ../runtime/scoring.py
       symbol: TessRotationMaeMetric
+    scoreability_contracts:
+      phyts_tess_rotation_predictions:
+        file: ../runtime/scoreability.py
+        symbol: TessRotationScoreabilityContract
 
 task_health:
   config: ../declared/task_health.yaml
