@@ -7,8 +7,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from workflows.data_analysis_composition import DataAnalysisWorkflowConfig
 
 from experiments.shared.checksum_manifest import sha256_file
+from experiments.tidmad.information_treatments.frozen_prior import full_analysis_policy
 from experiments.tidmad.information_treatments.prior_binding import (
-    candidate_analysis_policy,
     composition_overlay,
 )
 
@@ -42,9 +42,8 @@ def verify_full_analysis_binding(
 ) -> dict[str, str]:
     """Verify operator-selected bytes and the common input-only data boundary.
 
-    This checks a supplied policy; it does not select a time budget or declare
-    that an operator has approved formal Full. The policy constructor owns
-    access declarations and can also be consumed by orchestration preparation.
+    Supplied policy semantics must match frozen V6, including its resource
+    envelope. Deployment paths may relocate; task and treatment cannot drift.
     """
     root, policy_path, composition_path = (
         path.resolve() for path in (root, policy_path, composition_path)
@@ -60,12 +59,14 @@ def verify_full_analysis_binding(
     policy = DataAnalysisWorkflowConfig.model_validate(
         yaml.safe_load(policy_path.read_text())
     )
-    access_authority = candidate_analysis_policy(root, band)
+    access_authority = full_analysis_policy(root, band)
     for field in ("available_assets", "declared_scope", "access_policy"):
         if getattr(policy, field) != getattr(access_authority, field):
             raise ValueError(
                 f"Full analysis {field} differs from the common band input-only boundary"
             )
+    if policy != access_authority:
+        raise ValueError("Full analysis policy differs from frozen V6 settings")
     actual = yaml.safe_load(composition_path.read_text())
     expected = composition_overlay(root, policy_path)
     if actual != expected:

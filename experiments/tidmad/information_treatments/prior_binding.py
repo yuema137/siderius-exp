@@ -1,8 +1,7 @@
-"""Candidate experiment bindings; no task edits, agent scheduling or execution."""
+"""Frozen experiment prior bindings; no task edits or agent scheduling."""
 
 from __future__ import annotations
 
-import copy
 from enum import StrEnum
 from pathlib import Path
 
@@ -15,7 +14,10 @@ from experiments.shared.information_treatment import (
     ResolvedInformationTreatment,
     resolve_information_treatment,
 )
-from experiments.tidmad.main_fixed_workflow.band_inputs import BANDS
+from experiments.tidmad.information_treatments.frozen_prior import (
+    frozen_prior,
+    full_analysis_policy,
+)
 
 
 class Prior(StrEnum):
@@ -45,37 +47,16 @@ def resolve_prior(root: Path, prior: Prior) -> ResolvedInformationTreatment:
         )
     if treatment.task_package_path != root / "tasks/tidmad":
         raise ValueError("treatment does not reference the common TIDMAD task")
+    if enabled:
+        artifact = frozen_prior(root).advice
+        if treatment.advice_path != artifact.verify(root):
+            raise ValueError("Full treatment must bind the shared frozen V6 advice")
     return treatment
 
 
 def candidate_analysis_policy(root: Path, band: str) -> DataAnalysisWorkflowConfig:
-    """Adapt an existing raw-only diagnostic policy, explicitly not a scientific freeze."""
-    source = (
-        root
-        / "experiments/tidmad/data_analysis_raw_characterization/analysis_config.yaml"
-    )
-    raw = copy.deepcopy(yaml.safe_load(source.read_text()))
-    indices = list(BANDS[band])
-    raw["scientific_goal"] = (
-        "Characterize authorized raw waveform inputs in the selected band."
-    )
-    raw["scientific_constraints"] = [
-        f"Every certified selection must cover the selected files {indices} or refuse.",
-        "Findings concern sampled raw validation windows, not unseen data or hidden targets.",
-        "Use the declared physical cadence; distinguish measured findings from hypotheses.",
-    ]
-    asset = raw["available_assets"][0]
-    asset["asset_id"] = "tidmad-band-validation-input"
-    asset["description"] = "Raw validation input windows from the selected band."
-    asset["location"]["task_data_path_id"] = "tidmad_frozen_training_pool"
-    asset["authorized_scope"]["data_scope"]["file_indices"] = indices
-    asset["metadata"]["band_file_indices"] = indices
-    raw["declared_scope"]["raw_input_asset_ids"] = [asset["asset_id"]]
-    raw["access_policy"]["policy_id"] = f"tidmad-orchestrator-candidate-{band}"
-    raw["access_policy"]["purpose"] = (
-        "Candidate raw-only band analysis, pending main-run freeze."
-    )
-    return DataAnalysisWorkflowConfig.model_validate(raw)
+    """Compatibility name for callers; now returns the frozen V6 policy."""
+    return full_analysis_policy(root, band)
 
 
 def composition_overlay(root: Path, analysis_path: Path | None) -> dict:

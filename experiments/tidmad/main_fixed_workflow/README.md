@@ -33,26 +33,27 @@ The phase runtime watchdog is explicitly disabled (`--no-runtime_watchdog`)
 to avoid terminating candidates based on estimated phase duration. The
 supervisor's fixed 24-hour deadline and disk-space guard remain active.
 
-`advice.json` is the one reviewed Full-arm advice artifact for every band.
-It describes the paper's FC Net layers and the agreed time/VRAM context;
-it does not require FC Net or forbid other model families. The no-prior arm
-does not receive it. The Full treatment (Data Analysis plus human advice)
-has not been discussed and finalized for the main run; this preparation
-qualifies NoPrior only.
+`advice.json` is the frozen English V6 Full-arm artifact shared by every band
+and by the orchestration prior binding. It asks the agent to start from useful
+published encoder-decoder principles at comparable reference capacity, then
+explore controlled changes and comparable/greater capacity; it does not supply
+exact winner code or require a specific layer sequence. NoPrior never receives
+it. Full prior settings are frozen; deployment/execution qualification is a
+separate gate. See [the shared frozen prior](../information_treatments/full-prior-v6/README.md).
 
 The shared launcher accepts one treatment selector (`full` or
 `no-prior`, the default). Both treatments use the same workflow and agent-parameter JSON. The
 information-treatment manifest owns human advice and the dedicated data-analysis
 state. Full launch preparation requires explicit external analysis inputs;
 see [Full launch preparation](FULL_LAUNCH.md). Formal Full remains unqualified
-until its scientific configuration and deployment checks are complete.
+until deployment and execution checks are complete.
 NoPrior passes explicit disabled states. ML literature review remains enabled.
 
 The `main-fixed-no-prior.yaml` manifest declares `data_analysis: disabled`.
 The treatment renderer forwards that state as `--no-data_analysis_enabled`;
 it does not invent a second switch or alter the shared workflow JSON. The
-Full arm still requires a separate decision and a qualified band-scoped
-analysis binding before any effectful launch.
+Full arm requires its frozen band-scoped analysis binding and deployment
+qualification before any effectful launch.
 
 ## NoPrior preparation check
 
