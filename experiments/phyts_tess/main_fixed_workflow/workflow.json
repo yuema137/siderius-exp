@@ -15,7 +15,7 @@
     "--formal_time_budget_minutes": 15,
     "--trial_vram_budget_gb": 8,
     "--formal_vram_budget_gb": 8,
-    "--formal_training_scope_source": "agent",
+    "--formal_training_scope_source": "operator",
     "--formal_portion": 1.0,
     "--formal_train_portion": 1.0,
     "--formal_eval_portion": 1.0,

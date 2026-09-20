@@ -41,8 +41,34 @@ checkout would change the revision it claims to be running.
 | `--formal_vram_budget_gb` | 8 | |
 | `--formal_portion` | 1.0 | the whole training pool, no operator restriction |
 | `--formal_eval_portion` | 1.0 | formal evaluation is always the full validation split |
-| `--formal_training_scope_source` | `agent` | the agent owns the formal training portion |
+| `--formal_training_scope_source` | `operator` | forced, not preferred — see below |
 | trial portions | **not passed** | omitted means agent-controlled; typing them would freeze them |
+
+### Why the formal training scope is operator-owned
+
+The intended value was `agent`. It is **unusable at the pinned framework
+revision**, and the failure is silent until the second iteration.
+
+`model_exploration.py` passes `formal_training_scope_source` into the
+`LockLaunchIdentity` it writes the workspace lock from, while
+`run_one_iteration.py::compute_expected_invariants` builds the same carrier
+**without** it and so recomputes the field's `operator` default. The field is
+in the compared set, so iteration 1 locks `agent`, iteration 2 presents
+`operator`, and the run refuses its own workspace:
+
+```
+run-invariants lock violation:
+  formal_training_scope_source: locked='agent' vs this run='operator'
+```
+
+Observed live on unit `nop_002`, and confirmed by constructing both call
+sites. Any composed run using `agent` hits it.
+
+What the fallback costs, stated plainly: the agent can no longer **shrink**
+the formal training portion. It costs nothing else — `--formal_portion 1.0`
+keeps the formal round on the whole training pool, which is the frozen
+treatment anyway, and **trial portions remain agent-controlled** because they
+are still not passed. Formal evaluation was never the agent's to choose.
 
 **Formal evaluation is operator-owned no matter what.** The framework flag's
 own help says so, so the agent cannot shrink the formal evaluation set even

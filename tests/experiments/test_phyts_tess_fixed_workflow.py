@@ -231,7 +231,14 @@ def test_required_keys_follow_the_arm():
         ("--formal_vram_budget_gb", 8),
         ("--formal_portion", 1.0),
         ("--formal_eval_portion", 1.0),
-        ("--formal_training_scope_source", "agent"),
+        # `operator`, not `agent`, and NOT a preference. At the pinned
+        # framework revision `agent` is unusable: the lock writer in
+        # model_exploration passes formal_training_scope_source into
+        # LockLaunchIdentity while run_one_iteration's
+        # compute_expected_invariants does not, so iteration 1 locks `agent`
+        # and iteration 2 recomputes the `operator` default and refuses the
+        # workspace. Observed live — see the experiment README.
+        ("--formal_training_scope_source", "operator"),
     ],
 )
 def test_the_frozen_budget_values(flag, value):
