@@ -8,6 +8,7 @@ data, construct native models, choose examples, or decide scientific eligibility
 import shutil
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Literal
 
 import torch
 from pydantic import BaseModel, ConfigDict
@@ -22,6 +23,7 @@ class ScriptedExportReceipt(BaseModel):
     model_sha256: str
     weights_sha256: str
     example_count: int
+    serialization_method: Literal["script", "trace"] = "script"
     format: str = "torchscript-with-matching-state-dict-v1"
 
 
@@ -39,8 +41,35 @@ def _check_state(expected: dict[str, torch.Tensor], model: torch.nn.Module) -> N
             raise ValueError(f"scripted export changed parameter or buffer: {name}")
 
 
+def _serialize(model, examples, method):
+    if method == "script":
+        try:
+            return torch.jit.script(model)
+        except Exception as error:
+            raise ValueError(
+                "model cannot be scripted for the evaluator; no trace fallback was used"
+            ) from error
+    if method != "trace":
+        raise ValueError("serialization method must be script or trace")
+    if len(examples) < 2:
+        raise ValueError("explicit tracing needs at least two comparison examples")
+    try:
+        return torch.jit.trace(
+            model,
+            example_inputs=examples[0],
+            check_inputs=list(examples[1:]),
+            check_trace=True,
+            strict=True,
+        )
+    except Exception as error:
+        raise ValueError("explicit trace qualification failed") from error
+
+
 def qualify_scripted_model(
-    model: torch.nn.Module, examples: Sequence[tuple[torch.Tensor, ...]]
+    model: torch.nn.Module,
+    examples: Sequence[tuple[torch.Tensor, ...]],
+    *,
+    method: Literal["script", "trace"] = "script",
 ) -> torch.jit.ScriptModule:
     """Check scripting, example-output parity and absence of state mutation.
 
@@ -58,12 +87,9 @@ def qualify_scripted_model(
     if any(x.device.type != "cpu" for x in state.values()):
         raise ValueError("scripted export requires an explicit CPU model copy")
     snapshot = {name: value.detach().clone() for name, value in state.items()}
-    try:
-        scripted = torch.jit.script(model)
-    except Exception as error:
-        raise ValueError(
-            "model cannot be scripted for the evaluator; no trace fallback was used"
-        ) from error
+    scripted = _serialize(model, examples, method)
+    _check_state(snapshot, model)
+    _check_state(snapshot, scripted)
     with torch.inference_mode():
         for args in examples:
             expected = model(*args)
@@ -84,6 +110,7 @@ def export_scripted_model(
     *,
     examples: Sequence[tuple[torch.Tensor, ...]],
     destination: Path,
+    method: Literal["script", "trace"] = "script",
 ) -> ScriptedExportReceipt:
     """Write a fresh model/weights pair and verify its serialized round trip.
 
@@ -94,7 +121,7 @@ def export_scripted_model(
     """
     if destination.exists() or destination.is_symlink():
         raise FileExistsError(destination)
-    scripted = qualify_scripted_model(model, examples)
+    scripted = qualify_scripted_model(model, examples, method=method)
     expected = {k: v.detach().clone() for k, v in model.state_dict().items()}
     destination.mkdir(mode=0o700)
     try:
@@ -114,6 +141,7 @@ def export_scripted_model(
             model_sha256=sha256_file(model_path),
             weights_sha256=sha256_file(weights_path),
             example_count=len(examples),
+            serialization_method=method,
         )
         (destination / "export_receipt.json").write_text(
             receipt.model_dump_json(indent=2) + "\n"
