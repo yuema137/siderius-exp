@@ -1,7 +1,7 @@
 # Fixed Full launch preparation
 
-Implementation candidate: formal Full advice/policy and deployment qualification
-are not frozen by this document. No formal Full run has been started.
+Full prior V6 advice and analysis policies are frozen. Deployment qualification
+remains separate; this release does not start or qualify a formal Full run.
 
 Full uses the same `workflow.json`, band-data verifier, 24-hour unit clock and
 supervisor as NoPrior. It enables advice and Data Analysis together, keeps
@@ -9,11 +9,23 @@ literature review on, and requires an explicit analysis policy digest and a
 prepared composition. The composition must equal the frozen task with only its
 analysis binding added. Task files are not rewritten.
 
-Prepare the policy and composition outside both checkouts and outside the new
-unit directory. Use the `information_treatments.prior_binding` helpers;
-the orchestration deployment branch can reuse this authority. The policy must retain that band's declared
-input-only assets/access/scope. Budget selection still requires the experiment's
-review; this launcher does not choose a new budget.
+Prepare the policy and composition outside both checkouts, data and the new
+unit directory. The destination must not already exist:
+
+```bash
+.venv/bin/python -m experiments.tidmad.information_treatments.prepare_full \
+  --band 0-3 --output-dir /operator-inputs/full-0-3
+```
+
+Repeat for `4-9`, `10-14`, `15-19` with separate destinations. This copies the
+exact frozen band policy and creates a relocated task composition plus
+`binding-receipt.json`. It performs no data reads, API calls, clock start or
+model execution. Use the receipt's paths and policy SHA below. The same
+`full_analysis_policy` / `resolve_prior` authorities are available to
+orchestration preparation; a native orchestration launcher is not included in
+this release. Access declarations AND the complete policy (including the
+600-second resource envelope) must match V6. A new operator checksum alone
+cannot authorize a changed policy.
 
 Preview (no clock or run starts):
 
@@ -22,9 +34,9 @@ experiments/tidmad/main_fixed_workflow/launch.sh \
   --condition full --siderius-checkout /path/to/pinned/infra \
   --band 0-3 --data_dir /path/to/verified/band-data \
   --unit-dir /mounted-volume/new-full-unit --run_name full-band-0-3 \
-  --analysis-policy /operator-inputs/analysis.yaml \
+  --analysis-policy /operator-inputs/full-0-3/analysis-policy.yaml \
   --analysis-policy-sha256 <reviewed-sha256> \
-  --analysis-composition /operator-inputs/composition.yaml
+  --analysis-composition /operator-inputs/full-0-3/composition.yaml
 ```
 
 Only a reviewed launch adds `--launch`. Full requires all three analysis flags;
