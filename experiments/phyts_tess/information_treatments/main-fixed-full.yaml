@@ -1,0 +1,15 @@
+version: siderius-exp-information-treatment-v1
+treatment_id: phyts-tess-main-fixed-full-v1
+task_package: tasks/phyts_tess
+advice:
+  mode: enabled
+  artifact: experiments/phyts_tess/main_fixed_workflow/advice.json
+  sha256: b4ec769dce62ca2c2f22a705f0dffd212827d7fd97258f1fdb90f23960780a08
+  content_type: application/json
+modules:
+  literature_review:
+    siderius: enabled
+    coding_agent: not_applicable
+  data_analysis:
+    siderius: enabled
+    coding_agent: not_applicable

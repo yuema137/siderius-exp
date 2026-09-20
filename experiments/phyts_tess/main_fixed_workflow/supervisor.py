@@ -42,33 +42,58 @@ from experiments.phyts_tess.main_fixed_workflow.unit_clock import (
     read_launch_record,
 )
 from experiments.shared.fixed_workflow_config import render_siderius_args
+from experiments.shared.information_treatment import (
+    ModuleState,
+    ResolvedInformationTreatment,
+    resolve_information_treatment,
+)
 from experiments.shared.workflow_credentials import required_workflow_api_keys
 
 EXP_ROOT = Path(__file__).resolve().parents[3]
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 WORKFLOW = EXPERIMENT_DIR / "workflow.json"
 AGENTS = EXPERIMENT_DIR / "agents.json"
-TREATMENT = (
-    EXP_ROOT / "experiments/phyts_tess/information_treatments/main-fixed-no-prior.yaml"
-)
+TREATMENTS = EXP_ROOT / "experiments/phyts_tess/information_treatments"
+
+#: The two arms. Both select the same composition and the same workflow
+#: parameters; they differ only in what the agent is told.
+ARMS = {
+    "no-prior": TREATMENTS / "main-fixed-no-prior.yaml",
+    "full": TREATMENTS / "main-fixed-full.yaml",
+}
 
 #: The development host's accelerator. Checked by name because an 8 GiB VRAM
 #: budget measured on one card says nothing about another.
 REQUIRED_GPU_SUBSTRING = "RTX 5090"
 
-#: Data Analysis is disabled by the no-prior treatment, so its provider key
-#: is not required and must not be demanded at launch.
-DISABLED_ROLES = frozenset({"data_analysis"})
+
+def _disabled_roles(treatment: ResolvedInformationTreatment) -> frozenset[str]:
+    """Roles the TREATMENT switched off, so their keys are not demanded.
+
+    Derived from the treatment's own module states rather than from a second
+    constant. A hardcoded exclusion would keep excluding Data Analysis after
+    an arm enabled it, and the run would then start without the key it needs
+    and fail after the clock had already begun.
+    """
+    return frozenset(
+        module
+        for module, state in treatment.module_states.items()
+        if state is ModuleState.DISABLED
+    )
 
 
-def _verify_execution_environment() -> dict[str, object]:
+def _verify_execution_environment(
+    treatment: ResolvedInformationTreatment,
+) -> dict[str, object]:
     """Name-only key presence and one expected GPU, BEFORE any clock starts.
 
     Key VALUES are never read, logged or echoed. Presence is not usable
     provider access — a key can be present and rejected — so this check
     bounds the cheap failure, not the expensive one.
     """
-    required = required_workflow_api_keys(AGENTS, disabled_roles=DISABLED_ROLES)
+    required = required_workflow_api_keys(
+        AGENTS, disabled_roles=_disabled_roles(treatment)
+    )
     missing = sorted(name for name in required if not os.environ.get(name))
     if missing:
         raise ValueError(f"required provider keys are absent: {', '.join(missing)}")
@@ -101,15 +126,23 @@ def _append_event(path: Path, event: dict[str, object]) -> None:
 
 
 def _build_command(
-    *, checkout: Path, unit_dir: Path, data_dir: Path, run_name: str
+    *,
+    checkout: Path,
+    unit_dir: Path,
+    data_dir: Path,
+    run_name: str,
+    treatment: ResolvedInformationTreatment,
 ) -> list[str]:
     """The exact argv this unit will run, rendered once and then stored.
 
-    ``render_siderius_args`` already emits ``--task_composition`` and
-    ``--llm_config`` from the workflow config's own dedicated fields, so
-    neither is repeated here. Only the values that are genuinely this
-    LAUNCH's — where the run writes, what it reads, what it is called, and
-    the treatment-derived module switch — are added.
+    Three authorities, each rendering only what it owns and none duplicating
+    another. ``render_siderius_args`` emits the workflow treatment, including
+    ``--task_composition`` and ``--llm_config`` from the config's own fields,
+    so neither is repeated here. ``treatment.siderius_args()`` emits the arm
+    identity, the module switches and — when the arm enables it — the advice
+    path with its declared digest. Only the values genuinely belonging to
+    THIS launch, where the run writes and reads and what it is called, are
+    added below.
     """
     rendered = render_siderius_args(
         WORKFLOW, repository_root=EXP_ROOT, siderius_checkout=checkout
@@ -129,8 +162,7 @@ def _build_command(
         "blocking",
         "--result_authority",
         "scientific",
-        # Derived from the treatment's own module state, never a second switch.
-        "--no-data_analysis_enabled",
+        *treatment.siderius_args(),
         *rendered,
     ]
 
@@ -226,12 +258,25 @@ def run_unit(
     data_dir: Path,
     unit_dir: Path,
     run_name: str,
+    arm: str,
     launch: bool,
 ) -> int:
     """Preview or supervise one unit, preserving its first clock."""
     checkout = checkout.resolve()
     data_dir = data_dir.resolve()
     unit_dir = unit_dir.resolve()
+
+    if arm not in ARMS:
+        raise ValueError(f"unknown arm {arm!r}; choose one of {sorted(ARMS)}")
+    # Resolving here certifies the treatment manifest, and its advice digest,
+    # BEFORE anything else happens — an arm whose advice file has been edited
+    # since it was frozen must refuse rather than run with different bytes.
+    treatment = resolve_information_treatment(
+        ARMS[arm],
+        repository_root=EXP_ROOT,
+        adapter="siderius",
+        required_modules=("literature_review", "data_analysis"),
+    )
 
     if any(
         unit_dir.is_relative_to(source) or source.is_relative_to(unit_dir)
@@ -253,16 +298,21 @@ def run_unit(
         )
 
     command = _build_command(
-        checkout=checkout, unit_dir=unit_dir, data_dir=data_dir, run_name=run_name
+        checkout=checkout,
+        unit_dir=unit_dir,
+        data_dir=data_dir,
+        run_name=run_name,
+        treatment=treatment,
     )
     if not launch:
-        print("treatment:", TREATMENT)
+        print(f"arm: {arm}  ({ARMS[arm].relative_to(EXP_ROOT)})")
+        print("treatment receipt:", json.dumps(treatment.receipt(), sort_keys=True))
         print(f"unit budget: {UNIT_SECONDS} s ({UNIT_SECONDS / 3600:.0f} h)")
         print("command:")
         print("  " + " \\\n    ".join(command))
         return 0
 
-    receipt = _verify_execution_environment()
+    receipt = _verify_execution_environment(treatment)
     unit_dir.mkdir(parents=True, exist_ok=True)
     clock = unit_dir / "launch.json"
     record = read_launch_record(clock)
@@ -271,7 +321,7 @@ def run_unit(
             clock,
             {
                 "command": command,
-                "treatment": str(TREATMENT.relative_to(EXP_ROOT)),
+                "treatment": treatment.receipt(),
                 "siderius_revision": actual,
                 **receipt,
             },
@@ -296,6 +346,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--unit_dir", required=True, type=Path)
     parser.add_argument("--run_name", required=True)
     parser.add_argument(
+        "--arm",
+        required=True,
+        choices=sorted(ARMS),
+        help="Which information treatment this unit runs under.",
+    )
+    parser.add_argument(
         "--launch",
         action="store_true",
         help="Start or resume the unit. Without it, print the command and exit.",
@@ -306,6 +362,7 @@ def main(argv: list[str] | None = None) -> int:
         data_dir=args.data_dir,
         unit_dir=args.unit_dir,
         run_name=args.run_name,
+        arm=args.arm,
         launch=args.launch,
     )
 

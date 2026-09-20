@@ -2,35 +2,45 @@
 
 These small files say what information an experiment gives to its research
 agent. They do not change the TESS task, data, metric or validity rules —
-every treatment here selects the same task package, `tasks/phyts_tess`.
+both treatments here select the same task package, `tasks/phyts_tess`, and
+the same workflow parameters. **The information is the only variable.**
 
-| treatment | advice | Data Analysis | state |
+| treatment | advice | Data Analysis | Literature Review |
 |---|---|---|---|
-| [`main-fixed-no-prior.yaml`](main-fixed-no-prior.yaml) | disabled | disabled | available |
-| `main-fixed-full.yaml` | enabled | enabled | **not written yet** |
+| [`main-fixed-no-prior.yaml`](main-fixed-no-prior.yaml) | disabled | disabled | enabled |
+| [`main-fixed-full.yaml`](main-fixed-full.yaml) | enabled, sha-pinned | enabled | enabled |
 
-## The no-prior arm
+Select one with `--arm no-prior` or `--arm full` on the fixed-workflow
+launcher. The adapter derives every flag from the declaration — module state
+becomes `--data_analysis_enabled` / `--no-data_analysis_enabled`, and an
+enabled advice block becomes `--advice` plus `--advice_sha256` — so the two
+can never disagree with each other.
 
-`main-fixed-no-prior.yaml` declares the absence explicitly rather than
-leaving it implicit: `advice.mode: disabled` with null artifact, sha256 and
-content type, and `modules.data_analysis.siderius: disabled`. The SIDERIUS
-adapter renders that module state as `--no-data_analysis_enabled`; the flag
-is derived from the treatment field rather than from a second experiment
-switch, so the two can never disagree.
+Literature review stays **enabled in both arms**. It is a different
+information channel from human advice, and turning it off in one arm would
+make the contrast a two-variable change rather than the single "operator
+prior present or absent" comparison it is meant to be.
 
-Literature review stays `enabled`. It is a different information channel from
-human advice, and turning it off would make this arm a two-variable change
-rather than the single "no operator prior" contrast it is meant to be.
+## The advice artifact
 
-## The full-prior arm is deliberately absent
+[`../main_fixed_workflow/advice.json`](../main_fixed_workflow/advice.json),
+sha256 `b4ec769dce62ca2c2f22a705f0dffd212827d7fd97258f1fdb90f23960780a08`,
+carrying per-node guidance under `interpret`, `analysis`, `propose`,
+`implement` and `tune`.
 
-Writing it needs one thing this repository does not yet hold: the frozen
-advice artifact itself, whose content is per-node scientific guidance the
-operator owns. Declaring an `enabled` treatment without it would not merely
-be incomplete — the schema refuses an enabled advice block with a null
-artifact or sha256, so a placeholder cannot be committed and later forgotten.
+The digest is declared in the treatment and re-certified from the same bytes
+at load, so an edited advice file refuses the launch instead of quietly
+running a different treatment under an unchanged identity.
 
-When that artifact exists, the arm is three things: the JSON beside the
-experiment, its sha256 in a new `main-fixed-full.yaml`, and
-`modules.data_analysis.siderius: enabled`. Nothing else changes; both arms
-select the same composition and the same workflow parameters.
+**It is a DRAFT awaiting operator review.** Every claim in it is either
+transcribed from the PhyTS benchmark paper or measured from the released
+data; the artifact's own `_meta` key records which, line by line. `_meta` is
+inert by contract — a leading underscore is the framework's explicit way to
+say "this is not advice" — so the agents never read it.
+
+The substantive prior it carries: state-space models outperform
+convolutional and zero-shot foundation-model approaches on this task;
+capacity is not the lever, since all three published baselines peak near 300k
+parameters and the best one degrades at 700k; the signal is periodic rather
+than positional; and the target is a global property of the whole sequence,
+which is why whole-window summaries beat last-token representations.

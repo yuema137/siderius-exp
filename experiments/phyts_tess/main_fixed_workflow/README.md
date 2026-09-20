@@ -4,9 +4,10 @@ One bounded treatment of [`tasks/phyts_tess`](../../../tasks/phyts_tess/):
 the SIDERIUS reference workflow, one trial round and one formal round per
 iteration, under a six-hour wall-clock budget on a single RTX 5090.
 
-Currently only the **no-prior** arm exists. See
-[`../information_treatments/`](../information_treatments/README.md) for why
-the full-prior arm is absent rather than stubbed.
+Two arms, differing **only** in what the agent is told:
+`--arm no-prior` and `--arm full`. Both select the same composition and the
+same workflow parameters — see
+[`../information_treatments/`](../information_treatments/README.md).
 
 ## Preview the exact command
 
@@ -15,7 +16,8 @@ bash experiments/phyts_tess/main_fixed_workflow/launch.sh \
     --siderius-checkout /path/to/SIDERIUS \
     --data_dir /path/to/run-data \
     --unit_dir /path/to/unit \
-    --run_name tess_nop_001
+    --run_name tess_nop_001 \
+    --arm no-prior
 ```
 
 Without `--launch` this prints the argv and exits. It starts no clock, spends
@@ -68,6 +70,16 @@ Provider key **presence** by name — values are never read or logged — and
 exactly one GPU whose name contains `RTX 5090`. Both run before the clock is
 created, so a missing key costs zero minutes. Key presence is not usable
 provider access; a key can be present and still be rejected by the provider.
+
+Which keys are required is derived from the **selected arm's own module
+states**, not from a constant. A hardcoded exclusion would keep excluding
+Data Analysis after an arm enabled it, and the run would then start without
+the key it needs and fail after the clock had already begun.
+
+Selecting an arm also certifies its treatment manifest and, on the full arm,
+re-computes the advice digest from the same bytes it parses. An edited advice
+file refuses the launch rather than running a different treatment under an
+unchanged identity.
 
 ## Unit layout
 
