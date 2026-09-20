@@ -4,6 +4,9 @@ V7 retains V6's reference-scale encoder-decoder exploration advice and adds
 research-level guidance shared by fixed workflow and orchestration consumers:
 
 - Keep a research ledger and an explicit sequence of controlled hypotheses.
+- Compare competing explanations, including architecture, parameter capacity and
+  expressive power, optimization, data coverage, objectives and execution artifacts.
+  Reassess unsuccessful diagnoses and explicitly consider controlled capacity tests.
 - Distinguish architecture families and independent training from calibration,
   seed, output-rendering and ensemble variants.
 - Stop low-information sweeps based on evidence, without a fixed trial quota.

@@ -2,7 +2,7 @@
   "version": "full-prior-v7",
   "advice": {
     "path": "experiments/tidmad/information_treatments/full-prior-v7/advice.json",
-    "sha256": "5435314ae7627a80567aab658595b3bf04bcd84cdb04ee7d8c287a270f0f3db4"
+    "sha256": "e0b71703b2faa0c8d26f5cc338d3440b050a6e532bcf26d4a487f0dbf6574b44"
   },
   "analysis_policies": {
     "0-3": {
