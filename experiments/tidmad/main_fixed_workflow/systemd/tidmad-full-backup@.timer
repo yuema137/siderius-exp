@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodic Full artifact backup for %i
+
+[Timer]
+OnCalendar=*:0/10
+RandomizedDelaySec=30s
+Persistent=true
+Unit=tidmad-full-backup@%i.service
+
+[Install]
+WantedBy=timers.target

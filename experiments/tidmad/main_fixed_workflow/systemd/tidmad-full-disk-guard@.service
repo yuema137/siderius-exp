@@ -1,0 +1,11 @@
+[Unit]
+Description=Guard Full work-volume free space for %i
+RequiresMountsFor=@UNIT_MOUNT@
+ConditionPathIsMountPoint=@UNIT_MOUNT@
+ConditionPathExists=@UNIT_MOUNT@/%i-unit/launch.json
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/tidmad-full/%i.env
+ExecStart=/usr/bin/env /bin/bash ${EXP_CHECKOUT}/experiments/tidmad/main_fixed_workflow/backup.sh --check-space-only --unit-dir ${UNIT_DIR} --instance %i
+UMask=0077

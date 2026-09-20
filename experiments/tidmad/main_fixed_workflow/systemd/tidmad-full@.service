@@ -1,0 +1,21 @@
+[Unit]
+Description=SIDERIUS TIDMAD Full fixed workflow for %i
+After=network-online.target
+Wants=network-online.target
+RequiresMountsFor=@UNIT_MOUNT@
+ConditionPathIsMountPoint=@UNIT_MOUNT@
+
+[Service]
+Type=simple
+User=@FULL_USER@
+Group=@FULL_GROUP@
+EnvironmentFile=/etc/tidmad-full/%i.env
+ExecStart=/usr/bin/env /bin/bash ${EXP_CHECKOUT}/experiments/tidmad/main_fixed_workflow/launch.sh --launch --condition full --siderius-checkout ${SIDERIUS_CHECKOUT} --band ${BAND} --data_dir ${DATA_DIR} --unit-dir ${UNIT_DIR} --run_name ${RUN_NAME} --analysis-policy ${ANALYSIS_POLICY} --analysis-policy-sha256 ${ANALYSIS_POLICY_SHA256} --analysis-composition ${ANALYSIS_COMPOSITION}
+Restart=on-failure
+RestartPreventExitStatus=2 3
+RestartSec=10s
+KillMode=control-group
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
