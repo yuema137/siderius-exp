@@ -35,6 +35,8 @@ from execute_tools.task_data_path import (
     EpochSamplingParams,
     EvalMaterializationParams,
     EvaluationReadRequest,
+    HealthCoverageRequest,
+    HealthCoverageResult,
     ScopeBuildRequest,
     StorageReadScope,
     TaskOutputArtifactInventory,
@@ -373,6 +375,69 @@ class PhytsTessTaskDataPath:
     def max_inference_batch_size(self) -> int:
         """Fixed-length single-channel curves stack cleanly under 8 GiB."""
         return 256
+
+    def validate_health_coverage(
+        self, request: HealthCoverageRequest
+    ) -> HealthCoverageResult:
+        """Can THIS attempt's evaluation scope support the task's Health demand?
+
+        Required, not optional, once a composed run has Health enabled: the
+        framework refuses to execute an attempt whose task declines to answer.
+
+        The demand is one generic dispersion check over the predicted rotation
+        frequencies, so coverage is a question about the ESTIMATOR rather than
+        about files. Population dispersion over a single value is identically
+        zero, which the floor would read as a collapse that is really an
+        artefact of the scope; two values is the smallest scope on which the
+        statistic means anything at all. A larger scope is noisier-to-less-noisy,
+        not covered-to-uncovered, so it is not a second threshold here.
+        """
+        binding = request.health_binding
+        if binding is None:
+            return HealthCoverageResult(
+                applicable=False,
+                covered=False,
+                reason="no Health family is bound for this attempt",
+            )
+        if request.health_gate_files is not None:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason=(
+                    "a monitored-file override was supplied, but PhyTS TESS "
+                    "exposes one partition per split and has no monitored-file "
+                    "vocabulary to interpret it with"
+                ),
+            )
+        scope = request.evaluation_scope
+        rows = getattr(scope, "rows", None)
+        if rows is None:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason=(
+                    "Health coverage needs a PhyTS TESS evaluation scope; got "
+                    f"{type(scope).__name__}, which declares no rows"
+                ),
+            )
+        if len(rows) < 2:
+            return HealthCoverageResult(
+                applicable=True,
+                covered=False,
+                reason=(
+                    f"the evaluation scope holds {len(rows)} light curve(s); the "
+                    "prediction-dispersion check is identically zero below two "
+                    "and would report a collapse that is an artefact of the scope"
+                ),
+            )
+        return HealthCoverageResult(
+            applicable=True,
+            covered=True,
+            reason=(
+                f"{len(rows)} light curves in the {scope.split} scope support the "
+                "prediction-dispersion check"
+            ),
+        )
 
     def storage_read_scope(self, data_dir: str, scope: object) -> StorageReadScope:
         path = _split_path(data_dir, self._scope(scope).split).resolve()

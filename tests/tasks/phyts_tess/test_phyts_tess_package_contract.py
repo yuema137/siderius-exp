@@ -389,6 +389,71 @@ def test_staging_refuses_a_data_root_holding_test_artifacts(tmp_path):
     )
 
 
+# ----------------------------------------------------------- health coverage
+
+
+def test_the_data_path_declares_health_coverage(data_path):
+    """Without it a composed run with Health enabled cannot execute at all.
+
+    Found by the first real launch, not by reading: every tuning attempt died
+    with ``TaskHealthCoverageError``, iteration 1 produced no records, and the
+    chain halted. The capability is OPTIONAL to the four-method base contract
+    and MANDATORY once Health is bound, which is exactly the combination a
+    unit test that never binds Health cannot see.
+    """
+    from execute_tools.task_data_path import (
+        declares_health_coverage,
+        resolve_task_health_coverage_capability,
+    )
+
+    assert declares_health_coverage(data_path)
+    resolve_task_health_coverage_capability(data_path)
+
+
+def test_health_coverage_answers_each_case(data_path, full_request):
+    """The four answers, including the two refusals.
+
+    A capability that always returned ``covered=True`` would satisfy the
+    framework and defeat its purpose, so each branch is pinned to the
+    condition it is actually about.
+    """
+    from execute_tools.task_data_path import HealthCoverageRequest
+
+    scope = data_path.build_eval_scope(full_request)
+
+    def ask(**kwargs):
+        return data_path.validate_health_coverage(
+            HealthCoverageRequest(round_kind="formal", **kwargs)
+        )
+
+    # No Health family bound: a NAMED inapplicability, not a refusal.
+    absent = ask(evaluation_scope=scope, health_binding=None)
+    assert absent.applicable is False
+    assert absent.covered is False
+
+    # The full validation scope supports the dispersion check.
+    covered = ask(evaluation_scope=scope, health_binding="bound")
+    assert covered.applicable is True
+    assert covered.covered is True
+    assert str(len(scope.rows)) in covered.reason
+
+    # A monitored-file override is refused: this task has one partition per
+    # split and no file vocabulary to interpret it with.
+    override = ask(
+        evaluation_scope=scope, health_binding="bound", health_gate_files=(0,)
+    )
+    assert override.applicable is True
+    assert override.covered is False
+
+    # A single-curve scope makes population dispersion identically zero, which
+    # the floor would read as a collapse that is an artefact of the scope.
+    one_row = scope.model_copy(update={"rows": scope.rows[:1]})
+    tiny = ask(evaluation_scope=one_row, health_binding="bound")
+    assert tiny.applicable is True
+    assert tiny.covered is False
+    assert "identically zero" in tiny.reason
+
+
 # --------------------------------------------------------------- composition
 
 
