@@ -1,0 +1,19 @@
+version: siderius-exp-information-treatment-v1
+treatment_id: phyts-tess-main-cli-no-advice-v1
+task_package: tasks/phyts_tess
+advice:
+  mode: disabled
+  artifact: null
+  sha256: null
+  content_type: null
+modules:
+  # `not_applicable`, not `disabled`. A general coding agent has no
+  # literature-review or data-analysis MODULE to switch off; saying
+  # `disabled` would claim a contrast with a capability the product does not
+  # have, and the two states are deliberately distinguishable.
+  literature_review:
+    siderius: not_applicable
+    coding_agent: not_applicable
+  data_analysis:
+    siderius: not_applicable
+    coding_agent: not_applicable

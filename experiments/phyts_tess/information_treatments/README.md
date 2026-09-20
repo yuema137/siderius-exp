@@ -5,10 +5,16 @@ agent. They do not change the TESS task, data, metric or validity rules —
 both treatments here select the same task package, `tasks/phyts_tess`, and
 the same workflow parameters. **The information is the only variable.**
 
-| treatment | advice | Data Analysis | Literature Review |
-|---|---|---|---|
-| [`main-fixed-no-prior.yaml`](main-fixed-no-prior.yaml) | disabled | disabled | enabled |
-| [`main-fixed-full.yaml`](main-fixed-full.yaml) | enabled, sha-pinned | enabled | enabled |
+| treatment | used by | advice | Data Analysis | Literature Review |
+|---|---|---|---|---|
+| [`main-fixed-no-prior.yaml`](main-fixed-no-prior.yaml) | fixed workflow | disabled | disabled | enabled |
+| [`main-fixed-full.yaml`](main-fixed-full.yaml) | fixed workflow | enabled, sha-pinned | enabled | enabled |
+| [`main-cli-no-advice.yaml`](main-cli-no-advice.yaml) | coding-agent baseline | disabled | `not_applicable` | `not_applicable` |
+
+The CLI treatment says `not_applicable`, not `disabled`, and the distinction
+is load-bearing: a general coding agent has no literature-review or
+data-analysis MODULE to switch off. Claiming `disabled` would assert a
+contrast against a capability the product does not have.
 
 Select one with `--arm no-prior` or `--arm full` on the fixed-workflow
 launcher. The adapter derives every flag from the declaration — module state
