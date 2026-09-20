@@ -1,0 +1,11 @@
+{
+  "aggregation": "one_minus_residual_over_total_sum_of_squares_on_the_evaluation_scope",
+  "direction": "higher",
+  "id": "r2",
+  "references": [],
+  "scoreability": {
+    "contract_id": "phyts_tess_rotation_predictions"
+  },
+  "transform": null,
+  "transform_params": {}
+}

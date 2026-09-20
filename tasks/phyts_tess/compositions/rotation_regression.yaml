@@ -1,0 +1,96 @@
+# PhyTS TESS near-core rotation regression — task-owned composition.
+#
+# This manifest declares reusable scientific scope: what the task IS. It
+# contains no iteration counts, epochs, resource budgets, time budgets or
+# launch policy — an experiment selects this composition and owns those
+# treatment values.
+#
+# Nothing here is special-cased. `phyts_tess_rotation` is an ordinary
+# declared id and every family is reached by the same mechanism TIDMAD's and
+# Pets' manifests use.
+
+task_data_path:
+  file: ../runtime/tess_data_path.py
+  symbol: PhytsTessTaskDataPath
+  id: phyts_tess_rotation
+  # Task-instance configuration. `manifest_path` is a key the class's OWN
+  # constructor understands; the framework validates the shape and knows
+  # nothing about the name. The `{ref: ...}` envelope is how the TASK says
+  # "this value is a manifest-relative path", so the pack composes
+  # identically from whatever checkout and whatever cwd.
+  #
+  # The committed identity manifest is the SPLIT AUTHORITY. Scope
+  # construction reads it rather than the staged parquet, because
+  # ScopeBuildRequest carries no physical data root and because pinning the
+  # population in Git means a run's split cannot drift with whatever happens
+  # to sit in --data_dir.
+  #
+  # It carries train and val rows ONLY. The held-out test population has no
+  # row and no target here, so no scope this task can build reaches it.
+  config:
+    manifest_path:
+      ref: ../data/manifests/rotation_identity.csv
+
+dataset_profile:
+  config: ../declared/dataset_profile.json
+
+# PRIMARY: R-squared, HIGHER is better. This is the one value that orders
+# candidates. The implementation is the pack's own, because assembling truth
+# from a task-owned scope is task knowledge the framework must not have.
+metric:
+  declaration: ../declared/metric_r2.json
+  implementation:
+    file: ../runtime/scoring.py
+    symbol: TessRotationR2Metric
+  scoreability_contracts:
+    phyts_tess_rotation_predictions:
+      file: ../runtime/scoreability.py
+      symbol: TessRotationScoreabilityContract
+
+# OBSERVATIONAL. Recorded, shown to the agents, and never used to order
+# candidates or break a selection tie. RMSE carries the physical unit that
+# R-squared does not, and the gap between RMSE and MAE reads whether a
+# candidate's error is spread evenly or concentrated in a few curves.
+secondary_metrics:
+  - declaration: ../declared/metric_rmse.json
+    implementation:
+      file: ../runtime/scoring.py
+      symbol: TessRotationRmseMetric
+  - declaration: ../declared/metric_mae.json
+    implementation:
+      file: ../runtime/scoring.py
+      symbol: TessRotationMaeMetric
+
+task_health:
+  config: ../declared/task_health.yaml
+
+task_config:
+  config: ../declared/task_config.yaml
+
+# A NAMED absence, not an omission: saying nothing at all would be
+# LEGACY_OMITTED, the state that resolves TIDMAD's interpretation family,
+# and TIDMAD's axion-denoising science has nothing to say about stellar
+# rotation. `proposal_blocks` and `implementor_blocks` are genuinely
+# optional — their absence renders no header and no bytes — so they are left
+# unstated rather than declared empty.
+interpretation_blocks:
+  none: true
+
+# NO `objective:` SECTION, DELIBERATELY. A declared objective overrides the
+# planner, and this experiment is about what the agent can work out for
+# itself; fixing the training loss would remove one of the degrees of
+# freedom under study. The primary metric is unaffected either way — the
+# training objective and the selection metric are separate declarations.
+
+# NO `deliverable:` SECTION, DELIBERATELY. This task names its own
+# artifacts: `runtime/tess_data_path.py` defines a MODULE-LEVEL
+# `deliverable_name`, which is what `task_names_its_own_deliverables`
+# inspects. A composed run whose task names its own artifacts is refused an
+# indexed template rather than silently handed TIDMAD's, so no cleanup glob
+# can address files this run never wrote.
+
+model_plugins:
+  dir: ../plugins
+  # Not decoration: without `require:`, an unresolvable plugin root would be
+  # indistinguishable from a directory that simply had nothing in it.
+  require: [tess_reference_cnn]

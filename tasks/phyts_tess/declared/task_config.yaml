@@ -1,0 +1,79 @@
+# PhyTS TESS — the pack's OWN task description + forward contract.
+#
+# Task-owned declarations CO-LOCATE with the pack; a composition manifest
+# only POINTS here and carries no second copy of any of it.
+#
+# Semantics are the PhyTS benchmark's Task B for TESS, transcribed rather
+# than invented: near-core rotation-frequency regression on the GDOR_SPB
+# subset, R-squared on the evaluation scope, HIGHER is better. The
+# eight-class variability classification (PhyTS Task A) is deliberately NOT
+# part of this package.
+
+task_description: |
+  Regression of the near-core rotation frequency of a pulsating star from a
+  single TESS light curve.
+
+  Each sample is one star observed in one TESS sector: a univariate sequence
+  of normalized brightness measurements. The target is frot, the star's
+  near-core rotation frequency in cycles per day. The population is the
+  GDOR_SPB class of the PhyTS TESS benchmark — intermediate- and high-mass
+  g-mode pulsators — for which a rotation frequency could be derived.
+
+  The physical signal is periodic: rotation shifts the frequencies of the
+  star's gravity-mode pulsations, so the information lives in the sequence's
+  periodic structure rather than in its amplitude. Each curve is z-scored
+  individually before the model sees it, which removes absolute brightness
+  and per-star scale; what survives is the shape of the variability.
+
+  What makes this hard. Sampling is uneven in a way the fixed-length tensor
+  does not show: the released curves were taken at two different cadences
+  (30-minute and 10-minute), so a fixed 1024-sample window covers a
+  different physical duration depending on which mission observed the star,
+  and the frequency content is not aligned across samples. Targets span
+  roughly -0.27 to 17.45 cycles per day but concentrate near 1, so a model
+  that predicts the mean is not obviously wrong and scores exactly 0.0.
+
+  Two properties of the labels are worth knowing because they bound what is
+  achievable. First, frot is derived per LIGHT CURVE, not per star, so the
+  same star observed in different sectors can carry different target values;
+  if a model predicted each star's mean target perfectly it would score
+  R-squared 0.92 on train and 0.98 on validation, which is the label-noise
+  ceiling. Second, 26 of 4,183 released rows carry a negative frot, 23 of
+  them the exact repeated constant -0.271916. That value is almost certainly
+  a pipeline sentinel rather than 23 independent measurements; it is
+  retained unfiltered because the task definition is the released data, but
+  a model is not expected to reproduce it.
+
+forward_contract:
+  model_io:
+    input:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {dimension: {fixed: 1}}
+        - {dimension: {fixed: 1024}}
+      dtype: {admissible: ["float32"]}
+    output:
+      axes:
+        - {role: batch, dimension: {symbolic: "B"}}
+        - {dimension: {fixed: 1}}
+      dtype: {admissible: ["float32"]}
+  segmentation_applicability: not_applicable
+  input_description: >-
+    a batch of TESS light curves as one channel of 1024 float32 samples, each
+    curve already z-scored over its own observed samples and, when shorter
+    than 1024, right-padded with its last observed value
+  output_description: >-
+    one predicted near-core rotation frequency per light curve, in cycles per
+    day, as an unbounded real number
+  task_type: "regression"
+  output_head_note: >-
+    Output must be exactly [B, 1] — a final Linear(features, 1). Do NOT apply
+    any squashing activation to the head: the target is an unbounded real
+    quantity that includes a small number of negative values, and a ReLU or
+    sigmoid output would make part of the target range unreachable.
+  task_note: >-
+    The useful signal is periodic and sequential, not positional: what
+    matters is the frequency content of the variability, not where in the
+    window a feature happens to fall. Padding is a real part of the input
+    distribution rather than an edge case — most Primary-Mission curves are
+    shorter than 1024 samples and end in a constant tail.
