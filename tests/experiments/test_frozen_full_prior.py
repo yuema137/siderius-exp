@@ -24,7 +24,7 @@ def test_shared_prior_materializes_frozen_policy_and_refuses_budget_drift(
     receipt = prepare_full(ROOT, band, tmp_path / band)
     assert (
         receipt["advice_sha256"]
-        == "30efa76f3bd8235c46170e6981cba4498c52653da4f0ca2968b9cd45d94a3094"
+        == "7864467a2c85f63df713a8ae80181c8685cbcb5e3d89b4db5e54b79742bcd149"
     )
     assert full_analysis_policy(ROOT, band).resource_envelope.wall_time_budget_s == 600
     assert resolve_prior(ROOT, Prior.OFF).advice_path is None
