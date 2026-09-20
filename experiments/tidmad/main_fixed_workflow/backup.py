@@ -1,4 +1,4 @@
-"""Back up one NoPrior unit and stop its chain before its work disk fills.
+"""Back up one fixed-workflow unit and stop its chain before its work disk fills.
 
 The source is the external unit directory, never the frozen data directory.
 S3 sync is append-only from the caller's perspective: it does not use --delete,
@@ -23,7 +23,7 @@ from experiments.tidmad.main_fixed_workflow.unit_clock import read_launch_record
 MIN_FREE_GIB = 50
 _BUCKET = re.compile(r"[a-z0-9][a-z0-9.-]{2,62}")
 # Fresh units may append a version; preserve the complete systemd identity.
-_INSTANCE = re.compile(r"f-noprior-[0-9]+-[0-9]+(?:-[a-z0-9]+)*")
+_INSTANCE = re.compile(r"f-(?:noprior|full)-[0-9]+-[0-9]+(?:-[a-z0-9]+)*")
 _EXCLUDES = (
     "*.pth",
     "*.h5",
@@ -39,7 +39,9 @@ _EXCLUDES = (
 
 
 def _append_receipt(path: Path, payload: dict[str, object]) -> None:
-    descriptor = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    descriptor = os.open(
+        path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600
+    )
     try:
         os.write(descriptor, (json.dumps(payload, sort_keys=True) + "\n").encode())
         os.fsync(descriptor)
@@ -50,7 +52,9 @@ def _append_receipt(path: Path, payload: dict[str, object]) -> None:
 def _validated_unit(unit_dir: Path) -> tuple[Path, int]:
     source = unit_dir.absolute()
     if source.is_symlink() or not source.is_dir() or not source.parent.is_mount():
-        raise ValueError("unit directory must be a real child of the mounted work volume")
+        raise ValueError(
+            "unit directory must be a real child of the mounted work volume"
+        )
     launch = read_launch_record(source / "launch.json")
     if launch is None:
         raise ValueError("unit has no immutable launch receipt")
@@ -59,19 +63,24 @@ def _validated_unit(unit_dir: Path) -> tuple[Path, int]:
     return source, launch.deadline_epoch
 
 
-def check_space(*, unit_dir: Path, instance: str, min_free_gib: int = MIN_FREE_GIB) -> int:
+def check_space(
+    *, unit_dir: Path, instance: str, min_free_gib: int = MIN_FREE_GIB
+) -> int:
     """Stop only this run if the mounted work volume is below its reserve."""
 
     if not _INSTANCE.fullmatch(instance):
-        raise ValueError("invalid NoPrior service instance")
+        raise ValueError("invalid fixed-workflow service instance")
     if min_free_gib < 1:
         raise ValueError("minimum free space must be positive")
     source, _ = _validated_unit(unit_dir)
     free_bytes = shutil.disk_usage(source).free
     if free_bytes >= min_free_gib * 1024**3:
         return free_bytes
+    service_template = (
+        "tidmad-full" if instance.startswith("f-full-") else "tidmad-no-prior"
+    )
     stop = subprocess.run(
-        ["systemctl", "stop", f"tidmad-no-prior@{instance}.service"],
+        ["systemctl", "stop", f"{service_template}@{instance}.service"],
         check=False,
         capture_output=True,
         text=True,
@@ -87,7 +96,9 @@ def check_space(*, unit_dir: Path, instance: str, min_free_gib: int = MIN_FREE_G
         },
     )
     if stop.returncode != 0:
-        raise RuntimeError("failed to stop NoPrior service at low-space threshold")
+        raise RuntimeError(
+            "failed to stop fixed-workflow service at low-space threshold"
+        )
     return free_bytes
 
 
@@ -108,7 +119,9 @@ def backup_unit(
         raise ValueError("backup prefix must be a relative S3 key prefix")
     if not endpoint.startswith("https://"):
         raise ValueError("backup endpoint must use HTTPS")
-    if not os.environ.get("AWS_ACCESS_KEY_ID") or not os.environ.get("AWS_SECRET_ACCESS_KEY"):
+    if not os.environ.get("AWS_ACCESS_KEY_ID") or not os.environ.get(
+        "AWS_SECRET_ACCESS_KEY"
+    ):
         raise ValueError("backup S3 credentials are absent")
 
     source, deadline_epoch = _validated_unit(unit_dir)
@@ -143,7 +156,9 @@ def backup_unit(
     }
     _append_receipt(source / "backup_receipts.jsonl", receipt)
     if result.returncode != 0:
-        raise RuntimeError(f"NoPrior artifact sync failed with exit code {result.returncode}")
+        raise RuntimeError(
+            f"fixed-workflow artifact sync failed with exit code {result.returncode}"
+        )
     return receipt
 
 
@@ -176,7 +191,7 @@ def main() -> int:
                 min_free_gib=args.min_free_gib,
             )
     except (ValueError, OSError, RuntimeError) as exc:
-        parser.exit(2, f"NoPrior backup refused: {exc}\n")
+        parser.exit(2, f"fixed-workflow backup refused: {exc}\n")
     return 0
 
 

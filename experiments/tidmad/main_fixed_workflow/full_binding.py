@@ -42,7 +42,7 @@ def verify_full_analysis_binding(
 ) -> dict[str, str]:
     """Verify operator-selected bytes and the common input-only data boundary.
 
-    Supplied policy semantics must match frozen V6, including its resource
+    Supplied policy semantics must match frozen V7, including its resource
     envelope. Deployment paths may relocate; task and treatment cannot drift.
     """
     root, policy_path, composition_path = (
@@ -66,7 +66,7 @@ def verify_full_analysis_binding(
                 f"Full analysis {field} differs from the common band input-only boundary"
             )
     if policy != access_authority:
-        raise ValueError("Full analysis policy differs from frozen V6 settings")
+        raise ValueError("Full analysis policy differs from frozen V7 settings")
     actual = yaml.safe_load(composition_path.read_text())
     expected = composition_overlay(root, policy_path)
     if actual != expected:

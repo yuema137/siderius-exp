@@ -50,12 +50,12 @@ def resolve_prior(root: Path, prior: Prior) -> ResolvedInformationTreatment:
     if enabled:
         artifact = frozen_prior(root).advice
         if treatment.advice_path != artifact.verify(root):
-            raise ValueError("Full treatment must bind the shared frozen V6 advice")
+            raise ValueError("Full treatment must bind the shared frozen V7 advice")
     return treatment
 
 
 def candidate_analysis_policy(root: Path, band: str) -> DataAnalysisWorkflowConfig:
-    """Compatibility name for callers; now returns the frozen V6 policy."""
+    """Compatibility name for callers; now returns the frozen V7 policy."""
     return full_analysis_policy(root, band)
 
 

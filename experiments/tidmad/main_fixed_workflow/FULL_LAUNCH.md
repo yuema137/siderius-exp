@@ -1,6 +1,6 @@
 # Fixed Full launch preparation
 
-Full prior V6 advice and analysis policies are frozen. Deployment qualification
+Full prior V7 advice and analysis policies are frozen. Deployment qualification
 remains separate; this release does not start or qualify a formal Full run.
 
 Full uses the same `workflow.json`, band-data verifier, 24-hour unit clock and
@@ -24,7 +24,7 @@ model execution. Use the receipt's paths and policy SHA below. The same
 `full_analysis_policy` / `resolve_prior` authorities are available to
 orchestration preparation; a native orchestration launcher is not included in
 this release. Access declarations AND the complete policy (including the
-600-second resource envelope) must match V6. A new operator checksum alone
+600-second resource envelope) must match V7. A new operator checksum alone
 cannot authorize a changed policy.
 
 Preview (no clock or run starts):
@@ -42,6 +42,16 @@ experiments/tidmad/main_fixed_workflow/launch.sh \
 Only a reviewed launch adds `--launch`. Full requires all three analysis flags;
 NoPrior (the default condition) refuses them. The Full credential check includes
 Data Analysis's configured provider; NoPrior continues to exclude it explicitly.
+
+For reboot-safe deployment, install `systemd/tidmad-full@.service` after
+replacing `@FULL_USER@`, `@FULL_GROUP@` and `@UNIT_MOUNT@`. Each instance uses
+a mode-600 `/etc/tidmad-full/%i.env` containing `EXP_CHECKOUT`,
+`SIDERIUS_CHECKOUT`, `BAND`, `DATA_DIR`, `UNIT_DIR`, `RUN_NAME`,
+`ANALYSIS_POLICY`, `ANALYSIS_POLICY_SHA256`, `ANALYSIS_COMPOSITION`, and the
+enabled providers' credentials. The template passes `--condition full` and all
+three analysis bindings explicitly. Install the matching Full backup and disk
+guard service/timer pairs with `/etc/tidmad-full/%i-backup.env`; low-space
+handling stops the matching Full service, not a historical NoPrior instance.
 
 The first launch receipt binds policy and composition hashes along with the
 existing workflow, task, data, advice and revision identity. A restart reuses the
