@@ -4,7 +4,7 @@ task_package: tasks/tidmad
 advice:
   mode: enabled
   artifact: experiments/tidmad/information_treatments/full-prior-v7/advice.json
-  sha256: e0b71703b2faa0c8d26f5cc338d3440b050a6e532bcf26d4a487f0dbf6574b44
+  sha256: 30efa76f3bd8235c46170e6981cba4498c52653da4f0ca2968b9cd45d94a3094
   content_type: application/json
 modules:
   literature_review:
