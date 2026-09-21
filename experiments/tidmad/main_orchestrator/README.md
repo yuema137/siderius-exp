@@ -30,8 +30,12 @@ identity and the real native analysis binding. Missing prerequisites fail.
 `deployment.json` records the selected scope, identities, advice routing and
 remaining launch blockers. `composition.yaml` is an additive operator overlay
 referencing the original task files. `agent-models.json` copies the shared routing.
-Full additionally has `analysis-policy.yaml` and the exact fixed-Full `advice.json`;
-NoPrior emits neither and carries no advice content or analysis binding.
+Full additionally has `analysis-policy.yaml`, the exact fixed-Full `advice.json`,
+and the independently hashed `controller-work-strategy.md`. The first advice
+layer guides model research roles; the second is routed only to the outer
+controller and suggests adaptive resource use without prescribing a fixed
+schedule. NoPrior emits none of these and carries no advice content or analysis
+binding.
 
 **Do not mount this output or the whole exp repository into the coding agent.**
 The operator composition references private scorer code. Assemble a separate
@@ -54,11 +58,17 @@ seed 20260915. These are analysis bounds, not the 40000-sample model window or
 additional run time. They remain a proposed main-run policy, not a qualified
 Full freeze; both fixed-Full and orchestrator-Full need the same reviewed policy.
 
-Human advice is copied byte-for-byte from the matching fixed-Full authority and
+Model research advice is copied byte-for-byte from the matching fixed-Full authority and
 rendered by the existing native loader. Its current text includes fixed-workflow
 100-iteration/3-round/2-epoch/40-GiB context; review its applicability and parity
 before the Full freeze. This preparation does not silently impose those fixed
 scheduling limits on the orchestrator or rewrite the frozen advice.
+
+The separate controller strategy is copied byte-for-byte from
+`information_treatments/controller-work-strategy-v1.md`, checked against its
+frozen digest, and recorded with recipient `outer_controller`. Deployment must
+link that exact file from `SIDERIUS-RUN.md`. It is not part of the generic
+toolbox and must not be exposed to NoPrior or fixed-workflow roles.
 
 ## Remaining deployment work
 

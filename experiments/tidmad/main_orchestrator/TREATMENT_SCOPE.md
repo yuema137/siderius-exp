@@ -19,18 +19,21 @@ Preserve every common input file, including its original treatment and provenanc
 
 ## Joint selector and supplied information
 
-| Explicit run declaration | Dedicated Data Analysis | Initial human advice | Literature review |
-| --- | --- | --- | --- |
-| O-Full / prior on | Enabled | Exact declared artifact at `run/advice.json` | Enabled |
-| O-NoPrior / prior off | Disabled, no findings injection | Absent | Enabled |
+| Explicit run declaration | Dedicated Data Analysis | Model research advice | Controller strategy advice | Literature review |
+| --- | --- | --- | --- | --- |
+| O-Full / prior on | Enabled | Exact declared artifact at `run/advice.json` | Exact declared artifact at `run/controller-work-strategy.md`, outer controller only | Enabled |
+| O-NoPrior / prior off | Disabled, no findings injection | Absent | Absent | Enabled |
 
 These paths are relative to the assembled agent workspace containing
 `SIDERIUS-RUN.md`; they are not paths inside the frozen input tree. Full's
 `run/analysis-policy.yaml` is the separately declared candidate policy, not a
-permission to access raw private files. Match the advice artifact to the run's
-recorded digest and recipient routing. No new human advice is supplied during
-the clock. O-NoPrior must not acquire advice or dedicated analysis findings from
-another unit, inherited history or recovery state.
+permission to access raw private files. Match each advice artifact to the run's
+recorded digest and recipient routing. The controller strategy is a separate,
+independently hashed layer on top of the model research advice; do not concatenate
+the files or route controller-only text to fixed workflow roles. No new human
+advice is supplied during the clock. O-NoPrior must not acquire either advice
+layer or dedicated analysis findings from another unit, inherited history or
+recovery state.
 
 The run must explicitly identify its condition, prior state and matching
 artifacts. If they are missing, inconsistent or fail validation, report the
@@ -43,7 +46,7 @@ This decision resolves only the applicability of the common package's CLI
 advice restrictions. Task science, data scope, training-pool requirements,
 resource limits, continuing deadline, evaluator access and submission rules
 retain their existing authorities. It grants no access to private targets or
-evaluator implementation, changes no scheduling strategy, and makes no claim
+evaluator implementation, changes no generic scheduling mechanism, and makes no claim
 that a native executor has been provisioned.
 
 The generic toolbox stays unchanged. A different task must bring its own
