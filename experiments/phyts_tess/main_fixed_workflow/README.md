@@ -63,10 +63,15 @@ run-invariants lock violation:
 
 Observed live on unit `nop_002`, and confirmed by constructing both call
 sites. Any composed run using `agent` hits it. Tracked upstream as
-[SIDERIUS#563](https://github.com/Galileo-Sandbox/SIDERIUS/issues/563); it is
-still present on that repository's `master`. Restore `agent` here only once
-that issue is closed **and** a two-iteration run has been seen to survive,
-since a single-iteration run cannot detect it.
+[SIDERIUS#563](https://github.com/Galileo-Sandbox/SIDERIUS/issues/563), which
+is **closed**: `compute_expected_invariants` now passes the field, and the
+fix is contained in the framework revision this experiment pins.
+
+The value here stays `operator` anyway. The fix being present is half the
+condition; the other half is **a two-iteration run actually surviving**,
+because a single-iteration run cannot detect this class of defect and so
+cannot be the evidence that it is gone. Restore `agent` after that run, not
+before it.
 
 What the fallback costs, stated plainly: the agent can no longer **shrink**
 the formal training portion. It costs nothing else — `--formal_portion 1.0`
@@ -128,6 +133,18 @@ its own.
 
 ## Not yet done
 
-No run has been executed. The preview path has been exercised; `--launch`
-has not. Read [`../../../tasks/phyts_tess/STATUS.md`](../../../tasks/phyts_tess/STATUS.md)
+Three launches have run and **none produced an experiment record**. Each
+halted for a different reason: literature review enabled without a
+task-owned config, a data path missing `validate_health_coverage`, the lock
+violation above, and finally 17 consecutive runtime-verification rejections
+in 31 minutes ([SIDERIUS#565](https://github.com/Galileo-Sandbox/SIDERIUS/issues/565),
+since fixed and released). The first two were repaired here; the other two
+were framework defects.
+
+So no model has been trained to completion, no score exists, and the
+deadline kill has never fired — every attempt ended far inside the six
+hours. Read [`../../../tasks/phyts_tess/STATUS.md`](../../../tasks/phyts_tess/STATUS.md)
 for what the task package itself has and has not verified.
+
+Each attempt is preserved rather than reused: `.chain_halted` is never
+erased to retry, and a retry takes a fresh unit directory.

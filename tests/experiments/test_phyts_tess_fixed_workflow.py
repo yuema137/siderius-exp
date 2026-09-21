@@ -231,13 +231,16 @@ def test_required_keys_follow_the_arm():
         ("--formal_vram_budget_gb", 8),
         ("--formal_portion", 1.0),
         ("--formal_eval_portion", 1.0),
-        # `operator`, not `agent`, and NOT a preference. At the pinned
-        # framework revision `agent` is unusable: the lock writer in
-        # model_exploration passes formal_training_scope_source into
+        # `operator`, not `agent`, and NOT a preference. The lock writer in
+        # model_exploration passed formal_training_scope_source into
         # LockLaunchIdentity while run_one_iteration's
-        # compute_expected_invariants does not, so iteration 1 locks `agent`
-        # and iteration 2 recomputes the `operator` default and refuses the
-        # workspace. Observed live — see the experiment README.
+        # compute_expected_invariants did not, so iteration 1 locked `agent`
+        # and iteration 2 recomputed the `operator` default and refused the
+        # workspace. Observed live on nop_002; fixed upstream and contained
+        # in the pinned revision. The value stays `operator` until a
+        # two-iteration run has actually survived, because a one-iteration
+        # run cannot detect this class of defect and so cannot retire it.
+        # See the experiment README.
         ("--formal_training_scope_source", "operator"),
     ],
 )
