@@ -87,6 +87,14 @@ Do not prescribe serial order, number of proposers/implementers, branching or
 parallelism. Shared paths still need an actual collision-free ownership plan.
 The generic toolkit documents those effects without selecting a strategy.
 
+An experiment treatment may separately provide controller strategy advice. For
+O-Full, copy the prepared `controller-work-strategy.md` into `run/`, verify the
+digest recorded in `deployment.json`, and link it from `SIDERIUS-RUN.md` for the
+outer controller only. Keep it separate from `run/advice.json`, which serves the
+model research roles. O-NoPrior and fixed workflows must not receive the
+controller strategy artifact. This treatment-specific layer does not change the
+generic wrapper guidance above.
+
 ## Approved TIDMAD advice-scope declaration
 
 For O-Full/O-NoPrior, also copy
