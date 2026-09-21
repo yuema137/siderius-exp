@@ -45,24 +45,23 @@ Expose only the permitted advice/policy/routing and native capability bindings;
 private scoring stays in the trusted executor. A Python binding check here does
 not provision that service or certify physical data access.
 
-## Candidate Full policy: review before freezing
+## Frozen Full policy
 
-The proposed policy reuses the raw-only diagnostic configuration in
-`data_analysis_raw_characterization`, generalized to the chosen band's complete
-file list and frozen-pool task-data identity. It exposes sampled validation
+The Full policy reuses the reviewed raw-only configuration frozen by the V7
+manifest for the chosen band's complete file list and frozen-pool task-data
+identity. It exposes sampled validation
 **input only**, not validation targets, predictions or residuals; no historical
 inference or generated-skill promotion. Existing core-analysis/time-series packs
-are available. Inherited candidate limits: 45 seconds per analysis call, 12 seconds
+are available. Frozen limits: 600 seconds per Data Analysis invocation, 12 seconds
 per skill, 8 GiB host memory, CPU, 10 task-stratified windows of 262144 samples,
 seed 20260915. These are analysis bounds, not the 40000-sample model window or
-additional run time. They remain a proposed main-run policy, not a qualified
-Full freeze; both fixed-Full and orchestrator-Full need the same reviewed policy.
+additional run time. Fixed-Full and orchestrator-Full consume the same content-pinned
+policy and model advice.
 
-Model research advice is copied byte-for-byte from the matching fixed-Full authority and
-rendered by the existing native loader. Its current text includes fixed-workflow
-100-iteration/3-round/2-epoch/40-GiB context; review its applicability and parity
-before the Full freeze. This preparation does not silently impose those fixed
-scheduling limits on the orchestrator or rewrite the frozen advice.
+Model research advice is copied byte-for-byte from the matching fixed-Full V7
+authority and rendered by the existing native loader. This preparation does not
+silently impose the fixed workflow's controller schedule on the orchestrator or
+rewrite the frozen advice.
 
 The separate controller strategy is copied byte-for-byte from
 `information_treatments/controller-work-strategy-v1.md`, checked against its
@@ -77,8 +76,9 @@ public package, data scope, protected infra/task mounts, private evaluator route
 outer Codex version/settings, continuing 24-hour clock, recovery, candidate
 retention and replay. Native role routing is shared with the fixed workflow;
 outer-controller routing/version is a separate launch identity. No 24-hour run
-is authorized by preparation. `Full` also requires operator review/freeze of
-analysis policy and matched fixed-Full wiring; do not call a partial treatment Full.
+is authorized by preparation. `Full` additionally requires deployed hash
+verification for the frozen analysis policy, model advice and controller-only
+strategy; do not call a partial treatment Full.
 
 ## Before an H100 smoke
 
