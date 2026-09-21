@@ -24,6 +24,8 @@ def test_build_input_view_copies_only_inputs(tmp_path: Path, monkeypatch) -> Non
                 "timeseries/channel0002/timeseries", data=np.array([99, 99], dtype="i1")
             )
             file.attrs["secret"] = "must-not-copy"
+            file["timeseries/channel0001"].attrs["secret"] = "must-not-copy"
+            file["timeseries/channel0001/timeseries"].attrs["secret"] = "must-not-copy"
     monkeypatch.setattr(analysis_input_view.os, "geteuid", lambda: 0)
     monkeypatch.setattr(analysis_input_view.os, "chown", lambda *_: None)
     output = tmp_path / "published"
@@ -40,6 +42,8 @@ def test_build_input_view_copies_only_inputs(tmp_path: Path, monkeypatch) -> Non
         with h5py.File(output / "0-3" / f"abra_validation_{index:04d}.h5") as file:
             assert list(file["timeseries"]) == ["channel0001"]
             assert dict(file.attrs) == {}
+            assert dict(file["timeseries/channel0001"].attrs) == {}
+            assert dict(file["timeseries/channel0001/timeseries"].attrs) == {}
             np.testing.assert_array_equal(
                 file["timeseries/channel0001/timeseries"][:], [index, 2]
             )
