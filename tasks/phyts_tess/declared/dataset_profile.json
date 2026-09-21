@@ -1,0 +1,40 @@
+{
+  "partition_count": 1,
+  "anchor_selection_files": [0],
+  "health_peek_files": [0],
+  "topology": {
+    "modality": "univariate_time_series",
+    "partition_unit": "split_table",
+    "partition_note": "One parquet table per split. The population is a flat set of light curves rather than a set of files, so a run selects a FRACTION of stars inside the single partition instead of naming partitions; the data path refuses target_partitions and subset_ref for that reason.",
+    "scope_authority": "data/manifests/rotation_identity.csv",
+    "sample_unit": "one TESS light curve (one star observed in one sector)",
+    "identity_key": "gaia_id:sector",
+    "identity_note": "(GaiaID, sector) is unique in every released split. (TIC, sector) is NOT unique in train and must never be keyed on.",
+    "grouping_key": "gaia_id",
+    "grouping_note": "Splits are grouped by Gaia DR3 identifier: no star appears in two splits. Sub-portion draws inside a split are taken over STARS for the same reason.",
+    "populations": {
+      "train": 3338,
+      "val": 442,
+      "test_withheld": 403
+    },
+    "population_note": "test is the held-out final-evaluation population. It is not described here beyond its size, carries no row or target in the committed manifest, and is never staged into a run's data directory.",
+    "input_tensor": {
+      "shape": [1, 1024],
+      "dtype": "float32",
+      "layout": "CL"
+    },
+    "target": {
+      "kind": "continuous_scalar",
+      "name": "frot",
+      "unit": "cycles per day"
+    },
+    "preprocessing": {
+      "source_column": "flux",
+      "length_rule": "right-truncate to 1024, or pad with the last observed flux value",
+      "normalization": "per-light-curve z-score of the observed samples, applied BEFORE padding",
+      "augmentation": "none",
+      "authority": "tasks/phyts_tess/runtime/tess_data_path.py::normalize_curve"
+    },
+    "native_length_note": "Released curves run 542..3917 samples (median 1124), bimodal: the ~1.0-1.2k cluster is the 30-minute-cadence Primary Mission and the ~3.5-3.9k cluster is the 10-minute-cadence first Extended Mission. The frozen 1024 window therefore truncates most Extended-Mission curves; it is PhyTS appendix D.2 parity, not an optimum."
+  }
+}

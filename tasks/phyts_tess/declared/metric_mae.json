@@ -1,0 +1,11 @@
+{
+  "aggregation": "mean_absolute_error_in_cycles_per_day_over_the_evaluation_scope",
+  "direction": "lower",
+  "id": "mae",
+  "references": [],
+  "scoreability": {
+    "contract_id": "phyts_tess_rotation_predictions"
+  },
+  "transform": null,
+  "transform_params": {}
+}

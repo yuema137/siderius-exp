@@ -1,0 +1,19 @@
+version: siderius-exp-information-treatment-v1
+treatment_id: phyts-tess-main-fixed-full-v1
+task_package: tasks/phyts_tess
+advice:
+  mode: enabled
+  artifact: experiments/phyts_tess/main_fixed_workflow/advice.json
+  sha256: c3ec1514d08d392086b556c820b65cd270c8f41ffee04c2ca1c4f1bf2dcf3aae
+  content_type: application/json
+modules:
+  # Disabled in BOTH arms, so the contrast stays single-variable.
+  # Enabling it requires a task-owned lit-review config naming curated
+  # root papers and domain confidence criteria — task science, and a
+  # separate decision. The framework refuses the launch without one.
+  literature_review:
+    siderius: disabled
+    coding_agent: not_applicable
+  data_analysis:
+    siderius: enabled
+    coding_agent: not_applicable

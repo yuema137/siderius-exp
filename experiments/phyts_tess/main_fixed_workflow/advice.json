@@ -1,0 +1,31 @@
+{
+  "_meta": "DRAFT, AWAITING OPERATOR REVIEW. This artifact carries only DIRECTIVES. The benchmark's published baselines, their parameter counts, the capacity sweep, the foundation-model results and the label-noise ceiling are COMMON KNOWLEDGE and live in the task package (declared/task_config.yaml and declared/reference_baselines.json), where BOTH arms see them. Restating a number here would not be a prior; it would make the no-prior arm ignorant of the benchmark's published context rather than merely unadvised, which is a different and worse contrast. Each line below is an operator judgement about what to DO, grounded in facts the agent already has. Provenance: the architectural, capacity and representation directives read the published results the task package already states; the output-head and padding directives read this package's own declared forward contract and preprocessing authority; the budget directives read the experiment's own frozen values. The no-prior arm receives no advice file at all.",
+
+  "interpret": [
+    "When you compare two candidates, check that their R-squared values were computed over the same evaluation population before treating the difference as real. Quote the secondary RMSE, in cycles per day, whenever you need an error that does not move with the evaluation set.",
+    "Distinguish a residual pattern that indicates a model deficiency from one that indicates label uncertainty, and say which of the two an observation supports rather than assuming the first."
+  ],
+
+  "analysis": [
+    "Characterize only the authorized training and validation inputs. Measured properties of those inputs are findings; nothing about the held-out population is available and must not be inferred.",
+    "Quantifying how the two observing cadences are distributed across the training population is a useful measured finding, because a fixed-length window covers a different physical duration for each.",
+    "Report the target distribution as measured, including its extremes. An unresolved question about the data is not a finding."
+  ],
+
+  "propose": [
+    "Prefer an architecture that integrates information across the full sequence over one that only aggregates local features.",
+    "Do not treat capacity as the lever. Start near the parameter scale the published baselines used and justify a substantially larger candidate with measured evidence rather than with capacity alone.",
+    "Choose an architecture and a pooling scheme that are not translation-sensitive. The information is in the frequency content of the variability, not in where a feature falls inside the window.",
+    "Prefer a head that reads a whole-sequence summary over one that reads a final position, since the quantity being predicted is a global property of the window."
+  ],
+
+  "implement": [
+    "Put no squashing activation on the output head. The target is unbounded and includes negative values, so a ReLU or sigmoid output would make part of the target range unreachable for a reason unrelated to the science.",
+    "Design for the padded tail rather than around it. Most Primary-Mission curves are shorter than the fixed window and end in a constant run after normalization, so that shape is the majority of every batch and not a rare case."
+  ],
+
+  "tune": [
+    "Prefer testing more distinct hypotheses over extending any single run. A candidate at the published parameter scale trains well inside this experiment's per-round budget.",
+    "The training objective is yours to choose; it is deliberately not declared by the task. State what each attempt was testing rather than tuning the loss toward the selection metric."
+  ]
+}

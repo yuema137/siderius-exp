@@ -1,0 +1,191 @@
+{
+  "_about": "Published reference points for this task. COMMON KNOWLEDGE, not a prior: these are what the PhyTS benchmark reports for TESS Task B, available to anyone who reads it, and both information-treatment arms see them. What to DO about them is a separate question belonging to an experiment's advice artifact, not here.",
+
+  "_completeness": "Numbers under `supervised_baselines`, `capacity_sweep`, `foundation_models` and `published_observations` are transcribed from the PAPER. Structure under `baseline_architectures` is read from the benchmark's CODE REPOSITORY, which the paper itself does not describe beyond a family name and a citation. The two sources DISAGREE on parameter count; `repository_discrepancies` records that rather than picking one.",
+
+  "source": {
+    "paper": "PhyTS: A Benchmark for Scientific Time Series (NeurIPS 2026 submission)",
+    "task": "TESS Task B — near-core rotation regression, GDOR_SPB subset",
+    "metric": "R-squared on frot, higher is better",
+    "code": "https://github.com/kyoon-mit/PhyTS",
+    "data": "https://huggingface.co/datasets/PhyTS-team/PhyTS-bench"
+  },
+
+  "comparability": {
+    "published_numbers_are_test_split": true,
+    "this_package_scores_on_validation": true,
+    "note": "Every figure below was computed on a TEST split. A SIDERIUS run here is scored on VALIDATION, because the test split is held out and never enters a composition. R-squared is normalized by the evaluation set's own total sum of squares, so these numbers and a run's own are NOT directly comparable. They describe what this task's difficulty looks like; they are not a target to beat on the same footing.",
+    "foundation_model_split_differs": "The foundation-model figures come from the paper's own re-split (appendix D.2: stratified 70/15/15 grouped by TESS Input Catalogue identifier), which is NOT the released 80/10/10 split grouped by Gaia DR3 identifier that the supervised baselines and this package use. They are therefore not strictly comparable to the supervised rows either.",
+    "single_seed": "Table 2 figures are single-seed point estimates. The paper itself recommends 3-5 seeds with mean and standard deviation when the purpose is method comparison, and states the baselines are reference points rather than a ranking."
+  },
+
+  "supervised_baselines": {
+    "_source": "Table 2 (Stars & Exoplanets R-squared column), Table 8 (parameter counts), section 5 (setup)",
+    "_parameter_counts_note": "All three supervised baselines were run at 300K parameters for this dataset. That is the Stars & Exoplanets column of Table 8 read directly; the other datasets' columns are not reproduced here because they do not describe this task.",
+    "mean_predictor": {
+      "r2": -0.017,
+      "parameters": null,
+      "architecture": "predicts the training target mean for every input",
+      "note": "scores approximately 0 by construction; it is the reference for 'no better than knowing nothing about this curve'"
+    },
+    "S4D": {
+      "r2": 0.665,
+      "parameters": "300K",
+      "rank": 1,
+      "family": "diagonal structured state-space model",
+      "citation": "Gu, Goel, Gupta and Re, 'On the parameterization and initialization of diagonal state space models', NeurIPS 2022 (arXiv:2206.11893)",
+      "architecture_detail_published": false
+    },
+    "CNN": {
+      "r2": 0.617,
+      "parameters": "300K",
+      "rank": 2,
+      "family": "convolutional network",
+      "citation": null,
+      "architecture_detail_published": false,
+      "note": "The paper describes it only as 'a vanilla CNN' and gives no depth, kernel size or channel widths."
+    },
+    "LinOSS": {
+      "r2": 0.612,
+      "parameters": "300K",
+      "rank": 3,
+      "family": "oscillatory state-space model",
+      "citation": "Rusch and Rus, 'Oscillatory state-space models', ICLR 2025",
+      "architecture_detail_published": false
+    }
+  },
+
+  "baseline_architectures": {
+    "_source": "github.com/kyoon-mit/PhyTS — src/models/{conv,s4d,linoss}.py and configs/TESS/*.yaml, read 2026-09-20. The PAPER publishes none of this.",
+    "_scope_caveat": "The repository's committed TESS configs are for the CLASSIFICATION task (Task A, 8 outputs). No regression (Task B) config is committed. The backbones are the same three families and the same code paths; only the output width and the loss differ, so the structures below describe the rotation-regression baselines' shape but not a config that was literally run for it.",
+
+    "CNN": {
+      "class": "models.conv.ConvClassifier",
+      "structure": "five repeated blocks of Conv1d(kernel 15, same padding) -> BatchNorm1d -> GELU -> MaxPool1d(2) -> Dropout, then a global average pool over time, then a single Linear to the output width. An optional validity mask multiplies the input before the backbone.",
+      "channels": [64, 64, 128, 128, 256],
+      "kernel_size": 15,
+      "dropout": 0.4,
+      "measured_parameters": 926536,
+      "measured_parameters_note": "Constructed from the committed config at output width 8 and counted directly, not quoted.",
+      "training": {"lr": 1.0e-4, "lr_decay": 0.995, "weight_decay": 1.0e-4, "seq_len": 3917}
+    },
+
+    "S4D": {
+      "class": "models.s4d.S4Model",
+      "structure": "a Linear encoder to d_model, then n_layers residual blocks of S4D -> DropoutNd -> residual add -> LayerNorm (post-norm by default), then a mask-aware mean pool over time, then a single Linear to the output width.",
+      "d_model": 64,
+      "d_state": 16,
+      "n_layers": 4,
+      "dropout": 0.2,
+      "dt_min": 0.001,
+      "dt_max": 0.1,
+      "measured_parameters": null,
+      "measured_parameters_note": "Not counted here: the S4D layer's own implementation was not executed. The LinOSS config's comment refers to S4D at approximately 662K.",
+      "training": {"lr": 1.0e-3, "lr_decay": 0.99, "weight_decay": 1.0e-4, "seq_len": 3917}
+    },
+
+    "LinOSS": {
+      "class": "models.linoss.LinOSS",
+      "structure": "num_blocks blocks, each a BatchNorm, a LinOSS oscillatory state-space layer with diagonal A, B, C, D and learnable step sizes, a GLU nonlinearity, dropout and a residual connection. Implemented in JAX/Equinox rather than PyTorch.",
+      "num_blocks": 4,
+      "ssm_size": 100,
+      "H": 200,
+      "discretization": "IM",
+      "discretization_options": ["IMEX", "IM", "damped_IMEX"],
+      "output_step": 1,
+      "measured_parameters": null,
+      "measured_parameters_note": "The committed config carries the comment: approximately 265K parameters at ssm_size 64 with H 128, raised to ssm_size 100 with H 200 to match S4D's approximately 662K.",
+      "training": {"lr": 1.0e-3, "clip_grad_norm": 1.0, "seq_len": 1100}
+    }
+  },
+
+  "repository_discrepancies": {
+    "_about": "Recorded rather than resolved. Each is checkable against the cited files.",
+    "parameter_count": "The paper's Table 8 reports 300K for all three supervised baselines on this dataset. The committed CNN config measures 926,536 parameters, and the LinOSS config's own comment targets S4D at approximately 662K. The committed configs therefore sit near the sweep's ~700K point, NOT the ~300K point that Table 2's headline numbers come from. This matters because Table 10 shows S4D DROPPING from 0.665 at ~300K to 0.522 at ~700K: the committed config is not the configuration that produced the best published result.",
+    "split": "The committed conv and S4D configs use train_frac 0.7 and val_frac 0.15, which is appendix D.2's 70/15/15 re-split rather than the released 80/10/10 grouped by Gaia DR3 identifier that this task package uses.",
+    "sequence_length": "The committed configs disagree with each other and with the paper: conv and S4D use seq_len 3917 (the full maximum curve length), LinOSS uses 1100, and the paper states truncation to approximately 1,000 points with L = 1024. This package uses 1024.",
+    "task_coverage": "No regression config is committed for TESS at all; only the classification task has one."
+  },
+
+  "capacity_sweep": {
+    "_source": "Table 10, regression test/r2. Each cell is the mean of the top-3 models for that type and size, selected from a 100-iteration hyperparameter sweep.",
+    "_columns": ["~10k", "~100k", "~300k", "~700k"],
+    "LinOSS": [0.536, 0.589, 0.612, 0.598],
+    "S4D": [0.581, 0.624, 0.665, 0.522],
+    "CNN": [0.573, 0.580, 0.617, 0.591]
+  },
+
+  "foundation_models": {
+    "_source": "Table 9 (checkpoints), Table 2 (zero-shot R-squared), Table 12 (LoRA and full supervised fine-tuning). See comparability.foundation_model_split_differs.",
+    "_note": "These are the only baselines whose architecture the paper DOES specify, in Table 9. `pool` is the intra-window pooling, chosen to match each backbone's pre-training objective; `d` is the per-channel embedding dimension.",
+    "MOMENT": {
+      "architecture": "encoder (T5)",
+      "pretraining": "masked reconstruction",
+      "parameters": "109.6M",
+      "embedding_dim": 768,
+      "pool": "mean",
+      "r2": {"zero_shot": 0.2631, "lora": 0.3801, "full_sft": 0.3749}
+    },
+    "MOIRAI": {
+      "architecture": "encoder, any-variate",
+      "pretraining": "masked reconstruction",
+      "parameters": "91.4M",
+      "embedding_dim": 768,
+      "pool": "mean",
+      "r2": {"zero_shot": 0.2366, "lora": 0.3718, "full_sft": 0.3804}
+    },
+    "Chronos": {
+      "architecture": "encoder-decoder (T5)",
+      "pretraining": "forecasting",
+      "parameters": "201.4M",
+      "embedding_dim": 768,
+      "pool": "mean",
+      "r2": {"zero_shot": 0.3049, "lora": 0.2749, "full_sft": 0.3174}
+    },
+    "TimesFM": {
+      "architecture": "causal decoder",
+      "pretraining": "forecasting",
+      "parameters": "203.6M",
+      "embedding_dim": 1280,
+      "pool": "last",
+      "r2": {"zero_shot": 0.0740, "lora": 0.4095, "full_sft": 0.2735}
+    },
+    "Time-MoE": {
+      "architecture": "causal mixture-of-experts decoder",
+      "pretraining": "forecasting",
+      "parameters": "113.4M total, approximately 50M active per token",
+      "embedding_dim": 384,
+      "pool": "last",
+      "r2": {"zero_shot": 0.1715, "lora": 0.3056, "full_sft": 0.3098}
+    },
+    "Granite-TTM": {
+      "architecture": "channel mixer",
+      "pretraining": "masked reconstruction",
+      "parameters": "0.52M",
+      "embedding_dim": 192,
+      "pool": "mean",
+      "r2": {"zero_shot": 0.2050, "lora": null, "full_sft": 0.2742},
+      "note": "No LoRA result: the model has no attention projections to adapt."
+    }
+  },
+
+  "published_setup": {
+    "_source": "Section 5 (TESS) and appendices D.2, D.3",
+    "input": "normalized light curves truncated to approximately 1,000 data points",
+    "window": "padded with the last observed flux value or right-truncated to L = 1024",
+    "cadence": "the 10-minute and 30-minute sectors are mixed without separation, each tensor treated as cadence-agnostic",
+    "seeds": "supervised results averaged over three runs per model size",
+    "compute": "a single GPU; minutes to hours for lightweight models, several days for fine-tuning a foundation model",
+    "zero_shot_head": "frozen backbone, closed-form Ridge regression (alpha = 1.0) on the embeddings, features and targets z-scored with training-split statistics and inverse z-scored before metrics",
+    "finetune_head": "3-layer MLP d -> 256 -> 128 -> output, LayerNorm and GELU between layers, dropout 0.1",
+    "finetune_optimiser": "AdamW, weight decay 1e-4; LoRA at backbone LR 1e-4 / head LR 1e-3, batch 24, up to 100 epochs, patience 20, rank 8 alpha 16 on all q/k/v/o projections; full SFT at backbone LR 1e-5 / head LR 1e-3, batch 4, up to 30 epochs, patience 5"
+  },
+
+  "published_observations": {
+    "_source": "Sections 5, 6.1 and 6.4, appendix D.4 — the paper's own stated findings, transcribed in substance",
+    "architecture": "S4D performs best on both TESS tasks, followed by LinOSS. The paper selected state-space models deliberately, citing their performance and efficiency on long-range temporal dependencies, and attributes their consistent strength across the suite to an inductive bias toward temporal continuity and dynamical evolution that suits systems with long-range, non-Markovian dependencies.",
+    "foundation_models": "Zero-shot foundation models underperform the supervised baselines on this regression by a wide margin. Fine-tuning improves classification substantially but regression remains considerably harder, which the paper reads as foundation models capturing broad variability morphology while struggling with precise astrophysical parameter estimation.",
+    "causal_decoders": "TimesFM and Time-MoE are systematically weakest on zero-shot regression. The paper attributes this to a last-token representation optimised during pre-training to predict the next step rather than to summarise global properties.",
+    "label_uncertainty": "The paper's own limitations section names label and reference uncertainty as the dominant concern for TESS, since the rotation-frequency targets follow an asymptotic approximation calibrated on a restricted stellar regime."
+  }
+}

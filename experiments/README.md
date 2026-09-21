@@ -14,6 +14,7 @@ workspace; use `--dry-run` where the launcher supports it.
 | Oxford-IIIT Pet | [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | consumer-pair qualification |
 | DAVIS | [`two_iteration_qualification/`](davis_future_prediction/two_iteration_qualification/) | consumer-pair qualification |
 | Cancer MTG | [`p0_final_pair_qualification/`](cancer_gene_identification/p0_final_pair_qualification/) | consumer-pair qualification |
+| PhyTS TESS | [`main_fixed_workflow/`](phyts_tess/main_fixed_workflow/) | no-prior arm only; never run |
 
 Archived experiments are retained as dated evidence and are not current launch
 routes. Campaign coordination belongs under [`campaigns/`](../campaigns/README.md).
