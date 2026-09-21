@@ -1,6 +1,6 @@
 # Fixed Full launch preparation
 
-Full prior V7 advice and analysis policies are frozen. Deployment qualification
+Full prior V8 advice and analysis policies are frozen. Deployment qualification
 remains separate; this release does not start or qualify a formal Full run.
 
 Full uses the same `workflow.json`, band-data verifier, 24-hour unit clock and
@@ -24,7 +24,7 @@ model execution. Use the receipt's paths and policy SHA below. The same
 `full_analysis_policy` / `resolve_prior` authorities are available to
 orchestration preparation; a native orchestration launcher is not included in
 this release. Access declarations AND the complete policy (including the
-600-second resource envelope) must match V7. A new operator checksum alone
+600-second resource envelope) must match V8. A new operator checksum alone
 cannot authorize a changed policy.
 
 Preview (no clock or run starts):

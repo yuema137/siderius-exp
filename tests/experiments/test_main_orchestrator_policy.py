@@ -29,7 +29,7 @@ def test_deployment_status_matches_the_frozen_joint_treatment():
     full_status, full_blockers = deployment_status(Prior.ON)
     off_status, off_blockers = deployment_status(Prior.OFF)
 
-    assert full_status == "frozen_full_v7"
+    assert full_status == "frozen_full_v8"
     assert off_status == "disabled"
     assert all("Review/freeze" not in blocker for blocker in full_blockers)
     assert any("frozen Full analysis policy" in blocker for blocker in full_blockers)
