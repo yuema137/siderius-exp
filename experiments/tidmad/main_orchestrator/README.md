@@ -64,7 +64,7 @@ silently impose the fixed workflow's controller schedule on the orchestrator or
 rewrite the frozen advice.
 
 The separate controller strategy is copied byte-for-byte from
-`information_treatments/controller-work-strategy-v1.md`, checked against its
+`information_treatments/controller-work-strategy-v2.md`, checked against its
 frozen digest, and recorded with recipient `outer_controller`. Deployment must
 link that exact file from `SIDERIUS-RUN.md`. It is not part of the generic
 toolbox and must not be exposed to NoPrior or fixed-workflow roles.

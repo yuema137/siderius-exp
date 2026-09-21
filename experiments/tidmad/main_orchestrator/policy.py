@@ -17,10 +17,10 @@ __all__ = ["Prior", "candidate_analysis_policy", "composition_overlay", "resolve
 
 
 CONTROLLER_STRATEGY_RELATIVE_PATH = Path(
-    "experiments/tidmad/information_treatments/controller-work-strategy-v1.md"
+    "experiments/tidmad/information_treatments/controller-work-strategy-v2.md"
 )
 CONTROLLER_STRATEGY_SHA256 = (
-    "27b09b3b4b9d4c17ddb4d666277f264f77ae4410e9d52400d0c9827366ecc2bb"
+    "2c0f22319c8f68fc55a7cf87c02fbecffc0eff40d2d82afc3788e5f5519dc30a"
 )
 
 

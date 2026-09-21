@@ -26,3 +26,11 @@ long training schedule. Record the explicit smoke identity and limits before lau
 
 Full's candidate analysis/advice policy remains separately prepared for review;
 matched Full deployment is not a prerequisite for the present NoPrior launch.
+
+For a future O-Full launch, add a bounded startup and continuation check. From
+the actual research working directory, follow `AGENTS.md` to `SIDERIUS-RUN.md`,
+verify and open the pinned Full model advice and controller-only strategy, and
+identify the relevant toolkit guide. Repeat after a fresh invocation or context
+recovery. Record the read paths and hashes without asking the agent to reproduce
+the documents from memory. This tests delivery; it cannot guarantee the agent
+will follow every suggestion throughout a 24-hour run.

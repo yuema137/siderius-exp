@@ -95,6 +95,16 @@ model research roles. O-NoPrior and fixed workflows must not receive the
 controller strategy artifact. This treatment-specific layer does not change the
 generic wrapper guidance above.
 
+For O-Full, put both advice paths and their verified SHA-256 values directly in
+`SIDERIUS-RUN.md`, with an instruction to open both at startup and after context
+recovery. Keep those paths in the agent's continuation summary. At every new
+baseline-harness invocation, the same immutable run declaration and files must
+still be present and rechecked before the agent starts work. The generic
+toolkit's `AGENTS.md` already requires reopening the run declaration on context
+recovery. File presence, checksums, startup links and invocation checks can be
+enforced by deployment; whether a model acts on advice during an uninterrupted
+long invocation remains observable behavior, not a guarantee.
+
 ## Approved TIDMAD advice-scope declaration
 
 For O-Full/O-NoPrior, also copy
