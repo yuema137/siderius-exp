@@ -72,6 +72,18 @@ def build_input_view(
                 view[f"timeseries/{topology.channels.input_channel}"].keys()
             ) == ("timeseries",)
             copied = view[input_path]
+            for name_of_attribute in tuple(copied.attrs):
+                del copied.attrs[name_of_attribute]
+            if any(
+                len(view[path].attrs)
+                for path in (
+                    "/",
+                    "timeseries",
+                    f"timeseries/{topology.channels.input_channel}",
+                    input_path,
+                )
+            ):
+                raise ValueError(f"input-only view retained an HDF5 attribute: {name}")
             if copied.shape != dataset.shape or copied.dtype != dataset.dtype:
                 raise ValueError(
                     f"copied validation input differs in shape or dtype: {name}"
