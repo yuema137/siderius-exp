@@ -71,6 +71,17 @@ toolbox and must not be exposed to NoPrior or fixed-workflow roles.
 
 ## Remaining deployment work
 
+Full needs two public compositions because the compact baseline training files
+have a different task-data-path implementation identity from the frozen raw
+analysis asset. Keep `public_candidate_composition` for native training and
+complete candidate evaluation. Use `public_analysis_composition` with the same
+frozen Full policy for Data Analysis. The latter retains the original frozen
+task-data-path ID; its caller binds an input-only physical validation view made
+by `analysis_input_view.py`. That view contains the task-declared input HDF5
+dataset for every file in the band and no target channel or copied attributes.
+The research account must be denied the original private validation directory.
+The two compositions do not change the frozen task or the shared advice.
+
 Every receipt explicitly says `launch_ready: false`. Bind and verify the existing
 public package, data scope, protected infra/task mounts, private evaluator route,
 outer Codex version/settings, continuing 24-hour clock, recovery, candidate
