@@ -47,7 +47,7 @@ not provision that service or certify physical data access.
 
 ## Frozen Full policy
 
-The Full policy reuses the reviewed raw-only configuration frozen by the V7
+The Full policy reuses the reviewed raw-only configuration frozen by the V8
 manifest for the chosen band's complete file list and frozen-pool task-data
 identity. It exposes sampled validation
 **input only**, not validation targets, predictions or residuals; no historical
@@ -58,7 +58,7 @@ seed 20260915. These are analysis bounds, not the 40000-sample model window or
 additional run time. Fixed-Full and orchestrator-Full consume the same content-pinned
 policy and model advice.
 
-Model research advice is copied byte-for-byte from the matching fixed-Full V7
+Model research advice is copied byte-for-byte from the matching fixed-Full V8
 authority and rendered by the existing native loader. This preparation does not
 silently impose the fixed workflow's controller schedule on the orchestrator or
 rewrite the frozen advice.

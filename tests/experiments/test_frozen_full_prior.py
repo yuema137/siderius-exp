@@ -1,5 +1,6 @@
 """The published Full treatment must retain the operator-frozen prior bytes."""
 
+import json
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,20 @@ from experiments.tidmad.main_fixed_workflow.full_binding import (
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_training_order_advice_reaches_the_agent_that_owns_the_executable_field():
+    """Moving the executable hint to proposal would leave ordering at shuffle."""
+    advice = json.loads(
+        (
+            ROOT
+            / "experiments/tidmad/information_treatments/full-prior-v8/advice.json"
+        ).read_text()
+    )
+    tuner_advice = "\n".join(advice["tune"])
+    assert 'order_strategy: "sequential"' in tuner_advice
+    assert "published band-specific FCNet processed one file at a time" in tuner_advice
+    assert all("order_strategy" not in item for item in advice["propose"])
+
+
 @pytest.mark.parametrize("band", ["0-3", "4-9", "10-14", "15-19"])
 def test_shared_prior_materializes_frozen_policy_and_refuses_budget_drift(
     tmp_path, band
@@ -24,7 +39,7 @@ def test_shared_prior_materializes_frozen_policy_and_refuses_budget_drift(
     receipt = prepare_full(ROOT, band, tmp_path / band)
     assert (
         receipt["advice_sha256"]
-        == "b85c1c7243030234ca2cdbeb77d965492daeb2c11ca571c0be28e3f33a1a6f00"
+        == "3f20093dc894a0600c9cb491d4bd9350b4a09cef0f43e5a8d6fb712a71e81ac7"
     )
     assert full_analysis_policy(ROOT, band).resource_envelope.wall_time_budget_s == 600
     assert resolve_prior(ROOT, Prior.OFF).advice_path is None
@@ -32,7 +47,7 @@ def test_shared_prior_materializes_frozen_policy_and_refuses_budget_drift(
     policy = yaml.safe_load(policy_path.read_text())
     policy["resource_envelope"]["wall_time_budget_s"] = 300
     policy_path.write_text(yaml.safe_dump(policy))
-    with pytest.raises(ValueError, match="frozen V7"):
+    with pytest.raises(ValueError, match="frozen V8"):
         verify_full_analysis_binding(
             ROOT,
             band=band,

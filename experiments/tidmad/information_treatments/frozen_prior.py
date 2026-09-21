@@ -26,7 +26,7 @@ class FrozenArtifact(BaseModel):
 
 class FrozenPrior(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
-    version: Literal["full-prior-v7"]
+    version: Literal["full-prior-v8"]
     advice: FrozenArtifact
     analysis_policies: dict[str, FrozenArtifact]
 
@@ -36,7 +36,7 @@ def frozen_prior(root: Path) -> FrozenPrior:
     return FrozenPrior.model_validate_json(
         (
             root
-            / "experiments/tidmad/information_treatments/full-prior-v7/manifest.json"
+            / "experiments/tidmad/information_treatments/full-prior-v8/manifest.json"
         ).read_text()
     )
 

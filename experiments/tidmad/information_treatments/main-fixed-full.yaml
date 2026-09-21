@@ -1,10 +1,10 @@
 version: siderius-exp-information-treatment-v1
-treatment_id: tidmad-main-fixed-full-v7
+treatment_id: tidmad-main-fixed-full-v8
 task_package: tasks/tidmad
 advice:
   mode: enabled
-  artifact: experiments/tidmad/information_treatments/full-prior-v7/advice.json
-  sha256: b85c1c7243030234ca2cdbeb77d965492daeb2c11ca571c0be28e3f33a1a6f00
+  artifact: experiments/tidmad/information_treatments/full-prior-v8/advice.json
+  sha256: 3f20093dc894a0600c9cb491d4bd9350b4a09cef0f43e5a8d6fb712a71e81ac7
   content_type: application/json
 modules:
   literature_review:

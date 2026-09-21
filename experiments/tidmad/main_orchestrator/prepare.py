@@ -44,7 +44,7 @@ def deployment_status(prior: Prior) -> tuple[str, list[str]]:
     blockers = list(COMMON_LAUNCH_BLOCKERS)
     if prior is Prior.ON:
         blockers.extend(FULL_LAUNCH_BLOCKERS)
-        return "frozen_full_v7", blockers
+        return "frozen_full_v8", blockers
     return "disabled", blockers
 
 
