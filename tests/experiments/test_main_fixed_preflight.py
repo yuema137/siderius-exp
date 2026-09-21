@@ -22,7 +22,9 @@ def test_preflight_rejects_foreign_experiment_environment(tmp_path: Path) -> Non
         verify_installed_framework("a" * 40, tmp_path)
 
 
-def test_framework_pin_requires_dependency_and_checkout_identity(tmp_path: Path) -> None:
+def test_framework_pin_requires_dependency_and_checkout_identity(
+    tmp_path: Path,
+) -> None:
     checkout = tmp_path / "infra"
     checkout.mkdir()
     subprocess.run(["git", "init", "-q", str(checkout)], check=True)
@@ -107,7 +109,9 @@ def test_framework_pin_requires_dependency_and_checkout_identity(tmp_path: Path)
         verify_framework_pin(repository, checkout)
 
 
-def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_path: Path) -> None:
+def test_no_prior_preflight_binds_existing_treatment_and_band(
+    monkeypatch, tmp_path: Path
+) -> None:
     monkeypatch.setattr(preflight, "verify_framework_pin", lambda *_: "a" * 40)
     monkeypatch.setattr(preflight, "verify_installed_framework", lambda *_: None)
     monkeypatch.setattr(
@@ -134,6 +138,7 @@ def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_p
     assert command[command.index("--data_scope") + 1] == "4-9"
     assert command[command.index("--health_gate_files") + 1] == "4-9"
     assert command[command.index("--formal_eval_portion") + 1] == "1.0"
+    assert command[command.index("--training_validation_portion") + 1] == "0.1"
     assert "--no-runtime_watchdog" in command
     assert "--runtime_watchdog" not in command
     assert "--validation_max_phase_seconds" not in command
@@ -154,9 +159,13 @@ def test_no_prior_preflight_binds_existing_treatment_and_band(monkeypatch, tmp_p
 
     def wrong_task_package(*args, **kwargs):
         resolved = resolve_treatment(*args, **kwargs)
-        return resolved.model_copy(update={"task_package_path": tmp_path / "other-task"})
+        return resolved.model_copy(
+            update={"task_package_path": tmp_path / "other-task"}
+        )
 
-    monkeypatch.setattr(prior_binding, "resolve_information_treatment", wrong_task_package)
+    monkeypatch.setattr(
+        prior_binding, "resolve_information_treatment", wrong_task_package
+    )
     with pytest.raises(ValueError, match="common TIDMAD task"):
         preflight.resolve_no_prior_launch(
             ROOT,

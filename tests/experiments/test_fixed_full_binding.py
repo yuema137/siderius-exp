@@ -91,6 +91,7 @@ def test_full_preflight_enables_prior_without_changing_shared_workflow(
         "--trial_time_budget_minutes",
         "--formal_train_portion",
         "--formal_eval_portion",
+        "--training_validation_portion",
         "--max_epochs",
         "--formal_vram_budget_gb",
         "--workflow_parameter_rules",
@@ -100,6 +101,8 @@ def test_full_preflight_enables_prior_without_changing_shared_workflow(
             command[command.index(flag) + 1]
             == no_prior["command"][no_prior["command"].index(flag) + 1]
         )
+    assert command[command.index("--training_validation_portion") + 1] == "0.1"
+    assert command[command.index("--formal_eval_portion") + 1] == "1.0"
     policy_path.write_text(policy_path.read_text() + "\n# changed after binding\n")
     with pytest.raises(ValueError, match="bound digest"):
         preflight.resolve_full_launch(ROOT, checkout, full_analysis=binding, **kwargs)

@@ -170,3 +170,16 @@ overriding any inherited host-wide value. A fresh unit starts with independent
 timing evidence; resuming the same unit keeps its evidence and immutable clock.
 The generated model library remains workspace-local. Raw data and machine-owned
 credentials can be reused without reusing a previous run's learned timing state.
+
+## Training validation policy for new runs
+
+Both NoPrior and Full use a task-owned random snapshot of 10% of the eligible
+validation population for per-epoch loss. Each attempt records its selection
+seed and scope and reuses that snapshot for every epoch. Final Formal inference,
+scoring and Health continue to cover the full declared evaluation scope
+(`formal_eval_portion=1.0`). The frozen training pool is unchanged.
+
+This shared workflow policy applies to future runs of both conditions. Historical
+completed NoPrior runs used full-scope epoch validation and remain unchanged;
+record that treatment difference rather than describing them as having identical
+validation policy. Full v1 was stopped for diagnosis before this change.
