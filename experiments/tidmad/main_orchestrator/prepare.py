@@ -22,8 +22,30 @@ from experiments.tidmad.main_orchestrator.policy import (
     Prior,
     candidate_analysis_policy,
     composition_overlay,
+    materialize_controller_strategy,
     resolve_prior,
 )
+
+COMMON_LAUNCH_BLOCKERS = (
+    "Bind the unchanged frozen public task view and verify its content identity.",
+    "Reuse baseline account/data/scoring permissions; protect installed infra and frozen task.",
+    "Reuse agreed baseline outer Codex settings, data identity, clock and restart policy.",
+    "Verify full-band candidate replay and the deployed combination before formal launch.",
+)
+FULL_LAUNCH_BLOCKERS = (
+    "Verify the deployed frozen Full analysis policy and model-advice hashes.",
+    "Expose the certified controller strategy only to the outer controller and link it from SIDERIUS-RUN.md.",
+)
+
+
+def deployment_status(prior: Prior) -> tuple[str, list[str]]:
+    """Return treatment status and the remaining machine-owned launch gates."""
+    prior = Prior(prior)
+    blockers = list(COMMON_LAUNCH_BLOCKERS)
+    if prior is Prior.ON:
+        blockers.extend(FULL_LAUNCH_BLOCKERS)
+        return "frozen_full_v7", blockers
+    return "disabled", blockers
 
 
 def prepare(
@@ -69,6 +91,7 @@ def prepare(
     if (binding.data_analysis is not None) != (prior is Prior.ON):
         raise ValueError("native analysis binding disagrees with the prior switch")
     advice_routing = {}
+    controller_strategy = None
     if prior is Prior.ON:
         assert treatment.advice_path is not None
         advice = load_advice_artifact(
@@ -81,18 +104,10 @@ def prepare(
             for key, value in advice.content.items()
             if not key.startswith("_")
         }
+        controller_strategy = materialize_controller_strategy(root, output)
     llm = root / "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
     (output / "agent-models.json").write_bytes(llm.read_bytes())
-    blockers = [
-        "Bind the unchanged frozen public task view and verify its content identity.",
-        "Reuse baseline account/data/scoring permissions; protect installed infra and frozen task.",
-        "Reuse agreed baseline outer Codex settings, data identity, clock and restart policy.",
-        "Verify full-band candidate replay and the deployed combination before formal launch.",
-    ]
-    if prior is Prior.ON:
-        blockers.append(
-            "Review/freeze analysis policy and matched fixed-Full policy/advice parity."
-        )
+    analysis_policy_status, blockers = deployment_status(prior)
     receipt = {
         "schema_version": 1,
         "status": "operator_preparation_only",
@@ -111,12 +126,13 @@ def prepare(
         "literature_review_enabled": True,
         "data_analysis_enabled": prior is Prior.ON,
         "native_analysis_binding_resolved": binding.data_analysis is not None,
-        "analysis_policy_status": "candidate_not_frozen"
-        if prior is Prior.ON
-        else "disabled",
+        "analysis_policy_status": analysis_policy_status,
         "analysis_policy_sha256": sha256_file(analysis_path) if analysis_path else None,
         "advice_sha256": treatment.declaration.advice.sha256,
         "advice_by_recipient": advice_routing,
+        "controller_strategy_advice": (
+            controller_strategy.receipt() if controller_strategy else None
+        ),
         "agent_models_sha256": sha256_file(llm),
         "fixed_workflow_sha256": workflow_digest,
         "execution_policy_sha256": sha256_file(execution_path),

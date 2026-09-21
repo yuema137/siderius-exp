@@ -24,10 +24,10 @@ second experiment switch. An enabled main-workflow treatment remains
 non-launchable until the experiment provides a qualified band-scoped analysis
 binding.
 
-## Frozen Full V6
+## Frozen Full V7
 
-`main-fixed-full.yaml` now binds the frozen English V6 advice. The shared
-[manifest and four band policies](full-prior-v6/README.md) are the common prior
+`main-fixed-full.yaml` now binds the frozen English V7 advice. The shared
+[manifest and four band policies](full-prior-v7/README.md) are the common prior
 authority for fixed workflow and orchestration. DA has a 600-second allowance;
 NoPrior continues to disable advice and DA explicitly. The preparation CLI
 materializes verified deployment inputs without starting a run.

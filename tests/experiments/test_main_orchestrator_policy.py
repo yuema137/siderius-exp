@@ -11,13 +11,59 @@ import pytest
 import yaml
 
 from experiments.tidmad.main_orchestrator.policy import (
+    CONTROLLER_STRATEGY_RELATIVE_PATH,
+    CONTROLLER_STRATEGY_SHA256,
     Prior,
     candidate_analysis_policy,
     composition_overlay,
+    materialize_controller_strategy,
     resolve_prior,
 )
+from experiments.tidmad.main_orchestrator.prepare import deployment_status
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_deployment_status_matches_the_frozen_joint_treatment():
+    """Prevent a frozen Full policy from reverting to candidate launch metadata."""
+    full_status, full_blockers = deployment_status(Prior.ON)
+    off_status, off_blockers = deployment_status(Prior.OFF)
+
+    assert full_status == "frozen_full_v7"
+    assert off_status == "disabled"
+    assert all("Review/freeze" not in blocker for blocker in full_blockers)
+    assert any("frozen Full analysis policy" in blocker for blocker in full_blockers)
+    assert all("controller strategy" not in blocker for blocker in off_blockers)
+
+
+def test_controller_strategy_is_content_pinned_and_materialized_separately(tmp_path):
+    """Catch stale strategy bytes or accidental routing as the model advice file."""
+    output = tmp_path / "full"
+    output.mkdir()
+    binding = materialize_controller_strategy(ROOT, output)
+
+    source = ROOT / CONTROLLER_STRATEGY_RELATIVE_PATH
+    destination = output / "controller-work-strategy.md"
+    assert destination.read_bytes() == source.read_bytes()
+    assert binding.receipt() == {
+        "artifact": "controller-work-strategy.md",
+        "sha256": CONTROLLER_STRATEGY_SHA256,
+        "recipients": ["outer_controller"],
+        "layering": "on_top_of_model_research_advice",
+    }
+    assert not (output / "advice.json").exists()
+
+
+def test_controller_strategy_refuses_unreviewed_content_change(tmp_path):
+    """Catch strategy edits that bypass the explicit frozen digest update."""
+    source = tmp_path / CONTROLLER_STRATEGY_RELATIVE_PATH
+    source.parent.mkdir(parents=True)
+    source.write_text("changed without review\n")
+    output = tmp_path / "output"
+    output.mkdir()
+
+    with pytest.raises(ValueError, match="controller strategy checksum mismatch"):
+        materialize_controller_strategy(tmp_path, output)
 
 
 @pytest.mark.parametrize(

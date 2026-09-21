@@ -1,0 +1,10 @@
+[Unit]
+Description=Frequent Full work-volume guard for %i
+
+[Timer]
+OnCalendar=*:0/2
+Persistent=true
+Unit=tidmad-full-disk-guard@%i.service
+
+[Install]
+WantedBy=timers.target
