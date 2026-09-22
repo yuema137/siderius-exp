@@ -19,6 +19,7 @@ import yaml
 from core.sandbox_executor import TidmadSandbox
 from core.training_execution_bindings import TrainingExecutionBindings
 from execute_tools.task_data_path import EvaluationReadRequest, ScopeBuildRequest
+from ml_models.models_format_sandbox import TrainConfig
 from workflows.task_composition import (
     bind_run_task_composition,
     compose_run_task_bindings,
@@ -26,7 +27,8 @@ from workflows.task_composition import (
 
 
 def qualify(
-    composition_path: Path, data: Path, workspace: Path, device: str, attempts: int
+    composition_path: Path, data: Path, workspace: Path, device: str, attempts: int,
+    training_config: TrainConfig | None = None,
 ) -> dict:
     workspace.mkdir(parents=True, exist_ok=False)
     source = yaml.safe_load(composition_path.read_text())
@@ -98,6 +100,11 @@ def qualify(
         "optimizer_type": "adam",
         "device": device,
     }
+    if training_config is not None:
+        training = training_config.model_dump(mode="json")
+        training["device"] = device
+        model["batch_size"] = training_config.batch_size
+    record["training_config"] = training
     loss = {"loss_type": "smooth_l1", "reduction": "mean"}
     with bind_run_task_composition(composition, physical_data_root=str(data)):
         sandbox = TidmadSandbox(
@@ -183,9 +190,8 @@ def qualify(
             )
             truth = scopes.evaluation.truth(str(data))
             independent = float(np.sqrt(np.mean(np.square(predictions - truth))))
-            history = entry["phases"]["training"]["result"]["results"][
-                "training_history"
-            ]
+            training_result = entry["phases"]["training"]["result"]["results"]
+            history = training_result["training_history"]
             assert (
                 history["validation_requested_samples"]
                 == scopes.training_validation.row_count
@@ -195,11 +201,29 @@ def qualify(
             # export/restore or target-unit change across native subprocesses.
             indices = list(scopes.training_validation.rows)
             error = np.abs(predictions[indices] - truth[indices])
+            transform = training_result.get("target_standardization")
+            if training.get("target_standardization") == "training_pool_global":
+                assert transform is not None
+                targets = np.load(data / "training/targets.npy", mmap_mode="r")
+                selected = np.asarray(targets[list(scopes.training.rows)], dtype=np.float64)
+                assert transform["training_rows"] == scopes.training.row_count
+                assert np.isclose(transform["mean"], selected.mean(), rtol=1e-10)
+                assert np.isclose(transform["scale"], selected.std(), rtol=1e-10)
+                error = error / transform["scale"]
+            if training.get("drop_last") is False:
+                assert history["training_samples"] == [scopes.training.row_count] * len(
+                    history["validation_objective"]
+                )
+            selected_loss = history["validation_objective"][-1]
+            if training.get("checkpoint_selection") == "best_validation_loss":
+                selection = training_result["selected_checkpoint"]
+                selected_loss = min(history["validation_objective"])
+                assert selection["validation_loss"] == selected_loss
             restored_loss = float(
                 np.where(error < 1, 0.5 * error**2, error - 0.5).mean()
             )
             assert np.isclose(
-                restored_loss, history["validation_objective"][-1], rtol=1e-5, atol=1e-6
+                restored_loss, selected_loss, rtol=1e-5, atol=1e-6
             )
             entry["restored_validation_loss"] = restored_loss
             metric = entry["phases"]["scoring"]["result"]["results"]["metric_result"]
@@ -225,6 +249,8 @@ def main() -> None:
     parser.add_argument("--workspace", type=Path, required=True)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     parser.add_argument("--attempts", type=int, choices=(1, 2), default=2)
+    parser.add_argument("--training-config", type=Path,
+                        help="Optional native TrainConfig JSON for bounded policy qualification")
     args = parser.parse_args()
     qualify(
         args.composition.resolve(),
@@ -232,6 +258,8 @@ def main() -> None:
         args.workspace.resolve(),
         args.device,
         args.attempts,
+        TrainConfig.model_validate_json(args.training_config.read_text())
+        if args.training_config else None,
     )
 
 
