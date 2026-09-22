@@ -1,6 +1,6 @@
 # TIDMAD external-orchestrator deployment preparation
 
-Prepare one exact runtime pair and one joint prior selection for a Codex caller.
+Prepare one exact runtime pair and an explicit information treatment for a Codex caller.
 This is an **operator-only candidate preparation command**, not a launcher or
 an agent-visible task package. It never starts the scientific clock or calls an
 LLM, trains, scores, or changes any file in `tasks/tidmad`.
@@ -15,12 +15,14 @@ its own Python and an infra checkout matching `SIDERIUS_REVISION`:
 
 .venv/bin/python -m experiments.tidmad.main_orchestrator.prepare \
   --siderius-checkout /path/to/pinned/SIDERIUS \
-  --band 0-3 --prior on --output /path/to/new/O-Full-0-3
+  --band 0-3 --strategy-only --output /path/to/new/O-StrategyOnly-0-3
 ```
 
-Only `--prior` changes treatment: `on` means `O-Full`, `off` means `O-NoPrior`.
-Both retain literature review and use the same versioned agent-model JSON. No
-separate advice-only or analysis-only state is accepted. Each output directory
+`--strategy-only` selects controller strategy V3 with Data Analysis and model
+advice disabled. `--prior off` retains O-NoPrior. The historical `--prior on`
+joint Full treatment remains available for provenance, not as a substitute for
+strategy-only. These selectors are mutually exclusive. All retain literature
+review and use the same versioned agent-model JSON. Each output directory
 must be fresh; changing a flag does not resume an existing unit under a new arm.
 The CLI verifies clean source checkouts, source/lock/install pins, exact advice
 identity and the real native analysis binding. Missing prerequisites fail.
@@ -37,6 +39,11 @@ controller and suggests adaptive resource use without prescribing a fixed
 schedule. NoPrior emits none of these and carries no advice content or analysis
 binding.
 
+Strategy-only emits only `controller-work-strategy.md` and
+`prompt-supplement.json` in addition to the NoPrior materials. See the
+[strategy-only deployment contract](STRATEGY_ONLY.md) for protected assembly,
+per-invocation delivery and the DA exclusion checks required before launch.
+
 **Do not mount this output or the whole exp repository into the coding agent.**
 The operator composition references private scorer code. Assemble a separate
 agent-visible overlay onto the existing frozen common public view using
@@ -45,7 +52,7 @@ Expose only the permitted advice/policy/routing and native capability bindings;
 private scoring stays in the trusted executor. A Python binding check here does
 not provision that service or certify physical data access.
 
-## Frozen Full policy
+## Historical frozen Full policy
 
 The Full policy reuses the reviewed raw-only configuration frozen by the V8
 manifest for the chosen band's complete file list and frozen-pool task-data

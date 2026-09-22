@@ -14,6 +14,7 @@ from .agent_command import command_for, prompt_bytes
 from .deadline import load_or_create
 from .io import create_json_once
 from .model import AgentProduct, utc_text
+from .prompt_supplement import append_verified_supplement
 
 
 def _append_receipt(path: Path, payload: dict[str, object]) -> None:
@@ -43,9 +44,10 @@ def _run_once(
     deadline_epoch: int,
     run_id: str,
     invocation_id: str,
+    prompt_supplement: Path | None = None,
 ) -> tuple[int, bool]:
     command = command_for(product, prompt)
-    prompt_input = prompt_bytes(prompt)
+    prompt_input = append_verified_supplement(prompt_bytes(prompt), prompt_supplement)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("ab", buffering=0) as output:
         process = subprocess.Popen(
@@ -81,7 +83,11 @@ def supervise(
     work_root: Path,
     prompt: Path,
     scheduled_start_epoch: int,
+    prompt_supplement: Path | None = None,
 ) -> None:
+    # Refuse a broken deployment before creating its scientific clock.
+    if prompt_supplement is not None:
+        append_verified_supplement(prompt_bytes(prompt), prompt_supplement)
     state = work_root / "state"
     logs = work_root / "logs"
     deadline = load_or_create(state / "deadline.json", scheduled_start_epoch)
@@ -116,6 +122,7 @@ def supervise(
             deadline_epoch=deadline.agent_deadline_epoch,
             run_id=run_id,
             invocation_id=invocation_id,
+            prompt_supplement=prompt_supplement,
         )
         ended = int(time.time())
         _append_receipt(
@@ -142,12 +149,14 @@ def main() -> int:
     parser.add_argument("--work-root", type=Path, default=Path("/work"))
     parser.add_argument("--prompt", type=Path, default=Path("/work/input/task.md"))
     parser.add_argument("--scheduled-start-epoch", type=int, required=True)
+    parser.add_argument("--prompt-supplement", type=Path)
     args = parser.parse_args()
     supervise(
         product=args.product,
         work_root=args.work_root,
         prompt=args.prompt,
         scheduled_start_epoch=args.scheduled_start_epoch,
+        prompt_supplement=args.prompt_supplement,
     )
     return 0
 

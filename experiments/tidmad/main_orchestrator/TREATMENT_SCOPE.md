@@ -1,7 +1,8 @@
 # TIDMAD orchestrator information-treatment scope
 
 Operator decision: 2026-09-18. This is an additive experiment declaration for
-O-Full and O-NoPrior, not a change to the frozen common task or generic toolbox.
+O-Full, O-NoPrior and the subsequent O-StrategyOnly condition, not a change to
+the frozen common task or generic toolbox.
 Read it together with `SIDERIUS-RUN.md` in the assembled agent workspace.
 
 ## Scope of the common package's advice statements
@@ -11,18 +12,19 @@ The no-advice statements in the common `input/task.md` and the advice state in
 the statement that advice is allowed only at `input/advice.json` when
 `input/treatment.json` enables it applies to that CLI condition.
 
-For O-Full and O-NoPrior, the operator-approved additional orchestrator treatment
+For these orchestration conditions, the operator-approved additional treatment
 in `SIDERIUS-RUN.md` determines the dedicated Data Analysis and initial human
 advice state instead. The absence of `input/advice.json` is expected and does
 not disable an explicitly declared O-Full artifact outside the frozen input.
 Preserve every common input file, including its original treatment and provenance.
 
-## Joint selector and supplied information
+## Explicit selector and supplied information
 
 | Explicit run declaration | Dedicated Data Analysis | Model research advice | Controller strategy advice | Literature review |
 | --- | --- | --- | --- | --- |
 | O-Full / prior on | Enabled | Exact declared artifact at `run/advice.json` | Exact declared artifact at `run/controller-work-strategy.md`, outer controller only | Enabled |
 | O-NoPrior / prior off | Disabled, no findings injection | Absent | Absent | Enabled |
+| O-StrategyOnly / strategy-only | Disabled, no findings injection | Absent | Exact V3 artifact at `run/controller-work-strategy.md`, outer controller only | Enabled |
 
 These paths are relative to the assembled agent workspace containing
 `SIDERIUS-RUN.md`; they are not paths inside the frozen input tree. Full's
@@ -38,7 +40,9 @@ recovery state.
 The run must explicitly identify its condition, prior state and matching
 artifacts. If they are missing, inconsistent or fail validation, report the
 setup error before the affected operation; do not infer Full from nearby files.
-Partial analysis-only or advice-only configurations are not supported.
+O-StrategyOnly explicitly authorizes only controller V3 advice. It inherits
+NoPrior's DA and model-advice exclusions. See [its deployment contract](STRATEGY_ONLY.md).
+It is not a partial deployment of historical Full.
 
 ## Narrow effect and remaining requirements
 
@@ -53,14 +57,17 @@ The generic toolbox stays unchanged. A different task must bring its own
 experiment declaration; it must not inherit this TIDMAD-specific interpretation.
 Full policy/advice parity and actual execution still need qualification.
 
-## NoPrior requires enforced information exclusion
+## NoPrior and StrategyOnly require enforced information exclusion
 
-A deployment must omit advice artifacts, dedicated analysis findings and Full
+A NoPrior deployment must omit advice artifacts, dedicated analysis findings and Full
 histories from every research-process-readable mount, inherited state and
 recovery input. Do not expose the private exp checkout or operator output and
 rely on instructions not to read it. Resume must preserve NoPrior's information
 boundary. Validate it from the actual research process, including absolute-path
 read attempts against existing prohibited artifacts.
+
+StrategyOnly has the same exclusions except for its declared controller V3
+artifact. It must not inherit Full model advice, analysis data or findings.
 
 The trusted execution route must also reject dedicated Data Analysis requests
 for NoPrior and omit its findings from returned results. The current preparation
