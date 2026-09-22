@@ -26,10 +26,22 @@ No final offline test evaluation is enabled.
 
 New runs use operator-owned Formal training scope with `formal_portion=1.0`
 and `formal_train_portion=1.0`: all 40,000 prepared training events belong to
-the pool, and each complete epoch trains on all of them. Trial sampling remains
+the pool, and every epoch selects that full pool. Trial sampling remains
 agent-controlled. Epoch validation uses its fixed 10% snapshot; final Formal
 evaluation uses all 5,000 validation events. Time budgets and epoch caps still
 determine how many complete epochs fit.
+
+Pending deployment qualification: the native loader currently drops an
+incomplete final batch. If the batch size does not divide 40,000, selecting the
+full pool does not yet guarantee training on every selected event. Resolve this
+boundary before declaring the requested full-event policy ready for launch.
+
+Both Trial and Formal export the earliest checkpoint with minimum loss on
+their fixed training-validation snapshot, through the workflow rule
+`train_config.checkpoint_selection=best_validation_loss`. Training still runs
+until its time budget or epoch cap is reached; scientific early stopping is
+not enabled. Final scoring does not select checkpoints. The exported epoch
+and its validation loss are recorded in `selected_checkpoint`.
 
 This policy supersedes the agent-owned Formal fractions used by run-2, which
 was stopped for diagnosis. Historical results and workspaces retain their

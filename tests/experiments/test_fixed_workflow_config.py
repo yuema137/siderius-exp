@@ -14,6 +14,34 @@ ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / "experiments/tidmad/prerelease-tidmad-proof-of-function/workflow.json"
 
 
+def test_project8_checkpoint_rule_reaches_pinned_training_schema() -> None:
+    from agent.schemas.hyperparam_tuning import ExperimentPlan
+    from agent.schemas.parameter_rules import ParameterRules, apply_parameter_rules
+    from ml_models.models_format_sandbox import TrainConfig
+
+    config = ROOT / "experiments/phyts_project8/main_fixed_workflow/workflow.json"
+    arguments = render_siderius_args(
+        config, repository_root=ROOT, siderius_checkout=ROOT
+    )
+    rules = ParameterRules.model_validate_json(
+        arguments[arguments.index("--workflow_parameter_rules") + 1]
+    )
+    plan = ExperimentPlan(train_config={"checkpoint_selection": "last_completed_epoch"})
+    resolved = apply_parameter_rules(plan, workflow_rules=rules)
+    # An older infra schema silently drops unknown train_config fields. Require
+    # the actual pinned execution schema to recognize and retain the policy.
+    assert (
+        TrainConfig.model_validate(resolved.train_cfg).checkpoint_selection
+        == "best_validation_loss"
+    )
+    assert (
+        arguments[arguments.index("--formal_training_scope_source") + 1] == "operator"
+    )
+    for flag in ("--formal_portion", "--formal_train_portion", "--formal_eval_portion"):
+        assert arguments[arguments.index(flag) + 1] == "1.0"
+    assert arguments[arguments.index("--training_validation_portion") + 1] == "0.1"
+
+
 def _fixture(
     tmp_path: Path, *, parameters: dict[str, object]
 ) -> tuple[Path, Path, Path]:

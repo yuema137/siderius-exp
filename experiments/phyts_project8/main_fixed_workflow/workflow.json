@@ -3,6 +3,9 @@
   "task_composition": "tasks/phyts_project8/compositions/regression.yaml",
   "agent_parameters": "experiments/phyts_project8/main_fixed_workflow/agents.json",
   "agent_parameters_owner": "experiment",
+  "workflow_parameter_rules": {
+    "train_config.checkpoint_selection": {"exact": "best_validation_loss"}
+  },
   "parameters": {
     "--no-runtime_watchdog": true,
     "--num_iterations": 100,
