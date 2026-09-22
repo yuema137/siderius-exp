@@ -31,10 +31,22 @@ agent-controlled. Epoch validation uses its fixed 10% snapshot; final Formal
 evaluation uses all 5,000 validation events. Time budgets and epoch caps still
 determine how many complete epochs fit.
 
-Pending deployment qualification: the native loader currently drops an
-incomplete final batch. If the batch size does not divide 40,000, selecting the
-full pool does not yet guarantee training on every selected event. Resolve this
-boundary before declaring the requested full-event policy ready for launch.
+The workflow fixes `train_config.drop_last=false` for Trial and Formal, retaining
+the incomplete final batch. For example, Formal batch size 128 uses 313 steps,
+including the final 64 events. Completed-epoch sample counts are recorded in
+`training_history.training_samples`; training loss is weighted by batch size.
+Generated models must support partial batches.
+
+Both roles use `train_config.target_standardization=training_pool_global`.
+The framework fits one global target mean and population standard deviation
+from the actual authorized training pool, never validation targets. Loss uses
+standardized target and prediction values; exported inference restores the
+original target units. Statistics travel with the checkpoint and fitting time
+counts toward the attempt budget. Constant or nonfinite targets fail explicitly.
+This does not change the frozen dataset or preprocessing.
+
+These policies are staged against the repair branches. Review, CI, deployment
+qualification and a final released dependency pin remain required before launch.
 
 Both Trial and Formal export the earliest checkpoint with minimum loss on
 their fixed training-validation snapshot, through the workflow rule

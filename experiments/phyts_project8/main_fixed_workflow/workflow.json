@@ -4,7 +4,9 @@
   "agent_parameters": "experiments/phyts_project8/main_fixed_workflow/agents.json",
   "agent_parameters_owner": "experiment",
   "workflow_parameter_rules": {
-    "train_config.checkpoint_selection": {"exact": "best_validation_loss"}
+    "train_config.checkpoint_selection": {"exact": "best_validation_loss"},
+    "train_config.target_standardization": {"exact": "training_pool_global"},
+    "train_config.drop_last": {"exact": false}
   },
   "parameters": {
     "--no-runtime_watchdog": true,
