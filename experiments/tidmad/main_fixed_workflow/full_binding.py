@@ -3,11 +3,14 @@
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictBool
 from workflows.data_analysis_composition import DataAnalysisWorkflowConfig
 
 from experiments.shared.checksum_manifest import sha256_file
-from experiments.tidmad.information_treatments.frozen_prior import full_analysis_policy
+from experiments.tidmad.information_treatments.frozen_prior import (
+    analysis_policy,
+    full_analysis_policy,
+)
 from experiments.tidmad.information_treatments.prior_binding import (
     composition_overlay,
 )
@@ -20,6 +23,7 @@ class FullAnalysisInputs(BaseModel):
     policy_path: Path
     policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     composition_path: Path
+    model_advice: StrictBool = True
 
     def require_external_to(self, *directories: Path) -> None:
         """Keep operator inputs outside source, data and mutable run directories."""
@@ -39,7 +43,8 @@ def verify_full_analysis_binding(
     policy_path: Path,
     policy_sha256: str,
     composition_path: Path,
-) -> dict[str, str]:
+    model_advice: bool = True,
+) -> dict[str, object]:
     """Verify operator-selected bytes and the common input-only data boundary.
 
     Supplied policy semantics must match frozen V8, including its resource
@@ -59,7 +64,11 @@ def verify_full_analysis_binding(
     policy = DataAnalysisWorkflowConfig.model_validate(
         yaml.safe_load(policy_path.read_text())
     )
-    access_authority = full_analysis_policy(root, band)
+    access_authority = (
+        full_analysis_policy(root, band)
+        if model_advice
+        else analysis_policy(root, band)
+    )
     for field in ("available_assets", "declared_scope", "access_policy"):
         if getattr(policy, field) != getattr(access_authority, field):
             raise ValueError(
@@ -73,9 +82,12 @@ def verify_full_analysis_binding(
         raise ValueError(
             "Full composition must be the frozen task plus the bound analysis policy"
         )
-    return {
+    receipt: dict[str, object] = {
         "analysis_policy_path": str(policy_path),
         "analysis_policy_sha256": policy_sha256,
         "composition_path": str(composition_path),
         "composition_sha256": sha256_file(composition_path),
     }
+    if not model_advice:
+        receipt["model_advice"] = False
+    return receipt

@@ -25,6 +25,26 @@ class Prior(StrEnum):
     OFF = "off"
 
 
+def resolve_da_only(root: Path) -> ResolvedInformationTreatment:
+    """Enable the analysis node without reading or supplying model advice."""
+    treatment = resolve_information_treatment(
+        root / "experiments/tidmad/information_treatments/main-fixed-da-only.yaml",
+        repository_root=root,
+        adapter="siderius",
+        required_modules=("literature_review", "data_analysis"),
+    )
+    if (
+        treatment.declaration.advice.mode is not AdviceMode.DISABLED
+        or treatment.module_states["data_analysis"] is not ModuleState.ENABLED
+        or treatment.module_states["literature_review"] is not ModuleState.ENABLED
+        or treatment.task_package_path != root / "tasks/tidmad"
+    ):
+        raise ValueError(
+            "DA-only requires analysis and literature on, model advice off"
+        )
+    return treatment
+
+
 def resolve_prior(root: Path, prior: Prior) -> ResolvedInformationTreatment:
     """Reuse the matching fixed arm's exact information authority and advice bytes."""
     prior = Prior(prior)

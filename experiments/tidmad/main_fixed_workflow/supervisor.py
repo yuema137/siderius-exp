@@ -261,7 +261,9 @@ def main() -> int:
     parser.add_argument(
         "--launch", action="store_true", help="start or resume the 24-hour unit"
     )
-    parser.add_argument("--condition", choices=("no-prior", "full"), default="no-prior")
+    parser.add_argument(
+        "--condition", choices=("no-prior", "full", "da-only"), default="no-prior"
+    )
     parser.add_argument("--analysis-policy", type=Path)
     parser.add_argument("--analysis-policy-sha256")
     parser.add_argument("--analysis-composition", type=Path)
@@ -272,7 +274,7 @@ def main() -> int:
             args.analysis_policy_sha256,
             args.analysis_composition,
         )
-        if args.condition == "full":
+        if args.condition in ("full", "da-only"):
             if not all(supplied):
                 raise ValueError(
                     "Full requires explicit analysis policy, digest and composition"
@@ -281,6 +283,7 @@ def main() -> int:
                 policy_path=args.analysis_policy,
                 policy_sha256=args.analysis_policy_sha256,
                 composition_path=args.analysis_composition,
+                model_advice=args.condition == "full",
             )
         else:
             if any(supplied):

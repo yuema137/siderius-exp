@@ -41,11 +41,16 @@ def frozen_prior(root: Path) -> FrozenPrior:
     )
 
 
-def full_analysis_policy(root: Path, band: str) -> DataAnalysisWorkflowConfig:
-    """Both workflow and orchestration consume the same frozen band policy."""
+def analysis_policy(root: Path, band: str) -> DataAnalysisWorkflowConfig:
+    """Resolve the existing frozen analysis policy independently of model advice."""
     declaration = frozen_prior(root)
-    declaration.advice.verify(root)
     if band not in declaration.analysis_policies:
         raise ValueError(f"no frozen Full policy for band {band!r}")
     path = declaration.analysis_policies[band].verify(root)
     return DataAnalysisWorkflowConfig.model_validate(yaml.safe_load(path.read_text()))
+
+
+def full_analysis_policy(root: Path, band: str) -> DataAnalysisWorkflowConfig:
+    """Preserve the legacy joint Full binding, including advice verification."""
+    frozen_prior(root).advice.verify(root)
+    return analysis_policy(root, band)

@@ -132,13 +132,16 @@ def test_full_runtime_refusal_preserves_original_clock_and_results(
     assert not seen
 
 
-def test_full_analysis_binding_is_reused(recovery, monkeypatch):
+@pytest.mark.parametrize("model_advice", [True, False])
+def test_full_analysis_binding_is_reused(recovery, monkeypatch, model_advice):
     args, current, seen = recovery
     binding = {
         "analysis_policy_path": "/external/policy.yaml",
         "analysis_policy_sha256": "a" * 64,
         "composition_path": "/external/composition.yaml",
     }
+    if not model_advice:
+        binding["model_advice"] = False
     path = args["unit"] / "launch.json"
     payload = json.loads(path.read_text())
     payload["preflight"]["analysis_binding"] = binding
@@ -148,6 +151,7 @@ def test_full_analysis_binding_is_reused(recovery, monkeypatch):
 
     def resolve(*a, full_analysis, **kw):
         assert str(full_analysis.policy_path) == binding["analysis_policy_path"]
+        assert full_analysis.model_advice is model_advice
         assert kw["require_fresh_workspace"] is False
         return current
 

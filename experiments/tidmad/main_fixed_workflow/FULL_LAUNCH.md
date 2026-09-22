@@ -1,5 +1,39 @@
 # Fixed Full launch preparation
 
+## Data Analysis only (current supplemental workflow condition)
+
+The completed NoPrior workflow runs are reused as the DA-off controls. Launch
+only four new DA-on band units, without model advice. The historical Full
+condition below remains available for provenance and must not substitute for
+the new condition.
+
+Use `--condition da-only` when preparing inputs:
+
+```bash
+.venv/bin/python -m experiments.tidmad.information_treatments.prepare_full \
+  --condition da-only --band 0-3 --output-dir /operator-inputs/da-only-0-3
+```
+
+Use the same `--condition da-only` on `main_fixed_workflow/launch.sh`, with the
+three explicit analysis bindings shown below. The prepared receipt has null
+advice identity; the launch receipt identifies `da-only` and records
+`analysis_binding.model_advice=false`. The native command enables Data Analysis
+and literature review and contains no `--advice` or `--advice_sha256`.
+The scientific task and existing frozen band analysis policies are unchanged.
+
+For the existing analysis-enabled service template `tidmad-full@.service`, set
+`INFORMATION_CONDITION=da-only` in the instance's environment file. The default
+remains `full` for old deployments. Use a new instance/run directory and backup
+prefix; verify the actual CLI and receipt, not the service template's historical
+name. Sandbox readiness is mandatory for DA-only as well as historical Full.
+The shared backup/disk guard follows the existing instance without a new clock.
+
+Before launch, qualify successful reference and generated analysis and verify
+that the downstream proposal request receives findings without model advice.
+Do not seed formal workspaces with qualification reports or candidates.
+
+## Historical joint Full condition
+
 Full prior V8 advice and analysis policies are frozen. Deployment qualification
 remains separate; this release does not start or qualify a formal Full run.
 
