@@ -28,7 +28,9 @@ class LaunchRecord(BaseModel):
     @model_validator(mode="after")
     def require_one_day(self) -> LaunchRecord:
         if self.deadline_epoch - self.started_epoch != UNIT_SECONDS:
-            raise ValueError("NoPrior unit deadline must be exactly 24 hours after launch")
+            raise ValueError(
+                "NoPrior unit deadline must be exactly 24 hours after launch"
+            )
         if self.started_utc != _utc(self.started_epoch) or self.deadline_utc != _utc(
             self.deadline_epoch
         ):
@@ -52,7 +54,9 @@ def read_launch_record(path: Path) -> LaunchRecord | None:
     return LaunchRecord.model_validate_json(path.read_bytes())
 
 
-def create_launch_record(path: Path, preflight: dict[str, Any], started_epoch: int) -> LaunchRecord:
+def create_launch_record(
+    path: Path, preflight: dict[str, Any], started_epoch: int
+) -> LaunchRecord:
     """Publish the first clock atomically and never replace it."""
 
     record = LaunchRecord(
@@ -80,3 +84,52 @@ def create_launch_record(path: Path, preflight: dict[str, Any], started_epoch: i
     finally:
         temporary.unlink(missing_ok=True)
     return record
+
+
+class ContinuationRecord(BaseModel):
+    """One reviewed outage exclusion, without rewriting the original launch."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    version: Literal["tidmad-main-fixed-continuation-v1"]
+    original_launch_sha256: str
+    original_started_epoch: int
+    stopped_epoch: int
+    started_epoch: int
+    deadline_epoch: int
+    recovery_evidence_sha256: str
+    preflight: dict[str, Any]
+
+    @model_validator(mode="after")
+    def require_remaining_budget(self) -> ContinuationRecord:
+        consumed = self.stopped_epoch - self.original_started_epoch
+        if not 0 < consumed < UNIT_SECONDS:
+            raise ValueError(
+                "continuation requires a partially consumed original budget"
+            )
+        if self.started_epoch < self.stopped_epoch:
+            raise ValueError("continuation cannot start before the recorded failure")
+        if self.deadline_epoch - self.started_epoch != UNIT_SECONDS - consumed:
+            raise ValueError(
+                "continuation deadline must deduct all previously elapsed time"
+            )
+        return self
+
+
+def publish_continuation(path: Path, record: ContinuationRecord) -> None:
+    """Atomically publish a separate clock; never replace either launch record."""
+    descriptor, name = tempfile.mkstemp(prefix=".continuation-", dir=path.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(record.model_dump_json(indent=2).encode() + b"\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary, path)
+        directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        temporary.unlink(missing_ok=True)
