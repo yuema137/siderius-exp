@@ -35,11 +35,12 @@ schedule replacement controls or change the frozen task package.
 [Controller work strategy V3](controller-work-strategy-v3.md) contains only
 research organization, adaptive resource use and completion guidance. It has
 no model architecture, capacity, loss or task-specific training recipe.
-The planned strategy-on condition must disable model advice and Data Analysis;
+The strategy-on condition disables model advice and Data Analysis;
 the completed strategy-off runs are reused as controls.
 
-V3 is prepared for review but is not yet bound by the existing launcher. The
-legacy Full selector and controller V2 below do not implement the new condition.
+The orchestrator preparation command binds V3 through `--strategy-only`;
+see [the deployment contract](../main_orchestrator/STRATEGY_ONLY.md).
+The legacy Full selector and controller V2 below do not implement this condition.
 Keep historical artifacts unchanged for provenance; do not launch the legacy
 Full condition as a substitute for strategy-only advice.
 

@@ -88,6 +88,9 @@ parallelism. Shared paths still need an actual collision-free ownership plan.
 The generic toolkit documents those effects without selecting a strategy.
 
 An experiment treatment may separately provide controller strategy advice. For
+O-StrategyOnly, follow [the V3 deployment contract](../main_orchestrator/STRATEGY_ONLY.md):
+retain NoPrior's disabled DA and absent model advice, and bind the protected
+prompt supplement at every new outer invocation. For historical
 O-Full, copy the prepared `controller-work-strategy.md` into `run/`, verify the
 digest recorded in `deployment.json`, and link it from `SIDERIUS-RUN.md` for the
 outer controller only. Keep it separate from `run/advice.json`, which serves the

@@ -38,10 +38,24 @@ FULL_LAUNCH_BLOCKERS = (
 )
 
 
-def deployment_status(prior: Prior) -> tuple[str, list[str]]:
+def deployment_status(
+    prior: Prior, *, strategy_only: bool = False
+) -> tuple[str, list[str]]:
     """Return treatment status and the remaining machine-owned launch gates."""
     prior = Prior(prior)
     blockers = list(COMMON_LAUNCH_BLOCKERS)
+    if strategy_only:
+        if prior is not Prior.OFF:
+            raise ValueError(
+                "strategy-only requires prior off: Data Analysis and model advice disabled"
+            )
+        blockers.extend(
+            (
+                "Verify Data Analysis denial and absence of analysis inputs, findings and model advice from the research view.",
+                "Bind the protected V3 prompt supplement at every outer invocation and qualify context recovery.",
+            )
+        )
+        return "strategy_only_v3", blockers
     if prior is Prior.ON:
         blockers.extend(FULL_LAUNCH_BLOCKERS)
         return "frozen_full_v8", blockers
@@ -49,10 +63,19 @@ def deployment_status(prior: Prior) -> tuple[str, list[str]]:
 
 
 def prepare(
-    root: Path, checkout: Path, output: Path, *, prior: Prior, band: str
+    root: Path,
+    checkout: Path,
+    output: Path,
+    *,
+    prior: Prior,
+    band: str,
+    strategy_only: bool = False,
 ) -> dict:
     """Certify pins and native binding, recording unresolved launch requirements."""
     prior = Prior(prior)
+    analysis_policy_status, blockers = deployment_status(
+        prior, strategy_only=strategy_only
+    )
     root, checkout, output = root.resolve(), checkout.resolve(), output.resolve()
     if band not in BANDS:
         raise ValueError(f"unsupported band: {band}")
@@ -105,15 +128,29 @@ def prepare(
             if not key.startswith("_")
         }
         controller_strategy = materialize_controller_strategy(root, output)
+    if strategy_only:
+        controller_strategy = materialize_controller_strategy(
+            root, output, strategy_only=True
+        )
+        from deployments.tidmad_coding_agent_baseline.tools.prompt_supplement import (
+            PromptSupplement,
+        )
+
+        supplement = PromptSupplement(
+            artifact=controller_strategy.artifact,
+            sha256=controller_strategy.sha256,
+        )
+        (output / "prompt-supplement.json").write_text(supplement.to_json())
     llm = root / "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
     (output / "agent-models.json").write_bytes(llm.read_bytes())
-    analysis_policy_status, blockers = deployment_status(prior)
     receipt = {
         "schema_version": 1,
         "status": "operator_preparation_only",
         "launch_ready": False,
         "prior": prior.value,
-        "condition": "O-Full" if prior is Prior.ON else "O-NoPrior",
+        "condition": "O-StrategyOnly"
+        if strategy_only
+        else ("O-Full" if prior is Prior.ON else "O-NoPrior"),
         "band": band,
         "data_scope": {"file_indices": list(BANDS[band])},
         "exp_revision": subprocess.check_output(
@@ -143,13 +180,18 @@ def prepare(
         "agent_visible": False,
         "launch_blockers": blockers,
     }
+    if strategy_only:
+        receipt["prompt_supplement"] = "prompt-supplement.json"
+        receipt["model_advice_enabled"] = False
     (output / "deployment.json").write_text(json.dumps(receipt, indent=2) + "\n")
     return receipt
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--prior", type=Prior, choices=list(Prior), required=True)
+    treatment = parser.add_mutually_exclusive_group(required=True)
+    treatment.add_argument("--prior", type=Prior, choices=list(Prior))
+    treatment.add_argument("--strategy-only", action="store_true")
     parser.add_argument("--band", choices=list(BANDS), required=True)
     parser.add_argument("--siderius-checkout", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -158,8 +200,9 @@ def main() -> int:
         Path(__file__).resolve().parents[3],
         args.siderius_checkout,
         args.output,
-        prior=args.prior,
+        prior=args.prior or Prior.OFF,
         band=args.band,
+        strategy_only=args.strategy_only,
     )
     print(json.dumps(receipt, indent=2))
     return 0
