@@ -77,6 +77,19 @@ validation split twice. Receipts include per-stage timings, exact populations,
 export/restore loss parity and an independent global RMSE calculation.
 This is not an autonomous-agent smoke or a private-worker isolation test.
 
+To qualify the new training policies, pass `--training-config /path/to/train.json`
+containing a bounded native configuration, for example:
+
+```json
+{"epochs":3,"batch_size":17,"lr":0.001,"optimizer_type":"adam","drop_last":false,"checkpoint_selection":"best_validation_loss","target_standardization":"training_pool_global"}
+```
+
+The non-dividing batch size exercises tail retention. The qualification checks
+fitted statistics against the selected training targets, checks all 128 rows in
+each completed epoch, and compares restored predictions against the selected
+checkpoint's validation loss in standardized units. Final scoring remains in
+original units. This tiny model checks execution semantics, not model quality.
+
 Before a formal launch: qualify the real agent loop (including a second
 iteration), effective resource admission, deadline/collection behavior,
 provider credentials and the execution-account boundary; review/freeze the
