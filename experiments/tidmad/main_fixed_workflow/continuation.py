@@ -94,6 +94,7 @@ def run_continuation(
                     policy_path=Path(binding["analysis_policy_path"]),
                     policy_sha256=binding["analysis_policy_sha256"],
                     composition_path=Path(binding["composition_path"]),
+                    model_advice=binding.get("model_advice", True),
                 ),
             )
         else:

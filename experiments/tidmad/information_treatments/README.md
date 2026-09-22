@@ -24,7 +24,26 @@ second experiment switch. An enabled main-workflow treatment remains
 non-launchable until the experiment provides a qualified band-scoped analysis
 binding.
 
-## Frozen Full V8
+`main-fixed-da-only.yaml` enables Data Analysis and literature review while
+explicitly disabling model advice. Prepare and launch with `--condition da-only`;
+see [the fixed-workflow launch guide](../main_fixed_workflow/FULL_LAUNCH.md).
+The completed NoPrior runs are the reused controls; the new treatment does not
+schedule replacement controls or change the frozen task package.
+
+## Strategy-only advice for the next orchestration runs
+
+[Controller work strategy V3](controller-work-strategy-v3.md) contains only
+research organization, adaptive resource use and completion guidance. It has
+no model architecture, capacity, loss or task-specific training recipe.
+The planned strategy-on condition must disable model advice and Data Analysis;
+the completed strategy-off runs are reused as controls.
+
+V3 is prepared for review but is not yet bound by the existing launcher. The
+legacy Full selector and controller V2 below do not implement the new condition.
+Keep historical artifacts unchanged for provenance; do not launch the legacy
+Full condition as a substitute for strategy-only advice.
+
+## Historical frozen Full V8
 
 `main-fixed-full.yaml` now binds the frozen English V8 advice. The shared
 [manifest and four band policies](full-prior-v8/README.md) are the common prior

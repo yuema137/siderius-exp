@@ -104,13 +104,44 @@ def test_preview_does_not_start_clock(recovery):
     assert not (args["unit"] / "continuation.json").exists()
 
 
-def test_full_analysis_binding_is_reused(recovery, monkeypatch):
+def test_full_runtime_refusal_preserves_original_clock_and_results(
+    recovery, monkeypatch
+):
+    args, _, seen = recovery
+    path = args["unit"] / "launch.json"
+    data = json.loads(path.read_text())
+    data["preflight"]["analysis_binding"] = {
+        "analysis_policy_path": "/external/policy.yaml",
+        "analysis_policy_sha256": "a" * 64,
+        "composition_path": "/external/composition.yaml",
+    }
+    path.write_text(json.dumps(data))
+    original = path.read_bytes()
+    result = args["unit"] / "workspace/completed-science.json"
+    result.write_text('{"score":1.0}')
+
+    def unavailable(*a, **kw):
+        raise ValueError("Data Analysis generated-code runtime is unavailable")
+
+    monkeypatch.setattr(c, "resolve_full_launch", unavailable)
+    with pytest.raises(ValueError, match="generated-code runtime is unavailable"):
+        c.run_continuation(**args)
+    assert path.read_bytes() == original
+    assert result.read_text() == '{"score":1.0}'
+    assert not (args["unit"] / "continuation.json").exists()
+    assert not seen
+
+
+@pytest.mark.parametrize("model_advice", [True, False])
+def test_full_analysis_binding_is_reused(recovery, monkeypatch, model_advice):
     args, current, seen = recovery
     binding = {
         "analysis_policy_path": "/external/policy.yaml",
         "analysis_policy_sha256": "a" * 64,
         "composition_path": "/external/composition.yaml",
     }
+    if not model_advice:
+        binding["model_advice"] = False
     path = args["unit"] / "launch.json"
     payload = json.loads(path.read_text())
     payload["preflight"]["analysis_binding"] = binding
@@ -120,6 +151,7 @@ def test_full_analysis_binding_is_reused(recovery, monkeypatch):
 
     def resolve(*a, full_analysis, **kw):
         assert str(full_analysis.policy_path) == binding["analysis_policy_path"]
+        assert full_analysis.model_advice is model_advice
         assert kw["require_fresh_workspace"] is False
         return current
 

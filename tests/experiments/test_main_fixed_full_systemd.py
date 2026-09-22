@@ -10,7 +10,8 @@ def test_full_service_passes_every_required_full_binding() -> None:
     text = (SYSTEMD / "tidmad-full@.service").read_text()
     assert "EnvironmentFile=/etc/tidmad-full/%i.env" in text
     for fragment in (
-        "--condition full",
+        "Environment=INFORMATION_CONDITION=full",
+        "--condition ${INFORMATION_CONDITION}",
         "--analysis-policy ${ANALYSIS_POLICY}",
         "--analysis-policy-sha256 ${ANALYSIS_POLICY_SHA256}",
         "--analysis-composition ${ANALYSIS_COMPOSITION}",

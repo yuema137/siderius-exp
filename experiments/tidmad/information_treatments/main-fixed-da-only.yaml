@@ -1,0 +1,15 @@
+version: siderius-exp-information-treatment-v1
+treatment_id: tidmad-main-fixed-da-only-v1
+task_package: tasks/tidmad
+advice:
+  mode: disabled
+  artifact: null
+  sha256: null
+  content_type: null
+modules:
+  literature_review:
+    siderius: enabled
+    coding_agent: not_applicable
+  data_analysis:
+    siderius: enabled
+    coding_agent: not_applicable

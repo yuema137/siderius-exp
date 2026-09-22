@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 
 from experiments.shared.checksum_manifest import sha256_file
+from experiments.shared.data_analysis_runtime import require_generated_analysis_runtime
 from experiments.shared.fixed_workflow_config import render_siderius_args
 from experiments.shared.framework_pin import (
     verify_framework_pin,
@@ -15,6 +16,7 @@ from experiments.shared.framework_pin import (
 )
 from experiments.tidmad.information_treatments.prior_binding import (
     Prior,
+    resolve_da_only,
     resolve_prior,
 )
 from experiments.tidmad.main_fixed_workflow.band_inputs import BANDS, verify_band_inputs
@@ -71,8 +73,13 @@ def _resolve_launch(
         raise ValueError(f"framework chain launcher is missing: {launcher}")
     data_receipt = verify_band_inputs(root, data, band)
     enabled = full_analysis is not None
-    suffix = "full" if enabled else "no-prior"
-    treatment = resolve_prior(root, Prior.ON if enabled else Prior.OFF)
+    da_only = full_analysis is not None and not full_analysis.model_advice
+    suffix = "da-only" if da_only else ("full" if enabled else "no-prior")
+    treatment = (
+        resolve_da_only(root)
+        if da_only
+        else resolve_prior(root, Prior.ON if enabled else Prior.OFF)
+    )
     workflow = root / "experiments/tidmad/main_fixed_workflow/workflow.json"
     workflow_args = render_siderius_args(
         workflow, repository_root=root, siderius_checkout=checkout
@@ -85,7 +92,12 @@ def _resolve_launch(
             policy_path=full_analysis.policy_path,
             policy_sha256=full_analysis.policy_sha256,
             composition_path=full_analysis.composition_path,
+            model_advice=full_analysis.model_advice,
         )
+        # Full permits generated analysis. Refuse an incomplete deployment
+        # before publishing either the initial or continuation clock. Keep
+        # ephemeral host observations out of the immutable launch identity.
+        require_generated_analysis_runtime(checkout)
         workflow_args[workflow_args.index("--task_composition") + 1] = analysis_receipt[
             "composition_path"
         ]

@@ -40,6 +40,17 @@ qualification. This is a test-selection and launch-readiness failure.
    child failure separately; do not disable all retries to hide the defect.
 4. Inspect NRestarts, last completed iteration/attempt, score timestamp, stage and
    repeated errors. Active service, GPU use or a changing log alone is insufficient.
+5. For Full, require a successful generated-analysis program as well as reference
+   skills. A previous Full deployment lacked `bubblewrap`: reference skills
+   succeeded, but every generated program was refused before materialization.
+   Under the execution UID and service restrictions, run the native readiness
+   check documented in [Full launch](FULL_LAUNCH.md), then from the exact infra
+   checkout run `REQUIRE_ANALYSIS_SANDBOX=1 .venv/bin/python -m pytest -q
+   tests/unit/agent/data_analysis/test_analysis_code_sandbox.py`.
+   Record successful authorized-input and artifact witnesses, plus refusal
+   cases. These synthetic checks require no training or model calls. Missing
+   dependencies, blocked namespaces, failures or skips do not qualify the host.
+   Recheck each deployed host; one host's result cannot qualify another.
 
 Local service-boundary check, from this checkout's own frozen environment:
 
