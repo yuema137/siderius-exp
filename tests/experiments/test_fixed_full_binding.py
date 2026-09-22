@@ -53,6 +53,10 @@ def test_full_preflight_enables_prior_without_changing_shared_workflow(
     monkeypatch.setattr(preflight, "verify_framework_pin", lambda *_: "a" * 40)
     monkeypatch.setattr(preflight, "verify_installed_framework", lambda *_: None)
     monkeypatch.setattr(preflight, "verify_band_inputs", lambda *_: {"band": "0-3"})
+    runtime_checks = []
+    monkeypatch.setattr(
+        preflight, "require_generated_analysis_runtime", runtime_checks.append
+    )
     checkout = tmp_path / "infra"
     launcher = checkout / "scripts/launch/run_chain.sh"
     launcher.parent.mkdir(parents=True)
@@ -78,6 +82,7 @@ def test_full_preflight_enables_prior_without_changing_shared_workflow(
         ROOT, checkout, full_analysis=binding, **kwargs
     )
     no_prior = preflight.resolve_no_prior_launch(ROOT, checkout, **kwargs)
+    assert runtime_checks == [checkout]
     command = full["command"]
     assert command.count("--task_composition") == 1
     assert command[command.index("--task_composition") + 1] == str(composition_path)
@@ -106,3 +111,17 @@ def test_full_preflight_enables_prior_without_changing_shared_workflow(
     policy_path.write_text(policy_path.read_text() + "\n# changed after binding\n")
     with pytest.raises(ValueError, match="bound digest"):
         preflight.resolve_full_launch(ROOT, checkout, full_analysis=binding, **kwargs)
+    assert runtime_checks == [checkout]
+
+    policy_path.write_text(
+        policy_path.read_text().removesuffix("\n# changed after binding\n")
+    )
+
+    def unavailable(_checkout):
+        raise ValueError("generated-code runtime is unavailable")
+
+    monkeypatch.setattr(preflight, "require_generated_analysis_runtime", unavailable)
+    with pytest.raises(ValueError, match="generated-code runtime is unavailable"):
+        preflight.resolve_full_launch(ROOT, checkout, full_analysis=binding, **kwargs)
+    # NoPrior never depends on generated-analysis sandbox availability.
+    assert preflight.resolve_no_prior_launch(ROOT, checkout, **kwargs) == no_prior

@@ -104,6 +104,34 @@ def test_preview_does_not_start_clock(recovery):
     assert not (args["unit"] / "continuation.json").exists()
 
 
+def test_full_runtime_refusal_preserves_original_clock_and_results(
+    recovery, monkeypatch
+):
+    args, _, seen = recovery
+    path = args["unit"] / "launch.json"
+    data = json.loads(path.read_text())
+    data["preflight"]["analysis_binding"] = {
+        "analysis_policy_path": "/external/policy.yaml",
+        "analysis_policy_sha256": "a" * 64,
+        "composition_path": "/external/composition.yaml",
+    }
+    path.write_text(json.dumps(data))
+    original = path.read_bytes()
+    result = args["unit"] / "workspace/completed-science.json"
+    result.write_text('{"score":1.0}')
+
+    def unavailable(*a, **kw):
+        raise ValueError("Data Analysis generated-code runtime is unavailable")
+
+    monkeypatch.setattr(c, "resolve_full_launch", unavailable)
+    with pytest.raises(ValueError, match="generated-code runtime is unavailable"):
+        c.run_continuation(**args)
+    assert path.read_bytes() == original
+    assert result.read_text() == '{"score":1.0}'
+    assert not (args["unit"] / "continuation.json").exists()
+    assert not seen
+
+
 def test_full_analysis_binding_is_reused(recovery, monkeypatch):
     args, current, seen = recovery
     binding = {

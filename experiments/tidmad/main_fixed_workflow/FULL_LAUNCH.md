@@ -29,6 +29,27 @@ cannot authorize a changed policy.
 
 Preview (no clock or run starts):
 
+Full also requires the generated-analysis Linux sandbox. Install `bubblewrap`
+and `util-linux` on the execution host and qualify namespace permissions under
+the actual service UID, environment and service restrictions. A Python install
+or successful reference analysis alone is not sufficient. The Full preview,
+fresh start, restart and reviewed continuation all execute the native framework
+sandbox probe before publishing a clock or launching the chain. NoPrior does
+not require this capability. Host readiness is checked live and is not added
+to the frozen scientific launch identity.
+
+For an isolated readiness check from this experiment checkout:
+
+```bash
+.venv/bin/python -m experiments.shared.data_analysis_runtime \
+  --siderius-checkout /path/to/pinned/infra
+```
+
+This calls the framework checkout's own `.venv/bin/python`; it reads no task
+data, starts no experiment clock and makes no model requests. A refusal must
+be repaired before launch. Also complete the short generated-program execution
+witness in [smoke qualification](SMOKE_QUALIFICATION.md).
+
 ```bash
 experiments/tidmad/main_fixed_workflow/launch.sh \
   --condition full --siderius-checkout /path/to/pinned/infra \

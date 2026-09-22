@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 
 from experiments.shared.checksum_manifest import sha256_file
+from experiments.shared.data_analysis_runtime import require_generated_analysis_runtime
 from experiments.shared.fixed_workflow_config import render_siderius_args
 from experiments.shared.framework_pin import (
     verify_framework_pin,
@@ -86,6 +87,10 @@ def _resolve_launch(
             policy_sha256=full_analysis.policy_sha256,
             composition_path=full_analysis.composition_path,
         )
+        # Full permits generated analysis. Refuse an incomplete deployment
+        # before publishing either the initial or continuation clock. Keep
+        # ephemeral host observations out of the immutable launch identity.
+        require_generated_analysis_runtime(checkout)
         workflow_args[workflow_args.index("--task_composition") + 1] = analysis_receipt[
             "composition_path"
         ]

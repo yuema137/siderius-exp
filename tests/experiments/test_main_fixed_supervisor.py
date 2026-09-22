@@ -18,6 +18,41 @@ from experiments.tidmad.main_fixed_workflow.unit_clock import (
 )
 
 
+def test_full_runtime_refusal_precedes_clock_and_chain(tmp_path, monkeypatch):
+    from experiments.shared.data_analysis_runtime import (
+        require_generated_analysis_runtime,
+    )
+    from experiments.tidmad.main_fixed_workflow.full_binding import FullAnalysisInputs
+
+    unit = tmp_path / "unit"
+    monkeypatch.setattr(Path, "is_mount", lambda *_: True)
+
+    def unavailable(root, checkout, **kwargs):
+        require_generated_analysis_runtime(checkout)
+
+    monkeypatch.setattr(supervisor, "resolve_full_launch", unavailable)
+    monkeypatch.setattr(
+        supervisor, "_run_chain", lambda *a: pytest.fail("chain started")
+    )
+    with pytest.raises(ValueError, match="environment is missing"):
+        supervisor.run_unit(
+            root=tmp_path / "exp",
+            checkout=tmp_path / "infra",
+            band="0-3",
+            data_dir=tmp_path / "data",
+            unit_dir=unit,
+            run_name="full",
+            launch=True,
+            full_analysis=FullAnalysisInputs(
+                policy_path=tmp_path / "policy.yaml",
+                policy_sha256="a" * 64,
+                composition_path=tmp_path / "composition.yaml",
+            ),
+        )
+    assert not (unit / "launch.json").exists()
+    assert not (unit / "workspace").exists()
+
+
 @pytest.mark.parametrize(
     "code,marker,expected", [(3, False, 3), (1, True, 3), (1, False, 1), (0, False, 0)]
 )
