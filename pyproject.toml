@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Private scientific tasks and experiment campaigns for SIDERIUS"
 requires-python = ">=3.12"
 dependencies = [
-    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@ac0ac2befd3d239e218c9a92c91fb195fa286233",
+    "siderius @ git+https://github.com/Galileo-Sandbox/SIDERIUS.git@0fb88762798f2567db2294c4e6e3330f43672237",
     "torch==2.10.0",
 ]
 
