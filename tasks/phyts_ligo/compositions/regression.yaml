@@ -1,0 +1,33 @@
+task_data_path:
+  file: ../../shared/prepared_regression.py
+  symbol: LigoDataPath
+  id: phyts_ligo_chirp_mass
+  config:
+    declaration_path:
+      ref: ../declared/prepared.json
+dataset_profile:
+  config: ../declared/dataset_profile.json
+metric:
+  declaration: ../declared/metric_r2.json
+  implementation:
+    file: ../../shared/regression_metrics.py
+    symbol: RegressionR2
+  scoreability_contracts:
+    prepared_scalar_predictions:
+      file: ../../shared/prepared_regression.py
+      symbol: PreparedPredictionScoreability
+secondary_metrics:
+- declaration: ../declared/metric_rmse.json
+  implementation:
+    file: ../../shared/regression_metrics.py
+    symbol: RegressionRmse
+  scoreability_contracts:
+    prepared_scalar_predictions:
+      file: ../../shared/prepared_regression.py
+      symbol: PreparedPredictionScoreability
+task_health:
+  none: true
+interpretation_blocks:
+  none: true
+task_config:
+  config: ../declared/task_config.yaml

@@ -1,0 +1,30 @@
+# NoPrior disables advice and data analysis, not literature search.
+# No operator-selected model recipe or root paper is injected.
+enabled: false
+root_papers: []
+dynamic_search:
+  enabled: true
+  max_rounds: 3
+  initial_verbosity: 0
+  escalation_allowed: true
+  results_per_query: 10
+  max_escalations_per_round: 2
+findings_verbosity: 1
+synthesis:
+  transfer_tolerance: moderate
+confidence_rubric:
+  omit_below: 0.4
+  abstract_only_ceiling: 0.79
+  bands:
+  - lower: 0.8
+    upper: 1.0
+    criteria: Deep-read evidence directly applicable to the declared scientific task,
+      with a specific mechanism and explicit limits.
+  - lower: 0.6
+    upper: 0.79
+    criteria: Deep-read evidence with a justified transfer mechanism, or an on-domain
+      abstract with specific supporting results.
+  - lower: 0.4
+    upper: 0.59
+    criteria: Abstract-only or cross-domain evidence with a plausible but unvalidated
+      transfer rationale.

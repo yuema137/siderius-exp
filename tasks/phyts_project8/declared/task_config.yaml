@@ -1,0 +1,44 @@
+task_description: 'Estimate electron kinetic energy from one simulated CRES event. Channels are output_ts_I
+  + output_ts_I_cav_noise and output_ts_Q + output_ts_Q_cav_noise, retaining all 24576 samples at 403
+  MHz. Each event/channel has its own mean subtracted and is divided by its population standard deviation,
+  then cast to float32. A constant channel becomes zero. No FFT, crop, clean signal, separate noise, or
+  auxiliary truth parameters are available to the model. The target is energy_eV in eV.
+
+  Preprocessing follows the owner-supplied PhyTS paper and is already materialized. The released training
+  and validation splits are preserved. The full training split is the available pool; select training
+  fractions within the experiment budget. Predict one scalar in physical units for each example. Any target
+  standardization must use training statistics only and be inverted inside the exported model. The primary
+  selection metric is global validation R2 (higher is better); global RMSE is also reported. Formal scoring
+  uses all validation examples; per-epoch validation loss uses the fixed 10% subset. Test data are absent.
+  Paper test scores and campaign validation scores describe different populations.'
+forward_contract:
+  model_io:
+    input:
+      axes:
+      - role: batch
+        dimension:
+          symbolic: B
+      - dimension:
+          fixed: 2
+      - dimension:
+          fixed: 24576
+      dtype:
+        admissible:
+        - float32
+    output:
+      axes:
+      - role: batch
+        dimension:
+          symbolic: B
+      - dimension:
+          fixed: 1
+      dtype:
+        admissible:
+        - float32
+  segmentation_applicability: not_applicable
+  input_description: Prepared float32 [B, 2, 24576] observations; no additional mandatory preprocessing.
+  output_description: Float32 [B, 1] predictions of energy_eV in physical eV.
+  task_type: regression
+  output_head_note: Return exactly one scalar per example. Internal normalization is allowed; exported
+    outputs must be in physical units.
+  task_note: Sample identifiers align predictions and targets; they are not model features.
