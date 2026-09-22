@@ -29,6 +29,12 @@ import and deliver advice without site-packages, matching its bare-venv install.
 Pin/environment checks are bypassed in the per-band unit preparation fixture;
 that fixture is not a certificate of a deployed release.
 
+A separate unmocked CLI preparation then passed for all four bands at candidate
+`7329cbaa5f1a7590f580e6f952f2c5fe69ca8491`, using a clean source checkout at
+the exact infra pin and this exp checkout's own frozen environment. All four
+receipts resolve V3, no native analysis binding and empty model-advice routing.
+This certifies preparation, not deployment of the systemd launch command.
+
 ## Real bounded recovery witness
 
 The operator explicitly authorized sending controller V3 and synthetic drill
