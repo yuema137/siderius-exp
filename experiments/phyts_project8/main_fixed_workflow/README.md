@@ -45,8 +45,9 @@ original target units. Statistics travel with the checkpoint and fitting time
 counts toward the attempt budget. Constant or nonfinite targets fail explicitly.
 This does not change the frozen dataset or preprocessing.
 
-These policies are staged against the repair branches. Review, CI, deployment
-qualification and a final released dependency pin remain required before launch.
+These policies are bound to infra `v0.2.13`. Local native GPU qualification
+has passed; archive verification and deployment readiness remain required
+before any fresh formal launch.
 
 Both Trial and Formal export the earliest checkpoint with minimum loss on
 their fixed training-validation snapshot, through the workflow rule
