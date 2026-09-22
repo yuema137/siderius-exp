@@ -1,11 +1,12 @@
 # PhyTS project8: NoPrior fixed workflow
 
 This experiment binds [the prepared task](../../../tasks/phyts_project8/README.md)
-to the native fixed workflow. It is in deployment qualification; no formal
-campaign has started and the production launcher is being qualified.
+to the native fixed workflow. Deployment status and historical run receipts
+are tracked separately from this experiment configuration.
 
 - [workflow.json](workflow.json): one Trial followed by one Formal per proposal,
-  agent-controlled training fractions, fixed 10% epoch-loss validation, full
+  agent-controlled Trial training fractions, full-pool full-epoch Formal training,
+  fixed 10% epoch-loss validation, full
   Formal validation, and the requested stage time/VRAM limits.
 - [agents.json](agents.json): OpenAI gpt-5.6-sol, medium reasoning, through the
   framework gateway.
@@ -20,6 +21,20 @@ The 100-epoch ceiling inherits the framework limit; it does not force the studen
 20-epoch recipe. The campaign clock is 24 hours;
 Trial/Formal wall-clock and VRAM values are declared once in workflow.json.
 No final offline test evaluation is enabled.
+
+## Formal training data policy
+
+New runs use operator-owned Formal training scope with `formal_portion=1.0`
+and `formal_train_portion=1.0`: all 40,000 prepared training events belong to
+the pool, and each complete epoch trains on all of them. Trial sampling remains
+agent-controlled. Epoch validation uses its fixed 10% snapshot; final Formal
+evaluation uses all 5,000 validation events. Time budgets and epoch caps still
+determine how many complete epochs fit.
+
+This policy supersedes the agent-owned Formal fractions used by run-2, which
+was stopped for diagnosis. Historical results and workspaces retain their
+original settings; this change requires a fresh run and does not authorize a
+restart by itself. The frozen task, splits and preprocessing are unchanged.
 
 ## Native short qualification
 
