@@ -21,6 +21,7 @@ from experiments.tidmad.main_fixed_workflow.preflight import (
     resolve_no_prior_launch,
 )
 from experiments.tidmad.main_fixed_workflow.unit_clock import (
+    ContinuationRecord,
     LaunchRecord,
     create_launch_record,
     read_launch_record,
@@ -73,7 +74,7 @@ def _append_event(path: Path, event: dict[str, object]) -> None:
         os.close(descriptor)
 
 
-def _run_chain(record: LaunchRecord, unit_dir: Path) -> int:
+def _run_chain(record: LaunchRecord | ContinuationRecord, unit_dir: Path) -> int:
     """Start or resume the same chain; kill its process group at the deadline."""
 
     remaining = record.deadline_epoch - time.time()
