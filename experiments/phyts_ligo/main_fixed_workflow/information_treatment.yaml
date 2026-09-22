@@ -1,0 +1,13 @@
+version: siderius-exp-information-treatment-v1
+treatment_id: phyts-ligo-fixed-no-prior
+task_package: tasks/phyts_ligo
+advice:
+  mode: disabled
+  artifact: null
+  sha256: null
+  content_type: null
+modules:
+  data_analysis:
+    siderius: disabled
+  literature_review:
+    siderius: enabled

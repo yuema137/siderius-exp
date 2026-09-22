@@ -14,6 +14,8 @@ README explains the contract at a human level and links to the exact files.
 | [`davis_future_prediction`](davis_future_prediction/) | video-frame prediction | [`STATUS.md`](davis_future_prediction/STATUS.md) |
 | [`cancer_gene_identification`](cancer_gene_identification/) | cancer-gene ranking | [`STATUS.md`](cancer_gene_identification/STATUS.md) |
 | [`phyts_tess`](phyts_tess/) | stellar rotation regression | [`STATUS.md`](phyts_tess/STATUS.md) |
+| [`phyts_ligo`](phyts_ligo/) | chirp-mass regression | [`README.md`](phyts_ligo/README.md) |
+| [`phyts_project8`](phyts_project8/) | electron-energy regression | [`README.md`](phyts_project8/README.md) |
 
 Each directory is a static scientific task package consumed through SIDERIUS
 task-composition and plugin contracts. Task packages own dataset identity and

@@ -1,0 +1,32 @@
+{
+  "partition_count": 1,
+  "anchor_selection_files": [
+    0
+  ],
+  "health_peek_files": [
+    0
+  ],
+  "topology": {
+    "modality": "multivariate_time_series",
+    "partition_unit": "prepared_array",
+    "sample_unit": "one independent event",
+    "scope_authority": "declared/prepared.json",
+    "populations": {
+      "train": 40000,
+      "validation": 5000
+    },
+    "input_tensor": {
+      "shape": [
+        2,
+        24576
+      ],
+      "dtype": "float32",
+      "layout": "CL"
+    },
+    "target": {
+      "name": "energy_eV",
+      "unit": "eV"
+    },
+    "preprocessing": "Frozen external arrays; see task_config.yaml. Runtime performs no raw-data preprocessing."
+  }
+}

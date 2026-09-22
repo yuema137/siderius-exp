@@ -1,0 +1,44 @@
+task_description: 'Estimate binary-neutron-star chirp mass from H1/L1 whitened detector observations containing
+  injected signals. Each prepared sample is whitened_injected[:, 15104:16128], the fixed [59, 63) second
+  window at 256 Hz. Inputs are float32, two channels of 1024 samples. No per-example amplitude normalization
+  is applied. The target is stored chirp_mass in solar masses. Source masses, SNR, clean signals, backgrounds,
+  and other simulation parameters are excluded from model inputs.
+
+  Preprocessing follows the owner-supplied PhyTS paper and is already materialized. The released training
+  and validation splits are preserved. The full training split is the available pool; select training
+  fractions within the experiment budget. Predict one scalar in physical units for each example. Any target
+  standardization must use training statistics only and be inverted inside the exported model. The primary
+  selection metric is global validation R2 (higher is better); global RMSE is also reported. Formal scoring
+  uses all validation examples; per-epoch validation loss uses the fixed 10% subset. Test data are absent.
+  Paper test scores and campaign validation scores describe different populations.'
+forward_contract:
+  model_io:
+    input:
+      axes:
+      - role: batch
+        dimension:
+          symbolic: B
+      - dimension:
+          fixed: 2
+      - dimension:
+          fixed: 1024
+      dtype:
+        admissible:
+        - float32
+    output:
+      axes:
+      - role: batch
+        dimension:
+          symbolic: B
+      - dimension:
+          fixed: 1
+      dtype:
+        admissible:
+        - float32
+  segmentation_applicability: not_applicable
+  input_description: Prepared float32 [B, 2, 1024] observations; no additional mandatory preprocessing.
+  output_description: Float32 [B, 1] predictions of chirp_mass in physical solar masses.
+  task_type: regression
+  output_head_note: Return exactly one scalar per example. Internal normalization is allowed; exported
+    outputs must be in physical units.
+  task_note: Sample identifiers align predictions and targets; they are not model features.

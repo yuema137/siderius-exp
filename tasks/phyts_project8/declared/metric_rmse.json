@@ -1,0 +1,11 @@
+{
+  "id": "rmse",
+  "direction": "lower",
+  "aggregation": "global_over_exact_evaluation_scope",
+  "scoreability": {
+    "contract_id": "prepared_scalar_predictions"
+  },
+  "references": [],
+  "transform": null,
+  "transform_params": {}
+}
