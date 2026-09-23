@@ -44,6 +44,12 @@ Strategy-only emits only `controller-work-strategy.md` and
 [strategy-only deployment contract](STRATEGY_ONLY.md) for protected assembly,
 per-invocation delivery and the DA exclusion checks required before launch.
 
+DA-only (`--data-analysis-only`) adds only the frozen analysis policy and native
+analysis binding to NoPrior. No model advice, controller strategy or prompt
+supplement is produced. See the [DA-only deployment contract](DA_ONLY.md) for
+physical visibility and per-host comparison with the archived NoPrior scorer,
+data and execution conditions.
+
 **Do not mount this output or the whole exp repository into the coding agent.**
 The operator composition references private scorer code. Assemble a separate
 agent-visible overlay onto the existing frozen common public view using

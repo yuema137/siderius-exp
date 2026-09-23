@@ -14,6 +14,7 @@ from experiments.shared.framework_pin import (
     verify_framework_pin,
     verify_installed_framework,
 )
+from experiments.tidmad.information_treatments.prior_binding import resolve_da_only
 from experiments.tidmad.main_fixed_workflow.band_inputs import BANDS
 from experiments.tidmad.main_orchestrator.execution_policy import (
     resolve_execution_policy,
@@ -39,11 +40,22 @@ FULL_LAUNCH_BLOCKERS = (
 
 
 def deployment_status(
-    prior: Prior, *, strategy_only: bool = False
+    prior: Prior, *, strategy_only: bool = False, data_analysis_only: bool = False
 ) -> tuple[str, list[str]]:
     """Return treatment status and the remaining machine-owned launch gates."""
     prior = Prior(prior)
     blockers = list(COMMON_LAUNCH_BLOCKERS)
+    if data_analysis_only:
+        if prior is not Prior.OFF or strategy_only:
+            raise ValueError("data-analysis-only requires prior off and strategy off")
+        blockers.extend(
+            (
+                "Verify the frozen input-only analysis policy and generated-program execution as the research UID.",
+                "Verify model advice, controller strategies, prompt supplements and previous findings are inaccessible.",
+                "Compare the installed scorer, Health, inference and finalizer with archived NoPrior on every host.",
+            )
+        )
+        return "frozen_da_only_v1", blockers
     if strategy_only:
         if prior is not Prior.OFF:
             raise ValueError(
@@ -70,11 +82,12 @@ def prepare(
     prior: Prior,
     band: str,
     strategy_only: bool = False,
+    data_analysis_only: bool = False,
 ) -> dict:
     """Certify pins and native binding, recording unresolved launch requirements."""
     prior = Prior(prior)
     analysis_policy_status, blockers = deployment_status(
-        prior, strategy_only=strategy_only
+        prior, strategy_only=strategy_only, data_analysis_only=data_analysis_only
     )
     root, checkout, output = root.resolve(), checkout.resolve(), output.resolve()
     if band not in BANDS:
@@ -87,7 +100,10 @@ def prepare(
         raise ValueError("deployment artifacts must be outside protected repositories")
     revision = verify_framework_pin(root, checkout)
     verify_installed_framework(revision, root)
-    treatment = resolve_prior(root, prior)
+    treatment = (
+        resolve_da_only(root) if data_analysis_only else resolve_prior(root, prior)
+    )
+    analysis_enabled = prior is Prior.ON or data_analysis_only
     execution, workflow_digest = resolve_execution_policy(root, checkout)
     # Bind before registry-bearing native imports; preparation is operator-owned.
     from core.generated_library import bind_generated_library_to_workspace
@@ -100,7 +116,7 @@ def prepare(
     execution_path = output / "execution-policy.json"
     execution_path.write_text(execution.model_dump_json(indent=2) + "\n")
     analysis_path = None
-    if prior is Prior.ON:
+    if analysis_enabled:
         analysis_path = output / "analysis-policy.yaml"
         policy = candidate_analysis_policy(root, band)
         analysis_path.write_text(
@@ -111,8 +127,10 @@ def prepare(
         yaml.safe_dump(composition_overlay(root, analysis_path), sort_keys=False)
     )
     binding = compose_run_task_bindings(str(composition))
-    if (binding.data_analysis is not None) != (prior is Prior.ON):
-        raise ValueError("native analysis binding disagrees with the prior switch")
+    if (binding.data_analysis is not None) != analysis_enabled:
+        raise ValueError(
+            "native analysis binding disagrees with the information treatment"
+        )
     advice_routing = {}
     controller_strategy = None
     if prior is Prior.ON:
@@ -150,7 +168,11 @@ def prepare(
         "prior": prior.value,
         "condition": "O-StrategyOnly"
         if strategy_only
-        else ("O-Full" if prior is Prior.ON else "O-NoPrior"),
+        else (
+            "O-DAOnly"
+            if data_analysis_only
+            else ("O-Full" if prior is Prior.ON else "O-NoPrior")
+        ),
         "band": band,
         "data_scope": {"file_indices": list(BANDS[band])},
         "exp_revision": subprocess.check_output(
@@ -161,7 +183,7 @@ def prepare(
         "wrapper_revision": revision,
         "fixed_information_authority": treatment.receipt(),
         "literature_review_enabled": True,
-        "data_analysis_enabled": prior is Prior.ON,
+        "data_analysis_enabled": analysis_enabled,
         "native_analysis_binding_resolved": binding.data_analysis is not None,
         "analysis_policy_status": analysis_policy_status,
         "analysis_policy_sha256": sha256_file(analysis_path) if analysis_path else None,
@@ -183,6 +205,8 @@ def prepare(
     if strategy_only:
         receipt["prompt_supplement"] = "prompt-supplement.json"
         receipt["model_advice_enabled"] = False
+    if data_analysis_only:
+        receipt["model_advice_enabled"] = False
     (output / "deployment.json").write_text(json.dumps(receipt, indent=2) + "\n")
     return receipt
 
@@ -192,6 +216,7 @@ def main() -> int:
     treatment = parser.add_mutually_exclusive_group(required=True)
     treatment.add_argument("--prior", type=Prior, choices=list(Prior))
     treatment.add_argument("--strategy-only", action="store_true")
+    treatment.add_argument("--data-analysis-only", action="store_true")
     parser.add_argument("--band", choices=list(BANDS), required=True)
     parser.add_argument("--siderius-checkout", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -203,6 +228,7 @@ def main() -> int:
         prior=args.prior or Prior.OFF,
         band=args.band,
         strategy_only=args.strategy_only,
+        data_analysis_only=args.data_analysis_only,
     )
     print(json.dumps(receipt, indent=2))
     return 0

@@ -43,6 +43,19 @@ def public_analysis_composition(frozen_input: Path, analysis_path: Path) -> dict
     view. The compact training adapter retains its own identity and manifest.
     """
     payload = composition_overlay(frozen_input, analysis_path)
+    payload["task_data_path"] = {
+        "file": str(Path(__file__).with_name("compact_training.py").resolve()),
+        "symbol": "frozen_analysis_data_path",
+        "id": payload["task_data_path"]["id"],
+        "config": {
+            "frozen_manifest": str(
+                (
+                    frozen_input
+                    / "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml"
+                ).resolve()
+            )
+        },
+    }
     payload["metric"]["implementation"] = {
         "module": "execute_tools.evaluation_metric",
         "symbol": "CandidateEvaluationMetric",

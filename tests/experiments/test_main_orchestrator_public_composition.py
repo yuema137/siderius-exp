@@ -6,6 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 from experiments.tidmad.main_orchestrator.public_composition import (
@@ -90,3 +91,59 @@ def test_full_overlay_composes_with_frozen_analysis_policy(tmp_path):
     assert isinstance(composition.task_data_path, TaskAnalysisCapability)
     assert composition.task_data_path.task_data_path_id == "tidmad_frozen_training_pool"
     assert composition.metric.spec.id == "tidmad_denoising_score"
+
+
+@pytest.mark.parametrize("order", [("training", "analysis"), ("analysis", "training")])
+def test_training_and_analysis_share_frozen_plugin_identity(tmp_path, order, monkeypatch):
+    monkeypatch.setattr(sys, "dont_write_bytecode", True)
+    from core.generated_library import bind_generated_library_to_workspace
+    from execute_tools.task_registration_scope import run_registration_scope
+    from workflows.task_composition import compose_run_task_bindings
+
+    from experiments.tidmad.information_treatments.frozen_prior import (
+        full_analysis_policy,
+    )
+
+    root = Path(__file__).resolve().parents[2]
+    public = tmp_path / "frozen"
+    shutil.copytree(
+        root / "tasks/tidmad",
+        public / "tasks/tidmad",
+        ignore=shutil.ignore_patterns("__pycache__"),
+    )
+    (public / "tasks/tidmad/runtime/scoring.py").unlink()
+    before = {
+        str(p.relative_to(public)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in public.rglob("*")
+        if p.is_file()
+    }
+    policy = tmp_path / "analysis-policy.yaml"
+    policy.write_text(
+        yaml.safe_dump(full_analysis_policy(root, "0-3").model_dump(mode="json"))
+    )
+    manifests = {}
+    for name, payload in {
+        "training": public_candidate_composition(public),
+        "analysis": public_analysis_composition(public, policy),
+    }.items():
+        manifests[name] = tmp_path / (name + ".yaml")
+        manifests[name].write_text(yaml.safe_dump(payload))
+    bind_generated_library_to_workspace(tmp_path / "state")
+    with run_registration_scope():
+        bindings = {
+            name: compose_run_task_bindings(str(manifests[name])) for name in order
+        }
+        assert bindings["training"].data_analysis is None
+        assert bindings["analysis"].data_analysis is not None
+        assert (
+            bindings["training"].task_data_path._delegate
+            is bindings["analysis"].task_data_path
+        )
+        # Repeated switching must retain the same frozen implementation.
+        for name in reversed(order):
+            compose_run_task_bindings(str(manifests[name]))
+    assert before == {
+        str(p.relative_to(public)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in public.rglob("*")
+        if p.is_file()
+    }

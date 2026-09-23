@@ -1,7 +1,7 @@
 # TIDMAD orchestrator information-treatment scope
 
 Operator decision: 2026-09-18. This is an additive experiment declaration for
-O-Full, O-NoPrior and the subsequent O-StrategyOnly condition, not a change to
+O-Full, O-NoPrior and the subsequent O-StrategyOnly and O-DAOnly conditions, not a change to
 the frozen common task or generic toolbox.
 Read it together with `SIDERIUS-RUN.md` in the assembled agent workspace.
 
@@ -24,6 +24,7 @@ Preserve every common input file, including its original treatment and provenanc
 | --- | --- | --- | --- | --- |
 | O-Full / prior on | Enabled | Exact declared artifact at `run/advice.json` | Exact declared artifact at `run/controller-work-strategy.md`, outer controller only | Enabled |
 | O-NoPrior / prior off | Disabled, no findings injection | Absent | Absent | Enabled |
+| O-DAOnly / data-analysis-only | Enabled, frozen input-only policy | Absent | Absent | Enabled |
 | O-StrategyOnly / strategy-only | Disabled, no findings injection | Absent | Exact V3 artifact at `run/controller-work-strategy.md`, outer controller only | Enabled |
 
 These paths are relative to the assembled agent workspace containing
@@ -43,6 +44,10 @@ setup error before the affected operation; do not infer Full from nearby files.
 O-StrategyOnly explicitly authorizes only controller V3 advice. It inherits
 NoPrior's DA and model-advice exclusions. See [its deployment contract](STRATEGY_ONLY.md).
 It is not a partial deployment of historical Full.
+
+O-DAOnly authorizes the dedicated analysis capability and its new findings only.
+It inherits NoPrior's model-advice and controller-strategy exclusions. See the
+[DA-only deployment contract](DA_ONLY.md). No strategy prompt supplement is supplied.
 
 ## Narrow effect and remaining requirements
 

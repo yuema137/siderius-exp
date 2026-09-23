@@ -13,6 +13,16 @@ from execute_tools.task_data_path import EpochSamplingParams, StorageReadScope
 from workflows.task_composition import compose_task_data_path_from_manifest
 
 
+def frozen_analysis_data_path(*, frozen_manifest: str):
+    """Reuse the original frozen plugin identity for analysis and training.
+
+    Loading the same frozen file through a relocated absolute reference gives
+    the generic plugin loader a different module identity. Resolve through the
+    original manifest, exactly as the compact training delegate does.
+    """
+    return compose_task_data_path_from_manifest(frozen_manifest)
+
+
 class CompactFrozenPoolDataPath:
     """Keep original pool/validation semantics; translate training offsets only.
 
