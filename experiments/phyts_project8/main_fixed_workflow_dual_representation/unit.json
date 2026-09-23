@@ -1,0 +1,5 @@
+{
+  "version": "prepared-fixed-unit-v1",
+  "campaign_seconds": 86400,
+  "gpu_name": "H100"
+}

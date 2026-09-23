@@ -26,3 +26,7 @@ No advice or baseline recipe is supplied by this task to a NoPrior agent.
 [The experiment](../../experiments/phyts_project8/main_fixed_workflow/README.md)
 owns budgets and information treatment. Identical preprocessing does not make
 validation scores directly comparable to published test scores.
+
+## New task variant: explicit use of both representations
+
+The separately versioned [time/frequency task](DUAL_REPRESENTATION.md) requires both supplied representations and includes cited physical context. It does not overwrite this original time-input contract.

@@ -1,0 +1,47 @@
+task_description: |-
+  Estimate the starting electron kinetic energy (energy_eV, in eV) of one simulated cyclotron radiation emission spectroscopy (CRES) event. This task explicitly requires both the supplied time-domain and frequency-domain representations to contribute to the prediction during training and inference. Accepting four channels but discarding one representation does not satisfy the task. Choose the architecture and fusion mechanism yourself; describe where each representation enters the model. No named architecture is prescribed.
+
+  Physical context: An electron moving in a magnetic field emits cyclotron radiation. In an ideal uniform field, f_c = |e| B / (2*pi*m_e*gamma), with gamma = 1 + E_kin/(m_e*c^2); at fixed B, higher kinetic energy gives lower cyclotron frequency. Radiation loss can produce a frequency chirp. Starting energy is associated with the beginning of the event, not necessarily with its time-averaged frequency. Pitch angle means the angle between electron momentum and the magnetic field. Orbital motion and detector response can affect the observed spectral structure. These are physical context, not extra measured inputs or a supplied frequency-to-energy calibration. [Project 8 overview, Sec. 3: https://arxiv.org/abs/1703.02037]
+
+  Dataset: PhyTS provides simulated cavity CRES events generated with Kassiopeia particle tracking and Locust RF simulation. The two observations are in-phase (I) and quadrature (Q) readouts of the same event, not independent examples. The input source is output_ts_I + output_ts_I_cav_noise and output_ts_Q + output_ts_Q_cav_noise. Use the frequency-dependent cavity noise condition, not the alternative Gaussian noise fields. Each event has 24576 samples per channel at 403 MHz (about 61 microseconds). Simulated energies span about 100 eV; pitch angle and radial position vary across events. The cavity response and noise vary with frequency. Temporal/phase structure may carry information about electron motion and position that a magnitude-only spectral summary discards. [Owner-supplied PhyTS manuscript, Secs. 3.4 and 5, Appendix A/Table 7; Locust: https://arxiv.org/abs/1907.11124]
+
+  Prepared input: float32 [B,4,24576], ordered as time_I, time_Q, fft_real, fft_imag. The first two channels are the full noisy I/Q traces, individually centered and divided by their per-event population standard deviation; a constant channel becomes zero. Their original amplitude scales and offsets are not available. The next two channels are the real and imaginary parts of FFT(time_I + 1j*time_Q, norm='ortho'), computed over the entire event and stored in float32. The complex spectrum is full, unshifted and not cropped or converted to magnitude-only. There is no second frequency-domain normalization. These representations contain the same observed information up to numerical precision; FFT does not introduce labels or additional measurements.
+
+  Axis semantics: the last axis is sample time for channels 0:2 and frequency-bin index for channels 2:4. Equal indices across the two pairs do not denote the same physical coordinate. Time spacing is 1/403000000 seconds; the FFT frequencies are numpy.fft.fftfreq(24576, d=1/403000000), with spacing about 16.398 kHz and both positive and negative bins. Preserve the declared I + iQ convention. The sampled readout-frequency axis is not a calibrated absolute cyclotron-frequency axis; do not invent a magnetic field, receiver offset, or per-event calibration to plug into the ideal formula. The bin spacing alone is not an absolute limit on learned frequency estimation accuracy.
+
+  Allowed information and evaluation: Only the prepared noisy inputs are model features. Clean signals, separate noise arrays, start/average carrier frequency, axial frequency, pitch angle, radius, track slope, and all other simulation truth fields are unavailable as input features or auxiliary labels. energy_eV is the supervised training target only; do not read validation targets or fit preprocessing on them. Identifiers and row order are not features. Predict exactly one scalar in physical eV. Target standardization must use training statistics only and be inverted in the exported model. Original train/validation split and row order are preserved; test data are absent. Global validation R2 is the primary score and RMSE is also reported. Per-epoch validation loss uses the fixed 10% snapshot; final Formal scoring uses all validation examples. Workflow configuration owns training fractions and budgets.
+
+  This is a separately versioned dual-representation task. It adds an explicit FFT view and a both-representations requirement to the earlier time-domain task; it is not a claim of exact reproduction of a published baseline protocol.
+forward_contract:
+  model_io:
+    input:
+      axes:
+      - role: batch
+        dimension:
+          symbolic: B
+      - dimension:
+          fixed: 4
+      - dimension:
+          fixed: 24576
+      dtype:
+        admissible:
+        - float32
+    output:
+      axes:
+      - role: batch
+        dimension:
+          symbolic: B
+      - dimension:
+          fixed: 1
+      dtype:
+        admissible:
+        - float32
+  segmentation_applicability: not_applicable
+  input_description: 'Prepared float32 [B,4,24576]: normalized time_I/time_Q, then unshifted orthonormal
+    complex FFT real/imag. Both representations must contribute to the prediction; fusion is model-defined.'
+  output_description: Float32 [B, 1] predictions of energy_eV in physical eV.
+  task_type: regression
+  output_head_note: Return exactly one scalar per example. Internal normalization is allowed; exported
+    outputs must be in physical units.
+  task_note: Sample identifiers are not model features. Both time-domain channels 0:2 and frequency-domain
+    channels 2:4 must be used; their final axes have different physical meanings.

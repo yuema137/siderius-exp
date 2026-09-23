@@ -227,10 +227,11 @@ assert c.metric.spec.id == "r2"
 
 
 @pytest.mark.parametrize(
-    "task,trial,formal,vram", [("ligo", 10, 30, 16), ("project8", 30, 120, 40)]
+    "task,trial,formal,vram,training_scope",
+    [("ligo", 10, 30, 16, "agent"), ("project8", 30, 120, 40, "operator")],
 )
 def test_experiment_renders_independent_eval_and_training_budgets(
-    task, trial, formal, vram
+    task, trial, formal, vram, training_scope
 ):
     from experiments.shared.fixed_workflow_config import render_siderius_args
 
@@ -239,8 +240,12 @@ def test_experiment_renders_independent_eval_and_training_budgets(
         folder / "workflow.json", repository_root=ROOT, siderius_checkout=ROOT
     )
     value = lambda flag: args[args.index(flag) + 1]
-    assert value("--formal_training_scope_source") == "agent"
-    assert "--formal_train_portion" not in args and "--formal_portion" not in args
+    assert value("--formal_training_scope_source") == training_scope
+    if training_scope == "agent":
+        assert "--formal_train_portion" not in args and "--formal_portion" not in args
+    else:
+        assert float(value("--formal_train_portion")) == 1.0
+        assert float(value("--formal_portion")) == 1.0
     assert float(value("--formal_eval_portion")) == 1.0
     assert float(value("--training_validation_portion")) == 0.1
     assert int(value("--max_rounds")) == 2

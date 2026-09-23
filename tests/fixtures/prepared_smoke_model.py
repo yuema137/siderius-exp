@@ -13,12 +13,13 @@ class Config(BaseModel):
     model_type: Literal["prepared_smoke_regressor"] = "prepared_smoke_regressor"
     segmentation_size: int = Field(ge=1)
     batch_size: int = Field(default=16, ge=1)
+    input_channels: int = Field(default=2, ge=1)
 
 
 class Model(torch.nn.Module):
     def __init__(self, config: Config):
         super().__init__()
-        self.head = torch.nn.Linear(4, 1)
+        self.head = torch.nn.Linear(2 * config.input_channels, 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.head(torch.cat((x.mean(dim=-1), x.square().mean(dim=-1)), dim=1))

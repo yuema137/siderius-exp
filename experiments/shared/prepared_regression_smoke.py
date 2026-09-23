@@ -91,6 +91,7 @@ def qualify(
     model = {
         "model_type": model_type,
         "segmentation_size": adapter.declaration.length,
+        "input_channels": adapter.declaration.channels,
         "batch_size": 16,
     }
     training = {

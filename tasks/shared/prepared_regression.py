@@ -388,6 +388,10 @@ class Project8DataPath(PreparedRegressionDataPath):
     task_data_path_id: ClassVar[str] = "phyts_project8_energy"
 
 
+class Project8DualRepresentationDataPath(PreparedRegressionDataPath):
+    task_data_path_id: ClassVar[str] = "phyts_project8_energy_dual"
+
+
 class PreparedPredictionScoreability(ScoreabilityContract):
     contract_id: str = "prepared_scalar_predictions"
 
