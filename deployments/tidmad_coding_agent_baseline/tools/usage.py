@@ -24,6 +24,8 @@ def usage_from_log(path: Path, product: str) -> dict[str, int]:
             event = json.loads(line)
         except json.JSONDecodeError:
             continue
+        if not isinstance(event, dict):
+            continue
         if product == "codex" and event.get("type") == "turn.completed":
             usage = event.get("usage", {})
             if isinstance(usage, dict):
