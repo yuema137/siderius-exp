@@ -1,0 +1,15 @@
+{
+  "version": "siderius-tess-tutorial-v1",
+  "infra_checkout": "/absolute/path/to/SIDERIUS",
+  "data_dir": "/absolute/path/to/tess-run-data",
+  "workspace": "/absolute/path/to/new-tess-demo",
+  "run_name": "tess_demo_001",
+  "gpu": "RTX 5090",
+  "iterations": 1,
+  "epochs": 1,
+  "trial_minutes": 2,
+  "formal_minutes": 5,
+  "vram_gib": 8,
+  "composition": null,
+  "llm_config": null
+}

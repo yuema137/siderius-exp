@@ -6,7 +6,8 @@ This rule applies at every directory depth, including source, tests, examples,
 deployments and archived documentation. Classify Markdown by filename,
 case-insensitively:
 
-- `README.md` files and Markdown files whose names contain `tutorial` are
+- `README.md` files, Markdown files whose names contain `tutorial`, and
+  tutorial Jupyter notebooks (`.ipynb`) are
   **human-facing**. Assume a technically literate reader who is new to this
   project. Lead with purpose and prerequisites, then give ordered steps,
   concrete commands, expected outputs and effects, and where to change inputs.

@@ -6,6 +6,10 @@ the generic framework lives in the separate [SIDERIUS repository](https://github
 
 ## Start here
 
+For a guided notebook plus terminal-script example, start with the
+[paper tutorial package](tutorials/paper/README.md). Its first runnable task
+is TESS; the tutorial distinguishes a short demo from the paper campaign.
+
 1. Choose a scientific problem in [`tasks/`](tasks/README.md).
 2. Choose one bounded treatment in [`experiments/`](experiments/README.md).
 3. Use [`campaigns/`](campaigns/README.md) only for coordinated, multi-run work.

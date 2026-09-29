@@ -1,0 +1,8 @@
+{
+  "dataset": "PhyTS-team/PhyTS-bench",
+  "revision": "9f203f4c338645a1e4b2c9dc7d6f820269ca5114",
+  "files": {
+    "TESS/split/tess_regression_train.parquet": "78f2b9436f852f1c8b1b4c35c5cd3f05abffc6399b3a678b74c0bf69bddf3b33",
+    "TESS/split/tess_regression_val.parquet": "76ba732c8cb5cea71f7a651a611e08494a79fe36962216dfbea49dc60e335502"
+  }
+}

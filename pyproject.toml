@@ -13,6 +13,11 @@ dev = [
     "pytest>=8.4,<10",
     "ruff>=0.12,<0.17",
 ]
+tutorial = [
+    "jupyterlab>=4,<5",
+    "nbclient>=0.10,<0.11",
+    "pyarrow>=19,<24",
+]
 
 [tool.uv]
 package = false
