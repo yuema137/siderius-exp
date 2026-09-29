@@ -99,3 +99,9 @@ persisted deliverable. The unchanged scorer executed on that synthetic artifact
 and returned nonfinite (-inf), not a scientific success. The catalog heuristic
 identified its known injected 2000 Hz tone. This fixture neither uses official
 raw data nor qualifies real candidate performance or full-band cataloging.
+The current notebook also completed all opt-in file-writing cells against an
+explicit synthetic catalog (zero source hashes, not launchable as real data).
+All five saved TIDMAD experiment variants passed tutorial inspection and native
+`--dry-run`, leaving run directories absent. Final scoring was additionally
+exercised through the selected composed metric/scoreability handle on the
+single-segment synthetic artifact; its nonfinite metric serialized as null.
