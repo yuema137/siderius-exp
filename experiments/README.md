@@ -26,6 +26,27 @@ then owns one concrete treatment: parameter values, advice, literature-review
 state, iteration and epoch counts, data exposure, output locks, resource
 budgets, and result receipts.
 
+### TIDMAD: which file should I open?
+
+The TIDMAD fixed workflow has more than one layer. Use these files in order:
+
+1. [`tasks/tidmad/README.md`](../tasks/tidmad/README.md) explains the scientific
+   data contract, the 20 training/validation file pairs and 200 segments per
+   file, channels, model I/O,
+   score, Health, and task-owned reference rulers.
+2. [`tidmad/main_fixed_workflow/README.md`](tidmad/main_fixed_workflow/README.md)
+   explains the fixed workflow files, treatments, preflight, launch command,
+   band isolation, budgets, and backup services.
+3. [`tidmad/information_treatments/README.md`](tidmad/information_treatments/README.md)
+   explains which advice and agent modules each treatment enables.
+4. [`../tasks/tidmad/data/README.md`](../tasks/tidmad/data/README.md) explains
+   how to stage the external HDF5 root and verify the anchor file.
+
+If you only want a different existing band, change the experiment's `--band`
+and external `--data_dir`. If you want a different training parent, score,
+model I/O contract, or Health rule, start a new task/experiment identity and
+update the owning task files described in the TIDMAD README.
+
 The workflow owns the execution procedure, including Trial/Formal roles and
 their progression. The experiment may set approved values for that workflow;
 it does not redefine what Trial or Formal means.

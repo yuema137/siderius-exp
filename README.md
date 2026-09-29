@@ -14,6 +14,17 @@ the generic framework lives in the separate [SIDERIUS repository](https://github
 The shortest safe path is to read the relevant task page, then the experiment
 page, and use its dry-run command before an effectful launch.
 
+For the ICLR scientific work, read the package README before opening a
+launcher. The package README explains what the data means; the experiment
+README explains which files and run settings are used.
+
+| You want to… | Read first |
+| --- | --- |
+| Understand TIDMAD files, channels, splits, score, and Health | [`tasks/tidmad/README.md`](tasks/tidmad/README.md) |
+| Run or change the TIDMAD fixed workflow | [`experiments/tidmad/main_fixed_workflow/README.md`](experiments/tidmad/main_fixed_workflow/README.md) |
+| Compare TIDMAD information treatments | [`experiments/tidmad/information_treatments/README.md`](experiments/tidmad/information_treatments/README.md) |
+| Prepare the external TIDMAD data root | [`tasks/tidmad/data/README.md`](tasks/tidmad/data/README.md) |
+
 ## What belongs here
 
 - `tasks/`: scientific meaning, data identity, splits, plugins, metrics, and validity rules.
@@ -37,22 +48,40 @@ uv sync --group dev --frozen
 ```
 
 Do not mix checkouts with `PYTHONPATH`, another virtualenv, or an editable
-install. For API-backed work, prepare the required `.env` in the selected
-SIDERIUS checkout before launch; never commit credentials. Raw datasets,
-generated output, caches, and workspaces remain machine-local.
+install. For API-backed work, inject the enabled providers' keys into the
+launching process from a mode-600 external file or managed secret. Never
+commit credentials. The fixed-workflow supervisor checks its environment
+before starting; a file that a later child might load cannot satisfy that
+check. Raw datasets, generated output, caches and workspaces stay external.
+The complete agent contract is in
+[`CLAUDE.md`](CLAUDE.md#environment-and-launch-credentials).
 
 ## Validation
 
-The live test suite requires an explicit `SIDERIUS_CHECKOUT`; it intentionally
-fails when that boundary is missing. Follow the exact command in the relevant
-experiment or campaign README. For a quick, no-data check:
+Tests that inspect or execute framework source require an explicit
+`SIDERIUS_CHECKOUT`; those checks fail when it is missing. Follow the selected
+experiment's validation instructions. To collect tests without running them:
 
 ```bash
-.venv/bin/python -m pytest --collect-only -q
+SIDERIUS_CHECKOUT=/path/to/pinned/SIDERIUS .venv/bin/python -m pytest --collect-only -q
 ```
 
 Current task and campaign status is recorded by their `STATUS.md` or current
 index. Historical records are evidence, not launch authorization.
+
+## Task, experiment, and campaign are different things
+
+Use a **task package** when you need to change scientific meaning: data layout,
+model input/output, objective, metric, deliverable encoding, or Health rules.
+Use an **experiment** when you need to change how the search runs: information
+treatment, advice, model routing, band, iteration/round schedule, time/VRAM
+budget, or workspace identity. Use a **campaign** when you coordinate several
+experiment units.
+
+For TIDMAD, a different existing band can use the fixed-workflow launcher with
+a different `--band` and external `--data_dir`. A new scientific parent or file
+identity requires a new task/experiment binding and provenance; it should not
+be hidden in a shell argument or an old run receipt.
 
 ## More detail
 
