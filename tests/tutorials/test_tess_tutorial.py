@@ -294,3 +294,50 @@ def test_credential_check_uses_selected_routing_and_never_returns_values(monkeyp
     assert runner.credential_status(runner.WORKFLOW.parent / "agents.json") == {
         "GEMINI_API_KEY": False
     }
+
+
+def test_external_project_copies_inputs_and_generates_portable_quoted_script(tmp_path):
+    import hashlib
+    import json
+
+    from tutorials.paper.project import create_project
+
+    project = tmp_path / "user's project $local"
+    infra = tmp_path / "infra"
+    original = runner.ROOT / "tasks/phyts_tess/declared/task_config.yaml"
+    before = hashlib.sha256(original.read_bytes()).hexdigest()
+    create_project(project, infra)
+    experiment = json.loads((project / "experiments/tess-experiment.json").read_text())
+    assert Path(experiment["composition"]).is_relative_to(project / "tasks")
+    assert Path(experiment["llm_config"]).is_relative_to(project / "llm")
+    assert Path(experiment["workspace"]) == project / "runs/tess-demo-001"
+    assert not Path(experiment["workspace"]).exists()
+    (project / "tasks/tess/declared/task_config.yaml").write_text("edited by user\n")
+    assert hashlib.sha256(original.read_bytes()).hexdigest() == before
+    result = subprocess.run(
+        ["bash", str(project / "scripts/run-tess.sh"), "--help"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "--experiment" in result.stdout
+    with pytest.raises(ValueError, match="never overwritten"):
+        create_project(project, infra)
+
+
+def test_project_refuses_source_aliases_and_repo_config_inputs(tmp_path):
+    from tutorials.paper.project import create_project, write_launcher
+
+    alias = tmp_path / "source-alias"
+    alias.symlink_to(runner.ROOT, target_is_directory=True)
+    with pytest.raises(ValueError, match="separate from both"):
+        create_project(alias / "user-project", tmp_path / "infra")
+    with pytest.raises(ValueError, match="both source"):
+        write_launcher(
+            alias / "new-script.sh", tmp_path / "experiment.json", tmp_path / "infra"
+        )
+    with pytest.raises(ValueError, match="copy it into your project"):
+        runner.build_command(
+            settings(tmp_path, llm_config=runner.WORKFLOW.parent / "agents.json")
+        )

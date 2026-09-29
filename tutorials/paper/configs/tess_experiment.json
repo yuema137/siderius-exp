@@ -10,6 +10,7 @@
   "trial_minutes": 2,
   "formal_minutes": 5,
   "vram_gib": 8,
-  "composition": null,
-  "llm_config": null
+  "composition": "/absolute/path/to/my-tess-project/tasks/tess/compositions/rotation_regression.yaml",
+  "llm_config": "/absolute/path/to/my-tess-project/llm/agents.json",
+  "advice_file": null
 }

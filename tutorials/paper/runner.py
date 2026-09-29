@@ -55,6 +55,8 @@ class TutorialExperiment(BaseModel):
     vram_gib: float = Field(default=8, gt=0, le=80)
     composition: Path | None = None
     llm_config: Path | None = None
+    # This entrypoint deliberately preserves the NoPrior treatment.
+    advice_file: None = None
 
     @field_validator(
         "infra_checkout", "data_dir", "workspace", "composition", "llm_config"
@@ -105,6 +107,12 @@ def validate_locations(settings: TutorialExperiment) -> None:
         raise ValueError("tutorial launches require a new workspace; choose a new path")
     for external in (settings.composition, settings.llm_config):
         if external is not None:
+            if any(
+                not disjoint(external, repo) for repo in (ROOT, settings.infra_checkout)
+            ):
+                raise ValueError(
+                    "editable configuration must be outside both checkouts; copy it into your project"
+                )
             if not external.is_file():
                 raise ValueError(f"missing configuration: {external}")
             if external.is_relative_to(settings.workspace) or external.is_relative_to(
@@ -237,6 +245,7 @@ def verify_gpu(settings: TutorialExperiment) -> str:
 def child_environment(settings: TutorialExperiment) -> dict[str, str]:
     """Keep credentials in the environment and bind generated artifacts to this run."""
     env = os.environ.copy()
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
     for name in (
         "PYTHONPATH",
         "SIDERIUS_PLUGIN_DIRS",
@@ -340,6 +349,21 @@ def main() -> int:
     parser.add_argument("--launch", action="store_true")
     args = parser.parse_args()
     settings = TutorialExperiment.model_validate_json(args.experiment.read_text())
+    if settings.composition is None or settings.llm_config is None:
+        raise ValueError(
+            "select your external task composition and LLM config; initialize a user project first"
+        )
+    experiment_path = args.experiment.resolve()
+    if any(
+        not disjoint(experiment_path, repo) for repo in (ROOT, settings.infra_checkout)
+    ):
+        raise ValueError(
+            "save the experiment in your external project, not either checkout"
+        )
+    if experiment_path.is_relative_to(
+        settings.workspace
+    ) or experiment_path.is_relative_to(settings.data_dir):
+        raise ValueError("save the experiment outside data and the run workspace")
     receipt = inspect(settings, launch=args.launch)
     if not args.launch:
         missing = [

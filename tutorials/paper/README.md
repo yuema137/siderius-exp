@@ -36,7 +36,7 @@ edits do not affect a script until saved to the file passed with `--experiment`.
 
 `TutorialExperiment` is this teaching entrypoint's input contract, not a new
 repository-wide experiment format. It selects a task using `composition` and
-model routing using `llm_config`; null means the shipped TESS defaults. The
+model routing using `llm_config`; the CLI requires explicit external copies. The
 workflow and NoPrior treatment are fixed by this entrypoint. To teach another
 workflow/treatment, define and qualify its experiment entrypoint explicitly.
 
@@ -95,32 +95,78 @@ whitespace-only values before contacting providers. Merely creating a local
 credential file does not export its contents. Neither check prints key values.
 These checks use the selected routing, including an external routing file.
 
-The historical model ID is retained. If your account cannot use it, copy
-`agents.json` to the external tutorial directory and select an available model
-there, as shown in the notebook. That is a new model treatment, not an exact
+The historical model ID is retained. If your account cannot use it, edit
+your project's `llm/agents.json` and select an available model there, as shown in the notebook. That is a new model treatment, not an exact
 paper rerun. Key presence does not prove provider access; only a request can.
 
-## 3. Open an editable notebook outside source
+## 3. Create your own project, then open its notebook
 
-Configure provider keys using section 2 **before** starting Jupyter if you
-want its read-only key check to succeed. Offline reading needs no key.
+Source checkouts supply installed code and templates. **Do not edit their
+notebooks, scripts, task packages, experiments or LLM configuration.** The
+`.venv` created during installation is environment infrastructure, not a place
+for your experiment files. All tutorial edits and outputs go to a separate
+user project. A run workspace is just one output directory within that project.
 
-Choose an external tutorial directory; use the same path throughout:
+```text
+/path/to/SIDERIUS-tutorial/           installed infra; source unchanged
+/path/to/siderius-exp/               installed exp; source unchanged
+/path/to/my-tess-project/            YOUR editable project (TUTORIAL_HOME)
+├── project.json                    paths to the two installed checkouts
+├── notebooks/01_tess_tutorial.ipynb  your editable notebook and saved outputs
+├── tasks/tess/                      your complete task-package copy
+├── experiments/tess-experiment.json your initial experiment
+├── llm/agents.json                  model/provider routing; NO API keys
+├── advice/human_advice.example.json inactive example for this NoPrior demo
+├── scripts/run-tess.sh              your initial editable launch script
+├── data/raw-tess/                   downloaded Parquet and source receipt
+├── data/tess-data/                  exactly the two run-input NPZ files
+├── runs/tess-demo-001/              created by launch; logs/models/results
+├── runs/tess-demo-001.tutorial.json launch receipt
+└── .jupyter/                       local kernel registration
+```
+
+Keep credentials separately, for example in a trusted mode-600 file under your
+user configuration directory. Export them as described in section 2. Never
+copy them into the project, its scripts, notebook outputs or routing JSON.
+
+Choose a **new** directory outside both repositories. Initialization copies
+inputs and generates the launch script; it makes no API call and downloads no
+data. It refuses an existing directory so it cannot overwrite your work.
 
 ```bash
-export TUTORIAL_HOME="/absolute/path/to/tess-tutorial"
-mkdir -p "$TUTORIAL_HOME"
-cp "$EXP_CHECKOUT/tutorials/paper/notebooks/01_tess_tutorial.ipynb" "$TUTORIAL_HOME/"
-"$EXP_CHECKOUT/.venv/bin/python" -m ipykernel install \
-  --prefix "$EXP_CHECKOUT/.venv" --name siderius-exp-tutorial \
+export TUTORIAL_HOME="/absolute/path/to/my-tess-project"
+export PYTHONDONTWRITEBYTECODE=1
+cd "$EXP_CHECKOUT"
+.venv/bin/python -B -m tutorials.paper.project \
+  --project "$TUTORIAL_HOME" --infra-checkout "$INFRA_CHECKOUT"
+"$EXP_CHECKOUT/.venv/bin/python" -B -m ipykernel install \
+  --prefix "$TUTORIAL_HOME/.jupyter" --name siderius-exp-tutorial \
   --display-name "SIDERIUS exp tutorial"
+export JUPYTER_PATH="$TUTORIAL_HOME/.jupyter/share/jupyter"
+cd "$TUTORIAL_HOME"
 "$EXP_CHECKOUT/.venv/bin/jupyter" lab --ServerApp.root_dir="$TUTORIAL_HOME"
 ```
 
-Open `01_tess_tutorial.ipynb` and select **SIDERIUS exp tutorial**. The notebook
-verifies its interpreter. Default Run All reads source and displays settings;
-it downloads nothing and starts no run. Two optional file-writing exercises
-are disabled until you enable them.
+Open `notebooks/01_tess_tutorial.ipynb` and select **SIDERIUS exp tutorial**.
+The notebook reads `project.json` to find installed code, then inspects your
+copied task and experiment. Default Run All is read-only. Its opt-in exercises
+create a second task variant, a new experiment and a new launch script in your
+project, never in either repository.
+
+### Where human advice belongs
+
+Human advice is a scientific input, not an API credential. The initializer
+copies the existing structured JSON example into
+`advice/human_advice.example.json`. **NoPrior does not read this file.**
+`advice_file` must remain `null`; selecting a file is refused, not silently
+ignored. Editing this example alone cannot affect a run.
+
+An advice-enabled experiment needs its own information-treatment identity,
+explicit advice path/digest and framework advice routing. This tutorial has
+not implemented that different treatment. Do not add advice to the frozen
+NoPrior experiment or put it in `llm/agents.json`. Keep a future active advice
+artifact under your project's `advice/` directory and bind it through that
+separately defined experiment.
 
 ## 4. Prepare only the permitted data
 
@@ -129,8 +175,8 @@ Run in a terminal from the exp root:
 ```bash
 cd "$EXP_CHECKOUT"
 .venv/bin/python -m tutorials.paper.prepare_tess \
-  --raw-dir "$TUTORIAL_HOME/raw-tess" \
-  --data-dir "$TUTORIAL_HOME/tess-data"
+  --raw-dir "$TUTORIAL_HOME/data/raw-tess" \
+  --data-dir "$TUTORIAL_HOME/data/tess-data"
 ```
 
 Both destinations must be new. This downloads about 31 MB from the pinned
@@ -146,18 +192,35 @@ to the population need a new task identity and separate qualification.
 
 ## 5. Preview, launch, inspect
 
-The notebook writes external `tess-experiment.json` after you opt in. Alternatively,
-copy [tess_experiment.json](configs/tess_experiment.json) and replace all absolute paths.
-Choose `gpu: "RTX 5090"` or `gpu: "H100"` and a new workspace path:
+Initialization already created an experiment with explicit paths to your task
+copy, your LLM routing and `runs/tess-demo-001`. From **any terminal directory**:
 
 ```bash
-bash "$EXP_CHECKOUT/tutorials/paper/scripts/run.sh" \
-  --experiment "$TUTORIAL_HOME/tess-experiment.json"
+bash "$TUTORIAL_HOME/scripts/run-tess.sh"
 
 # Starts paid API calls and model training:
-bash "$EXP_CHECKOUT/tutorials/paper/scripts/run.sh" \
-  --experiment "$TUTORIAL_HOME/tess-experiment.json" --launch
+bash "$TUTORIAL_HOME/scripts/run-tess.sh" --launch
 ```
+
+To change it in the notebook, follow the editing exercises and enable
+`WRITE_CONFIG`. That creates `experiments/tess-edited.json` and
+`scripts/run-tess-edited.sh`. Launch the new script:
+
+```bash
+bash "$TUTORIAL_HOME/scripts/run-tess-edited.sh" --launch
+```
+
+For example, the notebook copies `tasks/tess` to `tasks/tess-variant`, edits
+its description, and saves an experiment selecting that composition with
+`epochs=2` and `workspace=.../runs/tess-edited-001`. The new script selects that
+saved experiment, so all results land in `runs/tess-edited-001`. The original
+experiment and repository task remain unchanged. Changing a Python variable
+without saving the experiment does not change the script's next run.
+
+The script has explicit `EXP_CHECKOUT` and `EXPERIMENT` bindings. Edit your
+script to choose another saved experiment. If you move the project or installed
+checkouts, update `project.json`, script bindings and all absolute paths in
+experiment JSON; moving files alone does not rebind references.
 
 Preview validates source pins, routing and composition and prints JSON. It
 needs no credentials, prepared data or GPU. Launch additionally checks keys,
@@ -192,17 +255,18 @@ outcome before retrying. This wrapper only starts fresh runs.
 
 | Change | Where | Effect |
 |---|---|---|
-| Iterations, epochs, time, VRAM | External `tess-experiment.json` | New demo schedule/budgets |
+| Iterations, epochs, time, VRAM | Your `experiments/*.json` | New demo schedule/budgets |
 | RTX 5090 ↔ H100 | `gpu` and suitable `vram_gib` | New hardware run; launcher checks physical card |
-| Provider/model | External routing JSON selected by `llm_config` | New model treatment and possibly new required keys |
+| Provider/model | Your `llm/*.json` selected by `llm_config` | New model treatment and possibly new required keys |
 | Task description | Copy of the whole task package selected by `composition` | New fingerprint; notebook demonstrates a controlled edit |
 | Input length, split, metric, Health | Task declaration **and** runtime/tests | Qualify the changed task; not an arbitrary launcher override |
 
 For **another NVIDIA GPU**, first verify that locked PyTorch can allocate a
 CUDA tensor on it. Choose a VRAM budget below physical capacity; review RAM,
-disk and time budgets. Add the card name explicitly to `TutorialExperiment.gpu`,
-extend the hardware tests/qualification evidence, commit the change, and run
-a short fresh demo. Unknown GPUs are refused until that work is done. Do not
+disk and time budgets. The current installed launcher accepts RTX 5090/H100 only; another card needs
+a separately qualified launcher release from the maintainers. Do not edit the
+installed repository as a tutorial step. Unknown GPUs are refused until an
+updated release supports them. Do not
 remove CUDA or capacity checks. `CUDA_VISIBLE_DEVICES` does not turn the
 one-physical-GPU check into multi-GPU support.
 
@@ -226,7 +290,7 @@ For the existing paper settings, use the original TESS supervisor on RTX 5090:
 ```bash
 bash "$EXP_CHECKOUT/experiments/phyts_tess/main_fixed_workflow/launch.sh" \
   --siderius-checkout "$INFRA_CHECKOUT" \
-  --data_dir "$TUTORIAL_HOME/tess-data" \
+  --data_dir "$TUTORIAL_HOME/data/tess-data" \
   --unit_dir "$TUTORIAL_HOME/new-paper-unit" \
   --run_name tess_paper_rerun_001 --arm no-prior
 ```

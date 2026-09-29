@@ -9,8 +9,8 @@ task science, the historical supervisor or infra runtime behavior.
 
 `runner.TutorialExperiment` validates the external experiment JSON boundary. `build_command`
 overrides iteration/epoch/time/VRAM settings on the existing rendered workflow,
-then adds the production treatment. External composition and routing files are
-explicit opt-ins. `TutorialReceipt` carries typed settings, argv and evidence
+then adds the production treatment. The CLI requires explicit external composition and routing files; internal
+renderer defaults are not the public tutorial path. `TutorialReceipt` carries typed settings, argv and evidence
 into execution. `inspect` resolves composition and validates routing without
 provider requests.
 
@@ -100,3 +100,35 @@ flags matched the saved file. For the original settings, its rendered native
 argv matched the smoke receipt (apart from the fresh workspace needed for
 preview). The final notebook executed all 12 code cells with actual smoke
 records, including observational Health failures. No second paid run occurred.
+
+
+## User-owned project layout and initialization
+
+`project.create_project` requires a new root disjoint from exp/infra (resolved
+paths, including symlink aliases). It copies the whole TESS task, notebook,
+LLM routing and inactive advice example, then writes absolute project bindings,
+a typed experiment and an external shell script. No secrets, data download,
+provider requests or source edits belong to initialization. Partial creation
+on an I/O failure is retained for inspection; retries need a new destination.
+
+The project root contains editable `tasks/`, `experiments/`, `llm/`, `advice/`,
+`notebooks/`, `scripts/`, plus `data/` and `runs/`. `workspace` is a fresh single
+run output under `runs/`, never the project root. Receipt is its sibling.
+Generated plugins and calibration remain in that run. The CLI rejects input
+experiment/composition/routing paths inside source; config paths cannot be
+inside data or the run output. Absolute bindings must be updated if moved.
+`write_launcher` quotes paths with shell-safe quoting, requires fresh output,
+and binds the exact exp venv plus selected experiment. Notebook calls it only
+when its explicit write exercise is enabled. Run shell arguments are limited
+to the runner's own flags; the normal generated-script path takes `--launch`.
+
+Advice is an inactive structured JSON example. `advice_file: None` rejects
+activation in this NoPrior adapter. An advice-enabled treatment remains separate
+work requiring explicit identity/digest/routing; do not imply support merely
+because an example file exists. Data preparation/verification still owns the
+original released population, so arbitrary split edits need separate qualification.
+
+Source `.venv` installation is allowed environment setup; tracked source is
+unchanged during tutorial use. Generated scripts use Python `-B`, child
+processes disable bytecode writes, and Jupyter registration uses the external
+project prefix. This is write-location discipline, not an OS security sandbox.
