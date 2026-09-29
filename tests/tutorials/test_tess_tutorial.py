@@ -12,7 +12,7 @@ import pytest
 from tutorials.paper import prepare_tess, runner
 
 
-def settings(tmp_path: Path, **changes: object) -> runner.DemoSettings:
+def settings(tmp_path: Path, **changes: object) -> runner.TutorialExperiment:
     values = {
         "version": "siderius-tess-tutorial-v1",
         "infra_checkout": tmp_path / "infra",
@@ -27,7 +27,7 @@ def settings(tmp_path: Path, **changes: object) -> runner.DemoSettings:
         "vram_gib": 8,
     }
     values.update(changes)
-    return runner.DemoSettings.model_validate(values)
+    return runner.TutorialExperiment.model_validate(values)
 
 
 def test_actual_renderer_keeps_no_prior_and_overrides_only_demo_knobs(tmp_path):
@@ -211,7 +211,6 @@ def test_notebook_result_cell_reads_real_schema_and_keeps_failed_score_missing(
             timestamp="2026-01-01T00:00:00Z",
             params={},
             is_trial=True,
-            logical_round=1,
         ),
         ExperimentRecord(
             exp_id="formal",
@@ -223,6 +222,20 @@ def test_notebook_result_cell_reads_real_schema_and_keeps_failed_score_missing(
             logical_round=2,
             denoising_score=0.25,
             metric_result=MetricResult(metric_id="r2", direction="higher", scalar=0.25),
+            health_gate_results=[
+                {
+                    "gate_name": "dispersion",
+                    "execution_status": "failed",
+                    "check_passed": False,
+                    "would_invalidate_under_production_policy": False,
+                    "resolved_action": "continue",
+                    "gate_role": "observational",
+                }
+            ],
+            scientific_authority={
+                "declared_result_authority": "diagnostic",
+                "authoritative": False,
+            },
         ),
     ]
     output = HyperparamTuningOutput(
@@ -256,10 +269,13 @@ def test_notebook_result_cell_reads_real_schema_and_keeps_failed_score_missing(
         {"record_path": record_path, "Path": Path, "display": tables.append},
     )
     table = tables[0]
-    assert table["round"].tolist() == [1, 2]
-    assert table["role"].tolist() == ["Trial", "Formal"]
+    assert np.isnan(table["round"][0]) and table["round"][1] == 2
+    assert table["role"].tolist() == ["Unspecified", "Formal"]
     assert table["status"].tolist() == ["error_training", "success"]
     assert np.isnan(table["score"][0]) and table["score"][1] == 0.25
+    assert table["health_checks"][1][0]["passed"] is False
+    assert table["health_checks"][1][0]["role"] == "observational"
+    assert table["authority"][1]["authoritative"] is False
 
 
 def test_credential_check_uses_selected_routing_and_never_returns_values(monkeypatch):

@@ -7,7 +7,7 @@ staging, composition, workflow rendering, information-treatment rendering,
 provider-key derivation and framework pin verification. It does not modify
 task science, the historical supervisor or infra runtime behavior.
 
-`runner.DemoSettings` validates the external JSON boundary. `build_command`
+`runner.TutorialExperiment` validates the external experiment JSON boundary. `build_command`
 overrides iteration/epoch/time/VRAM settings on the existing rendered workflow,
 then adds the production treatment. External composition and routing files are
 explicit opt-ins. `TutorialReceipt` carries typed settings, argv and evidence
@@ -52,3 +52,48 @@ notebook/runner schema drift. Do not add tests of Pydantic's own field defaults.
 Execute the notebook offline with nbclient and the exact interpreter; syntax
 and nbformat alone do not prove Run All. Download/staging and command preview
 witnesses are distinct from a paid real-agent or GPU training qualification.
+
+
+## Tutorial responsibility boundary
+
+The notebook owns explanation, opt-in external task-copy/experiment editing,
+and read-only inspection. It must not execute `run.sh`, native framework launch,
+or provider calls. The script owns parsing the saved experiment, resolving its
+selected task, credential/data/GPU/source checks, argv construction and launch.
+The notebook imports the experiment schema and read-only credential checker;
+it does not construct native framework argv. `--experiment` is the only input
+configuration flag. The workflow and information treatment remain fixed by this
+TESS entrypoint; composition/routing and budget changes are explicit fields.
+
+Credential status is derived from enabled routing and contains names/booleans
+only. Preview warns but stays offline; launch rejects absent/whitespace values
+before creating a receipt/workspace or making provider calls. A local secret
+file is not read automatically. The user must export its values in the parent
+terminal of Jupyter and separately in the launching terminal as needed.
+
+
+## Observed RTX 5090 smoke run (2026-09-29)
+
+The API-backed run `api_smoke_001` used exp commit `4762036`, infra pin
+`349b6cd6d9766abbf3d87515b22e1005599a694b`, the shipped OpenAI `gpt-5.6-sol`
+routing, external mode-600 credentials exported into the launch process,
+1 iteration, 1 epoch ceiling, 2/5-minute Trial/Formal budgets and 8 GiB VRAM.
+The native chain exited 0 after 6 minutes 33 seconds with 2 completed rounds
+and 3 attempts. Its token ledger records 12 calls and 122,548 total tokens;
+this is one observation, not a promised duration or cost.
+
+Attempt 1 was `skipped_time_risk`: 2 training and 1 validation observations
+could not establish runtime calibration. The planner's existing retry selected
+full scopes and batch size 4; attempt 2 scored Trial R²
+`-0.008499914365340144`, and attempt 3 scored Formal R²
+`-0.06247370099701155`. Both scored records failed the observational prediction
+dispersion check; their configured action was continue. The Formal authority
+was diagnostic/non-authoritative. No runtime or Health policy was weakened.
+This qualifies launch/API/training/inference/record handling, not scientific
+performance or archived paper reproduction. H100 has no local real-run witness.
+
+The subsequent responsibility refactor renames the input to
+`TutorialExperiment` / `--experiment`, changes notebook editing/inspection and
+documentation, and leaves native command construction unchanged. Validate the
+final script's saved-file handoff and compare its rendered native argv against
+the smoke receipt; do not imply a second paid run occurred.

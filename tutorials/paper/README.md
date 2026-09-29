@@ -10,7 +10,7 @@ repositories. Keep data, credentials, edited notebooks and outputs outside them.
 
 | Paper task | Tutorial status | Existing task |
 |---|---|---|
-| TESS | Notebook, pinned download/staging, editable demo and formal entrypoint | [Task package](../../tasks/phyts_tess/README.md) |
+| TESS | Notebook, pinned download/staging, editable experiment and formal entrypoint | [Task package](../../tasks/phyts_tess/README.md) |
 | LIGO | Next task; no runnable notebook here yet | [Task package](../../tasks/phyts_ligo/README.md) |
 | Project 8 | Next task; paper uses the time/frequency four-channel variant | [Dual representation](../../tasks/phyts_project8/DUAL_REPRESENTATION.md) |
 | TIDMAD | Next task; four independent bands | [Task package](../../tasks/tidmad/README.md) |
@@ -19,6 +19,26 @@ The demo teaches configuration and execution. Fresh LLM searches need not
 produce the paper's exact models or scores. Four fixed-workflow tutorials will
 not reproduce the coding-agent/orchestration comparisons or retrospective
 behavioral reviews. Archived-checkpoint replay is a separate reproduction path.
+
+## Task package, experiment, notebook and script
+
+The **task package** owns the scientific problem: data identities and splits,
+input/output contract, metric and validity rules. An **experiment** selects
+that task plus a workflow/treatment, then specifies model routing, budgets,
+hardware and run locations. For example, increasing epochs changes the
+experiment; changing the target or metric changes the task.
+
+The notebook explains both layers and demonstrates editing a copied task and
+saving an external `tess-experiment.json`. The script reads that saved file,
+resolves the selected task, checks prerequisites and launches the framework.
+The notebook never launches the workflow or calls a provider. Its in-memory
+edits do not affect a script until saved to the file passed with `--experiment`.
+
+`TutorialExperiment` is this teaching entrypoint's input contract, not a new
+repository-wide experiment format. It selects a task using `composition` and
+model routing using `llm_config`; null means the shipped TESS defaults. The
+workflow and NoPrior treatment are fixed by this entrypoint. To teach another
+workflow/treatment, define and qualify its experiment entrypoint explicitly.
 
 ## 1. Install in the two exact checkouts
 
@@ -45,7 +65,45 @@ environment executes the research loop. Neither borrows the other's
 `site-packages` or uses `PYTHONPATH`. Both source checkouts must be clean at
 preview/launch time. Do not edit the version pin to work around a refusal.
 
-## 2. Open an editable notebook outside source
+## 2. Configure keys without storing them in a notebook
+
+The shipped TESS NoPrior treatment disables advice, Data Analysis **and
+literature review**. Active agents use OpenAI routing, so it needs
+`OPENAI_API_KEY`; it needs no Semantic Scholar key. Changing to another
+supported provider changes the required keys. Preview lists their names.
+
+In the terminal that will launch the run:
+
+```bash
+read -r -s -p "OpenAI API key: " OPENAI_API_KEY
+echo
+export OPENAI_API_KEY
+```
+
+This reads without terminal echo and does not put the value in shell history.
+For repeated use, load a trusted external mode-600 environment file into the
+same launching shell. Do not enter keys in notebook cells, experiment JSON,
+command arguments or Git. A key in the Jupyter server is not thereby present
+in a separate terminal.
+
+**Start Jupyter from the configured terminal.** If its server was already
+running, stop and restart the server from that terminal, then restart the
+kernel. Restarting only a kernel does not update the server's environment.
+The notebook and script preview report each required variable's name and
+presence, and warn when any are missing. `--launch` refuses missing or
+whitespace-only values before contacting providers. Merely creating a local
+credential file does not export its contents. Neither check prints key values.
+These checks use the selected routing, including an external routing file.
+
+The historical model ID is retained. If your account cannot use it, copy
+`agents.json` to the external tutorial directory and select an available model
+there, as shown in the notebook. That is a new model treatment, not an exact
+paper rerun. Key presence does not prove provider access; only a request can.
+
+## 3. Open an editable notebook outside source
+
+Configure provider keys using section 2 **before** starting Jupyter if you
+want its read-only key check to succeed. Offline reading needs no key.
 
 Choose an external tutorial directory; use the same path throughout:
 
@@ -64,7 +122,7 @@ verifies its interpreter. Default Run All reads source and displays settings;
 it downloads nothing and starts no run. Two optional file-writing exercises
 are disabled until you enable them.
 
-## 3. Prepare only the permitted data
+## 4. Prepare only the permitted data
 
 Run in a terminal from the exp root:
 
@@ -86,54 +144,19 @@ If a download fails, inspect the error and choose new destinations for a retry;
 the helper never overwrites existing data. It does not re-split stars. Changes
 to the population need a new task identity and separate qualification.
 
-## 4. Configure keys without storing them in a notebook
-
-The shipped TESS NoPrior treatment disables advice, Data Analysis **and
-literature review**. Active agents use OpenAI routing, so it needs
-`OPENAI_API_KEY`; it needs no Semantic Scholar key. Changing to another
-supported provider changes the required keys. Preview lists their names.
-
-In the terminal that will launch the run:
-
-```bash
-read -r -s -p "OpenAI API key: " OPENAI_API_KEY
-echo
-export OPENAI_API_KEY
-```
-
-This reads without terminal echo and does not put the value in shell history.
-For repeated use, load a trusted external mode-600 environment file into the
-same launching shell. Do not enter keys in notebook cells, settings JSON,
-command arguments or Git. A key in the Jupyter server is not thereby present
-in a separate terminal.
-
-**Start Jupyter from the configured terminal.** If its server was already
-running, stop and restart the server from that terminal, then restart the
-kernel. Restarting only a kernel does not update the server's environment.
-The notebook and script preview report each required variable's name and
-presence, and warn when any are missing. `--launch` refuses missing or
-whitespace-only values before contacting providers. Merely creating a local
-credential file does not export its contents. Neither check prints key values.
-These checks use the selected routing, including an external routing file.
-
-The historical model ID is retained. If your account cannot use it, copy
-`agents.json` to the external tutorial directory and select an available model
-there, as shown in the notebook. That is a new model treatment, not an exact
-paper rerun. Key presence does not prove provider access; only a request can.
-
 ## 5. Preview, launch, inspect
 
-The notebook writes external `tess-demo.json` after you opt in. Alternatively,
-copy [tess_demo.json](configs/tess_demo.json) and replace all absolute paths.
+The notebook writes external `tess-experiment.json` after you opt in. Alternatively,
+copy [tess_experiment.json](configs/tess_experiment.json) and replace all absolute paths.
 Choose `gpu: "RTX 5090"` or `gpu: "H100"` and a new workspace path:
 
 ```bash
 bash "$EXP_CHECKOUT/tutorials/paper/scripts/run.sh" \
-  --config "$TUTORIAL_HOME/tess-demo.json"
+  --experiment "$TUTORIAL_HOME/tess-experiment.json"
 
 # Starts paid API calls and model training:
 bash "$EXP_CHECKOUT/tutorials/paper/scripts/run.sh" \
-  --config "$TUTORIAL_HOME/tess-demo.json" --launch
+  --experiment "$TUTORIAL_HOME/tess-experiment.json" --launch
 ```
 
 Preview validates source pins, routing and composition and prints JSON. It
@@ -142,10 +165,21 @@ both staged populations, hashes, GPU name/capacity and an actual CUDA allocation
 in infra's environment. It refuses root execution.
 
 The default demo runs one iteration with one Trial and one Formal opportunity,
-one-epoch ceilings, 2/5-minute attempt budgets and an 8 GiB VRAM budget. A
+one-epoch ceilings, 2/5-minute training attempt budgets and an 8 GiB VRAM budget. A
 candidate can fail validation or training; a Formal score is not guaranteed.
-Attempt budgets are not a total wall-clock or API-spend cap. This teaching
+Proposal reasoning, generated-code implementation and planning make separate
+LLM requests before training. Even this one-iteration example may take much
+longer than the training budget. Attempt budgets are not a total wall-clock
+or API-spend cap. This teaching
 entrypoint has no six-hour campaign supervisor.
+
+A tiny Trial may fail runtime calibration before a score exists. In the
+RTX 5090 smoke test, the first attempt provided only 2 training batches and
+1 validation batch. The workflow retried with full scopes and batch size 4,
+then produced a score. That observed recovery is not guaranteed for every
+new LLM proposal. One epoch can also produce near-constant predictions;
+inspect task Health and the result authority instead of treating a finite
+score as scientific success. Do not disable admission or Health to force a pass.
 
 The sibling `<workspace>.tutorial.json` records settings, command, revisions,
 composition identity, routing digest and data digests without secrets. Node
@@ -158,7 +192,7 @@ outcome before retrying. This wrapper only starts fresh runs.
 
 | Change | Where | Effect |
 |---|---|---|
-| Iterations, epochs, time, VRAM | External `tess-demo.json` | New demo schedule/budgets |
+| Iterations, epochs, time, VRAM | External `tess-experiment.json` | New demo schedule/budgets |
 | RTX 5090 ↔ H100 | `gpu` and suitable `vram_gib` | New hardware run; launcher checks physical card |
 | Provider/model | External routing JSON selected by `llm_config` | New model treatment and possibly new required keys |
 | Task description | Copy of the whole task package selected by `composition` | New fingerprint; notebook demonstrates a controlled edit |
@@ -166,7 +200,7 @@ outcome before retrying. This wrapper only starts fresh runs.
 
 For **another NVIDIA GPU**, first verify that locked PyTorch can allocate a
 CUDA tensor on it. Choose a VRAM budget below physical capacity; review RAM,
-disk and time budgets. Add the card name explicitly to `DemoSettings.gpu`,
+disk and time budgets. Add the card name explicitly to `TutorialExperiment.gpu`,
 extend the hardware tests/qualification evidence, commit the change, and run
 a short fresh demo. Unknown GPUs are refused until that work is done. Do not
 remove CUDA or capacity checks. `CUDA_VISIBLE_DEVICES` does not turn the

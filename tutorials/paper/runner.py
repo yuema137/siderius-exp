@@ -33,8 +33,13 @@ TREATMENT = (
 )
 
 
-class DemoSettings(BaseModel):
-    """Editable runtime settings; unknown keys and ambiguous paths are refused."""
+class TutorialExperiment(BaseModel):
+    """One teaching experiment: task selection, run budgets and local bindings.
+
+    Scientific declarations remain owned by the selected task package. This
+    adapter selects the existing TESS fixed workflow and NoPrior treatment;
+    it is not the repository-wide experiment schema.
+    """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
     version: Literal["siderius-tess-tutorial-v1"]
@@ -69,7 +74,7 @@ class TutorialReceipt(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     kind: Literal["tess-teaching-demo"] = "tess-teaching-demo"
     scientific_reproduction: Literal[False] = False
-    settings: DemoSettings
+    settings: TutorialExperiment
     infra_revision: str
     exp_revision: str
     command: tuple[str, ...]
@@ -87,7 +92,7 @@ def disjoint(left: Path, right: Path) -> bool:
     return not (left.is_relative_to(right) or right.is_relative_to(left))
 
 
-def validate_locations(settings: DemoSettings) -> None:
+def validate_locations(settings: TutorialExperiment) -> None:
     """Keep source, data, and all run output in separate directory trees."""
     for checkout in (ROOT, settings.infra_checkout):
         if not disjoint(settings.workspace, checkout) or not disjoint(
@@ -110,7 +115,7 @@ def validate_locations(settings: DemoSettings) -> None:
                 )
 
 
-def build_command(settings: DemoSettings) -> list[str]:
+def build_command(settings: TutorialExperiment) -> list[str]:
     """Reuse production workflow/treatment renderers, overriding only demo knobs."""
     validate_locations(settings)
     args = render_siderius_args(
@@ -193,7 +198,7 @@ def verify_data(data: Path) -> dict[str, str]:
     return hashes
 
 
-def verify_gpu(settings: DemoSettings) -> str:
+def verify_gpu(settings: TutorialExperiment) -> str:
     """Require one supported physical GPU and a working CUDA allocation in infra."""
     probe = subprocess.run(
         [
@@ -229,7 +234,7 @@ def verify_gpu(settings: DemoSettings) -> str:
     return rows[0]
 
 
-def child_environment(settings: DemoSettings) -> dict[str, str]:
+def child_environment(settings: TutorialExperiment) -> dict[str, str]:
     """Keep credentials in the environment and bind generated artifacts to this run."""
     env = os.environ.copy()
     for name in (
@@ -253,7 +258,7 @@ def child_environment(settings: DemoSettings) -> dict[str, str]:
     return env
 
 
-def composition_identity(settings: DemoSettings, manifest: str) -> str:
+def composition_identity(settings: TutorialExperiment, manifest: str) -> str:
     """Resolve with the infra environment and run-local plugins, never user defaults."""
     result = subprocess.run(
         [
@@ -286,7 +291,7 @@ def credential_status(config: Path) -> dict[str, bool]:
     return {name: bool(os.environ.get(name, "").strip()) for name in sorted(required)}
 
 
-def inspect(settings: DemoSettings, *, launch: bool) -> TutorialReceipt:
+def inspect(settings: TutorialExperiment, *, launch: bool) -> TutorialReceipt:
     """Validate before any provider call; previews need neither data nor a GPU."""
     command = build_command(settings)
     # Pin checks intentionally require clean source. Notebook outputs/config edits
@@ -331,10 +336,10 @@ def inspect(settings: DemoSettings, *, launch: bool) -> TutorialReceipt:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--experiment", type=Path, required=True)
     parser.add_argument("--launch", action="store_true")
     args = parser.parse_args()
-    settings = DemoSettings.model_validate_json(args.config.read_text())
+    settings = TutorialExperiment.model_validate_json(args.experiment.read_text())
     receipt = inspect(settings, launch=args.launch)
     if not args.launch:
         missing = [
