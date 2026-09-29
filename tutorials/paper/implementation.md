@@ -188,3 +188,23 @@ new task/data pair and its experiment/script. Both default false. They perform
 preparation only; terminal scripts own launch. Old validation statements above
 refer to earlier notebook revisions (12 code cells); revalidate the current
 11-cell notebook, including both default and opt-in paths, after edits.
+
+
+### Four-demo validation (2026-09-29)
+
+Current notebook has 11 code cells. Default Run All completed without creating
+example configurations or split outputs. Opt-in Run All completed with both
+switches enabled, producing baseline plus four experiment/script pairs and
+new split task/data. Five independent external-script previews and native
+`run_chain.sh --dry-run` calls passed from an unrelated cwd; no run directory
+or launch receipt was created. Selected-data verification passed for each.
+The actual pinned task loader materialized the new split's 3,075 training and
+705 validation examples with input shape (1, 1024). The seed-42 25%/50% Trial
+scope example returned 843/222 curves against 3,338/442 full populations.
+
+The 14 tutorial regressions plus 34 existing TESS task/workflow tests passed.
+Coverage includes distinct Trial/Formal flag mapping, whole-star independence,
+unchanged parent manifest, preserved targets/flux and deterministic star
+assignment. The initialized baseline now fixes Trial fractions at 1.0; the
+older paid smoke run delegated them to the planner. No paid run of the new
+fraction/split recipes is claimed; scientific performance remains unqualified.
