@@ -71,6 +71,11 @@ def selected_split(settings: TidmadExperiment) -> FileSplit | None:
 
 def build_command(settings: TidmadExperiment) -> list[str]:
     split = selected_split(settings)
+    literature = (
+        settings.composition.parent.parent / "framework_configs/lit_review.yaml"
+    )
+    if not literature.is_file():
+        raise ValueError(f"missing task literature-review configuration: {literature}")
     health_files = (
         "0-3" if split is None else ",".join(map(str, sorted(split.validation_files)))
     )
@@ -79,7 +84,14 @@ def build_command(settings: TidmadExperiment) -> list[str]:
         workflow=ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json",
         treatment_path=ROOT
         / "experiments/tidmad/information_treatments/main-fixed-no-prior.yaml",
-    ) + ["--data_scope", "0-3", "--health_gate_files", health_files]
+    ) + [
+        "--data_scope",
+        "0-3",
+        "--health_gate_files",
+        health_files,
+        "--ml_lit_review_config",
+        str(literature),
+    ]
 
 
 def credential_status(settings: TidmadExperiment) -> dict[str, bool]:
@@ -123,6 +135,9 @@ def inspect(settings: TidmadExperiment, *, launch: bool = False) -> dict:
         "composition_fingerprint": fingerprint,
         "llm_config_sha256": hashlib.sha256(
             settings.llm_config.read_bytes()
+        ).hexdigest(),
+        "literature_review_config_sha256": hashlib.sha256(
+            Path(command[command.index("--ml_lit_review_config") + 1]).read_bytes()
         ).hexdigest(),
         "data": data,
         "gpu": gpu,

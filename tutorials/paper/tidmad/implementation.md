@@ -12,7 +12,8 @@ than relying on in-memory settings. Notebook cells never launch or call APIs.
 
 `runner` reuses shared location/GPU/environment/source checks and workflow
 rendering with explicit TIDMAD workflow/treatment paths. TIDMAD NoPrior retains
-literature review; data analysis and advice are disabled. Source checkouts must
+literature review, binding the external task's `framework_configs/lit_review.yaml`
+through `--ml_lit_review_config`; data analysis and advice are disabled. Source checkouts must
 be clean and pins exact. Missing exported credentials refuse before data/GPU
 checks. Preview reports key names/booleans only. Result authority is diagnostic;
 blocking Health is preserved. No total campaign clock/spending cap is supplied.

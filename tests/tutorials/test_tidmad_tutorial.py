@@ -102,6 +102,9 @@ def test_command_uses_selected_file_split_for_health_and_formal_fraction(project
     )
     command = build_command(settings)
     assert command[command.index("--formal_portion") + 1] == "0.1"
+    assert command[command.index("--ml_lit_review_config") + 1] == str(
+        project / "tasks/tidmad/framework_configs/lit_review.yaml"
+    )
     assert (
         "--ml_lit_review_enabled" in command and "--no-data_analysis_enabled" in command
     )
