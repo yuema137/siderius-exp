@@ -2,7 +2,9 @@
 
 TIDMAD is the task package for denoising long SQUID detector time series. One
 example is a long waveform segment. The model receives the noisy signal and
-returns one continuous denoised value for every time step.
+returns one continuous denoised value for every time step in the current
+continuous-regression workflow. Historical classification compositions remain
+available and are identified separately below.
 
 This directory defines what the data means and how a prediction becomes a
 score. It does not choose the number of research iterations, Trial/Formal
@@ -11,15 +13,19 @@ belong to an experiment under `experiments/tidmad/`.
 
 ## The data contract in one minute
 
+Here `B` is batch size and `T` is the model's time-window length. A PSD
+segment is the long waveform interval used to estimate a power spectrum;
+the model processes shorter windows within that interval.
+
 | Item | Current declaration |
 | --- | --- |
 | Files | `abra_training_0000.h5` … `abra_training_0019.h5` and the matching validation files |
-| Dataset files | 20 files total. A main run selects one band: `0-3` (4 files), `4-9` (6 files), `10-14` (5 files), or `15-19` (5 files) |
+| Dataset files | 20 file indices, each with a training and validation file (40 HDF5 files total). A main run selects `0-3` (4 pairs), `4-9` (6 pairs), `10-14` (5 pairs), or `15-19` (5 pairs) |
 | Examples per file | 200 PSD segments |
 | Raw segment | 10,000,000 samples at 10 MHz |
 | Model segment | Caller/model configuration chooses `segmentation_size`; the fixed ICLR workflow requires 40,000 |
 | Input channels | `channel0001` is the noisy SQUID readout; `channel0002` is the injected clean target |
-| Model input | `[B, T]` integer-coded samples. HDF5 stores the raw encoding as `int16`; the task adapter converts it at the model boundary to the contract's `int64` (or compatible `int32`) input |
+| Model input | `[B, T]` integer-coded samples. The profile declares `int8` storage, `int16` arithmetic and offset `+128` to obtain codes 0–255; the model boundary accepts `int64` or `int32` |
 | Model output | `[B, T]` `float32` continuous waveform; there is no class axis and no `argmax` |
 | Stored deliverable | `.h5`, prefix `abra_validation_denoised`, `int8` storage with the task's offset codec |
 | Primary score | `tidmad_denoising_score`, higher is better |
@@ -39,10 +45,10 @@ the task's authority.
 | Which HDF5 root is used | The experiment command's `--data_dir` | This repository's Python code |
 | Which band is exposed | The experiment's `--band` (`0-3`, `4-9`, `10-14`, `15-19`) | A second hard-coded file list in the task |
 | Training/validation file names and topology | `resolved/dataset_profile.json` through its owning declaration/projection, plus provenance and tests | A launcher-only file pattern |
-| The fixed 20-of-200 training parent | `declared/frozen_training_pool_v1.json`; then use the frozen-pool composition | `resolved/` snapshots or an old run receipt |
+| The fixed 20-of-200 training parent | A new pool declaration and matching data-path implementation; the current manifest digest and 0.1 source fraction are enforced in `TidmadFrozenPoolDataPath` | Only the JSON or `--formal_portion`; neither alone changes the frozen pool |
 | Task meaning and model I/O | `declared/task_config_regression.yaml` | `workflow.json` or advice text |
 | Primary score and direction | `resolved/metric_spec.json` and `runtime/scoring.py`, in one reviewed task change | A secondary score or a dashboard ordering rule |
-| Output filename and storage encoding | `resolved/deliverable_spec.json` and `runtime/output_conversion.py` | Candidate code or a shell rename |
+| Output filename and storage encoding | The composition's `deliverable` block, `resolved/dataset_profile.json` encoding, and `runtime/output_conversion.py`; synchronize the deliverable snapshot | Candidate code, a shell rename, or the snapshot alone |
 | Blocking/recording Health checks | `framework_configs/health_regression.yaml` and the referenced runtime checks | Framework policy or the model prompt |
 | What the proposer/implementor is told about the science | `framework_configs/proposal_regression.yaml`, `interpretation.yaml`, or `implementor.yaml` | An experiment budget file |
 | Literature search rules | `framework_configs/lit_review.yaml` | The generic infra repository |
@@ -64,7 +70,7 @@ Choose one composition explicitly in the experiment:
 | --- | --- |
 | `compositions/continuous_regression_frozen_pool.yaml` | Main ICLR-style workflow. Uses the continuous waveform contract and the fixed 20-of-200 training parent. |
 | `compositions/continuous_regression.yaml` | Reusable continuous-regression task without the frozen parent binding. Use only when the experiment intentionally owns a different training scope. |
-| `compositions/bounded_qualification.yaml` | Small qualification scope; it is not a paper-scale campaign definition. |
+| `compositions/bounded_qualification.yaml` | Historical classification contract selected by the two-iteration qualification launcher; not the current regression workflow or a paper-scale campaign. |
 
 Each composition connects the task data path, dataset profile, metric,
 scoreability contract, Health, task prompt blocks, task configuration, and
@@ -78,10 +84,10 @@ composition; it does not rewrite these declarations.
 | `declared/task_config_regression.yaml` | Plain-language task description, `[B,T]` input, `[B,T]` continuous output, admissible dtypes, segmentation semantics, and regression guidance |
 | `declared/frozen_training_pool_v1.json` | Seed `20260916`, 20 selected segment indices for every file, 10% parent (`20/200`), 10,000,000-sample PSD length |
 | `resolved/dataset_profile.json` | 20-file topology, 200 segments/file, 10 MHz rate, channel names, encoding metadata, and Health peek files |
-| `resolved/model_io_contract.json` | The resolved model boundary: integer `[B,T]` input and float32 `[B,T]` output |
+| `resolved/model_io_contract.json` | Historical classification snapshot with `[B,256,T]` output; not selected by the continuous-regression compositions. Their live contract comes from `declared/task_config_regression.yaml` |
 | `resolved/metric_spec.json` | `tidmad_denoising_score`, higher-is-better, anchor-normalized log aggregation, and required deliverable attributes |
-| `resolved/deliverable_spec.json` | `abra_validation_denoised_XXXX.h5`, input/target channel groups, int8 storage, and offset `128` |
-| `resolved/identity.json` | File families and task identity used by the data adapter |
+| `resolved/deliverable_spec.json` | Reference snapshot of output naming and encoding; live naming comes from the composition and storage encoding from the dataset profile |
+| `resolved/identity.json` | Reference snapshot of file families and indices; the runtime adapter reads the bound dataset profile |
 
 ### 3. Prompt and validity declarations
 
@@ -117,8 +123,8 @@ These files are scientific evidence, not a replacement for the external HDF5
 data root.
 
 The scripts in `tools/` compute or render reference artifacts and comparisons.
-They do not change the task package when you run them. Read their command-line
-help and record any generated artifact outside a formal run workspace.
+Inspect each script's output arguments and defaults before running it; select
+an external output directory and preserve the frozen reference files.
 
 ## How a fixed workflow calls this package
 
@@ -160,8 +166,11 @@ experiment preflight and launcher.
 Create a new declared pool JSON and a new composition or experiment treatment.
 Do not edit `frozen_training_pool_v1.json` in place if you need to preserve the
 ICLR identity. Update the pool seed, selected indices, source portion, and
-provenance together. The resulting run is a new treatment and cannot be mixed
-with old scores as if the parent pool were unchanged.
+provenance together. The current `TidmadFrozenPoolDataPath` also pins the
+manifest SHA-256 and requires a 0.1 source fraction. Bind a matching task
+implementation and test it; replacing the JSON alone will be refused.
+The resulting run is a new treatment and cannot be mixed with old scores as
+if the parent pool were unchanged.
 
 ### Change model window length
 
@@ -178,7 +187,9 @@ patch a score in a result file or replace a Health result in a launcher.
 
 ## Quickstart
 
-Use a fresh external workspace and preview before any real run:
+The following previews the historical classification qualification. For the
+current regression workflow, use the linked fixed-workflow steps below.
+Use a fresh external workspace:
 
 ```bash
 bash experiments/tidmad/two_iteration_qualification/launch.sh \

@@ -7,12 +7,13 @@ agent. They do not change the TIDMAD task, data, metric, or validity rules.
 
 | File | Advice | Data Analysis | Literature Review | Direct preparation entrypoint |
 | --- | --- | --- | --- | --- |
-| `main-fixed-no-prior.yaml` | Off | Off | On | `main_fixed_workflow/preflight.py` + normal `launch.sh` |
-| `main-fixed-da-only.yaml` | Off | On | On | `prepare_full.py --condition da-only`, then `FULL_LAUNCH.md` |
-| `main-fixed-full.yaml` | On, `full-prior-v8/advice.json` | On | On | `prepare_full.py --condition full`, then `FULL_LAUNCH.md` |
+| `main-fixed-no-prior.yaml` | Off | Off | On | [NoPrior preflight and launch](../main_fixed_workflow/README.md#what-each-command-does) |
+| `main-fixed-da-only.yaml` | Off | On | On | [`prepare_full.py`](prepare_full.py) with `--condition da-only`, then [launch bindings](../main_fixed_workflow/FULL_LAUNCH.md) |
+| `main-fixed-full.yaml` (historical joint condition) | On, `full-prior-v8/advice.json` | On | On | [`prepare_full.py`](prepare_full.py) with `--condition full`, then [launch bindings](../main_fixed_workflow/FULL_LAUNCH.md) |
 
-The YAML file is the switchboard for information exposure. The shared task
-composition and `workflow.json` stay the same across these rows. Advice is an
+The YAML file selects information exposure. All rows share `workflow.json`
+and the base scientific task. DA-only and Full use an external composition
+derived from that base with the verified analysis binding added. Advice is an
 explicit artifact with a SHA-256 when enabled; an advice-off row records
 `mode: disabled` and no artifact. Module states are explicit so a missing key
 cannot silently turn Data Analysis on or off.

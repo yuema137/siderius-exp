@@ -31,7 +31,8 @@ budgets, and result receipts.
 The TIDMAD fixed workflow has more than one layer. Use these files in order:
 
 1. [`tasks/tidmad/README.md`](../tasks/tidmad/README.md) explains the scientific
-   data contract, the 20 files and 200 segments per file, channels, model I/O,
+   data contract, the 20 training/validation file pairs and 200 segments per
+   file, channels, model I/O,
    score, Health, and task-owned reference rulers.
 2. [`tidmad/main_fixed_workflow/README.md`](tidmad/main_fixed_workflow/README.md)
    explains the fixed workflow files, treatments, preflight, launch command,

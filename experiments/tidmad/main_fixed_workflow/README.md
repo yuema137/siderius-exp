@@ -26,6 +26,7 @@ choose band and external data root
 | `../information_treatments/main-fixed-full.yaml` | Enables the frozen Full advice artifact and Data Analysis | You need the Full prior condition |
 | `advice.json` | Legacy/local Full advice artifact retained for historical compatibility | Do not edit for the current Full treatment; use `full-prior-v8/advice.json` and its manifest |
 | `preflight.py` | Resolves one band, verifies pins/checksums, and prints a launch receipt without starting a chain | Before every fresh unit and after any input change |
+| `../information_treatments/prepare_full.py` | Writes external analysis policy, composition and binding receipt for DA-only or Full | Before previewing either analysis-enabled condition |
 | `FULL_LAUNCH.md` | Preparation and launch instructions for DA-only and historical Full conditions | Before any treatment that enables Data Analysis or advice |
 | `band_inputs.py` | Defines the four supported bands and rejects files outside the selected band | To add a new band or a different file grouping; update checksums and tests too |
 | `launch.sh` | Thin wrapper that invokes the supervisor in this directory's environment | Normally do not edit; it is the stable entrypoint |
@@ -54,7 +55,7 @@ the current file are authoritative; this table explains their meaning.
 | Trial/Formal time budgets | Candidate execution allowances for Trial and Formal |
 | Trial/Formal VRAM budgets | Admission and runtime memory ceilings |
 | `--formal_training_scope_source operator` | Formal training parent is chosen by the experiment, not by an agent proposal |
-| `--formal_portion` | Fraction of each selected parent file used to build the Formal training scope; current value `0.1` means 10% of the declared parent |
+| `--formal_portion` | Must match the frozen parent's fraction of the original population: `0.1 = 20/200`. Formal uses all 20 declared PSD segments per selected file |
 | `--formal_train_portion` | Fraction of that already-selected Formal scope used in each training epoch; current value `1.0` means all of the Formal scope |
 | `--formal_eval_portion` | Final Formal evaluation scope; the ICLR fixed workflow locks this to the full selected validation band |
 | `--training_validation_portion` | Snapshot used for training-time validation loss in new runs |
@@ -77,14 +78,18 @@ prediction/runtime watchdog=disabled
 model_config.segmentation_size=40000 (exact rule)
 ```
 
-The epoch value is a ceiling, not a promise to stop after 100 epochs. The
+The epoch value is an upper limit, not a promise to complete 100 epochs. The
 time policy may stop earlier, and the cooperative budget logic reserves the
 configured downstream fraction for inference, scoring, and saving. Scientific
 early stopping is not enabled by this file.
 
-`formal_portion=0.1` does not mean that each epoch sees 10% of the Formal
-scope. The 10% selection happens first; `formal_train_portion=1.0` then makes
-each epoch use all samples in that selected scope.
+For example, a training file has 200 PSD segments. The task manifest fixes
+20 of them as the parent. Formal uses those same 20 segments;
+`formal_portion=0.1` must match 20/200, and does not select another 10%.
+`formal_train_portion=1.0` makes the full parent available to each epoch,
+subject to the execution budget. A Trial with `trial_portion=0.5` instead
+selects 10 of the parent's 20 segments. See
+`tests/tasks/tidmad/test_frozen_training_pool.py` for the scope regression.
 
 The workflow settings do not change the task's raw data, target, score, or
 Health rules. A proposal still has to satisfy the task model I/O contract and
@@ -109,11 +114,24 @@ The preparation path depends on the condition:
 
 - **NoPrior:** run `preflight.py`, review its receipt, then use the normal
   `launch.sh` entrypoint. The preflight example is for this condition.
-- **DA-only:** first run `prepare_full.py --condition da-only`, then follow the
+- **DA-only:** first run the preparation module below, then follow the
   three explicit analysis bindings in [`FULL_LAUNCH.md`](FULL_LAUNCH.md).
-- **Full:** first run `prepare_full.py --condition full`, then use the Full
+- **Full (historical joint condition):** use `--condition full` with the same
+  preparation module, then use the Full
   launch command in [`FULL_LAUNCH.md`](FULL_LAUNCH.md). Do not infer this path
   from the NoPrior preflight command.
+
+From the exp repository root, prepare DA-only inputs with:
+
+```bash
+.venv/bin/python -m experiments.tidmad.information_treatments.prepare_full \
+  --condition da-only --band 0-3 --output-dir /path/to/new/analysis-inputs
+```
+
+This creates files but starts no run. The destination must not already exist.
+DA-only and Full launch with the generated policy path, policy SHA-256 and
+composition path; they also require the generated-analysis sandbox described
+in the linked launch contract.
 
 ## What each command does
 
@@ -121,13 +139,13 @@ The preparation path depends on the condition:
 
 `preflight.py` checks all of the following before a provider call or training:
 
-- exact exp revision and exact SIDERIUS revision;
+- clean exp/framework checkouts, the recorded exp HEAD, and exact SIDERIUS pin;
 - the installed SIDERIUS package and its `uv.lock` environment;
 - a fresh external workspace;
 - the selected band name and the expected training/validation HDF5 pair list;
 - every selected HDF5 checksum against the committed campaign manifest;
 - `segment_anchors.json` byte equality with the committed task ruler;
-- task composition, workflow JSON, LLM config, literature config, and treatment hashes;
+- task Git tree, workflow/LLM/literature hashes and treatment identity;
 - the final command that will be passed to SIDERIUS.
 
 Example:
@@ -137,12 +155,15 @@ Example:
   --siderius-checkout /path/to/pinned/SIDERIUS \
   --band 0-3 \
   --data_dir /path/to/isolated/band-0-3-data \
-  --workspace /path/to/new/no-prior-0-3-workspace \
+  --workspace /path/to/unit-parent/no-prior-0-3/workspace \
   --run_name reviewed_run_name
 ```
 
 If you change the band, data root, treatment, workspace, or pinned checkout,
 run preflight again. Do not reuse an old receipt after one of those changes.
+The supervisor derives its workspace as `<unit-dir>/workspace`; use that
+exact path in the standalone preflight as shown here. Preflight checks the
+source/dependency pins and data bytes, but does not execute the full chain.
 
 ### 2. Launch: start or resume one unit
 
@@ -156,6 +177,7 @@ bash experiments/tidmad/main_fixed_workflow/launch.sh \
   --launch
 ```
 
+Omit `--launch` to preview the supervisor's resolved receipt before starting.
 `launch.sh` is a wrapper; `supervisor.py` does the work. The first effectful
 launch writes `launch.json` once with the resolved command, input identities,
 UTC start, and UTC deadline. A restart validates the same receipt and resumes

@@ -48,18 +48,22 @@ uv sync --group dev --frozen
 ```
 
 Do not mix checkouts with `PYTHONPATH`, another virtualenv, or an editable
-install. For API-backed work, prepare the required `.env` in the selected
-SIDERIUS checkout before launch; never commit credentials. Raw datasets,
-generated output, caches, and workspaces remain machine-local.
+install. For API-backed work, inject the enabled providers' keys into the
+launching process from a mode-600 external file or managed secret. Never
+commit credentials. The fixed-workflow supervisor checks its environment
+before starting; a file that a later child might load cannot satisfy that
+check. Raw datasets, generated output, caches and workspaces stay external.
+The complete agent contract is in
+[`CLAUDE.md`](CLAUDE.md#environment-and-launch-credentials).
 
 ## Validation
 
-The live test suite requires an explicit `SIDERIUS_CHECKOUT`; it intentionally
-fails when that boundary is missing. Follow the exact command in the relevant
-experiment or campaign README. For a quick, no-data check:
+Tests that inspect or execute framework source require an explicit
+`SIDERIUS_CHECKOUT`; those checks fail when it is missing. Follow the selected
+experiment's validation instructions. To collect tests without running them:
 
 ```bash
-.venv/bin/python -m pytest --collect-only -q
+SIDERIUS_CHECKOUT=/path/to/pinned/SIDERIUS .venv/bin/python -m pytest --collect-only -q
 ```
 
 Current task and campaign status is recorded by their `STATUS.md` or current
