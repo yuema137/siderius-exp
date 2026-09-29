@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from typing import Literal
 
+from execute_tools.dataset_config import DataScope
 from execute_tools.task_data_path import ScopeBuildRequest
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -98,7 +99,8 @@ class FileSplitDataPath(_base().TidmadTaskDataPath):
         self, request: ScopeBuildRequest, leg: Literal["train", "validation"]
     ):
         if (
-            request.subset_ref != "0-3"
+            request.subset_ref is None
+            or DataScope.from_cli(request.subset_ref).file_indices != list(range(4))
             or request.selection_strategy != "snapshot"
             or request.target_partitions
         ):

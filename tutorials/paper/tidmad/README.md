@@ -100,7 +100,9 @@ Changing the split is a new scientific protocol, not the frozen paper result.
 Workflow validation influences the agent and training/model selection. Final
 test happens only after selection: stop search, declare the selected native
 model, seal its hashes, then run the separate test script. The notebook shows
-all candidate-file fields and commands. Its report uses the selected task's
+how to select a saved successful attempt and generate `final-test/candidate.json`
+from its recorded artifact paths. Search scripts retain the training checkpoint
+for this step. Its report uses the selected task's
 metric and scoreability contract, is diagnostic, and does not run the full
 workflow Health assessment. Do not adapt the model to that final score.
 

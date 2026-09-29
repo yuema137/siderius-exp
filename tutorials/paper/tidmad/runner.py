@@ -91,6 +91,7 @@ def build_command(settings: TidmadExperiment) -> list[str]:
         health_files,
         "--ml_lit_review_config",
         str(literature),
+        "--retain_training_checkpoints",
     ]
 
 

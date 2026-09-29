@@ -12,6 +12,8 @@ import json
 import subprocess
 from pathlib import Path
 
+from agent.schemas.hyperparam_tuning import HyperparamTuningOutput
+from core.sandbox_layout import training_checkpoint_path
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from experiments.shared.framework_pin import (
@@ -34,6 +36,7 @@ class Candidate(BaseModel):
     model_name: str = Field(pattern=r"^[A-Za-z0-9_]+$")
     exp_id: str = Field(pattern=r"^[A-Za-z0-9_-]+$")
     checkpoint: Path
+    run_output_path: Path
     model_config_path: Path
     loss_config_path: Path
     generated_library: Path
@@ -41,7 +44,11 @@ class Candidate(BaseModel):
     inference_batch_size: int = Field(default=1, ge=1, le=32)
 
     @field_validator(
-        "checkpoint", "model_config_path", "loss_config_path", "generated_library"
+        "checkpoint",
+        "run_output_path",
+        "model_config_path",
+        "loss_config_path",
+        "generated_library",
     )
     @classmethod
     def absolute(cls, value):
@@ -55,15 +62,83 @@ def digest(path: Path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def candidate_for_record(
+    settings: TidmadExperiment,
+    run_output_path: Path,
+    exp_id: str,
+    *,
+    search_completed: bool = False,
+    inference_batch_size: int = 1,
+) -> Candidate:
+    """Resolve artifacts for an explicitly chosen successful native attempt.
+
+    The caller chooses using workflow validation/Health. This helper never
+    chooses the best record, trains, or reads held-out test arrays.
+    """
+    path = run_output_path.resolve()
+    if not path.is_relative_to(settings.workspace):
+        raise ValueError("select a run record inside this experiment's workspace")
+    output = HyperparamTuningOutput.model_validate_json(path.read_text())
+    matches = [r for r in output.all_records if r.exp_id == exp_id]
+    if len(matches) != 1 or matches[0].status != "success":
+        raise ValueError("select one successful completed attempt from this run record")
+    record = matches[0]
+    fingerprint = composition_identity(settings, str(settings.composition))
+    if (
+        output.task_composition_fingerprint != fingerprint
+        or record.task_composition_fingerprint != fingerprint
+    ):
+        raise ValueError(
+            "selected model was not trained under this task/split identity"
+        )
+    if record.model_type != output.model_type:
+        raise ValueError("run and attempt disagree on model identity")
+
+    def config(name):
+        files = list(path.parent.rglob(f"{name}_config_{exp_id}.json"))
+        if len(files) != 1:
+            raise ValueError(f"expected one persisted {name} config for {exp_id}")
+        return files[0].resolve()
+
+    sentinels = list(path.parent.rglob(f"_OK_{exp_id}"))
+    if len(sentinels) != 1:
+        raise ValueError("expected one native training-success marker for this attempt")
+    return Candidate(
+        model_name=record.model_type,
+        exp_id=exp_id,
+        run_output_path=path,
+        checkpoint=training_checkpoint_path(
+            sentinels[0].parent, record.model_type, exp_id
+        ),
+        model_config_path=config("model"),
+        loss_config_path=config("loss"),
+        generated_library=settings.workspace / "generated_library",
+        search_completed=search_completed,
+        inference_batch_size=inference_batch_size,
+    )
+
+
 def evidence(candidate: Candidate, settings: TidmadExperiment):
     if not candidate.search_completed:
         raise ValueError(
             "stop search and choose the model using validation before sealing"
         )
+    expected = candidate_for_record(
+        settings,
+        candidate.run_output_path,
+        candidate.exp_id,
+        search_completed=candidate.search_completed,
+        inference_batch_size=candidate.inference_batch_size,
+    )
+    if candidate != expected:
+        raise ValueError(
+            "candidate paths or model identity differ from the selected run record"
+        )
     if not candidate.generated_library.is_dir():
         raise ValueError("use the selected run's generated_library directory")
     paths = [
         candidate.checkpoint,
+        candidate.run_output_path,
         candidate.model_config_path,
         candidate.loss_config_path,
         *sorted(

@@ -53,14 +53,18 @@ Ordinary scope fractions select ceil(portion*200), at least one, with per-file
 seeded sampling. Per-epoch `formal_train_portion` stays 1.0. Workflow scope methods
 can return only train/validation groups; `build_final_test_scope` is called only
 by the separate final entrypoint. The adapter accepts snapshot strategy,
-subset_ref 0-3, no target partitions, and model window 40000. CLI Health coverage
+subset_ref whose parsed file set is 0..3 (both range and canonical CSV spelling), no target partitions, and model window 40000. CLI Health coverage
 is explicitly the selected validation file group, not the union of all four
 indices; raw band staging and data_scope remain 0-3. Model I/O, serialization,
 materializers, scoreability, metric arithmetic and Health thresholds are reused.
 
 ## Final-test lifecycle
 
-`Candidate` names the selected native model, model/loss configs, checkpoint,
+The launcher explicitly retains original training checkpoints for final testing.
+`candidate_for_record` resolves a user-selected successful native attempt from a
+run record inside the experiment workspace and requires both run and attempt
+task fingerprints to match the selected composition. It never selects a winner.
+`Candidate` names that run record and the selected native model, model/loss configs, checkpoint,
 success sentinel and generated-library tree. The operator attests search has
 stopped. `--seal` creates a fresh output and records candidate artifacts, task
 composition fingerprint, experiment digest and source revisions before test

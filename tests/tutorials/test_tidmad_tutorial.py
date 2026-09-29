@@ -59,7 +59,7 @@ def test_composed_scopes_hold_out_files_and_keep_original_indices(project):
         selection_strategy="snapshot",
         portion=0.25,
         seed=42,
-        subset_ref="0-3",
+        subset_ref="0,1,2,3",
         task_parameters={"seg_size": 40000},
     )
     with bind_run_task_composition(
@@ -126,6 +126,7 @@ def test_command_uses_selected_file_split_for_health_and_formal_fraction(project
     assert command[command.index("--health_gate_files") + 1] == "2"
     assert command[command.index("--formal_train_portion") + 1] == "1.0"
     assert command.count("--formal_portion") == 1
+    assert "--retain_training_checkpoints" in command
 
 
 def test_existing_tidmad_entry_uses_links_and_never_copies_raw(
@@ -186,21 +187,49 @@ def test_final_selection_change_refused_before_test_data(project, monkeypatch):
             "composition": composition,
         }
     )
+    from agent.schemas.hyperparam_tuning import ExperimentRecord, HyperparamTuningOutput
+
+    model = project / "runs/selected"
+    settings = TidmadExperiment.model_validate(
+        {**settings.model_dump(), "workspace": model}
+    )
     experiment = project / "experiments/holdout.json"
     experiment.write_text(settings.model_dump_json())
-    model = project / "runs/selected"
     model.mkdir()
     (model / "generated_library").mkdir()
-    for name in ("weights.pth", "model.json", "loss.json", "_OK_selected"):
-        (model / name).write_text("selected bytes")
-    candidate = final_test.Candidate(
-        model_name="selected",
-        exp_id="selected",
-        checkpoint=model / "weights.pth",
-        model_config_path=model / "model.json",
-        loss_config_path=model / "loss.json",
-        generated_library=model / "generated_library",
-        search_completed=True,
+    attempt = model / "attempt"
+    (attempt / "cached_models").mkdir(parents=True)
+    for name in ("model_config_selected.json", "loss_config_selected.json"):
+        (attempt / name).write_text("selected config bytes")
+    checkpoint = attempt / "cached_models/model_selected_selected_agent.pth"
+    checkpoint.write_text("selected checkpoint bytes")
+    (checkpoint.parent / "_OK_selected").touch()
+    fingerprint = final_test.composition_identity(settings, str(composition))
+    record_path = attempt / "run_output_iter_001.json"
+    output_record = HyperparamTuningOutput(
+        run_name="iter_001",
+        model_type="selected",
+        file_index=0,
+        status="completed",
+        completed_rounds=1,
+        total_attempts=1,
+        started_at="start",
+        finished_at="finish",
+        task_composition_fingerprint=fingerprint,
+        all_records=[
+            ExperimentRecord(
+                exp_id="selected",
+                status="success",
+                model_type="selected",
+                timestamp="now",
+                params={},
+                task_composition_fingerprint=fingerprint,
+            )
+        ],
+    )
+    record_path.write_text(output_record.model_dump_json())
+    candidate = final_test.candidate_for_record(
+        settings, record_path, "selected", search_completed=True
     )
     path = project / "final-test/candidate.json"
     path.write_text(candidate.model_dump_json())
@@ -225,7 +254,7 @@ def test_final_selection_change_refused_before_test_data(project, monkeypatch):
     final_test.main()
     assert (output / "selection.json").is_file()
     assert not (output / "test-started.json").exists()
-    (model / "weights.pth").write_text("changed after model selection")
+    checkpoint.write_text("changed after model selection")
     monkeypatch.setattr("sys.argv", [*args, "--evaluate"])
     with pytest.raises(ValueError, match="changed after sealing"):
         final_test.main()
@@ -253,3 +282,38 @@ def test_launch_requires_exported_credentials_before_data(project, monkeypatch):
     with pytest.raises(ValueError, match="export required keys"):
         runner.inspect(settings, launch=True)
     assert not settings.workspace.exists()
+
+
+def test_native_scope_acquisition_normalizes_band_and_keeps_training_validation_separate(
+    project,
+):
+    from execute_tools.dataset_config import DataScope
+    from nodes.ml_hyperparameter_tune_agent.scope_acquisition import (
+        acquire_attempt_scopes,
+    )
+
+    path = write_file_split_task(project / "tasks/tidmad", FileSplit())
+    composition = compose_run_task_bindings(str(path))
+    with bind_run_task_composition(
+        composition, physical_data_root=str(project / "data/band-0-3")
+    ):
+        scopes = acquire_attempt_scopes(
+            composed=True,
+            mode="trial",
+            trial_strategy="snapshot",
+            trial_portion=0.01,
+            eval_strategy="snapshot",
+            eval_portion=0.01,
+            train_sampling_seed=42,
+            eval_sampling_seed=43,
+            target_files=None,
+            subset=DataScope.from_cli("0-3"),
+            validation_max_samples=None,
+            task_parameters={"seg_size": 40000},
+            training_validation_portion=0.1,
+        )
+        assert scopes.training.sample_set.keys() == {0, 1}
+        assert scopes.evaluation.sample_set.keys() == {2}
+        assert scopes.training_validation.sample_set.keys() == {2}
+        assert len(scopes.training_validation.sample_set[2]) == 20
+        assert len(scopes.evaluation.sample_set[2]) == 2
