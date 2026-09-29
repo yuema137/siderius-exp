@@ -1,73 +1,120 @@
-# TIDMAD main fixed-workflow configuration
+# TIDMAD fixed workflow experiment
 
-Before launch, complete the [workflow qualification gates](SMOKE_QUALIFICATION.md),
-including scored-output recovery into the next iteration and service-level halt propagation.
+This directory turns the TIDMAD task package into one concrete experiment: one
+band, one external workspace, one run identity, and one selected information
+treatment. It does not redefine TIDMAD's metric or model I/O. Those remain in
+`tasks/tidmad/`.
 
-This directory contains the NoPrior launch path for the planned one-band,
-24-hour main experiment. The paper run is not qualified yet: real H100 data,
-the short smoke, candidate replay, and the final launch checkpoint remain open.
-`workflow.json` pins the continuous-regression task,
-the experiment-owned `iclr_official_v1.json` for every current LLM role,
-the exact 40,000-sample segment length, and the existing frozen-pool
-continuous-regression composition. It selects the same content-pinned 20 of
-200 PSD segments per training file as the deployed single-band CLI baseline.
-Trial chooses a smaller sample from that parent. Formal uses the complete
-parent (`formal_portion=0.1`, `formal_train_portion=1.0`); its portion is
-operator-owned because the frozen-pool capability refuses a different Formal
-parent. Trial validation portion remains agent-chosen. Formal evaluation
-scores the complete validation band. This changes the experiment binding,
-not any file in `tasks/tidmad`.
-The shared configuration
-sets a 100-iteration ceiling, three rounds, at most 100 epochs, 30/120-minute
-Trial/Formal execution allowances, and 40-GiB VRAM limits. Cooperative training
-is explicitly enabled with `--training_budget_reserve_fraction 0.2`. After
-each full validation pass, training continues only if another complete epoch
-fits while preserving this operator allowance for final inference, scoring
-and saving. No scientific early stopping is enabled; the last completed
-weights are retained. Formal has its own allocation even when it inherits the
-Trial proposal. A time/cap stop does not establish convergence; a slow single
-epoch can overrun without the prediction watchdog. Actual receipts distinguish
-the proposal, executed epochs and stop reason. The workspace, band, and 24-hour
-run deadline remain launch-owned.
-The phase runtime watchdog is explicitly disabled (`--no-runtime_watchdog`)
-to avoid terminating candidates based on estimated phase duration. The
-supervisor's fixed 24-hour deadline and disk-space guard remain active.
+The normal user path is:
 
-[V8 advice](../information_treatments/full-prior-v8/advice.json) is the English Full-arm artifact shared by every band
-and by the orchestration prior binding. It asks the agent to start from useful
-published encoder-decoder principles in a new FCNet-informed variant, preferably
-above 100M parameters and near or beyond the approximately 323M reference scale
-when feasible, then explore incremental changes before bolder alternatives; it
-does not supply exact winner code or require a specific layer sequence. NoPrior never receives
-it. Full prior settings are frozen; deployment/execution qualification is a
-separate gate. See [the shared frozen prior](../information_treatments/full-prior-v8/README.md).
+```text
+choose band and external data root
+    → run preflight.py
+    → review the printed pins, hashes, treatment, and command
+    → run launch.sh with the same inputs
+    → inspect the external workspace and receipts
+```
 
-The shared launcher accepts one treatment selector (`full` or
-`no-prior`, the default). Both treatments use the same workflow and agent-parameter JSON. The
-information-treatment manifest owns human advice and the dedicated data-analysis
-state. Full launch preparation requires explicit external analysis inputs;
-see [Full launch preparation](FULL_LAUNCH.md). Formal Full remains unqualified
-until deployment and execution checks are complete.
-NoPrior passes explicit disabled states. ML literature review remains enabled.
+## File map: change the right file
 
-The `main-fixed-no-prior.yaml` manifest declares `data_analysis: disabled`.
-The treatment renderer forwards that state as `--no-data_analysis_enabled`;
-it does not invent a second switch or alter the shared workflow JSON. The
-Full arm requires its frozen band-scoped analysis binding and deployment
-qualification before any effectful launch.
+| File | What it does | Change it when… |
+| --- | --- | --- |
+| `workflow.json` | Shared fixed-workflow settings: task composition, LLM routing file, iterations, rounds, epoch ceilings, Trial/Formal time and VRAM limits, validation/evaluation portions, and parameter rules | You are intentionally defining a new workflow treatment |
+| `iclr_official_v1.json` | Provider/model and reasoning-effort routing for interpret, analysis, propose, implement, validate, tune, and literature review | You are changing the LLM routing; record a new experiment identity |
+| `../information_treatments/main-fixed-no-prior.yaml` | Explicitly disables human advice and Data Analysis while keeping Literature Review enabled | You need the NoPrior information condition |
+| `../information_treatments/main-fixed-da-only.yaml` | Enables Data Analysis and disables model-level advice | You need the DA-only ablation |
+| `../information_treatments/main-fixed-full.yaml` | Enables the frozen Full advice artifact and Data Analysis | You need the Full prior condition |
+| `advice.json` | Legacy/local Full advice artifact retained for historical compatibility | Do not edit for the current Full treatment; use `full-prior-v8/advice.json` and its manifest |
+| `preflight.py` | Resolves one band, verifies pins/checksums, and prints a launch receipt without starting a chain | Before every fresh unit and after any input change |
+| `band_inputs.py` | Defines the four supported bands and rejects files outside the selected band | To add a new band or a different file grouping; update checksums and tests too |
+| `launch.sh` | Thin wrapper that invokes the supervisor in this directory's environment | Normally do not edit; it is the stable entrypoint |
+| `supervisor.py` | Owns the 24-hour unit clock, launch receipt, restart/resume checks, deadline stop, and service boundary | Only when changing run control or restart semantics |
+| `unit_clock.py` | Writes and validates the immutable UTC deadline | Only when changing clock identity or receipt format |
+| `backup.py`, `backup.sh` | Uploads retained certified artifacts and writes backup receipts | Only when changing retained-artifact selection or backup transport |
+| `systemd/` | Service and timer templates for workflow, backup, and disk guard | When installing or changing machine-level service behavior |
 
-## NoPrior preparation check
+The task package files are documented in
+[`tasks/tidmad/README.md`](../../../tasks/tidmad/README.md). If the requested
+change concerns waveform meaning, score, deliverable encoding, data topology,
+or Health thresholds, change the task owner there instead of putting the rule
+in this experiment directory.
 
-`preflight.py` resolves a single NoPrior unit without starting an experiment.
-It checks the repository, dependency, installed package and framework checkout
-revisions; requires a fresh external workspace; and verifies that the selected
-band's data directory contains only its training/validation HDF5 pairs and the
-approved `segment_anchors.json`. Each HDF5 byte stream is checked against the
-existing `campaigns/tidmad_gold/inputs/q3_data_manifest.sha256`. Its JSON output
-records the resolved chain arguments and input digests. It does not write a
-workspace or launch a chain.
+## Current shared workflow settings
 
-From the exact exp checkout after installing its frozen environment:
+`workflow.json` is the single place for the values below. The exact values in
+the current file are authoritative; this table explains their meaning.
+
+| Setting | Meaning |
+| --- | --- |
+| `task_composition` | Uses `continuous_regression_frozen_pool.yaml`, the continuous `[B,T]` waveform task with the fixed training parent |
+| `--num_iterations` | Maximum iterations in this fixed schedule |
+| `--max_rounds` | Tuning rounds within one iteration |
+| `--max_epochs`, `--trial_max_epochs`, `--formal_max_epochs` | Scientific/runtime epoch ceilings; a time budget can stop earlier |
+| Trial/Formal time budgets | Candidate execution allowances for Trial and Formal |
+| Trial/Formal VRAM budgets | Admission and runtime memory ceilings |
+| `--formal_training_scope_source operator` | Formal training parent is chosen by the experiment, not by an agent proposal |
+| `--formal_portion` / `--formal_train_portion` | Formal training scope inside the declared parent |
+| `--formal_eval_portion` | Final Formal evaluation scope; the ICLR fixed workflow locks this to the full selected validation band |
+| `--training_validation_portion` | Snapshot used for training-time validation loss in new runs |
+| `--training_budget_reserve_fraction` | Portion held for final inference, scoring, and saving |
+| `--no-runtime_watchdog` | Disables prediction-based phase killing; the supervisor deadline and disk guard remain separate controls |
+| `workflow_parameter_rules` | Deterministic constraints on model parameters, including the fixed segmentation size |
+
+The current ICLR fixed-workflow file resolves to these concrete values:
+
+```text
+iterations=100, rounds=3
+max_epochs=trial_max_epochs=formal_max_epochs=100
+Trial/Formal time=30/120 minutes
+Trial/Formal VRAM=40/40 GiB
+formal_training_scope_source=operator
+formal_portion=0.1, formal_train_portion=1.0, formal_eval_portion=1.0
+training_validation_portion=0.1
+training_budget_reserve_fraction=0.2
+prediction/runtime watchdog=disabled
+model_config.segmentation_size=40000 (exact rule)
+```
+
+The epoch value is a ceiling, not a promise to stop after 100 epochs. The
+time policy may stop earlier, and the cooperative budget logic reserves the
+configured downstream fraction for inference, scoring, and saving. Scientific
+early stopping is not enabled by this file.
+
+The workflow settings do not change the task's raw data, target, score, or
+Health rules. A proposal still has to satisfy the task model I/O contract and
+the workflow's schema checks.
+
+## Information treatments
+
+The treatment YAML files make information changes explicit. They all point to
+the same `tasks/tidmad` package and the same workflow JSON.
+
+| Treatment | Human advice | Data Analysis | Literature Review |
+| --- | --- | --- | --- |
+| `main-fixed-no-prior.yaml` | Off | Off | On |
+| `main-fixed-da-only.yaml` | Off | On | On |
+| `main-fixed-full.yaml` | On, frozen `full-prior-v8/advice.json` | On | On |
+
+The treatment file is selected by the launcher/supervisor binding. It is not a
+second task manifest. Its SHA-256 and resolved module states are recorded in
+the preflight and launch receipts.
+
+## What each command does
+
+### 1. Preflight: inspect, do not launch
+
+`preflight.py` checks all of the following before a provider call or training:
+
+- exact exp revision and exact SIDERIUS revision;
+- the installed SIDERIUS package and its `uv.lock` environment;
+- a fresh external workspace;
+- the selected band name and the expected training/validation HDF5 pair list;
+- every selected HDF5 checksum against the committed campaign manifest;
+- `segment_anchors.json` byte equality with the committed task ruler;
+- task composition, workflow JSON, LLM config, literature config, and treatment hashes;
+- the final command that will be passed to SIDERIUS.
+
+Example:
 
 ```bash
 .venv/bin/python -m experiments.tidmad.main_fixed_workflow.preflight \
@@ -75,111 +122,78 @@ From the exact exp checkout after installing its frozen environment:
   --band 0-3 \
   --data_dir /path/to/isolated/band-0-3-data \
   --workspace /path/to/new/no-prior-0-3-workspace \
-  --run_name YOUR_REVIEWED_RUN_NAME
+  --run_name reviewed_run_name
 ```
 
-The root `SIDERIUS_REVISION`, `pyproject.toml`, `uv.lock`, installed package and
-isolated framework checkout must all match the selected exact commit.
-The exact current pin is recorded in the root `SIDERIUS_REVISION`. Composed
-inference now passes the resolved model input dtype to the execution adapter.
-Before training, its resource worker also checks one real validation input
-through that adapter. This catches input-interface failures early; it does not
-replace scoring or Health, or guarantee that every validation sample succeeds.
+If you change the band, data root, treatment, workspace, or pinned checkout,
+run preflight again. Do not reuse an old receipt after one of those changes.
 
-## NoPrior unit control
-
-`launch.sh` previews a single unit by default. Supply an external parent
-directory for that unit; the chain workspace is its `workspace/` child. For an
-effectful launch, the parent of the unit directory must already be the mounted
-persistent work volume, so a missing work disk cannot create a new clock on
-the VM boot disk. The unit directory is private to the service account:
+### 2. Launch: start or resume one unit
 
 ```bash
 bash experiments/tidmad/main_fixed_workflow/launch.sh \
   --siderius-checkout /path/to/pinned/SIDERIUS \
   --band 0-3 \
   --data_dir /path/to/isolated/band-0-3-data \
-  --unit-dir /path/to/new/no-prior-0-3-unit \
-  --run_name YOUR_REVIEWED_RUN_NAME
+  --unit-dir /path/to/unit-parent/no-prior-0-3 \
+  --run_name reviewed_run_name \
+  --launch
 ```
 
-The preview checks pins, treatment, configuration and all selected input
-checksums; it creates no unit files. Adding `--launch` starts or resumes the
-effectful chain. Before the first effect, it also requires exactly one H100
-and checks the presence of API keys for enabled LLM providers in the same
-process. A trusted external secret injector or mode-600 service environment
-file must supply those keys; values never enter receipts.
+`launch.sh` is a wrapper; `supervisor.py` does the work. The first effectful
+launch writes `launch.json` once with the resolved command, input identities,
+UTC start, and UTC deadline. A restart validates the same receipt and resumes
+the same workspace without extending the deadline. A new scientific treatment
+requires a new unit directory and run identity.
 
-The first launch writes `launch.json` exactly once, with the resolved command,
-input identities, UTC start and the start plus 24 hours as deadline. Restart
-revalidates the current inputs against that receipt and resumes the same chain
-workspace without extending the deadline. The supervisor appends events and
-chain output below the unit directory and kills the chain process group at the
-deadline. `systemd/tidmad-no-prior@.service` is the reboot/restart template;
-replace `@NO_PRIOR_USER@`, `@NO_PRIOR_GROUP@`, and `@UNIT_MOUNT@` with a dedicated
-unprivileged account and the mounted work-volume path before installation.
-Each `%i` needs its own mode-600
-`/etc/tidmad-no-prior/%i.env` declaring `EXP_CHECKOUT`, `SIDERIUS_CHECKOUT`,
-`BAND`, `DATA_DIR`, `UNIT_DIR`, `RUN_NAME`, and the required provider key. The
-service must be enabled for boot recovery. No unit is installed or launched by
-this repository change.
+The service requires one H100 for the formal deployment, provider keys from a
+mode-600 external environment, and a mounted persistent work volume. Secrets
+are checked for presence but never written to receipts.
 
-The ordinary output-retention default removes large per-sample deliverables
-after scoring and Health. The tuner also removes raw training `.pth` files
-after each attempt by default (preserving the latest completed Formal training output), while retaining every scored
-certified `.pt` candidate. The main experiment still needs a demonstrated
-offline candidate replay and scorer/Health parity check before paper-run
-authorization.
+### 3. Backup and disk protection
 
-## Retained-artifact backup and disk guard
+The backup service and disk guard are independent systemd units. Backup keeps
+certified `.pt` candidates, configs, source, score/Health receipts, and
+provenance. It excludes raw `.pth` training files, denoised HDF5, `.env`,
+temporary files, and logs. Every upload appends a local backup receipt. The
+disk guard writes a `low_space_stop` receipt and stops the workflow service if
+the mounted volume falls below its configured free-space threshold.
 
-`backup.sh` is an exp-owned, independent service. Its systemd oneshot and
-10-minute timer are `systemd/tidmad-no-prior-backup@.*`; the separate 2-minute
-free-space guard is `systemd/tidmad-no-prior-disk-guard@.*`. Install both pairs
-with the same `@UNIT_MOUNT@` replacement as the workflow service, then enable
-both timers for each band. Both wait until immutable `launch.json` exists. Run
-one manual backup service invocation after launch to verify an actual upload
-and receipt before relying on the timer.
+Install the matching templates under `systemd/` only after replacing the
+machine placeholders and reviewing the unit-specific environment files. The
+repository does not install or start services automatically.
 
-Each instance needs a separate mode-600
-`/etc/tidmad-no-prior/%i-backup.env` with `BACKUP_BUCKET`, `BACKUP_PREFIX`,
-`BACKUP_ENDPOINT`, `AWS_DEFAULT_REGION`, `AWS_ACCESS_KEY_ID`, and
-`AWS_SECRET_ACCESS_KEY`; the
-ordinary `%i.env` still owns `UNIT_DIR` and `EXP_CHECKOUT`. Install AWS CLI
-1.46.1 in a separate `/opt/tidmad-no-prior/awscli-venv`; the backup service's
-PATH selects it without changing the frozen exp or infra environments. Grant
-the instance's writer group only `storage.uploader` and
-`storage.object-lister` for its own versioned bucket; these roles permit sync
-and multipart upload without object read or delete. Never put S3 keys in a
-repository or the workflow's LLM environment file.
+## Changing data splits or other settings
 
-The sync includes certified `.pt` weights, model artifact documents, configs,
-source, scoring and Health receipts. It excludes retired training `.pth`,
-denoised HDF5, environment files, temporary files and logs, never uses S3 deletion, and appends
-local `backup_receipts.jsonl` after each attempt. Versioning protects earlier
-object revisions when a JSON record grows. If the mounted work volume falls
-below 50 GiB free, the backup service first stops that instance's workflow
-service and writes a `low_space_stop` receipt; the 24-hour deadline remains
-unchanged. Operators must inspect disk space and the receipt before resuming.
+Use this decision sequence:
 
+1. **Only a different existing band?** Keep the task and workflow files. Change
+   `--band` and `--data_dir`; preflight will reject files from other bands.
+2. **A different set of segment rows?** Create a new declared pool JSON and
+   composition/treatment. Update its seed, row indices, provenance, and tests.
+   Do not overwrite `frozen_training_pool_v1.json` for a new scientific arm.
+3. **A different model window or training budget?** Change `workflow.json` and
+   give the result a new experiment identity. Re-run preflight and qualification.
+4. **A different scientific output, score, or Health rule?** Change the task
+   declarations/runtime under `tasks/tidmad/`, update the reference evidence,
+   and start a fresh task/experiment identity. Do not patch a result file.
+5. **A different advice or Data Analysis condition?** Add or update a treatment
+   YAML and its referenced artifact. Keep the task composition and scientific
+   contract unchanged.
 
-### Fresh-unit timing evidence
+## Retention and provenance
 
-The supervisor binds `SIDERIUS_CALIBRATION_DIR` to `<unit-dir>/calibration`,
-overriding any inherited host-wide value. A fresh unit starts with independent
-timing evidence; resuming the same unit keeps its evidence and immutable clock.
-The generated model library remains workspace-local. Raw data and machine-owned
-credentials can be reused without reusing a previous run's learned timing state.
+The external unit directory contains the launch receipt, chain workspace,
+candidate records, scoring and Health evidence, backup receipts, and the
+immutable deadline events. The repository contains no raw HDF5, credentials,
+run workspace, or generated candidate code. Historical units are not resumed
+under a new release; a new release creates a fresh unit and records its exact
+pin.
 
-## Training validation policy for new runs
+## Related files
 
-Both NoPrior and Full use a task-owned random snapshot of 10% of the eligible
-validation population for per-epoch loss. Each attempt records its selection
-seed and scope and reuses that snapshot for every epoch. Final Formal inference,
-scoring and Health continue to cover the full declared evaluation scope
-(`formal_eval_portion=1.0`). The frozen training pool is unchanged.
-
-This shared workflow policy applies to future runs of both conditions. Historical
-completed NoPrior runs used full-scope epoch validation and remain unchanged;
-record that treatment difference rather than describing them as having identical
-validation policy. Full v1 was stopped for diagnosis before this change.
+- [TIDMAD task package](../../../tasks/tidmad/README.md)
+- [TIDMAD data-root preparation](../../../tasks/tidmad/data/README.md)
+- [Full launch preparation](FULL_LAUNCH.md)
+- [Smoke qualification](SMOKE_QUALIFICATION.md)
+- [Continuation and resume](CONTINUATION.md)

@@ -3,6 +3,25 @@
 These small files say what information an experiment gives to its research
 agent. They do not change the TIDMAD task, data, metric, or validity rules.
 
+## Current fixed-workflow files
+
+| File | Advice | Data Analysis | Literature Review | Used by |
+| --- | --- | --- | --- | --- |
+| `main-fixed-no-prior.yaml` | Off | Off | On | fixed NoPrior workflow |
+| `main-fixed-da-only.yaml` | Off | On | On | fixed DA-only ablation |
+| `main-fixed-full.yaml` | On, `full-prior-v8/advice.json` | On | On | fixed Full workflow |
+
+The YAML file is the switchboard for information exposure. The shared task
+composition and `workflow.json` stay the same across these rows. Advice is an
+explicit artifact with a SHA-256 when enabled; an advice-off row records
+`mode: disabled` and no artifact. Module states are explicit so a missing key
+cannot silently turn Data Analysis on or off.
+
+The older `prerelease-with-advice.yaml` and
+`prerelease-without-advice.yaml` files describe an earlier qualification
+surface. Keep them for historical reproduction; do not use them as the current
+ICLR fixed-workflow treatment.
+
 Both treatments use the same task package in `tasks/tidmad`:
 
 - `prerelease-with-advice.yaml` includes the reviewed prerelease advice file.
@@ -15,6 +34,15 @@ the absence is recorded instead of being left implicit.
 Module states are also explicit. For example, literature review can be turned
 off in a SIDERIUS workflow while being `not_applicable` to a coding-agent
 product that has no matching workflow module.
+
+## How a treatment is called
+
+The fixed-workflow preflight resolves the selected treatment before building
+the SIDERIUS command. It records the treatment id, artifact digest, and module
+states in the launch receipt. Users normally select the treatment through the
+fixed workflow's launcher binding; they should not edit the generated command
+to add or remove an advice/data-analysis flag. To create a new condition, add a
+new treatment file and qualify it against the same task composition.
 
 For the main fixed workflow, `main-fixed-no-prior.yaml` declares Data Analysis
 disabled. The SIDERIUS adapter renders this as `--no-data_analysis_enabled`;

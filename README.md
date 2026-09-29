@@ -14,6 +14,17 @@ the generic framework lives in the separate [SIDERIUS repository](https://github
 The shortest safe path is to read the relevant task page, then the experiment
 page, and use its dry-run command before an effectful launch.
 
+For the ICLR scientific work, read the package README before opening a
+launcher. The package README explains what the data means; the experiment
+README explains which files and run settings are used.
+
+| You want to… | Read first |
+| --- | --- |
+| Understand TIDMAD files, channels, splits, score, and Health | [`tasks/tidmad/README.md`](tasks/tidmad/README.md) |
+| Run or change the TIDMAD fixed workflow | [`experiments/tidmad/main_fixed_workflow/README.md`](experiments/tidmad/main_fixed_workflow/README.md) |
+| Compare TIDMAD information treatments | [`experiments/tidmad/information_treatments/README.md`](experiments/tidmad/information_treatments/README.md) |
+| Prepare the external TIDMAD data root | [`tasks/tidmad/data/README.md`](tasks/tidmad/data/README.md) |
+
 ## What belongs here
 
 - `tasks/`: scientific meaning, data identity, splits, plugins, metrics, and validity rules.
@@ -53,6 +64,20 @@ experiment or campaign README. For a quick, no-data check:
 
 Current task and campaign status is recorded by their `STATUS.md` or current
 index. Historical records are evidence, not launch authorization.
+
+## Task, experiment, and campaign are different things
+
+Use a **task package** when you need to change scientific meaning: data layout,
+model input/output, objective, metric, deliverable encoding, or Health rules.
+Use an **experiment** when you need to change how the search runs: information
+treatment, advice, model routing, band, iteration/round schedule, time/VRAM
+budget, or workspace identity. Use a **campaign** when you coordinate several
+experiment units.
+
+For TIDMAD, a different existing band can use the fixed-workflow launcher with
+a different `--band` and external `--data_dir`. A new scientific parent or file
+identity requires a new task/experiment binding and provenance; it should not
+be hidden in a shell argument or an old run receipt.
 
 ## More detail
 
