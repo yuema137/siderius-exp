@@ -9,7 +9,7 @@ The normal user path is:
 
 ```text
 choose band and external data root
-    → run preflight.py
+    → run preflight.py (NoPrior only)
     → review the printed pins, hashes, treatment, and command
     → run launch.sh with the same inputs
     → inspect the external workspace and receipts
@@ -26,6 +26,7 @@ choose band and external data root
 | `../information_treatments/main-fixed-full.yaml` | Enables the frozen Full advice artifact and Data Analysis | You need the Full prior condition |
 | `advice.json` | Legacy/local Full advice artifact retained for historical compatibility | Do not edit for the current Full treatment; use `full-prior-v8/advice.json` and its manifest |
 | `preflight.py` | Resolves one band, verifies pins/checksums, and prints a launch receipt without starting a chain | Before every fresh unit and after any input change |
+| `FULL_LAUNCH.md` | Preparation and launch instructions for DA-only and historical Full conditions | Before any treatment that enables Data Analysis or advice |
 | `band_inputs.py` | Defines the four supported bands and rejects files outside the selected band | To add a new band or a different file grouping; update checksums and tests too |
 | `launch.sh` | Thin wrapper that invokes the supervisor in this directory's environment | Normally do not edit; it is the stable entrypoint |
 | `supervisor.py` | Owns the 24-hour unit clock, launch receipt, restart/resume checks, deadline stop, and service boundary | Only when changing run control or restart semantics |
@@ -53,7 +54,8 @@ the current file are authoritative; this table explains their meaning.
 | Trial/Formal time budgets | Candidate execution allowances for Trial and Formal |
 | Trial/Formal VRAM budgets | Admission and runtime memory ceilings |
 | `--formal_training_scope_source operator` | Formal training parent is chosen by the experiment, not by an agent proposal |
-| `--formal_portion` / `--formal_train_portion` | Formal training scope inside the declared parent |
+| `--formal_portion` | Fraction of each selected parent file used to build the Formal training scope; current value `0.1` means 10% of the declared parent |
+| `--formal_train_portion` | Fraction of that already-selected Formal scope used in each training epoch; current value `1.0` means all of the Formal scope |
 | `--formal_eval_portion` | Final Formal evaluation scope; the ICLR fixed workflow locks this to the full selected validation band |
 | `--training_validation_portion` | Snapshot used for training-time validation loss in new runs |
 | `--training_budget_reserve_fraction` | Portion held for final inference, scoring, and saving |
@@ -80,6 +82,10 @@ time policy may stop earlier, and the cooperative budget logic reserves the
 configured downstream fraction for inference, scoring, and saving. Scientific
 early stopping is not enabled by this file.
 
+`formal_portion=0.1` does not mean that each epoch sees 10% of the Formal
+scope. The 10% selection happens first; `formal_train_portion=1.0` then makes
+each epoch use all samples in that selected scope.
+
 The workflow settings do not change the task's raw data, target, score, or
 Health rules. A proposal still has to satisfy the task model I/O contract and
 the workflow's schema checks.
@@ -98,6 +104,16 @@ the same `tasks/tidmad` package and the same workflow JSON.
 The treatment file is selected by the launcher/supervisor binding. It is not a
 second task manifest. Its SHA-256 and resolved module states are recorded in
 the preflight and launch receipts.
+
+The preparation path depends on the condition:
+
+- **NoPrior:** run `preflight.py`, review its receipt, then use the normal
+  `launch.sh` entrypoint. The preflight example is for this condition.
+- **DA-only:** first run `prepare_full.py --condition da-only`, then follow the
+  three explicit analysis bindings in [`FULL_LAUNCH.md`](FULL_LAUNCH.md).
+- **Full:** first run `prepare_full.py --condition full`, then use the Full
+  launch command in [`FULL_LAUNCH.md`](FULL_LAUNCH.md). Do not infer this path
+  from the NoPrior preflight command.
 
 ## What each command does
 

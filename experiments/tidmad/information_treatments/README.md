@@ -5,11 +5,11 @@ agent. They do not change the TIDMAD task, data, metric, or validity rules.
 
 ## Current fixed-workflow files
 
-| File | Advice | Data Analysis | Literature Review | Used by |
+| File | Advice | Data Analysis | Literature Review | Direct preparation entrypoint |
 | --- | --- | --- | --- | --- |
-| `main-fixed-no-prior.yaml` | Off | Off | On | fixed NoPrior workflow |
-| `main-fixed-da-only.yaml` | Off | On | On | fixed DA-only ablation |
-| `main-fixed-full.yaml` | On, `full-prior-v8/advice.json` | On | On | fixed Full workflow |
+| `main-fixed-no-prior.yaml` | Off | Off | On | `main_fixed_workflow/preflight.py` + normal `launch.sh` |
+| `main-fixed-da-only.yaml` | Off | On | On | `prepare_full.py --condition da-only`, then `FULL_LAUNCH.md` |
+| `main-fixed-full.yaml` | On, `full-prior-v8/advice.json` | On | On | `prepare_full.py --condition full`, then `FULL_LAUNCH.md` |
 
 The YAML file is the switchboard for information exposure. The shared task
 composition and `workflow.json` stay the same across these rows. Advice is an
@@ -22,7 +22,8 @@ The older `prerelease-with-advice.yaml` and
 surface. Keep them for historical reproduction; do not use them as the current
 ICLR fixed-workflow treatment.
 
-Both treatments use the same task package in `tasks/tidmad`:
+The two historical `prerelease-*` files also reference the same task package
+in `tasks/tidmad`:
 
 - `prerelease-with-advice.yaml` includes the reviewed prerelease advice file.
 - `prerelease-without-advice.yaml` explicitly includes no human advice.

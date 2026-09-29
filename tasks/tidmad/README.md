@@ -14,12 +14,12 @@ belong to an experiment under `experiments/tidmad/`.
 | Item | Current declaration |
 | --- | --- |
 | Files | `abra_training_0000.h5` … `abra_training_0019.h5` and the matching validation files |
-| Files per task scope | 20 files; a main run selects one band: `0-3`, `4-9`, `10-14`, or `15-19` |
+| Dataset files | 20 files total. A main run selects one band: `0-3` (4 files), `4-9` (6 files), `10-14` (5 files), or `15-19` (5 files) |
 | Examples per file | 200 PSD segments |
 | Raw segment | 10,000,000 samples at 10 MHz |
 | Model segment | Caller/model configuration chooses `segmentation_size`; the fixed ICLR workflow requires 40,000 |
 | Input channels | `channel0001` is the noisy SQUID readout; `channel0002` is the injected clean target |
-| Model input | `[B, T]` integer-coded samples, passed to PyTorch as `int64` or `int32` |
+| Model input | `[B, T]` integer-coded samples. HDF5 stores the raw encoding as `int16`; the task adapter converts it at the model boundary to the contract's `int64` (or compatible `int32`) input |
 | Model output | `[B, T]` `float32` continuous waveform; there is no class axis and no `argmax` |
 | Stored deliverable | `.h5`, prefix `abra_validation_denoised`, `int8` storage with the task's offset codec |
 | Primary score | `tidmad_denoising_score`, higher is better |
