@@ -94,6 +94,9 @@ performance or archived paper reproduction. H100 has no local real-run witness.
 
 The subsequent responsibility refactor renames the input to
 `TutorialExperiment` / `--experiment`, changes notebook editing/inspection and
-documentation, and leaves native command construction unchanged. Validate the
-final script's saved-file handoff and compare its rendered native argv against
-the smoke receipt; do not imply a second paid run occurred.
+documentation, and leaves native command construction unchanged. The final script's saved-file handoff was executed against a notebook-created
+task copy and two-epoch experiment: its fingerprint changed and its epoch
+flags matched the saved file. For the original settings, its rendered native
+argv matched the smoke receipt (apart from the fresh workspace needed for
+preview). The final notebook executed all 12 code cells with actual smoke
+records, including observational Health failures. No second paid run occurred.

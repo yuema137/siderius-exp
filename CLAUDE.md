@@ -91,3 +91,11 @@ inherited conflicting overlays. Follow the selected launcher's actual checks.
 
 Continue development and review in Galileo-Sandbox. Synchronize to yuema137
 only for a stable release selected by the operator.
+
+
+## Paper tutorial ownership
+
+For notebook/task/experiment/launch responsibilities, follow the owning
+[tutorial support contract](tutorials/paper/implementation.md#tutorial-responsibility-boundary).
+Keep notebook teaching and opt-in configuration editing separate from script
+execution; do not add provider calls or workflow launch to notebook cells.
