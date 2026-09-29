@@ -8,7 +8,9 @@ interpreter. `write_file_split_task` writes a new composition containing a
 validated `FileSplit` constructor value. That inline declaration participates
 in composition fingerprinting. Notebook save cells create the task YAML,
 experiment JSON and matching shell scripts; read-back cells inspect disk rather
-than relying on in-memory settings. Notebook cells never launch or call APIs.
+than relying on in-memory settings. The Run All quick-demo cell delegates to its saved search script; all native
+execution/provider calls remain owned by that script and workflow. Advanced
+save/readback cells do not execute searches.
 
 `runner` reuses shared location/GPU/environment/source checks and workflow
 rendering with explicit TIDMAD workflow/treatment paths. TIDMAD NoPrior retains

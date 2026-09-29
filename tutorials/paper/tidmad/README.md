@@ -3,7 +3,9 @@
 The [notebook](../notebooks/02_tidmad_tutorial.ipynb) teaches a complete sequence:
 choose data, change settings, save your task/experiment, open the saved files,
 then run the script that selects them. It uses **band 0–3** only. The notebook
-prepares and explains; terminal scripts launch searches and final inference.
+prepares and explains; its Run All quick-demo cell invokes a saved search
+script and plots score versus iteration. Set `RUN_QUICK_DEMO=False` to skip paid
+execution. Final inference remains a separate, explicitly selected step.
 
 ## Initialize your own project
 

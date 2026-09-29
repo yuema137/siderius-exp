@@ -40,6 +40,23 @@ produced no valid model for final testing. The separate TIDMAD final-test path
 therefore does not yet have a successful real-run qualification. Do not treat
 small fractions or a completed command as proof of model quality.
 
+## What you will see after Run All
+
+With the external project, data and exported keys ready, the notebook saves a
+three-iteration experiment, displays its files/parameters, invokes its shell
+script, and draws **score versus iteration** from actual run records. Filled
+markers mean Health PASS; hollow markers mean Health FAIL/failed attempts.
+Missing scores have their own strip, never a fabricated y=0. The best-recorded
+score line can include invalid points, just as the paper separates score from
+validity. CSV, PNG and SVG outputs are saved under your project's `plots/`.
+
+Re-running an unchanged completed demo redraws results without another API call.
+To plot a different run, change `PLOT_WORKSPACE` and execute only the plotting
+cell. To launch changed settings, choose a new `DEMO_NAME`. Three iterations can
+still take many minutes because each includes LLM work and native checks; small
+budgets do not guarantee a valid model. Independent final testing is a separate,
+manual model-selection step, not part of the quick-demo validation plot.
+
 ## Before you start
 
 - Linux, Python 3.12, `git`, `uv`, and one supported NVIDIA RTX 5090 or H100.
@@ -74,8 +91,9 @@ experiment; changing the target or metric changes the task.
 The notebook explains both layers and demonstrates editing a copied task and
 saving an external `tess-experiment.json`. The script reads that saved file,
 resolves the selected task, checks prerequisites and launches the framework.
-The notebook never launches the workflow or calls a provider. Its in-memory
-edits do not affect a script until saved to the file passed with `--experiment`.
+The quick-demo Run All cell invokes that saved script; training and provider
+calls remain in the existing workflow. Its in-memory edits do not affect a
+script until saved to the file passed with `--experiment`.
 
 `TutorialExperiment` is this teaching entrypoint's input contract, not a new
 repository-wide experiment format. It selects a task using `composition` and
@@ -197,9 +215,12 @@ cd "$TUTORIAL_HOME"
 
 Open `notebooks/01_tess_tutorial.ipynb` and select **SIDERIUS exp tutorial**.
 The notebook reads `project.json` to find installed code, then inspects your
-copied task and experiment. Default Run All is read-only. Its opt-in exercises
-save example experiments/scripts and optionally create a re-split task/data
-pair in your project, never in either repository.
+copied task and experiment. **After preparing data in section 4**, Run All
+saves and executes a three-iteration quick demo, then plots its actual Formal
+scores and Health markers. This uses paid APIs and GPU time. Set
+`RUN_QUICK_DEMO=False` to skip execution. Advanced opt-in exercises save separate
+experiment/scripts and optionally create a re-split task/data pair in your
+project, never in either repository.
 
 ### Where human advice belongs
 
@@ -328,7 +349,7 @@ needs no credentials, prepared data or GPU. Launch additionally checks keys,
 both staged populations, hashes, GPU name/capacity and an actual CUDA allocation
 in infra's environment. It refuses root execution.
 
-The default demo runs one iteration with one Trial and one Formal opportunity,
+The initial manual experiment (distinct from the three-iteration Run All demo) runs one iteration with one Trial and one Formal opportunity,
 one-epoch ceilings, 2/5-minute training attempt budgets and an 8 GiB VRAM budget. A
 candidate can fail validation or training; a Formal score is not guaranteed.
 Explicit data fractions can differ from the historical agent-controlled Trial

@@ -103,8 +103,11 @@ only for a stable release selected by the operator.
 
 For notebook/task/experiment/launch responsibilities, follow the owning
 [tutorial support contract](tutorials/paper/implementation.md#tutorial-responsibility-boundary).
-Keep notebook teaching and opt-in configuration editing separate from script
-execution; do not add provider calls or workflow launch to notebook cells.
+Keep training/execution owned by the saved scripts. The Run All quick-demo
+cell may explicitly invoke its saved script (operator-requested onboarding
+route); notebook cells must not reimplement training or construct provider calls.
+Disclose API/GPU effects before the cell and reuse completed runs without
+silently relaunching them.
 
 Tutorial users edit only their initialized external project: copied notebooks,
 tasks, experiment JSON, LLM routing and generated scripts. Never prescribe

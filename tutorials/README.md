@@ -3,7 +3,10 @@
 These tutorials are for readers who are new to SIDERIUS. They show how to copy a
 scientific task into your own project, change its experiment settings, inspect
 the saved files, and start a run from a terminal script. The notebooks teach and
-edit configuration; the scripts run the research workflow.
+edit configuration, then their Run All quick demo invokes the saved script and
+plots three iterations of real results. The scripts own research execution.
+Run All requires prepared data/exported keys and incurs API/GPU work;
+`RUN_QUICK_DEMO=False` is the inspection-only option.
 
 **Start with [the paper tutorial guide](paper/README.md).** It explains installation,
 API keys, data preparation, supported hardware, and what the demos can establish.

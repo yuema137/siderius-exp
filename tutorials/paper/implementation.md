@@ -38,12 +38,14 @@ Hugging Face LFS objects and are verified again locally. No test file is request
 
 ## Notebook effects
 
-The notebook is committed without outputs or execution counts. Default Run All
-only reads source and optional staged data. It does not download, write config,
-call providers or train. Two named opt-in booleans control external config
-writing and task-copy creation. Tensor normalization uses the task authority.
-Long execution is shown as a terminal command. The kernel must use the exact
-exp virtualenv; editable notebooks and configs belong outside source.
+The notebook is committed without outputs or execution counts. The operator's
+Run All onboarding route supersedes the earlier read-only default: it writes a
+named external quick-demo JSON/script, reviews it, invokes that script with
+`--launch`, and renders real progress records. RUN_QUICK_DEMO=False suppresses
+execution. Re-running a completed unchanged demo reuses its result; edited
+settings require a new name. Advanced example/split saves remain opt-in. Data
+must be prepared and keys exported before Jupyter starts. No raw data download
+occurs implicitly. The exact exp kernel owns notebook execution.
 
 ## Validation ownership
 
@@ -58,14 +60,14 @@ witnesses are distinct from a paid real-agent or GPU training qualification.
 
 ## Tutorial responsibility boundary
 
-The notebook owns explanation, opt-in external task-copy/experiment editing,
-and read-only inspection. It must not execute `run.sh`, native framework launch,
-or provider calls. The script owns parsing the saved experiment, resolving its
-selected task, credential/data/GPU/source checks, argv construction and launch.
-The notebook imports the experiment schema and read-only credential checker;
-it does not construct native framework argv. `--experiment` is the only input
-configuration flag. The workflow and information treatment remain fixed by this
-TESS entrypoint; composition/routing and budget changes are explicit fields.
+The notebook owns explanation, external configuration editing, saved-file
+review, delegation to its saved script, and plotting. `quick_demo.run_demo`
+executes that script, not native training or provider constructors. The script
+owns parsing the saved experiment, task resolution, credential/data/GPU/source
+checks, native argv construction and launch. This explicit Run All orchestration
+route was requested after the original no-notebook-launch boundary. Manual
+terminal execution remains available. Final-test selection is not automatic;
+the notebook does not select a winner or consume the holdout to make a graph.
 
 Credential status is derived from enabled routing and contains names/booleans
 only. Preview warns but stays offline; launch rejects absent/whitespace values
@@ -194,7 +196,7 @@ refer to earlier notebook revisions (12 code cells); revalidate the current
 
 ### Four-demo validation (2026-09-29)
 
-Current notebook has 11 code cells. Default Run All completed without creating
+Historical pre-quick-demo notebook had 11 code cells. Its default Run All completed without creating
 example configurations or split outputs. Opt-in Run All completed with both
 switches enabled, producing baseline plus four experiment/script pairs and
 new split task/data. Five independent external-script previews and native
@@ -243,3 +245,29 @@ TIDMAD's section-7 search review precedes section-8 seal/evaluate. Local README
 links and empty committed notebook outputs were checked. Frozen installation
 from yuema137/SIDERIUS succeeded at unchanged revision 349b6cd6d9766abbf3d87515b22e1005599a694b.
 No new paid model search was needed for these presentation changes.
+
+
+## Three-iteration Run All and progress plotting
+
+`quick_demo.prepare_demo` validates settings through the existing TESS/TIDMAD
+experiment schema, saves a uniquely named external JSON/script, and refuses a
+same-name settings change. TIDMAD uses a separate copied file-holdout task.
+`run_demo` delegates to the saved bash launcher after key/presence/binding review,
+logs outside source, and records completion plus experiment digest. Completed
+runs are reused; interrupted/existing unreceipted runs require inspection and
+a new name, not automatic resume. Kernel interruption terminates its owned child
+process group. Nonzero chain exits remain visible; plotted failure records do
+not become successful scientific results.
+
+`progress.read_progress` validates native HyperparamTuningOutput, uses outer
+chain `iter_NNN` as x, keeps Formal records only, and reads `metric_result.scalar`
+even when accepted denoising_score has been nullified for invalidity. It never
+substitutes Trial, invents zero for missing/nonfinite values, mixes metrics or
+merges duplicate iteration/attempt identities. Filled/hollow markers record
+Health PASS/FAIL or failed attempt status; unknown Health uses a distinct cross.
+This follows the paper cross-task figure's Health fill convention but is not
+retrospective behavioral certification. The running-best raw-score line includes
+invalid observations, respecting metric direction. Missing values/no Formal
+records appear in a separate unscored strip. PNG/SVG/CSV outputs live externally;
+the CSV retains source-record paths. A user can replot another workspace without
+executing any search.
