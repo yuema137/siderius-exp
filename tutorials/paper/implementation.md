@@ -210,3 +210,36 @@ unchanged parent manifest, preserved targets/flux and deterministic star
 assignment. The initialized baseline now fixes Trial fractions at 1.0; the
 older paid smoke run delegated them to the planner. No paid run of the new
 fraction/split recipes is claimed; scientific performance remains unqualified.
+
+
+## Saved-file launch review
+
+`launch_review.launch_review` is a read-only notebook presentation helper. It
+reloads the selected experiment through the task's schema, checks the shell
+entrypoint's literal `EXPERIMENT`/`EXP_CHECKOUT` bindings and task-specific search
+module, and renders saved/effective parameters, task/split/routing paths, required
+input filenames, credential names and output destinations. Missing input files
+or an existing output workspace suppress executable command blocks; mismatched
+script bindings raise before any command is offered. No shell is executed.
+It does not certify arbitrary shell code, data hashes, CUDA or source pins;
+these remain the native preview/launch owner's checks. Kernel credential state
+is not a claim about a separately launched terminal.
+
+The TESS checklist follows all four save examples, including re-splitting.
+TIDMAD section 6 serves the same role before section 8's final-test lifecycle.
+Both default to one named saved demo and offer an explicit initial/demo mapping.
+User-facing repository links and the locked framework dependency use the
+operator's yuema137 release repositories at the unchanged framework revision;
+Galileo-Sandbox remains the development/PR destination.
+
+
+Launch-review validation (2026-09-29): 31 tutorial tests passed, including eight
+new cases covering disk re-read, quoted external paths, missing data/used
+workspace command suppression, mismatched script binding, and rejection of a
+final-test launcher as a search launcher. Three framework-preflight tests also
+passed after the dependency-origin update. Both notebooks executed against
+existing external projects and rendered the exact selected search command;
+TIDMAD's section-7 search review precedes section-8 seal/evaluate. Local README
+links and empty committed notebook outputs were checked. Frozen installation
+from yuema137/SIDERIUS succeeded at unchanged revision 349b6cd6d9766abbf3d87515b22e1005599a694b.
+No new paid model search was needed for these presentation changes.

@@ -43,6 +43,12 @@ an unrelated repository-wide rewrite. Explicitly requested human reading
 mirrors remain reading aids for the authoritative source, not separate rule
 owners.
 
+Public installation/download examples and current repository entry links use
+`yuema137/SIDERIUS` and `yuema137/siderius-exp`. Development PRs remain in
+Galileo-Sandbox. Preserve historical issue/PR evidence links at their actual
+origin; changing documentation links does not authorize publishing or syncing
+a release.
+
 ## Repository and scientific ownership
 
 Before reporting where work lives, verify the current checkout:

@@ -1,26 +1,67 @@
-# Learn a paper task, then run it from a script
+# Paper tutorials: configure a scientific task and launch your own run
 
-Start with **TESS near-core rotation regression**: predict a star's rotation
-frequency from its brightness measurements over time. The notebook teaches
-four changes through runnable configuration examples: search longer, use less
-Trial data, adjust time/VRAM budgets, and create a new train/validation split. The terminal script runs
-the existing fixed workflow. You can close the notebook while the script runs.
+Use these tutorials to learn **which files define a task, which parameters define
+an experiment, and which terminal command runs what you saved**. You work in your
+own project directory. The notebook explains and saves configurations; a separate
+shell script launches the fixed workflow and writes results into that project.
 
-This is a self-contained teaching entrypoint inside siderius-exp, not a second
-copy of the framework or task implementations. You need access to both Git
-repositories. Keep data, credentials, edited notebooks and outputs outside them.
+## Choose a tutorial
 
-| Paper task | Tutorial status | Existing task |
-|---|---|---|
-| TESS | Notebook, pinned download/staging, editable experiment and formal entrypoint | [Task package](../../tasks/phyts_tess/README.md) |
-| LIGO | Next task; no runnable notebook here yet | [Task package](../../tasks/phyts_ligo/README.md) |
-| Project 8 | Next task; paper uses the time/frequency four-channel variant | [Dual representation](../../tasks/phyts_project8/DUAL_REPRESENTATION.md) |
-| TIDMAD | [One-band notebook, saved files and file-range holdout](tidmad/README.md) | [Task package](../../tasks/tidmad/README.md) |
+| Tutorial | Scientific question | What you can change | Start here |
+|---|---|---|---|
+| **TESS** | Predict a star's rotation frequency from its brightness measurements over time | Iterations, epochs, Trial/Formal fractions, time/VRAM budgets, and a new whole-star train/validation split | **[Open the TESS notebook](notebooks/01_tess_tutorial.ipynb)**; follow setup below before executing your own copy |
+| **TIDMAD, band 0–3** | Recover an injected waveform from noisy detector measurements | The same budgets/fractions, plus file-index training/validation/final-test groups | **[TIDMAD setup and walkthrough](tidmad/README.md)** · **[Open the TIDMAD notebook](notebooks/02_tidmad_tutorial.ipynb)** |
+| LIGO | Gravitational-wave task | No runnable tutorial yet | [Existing task package](../../tasks/phyts_ligo/README.md) |
+| Project 8 | Paper time/frequency four-channel task | No runnable tutorial yet | [Existing task documentation](../../tasks/phyts_project8/DUAL_REPRESENTATION.md) |
 
-The demo teaches configuration and execution. Fresh LLM searches need not
-produce the paper's exact models or scores. Four fixed-workflow tutorials will
-not reproduce the coding-agent/orchestration comparisons or retrospective
-behavioral reviews. Archived-checkpoint replay is a separate reproduction path.
+For the underlying TESS task and data contract, see the
+[TESS task package](../../tasks/phyts_tess/README.md). The tutorial downloads its
+pinned [PhyTS TESS data](https://huggingface.co/datasets/PhyTS-team/PhyTS-bench/tree/9f203f4c338645a1e4b2c9dc7d6f820269ca5114/TESS/split),
+or reuses the shared machine's existing files.
+
+## What these tutorials can—and cannot—do
+
+You can use them to prepare data, configure model/provider routing without saving
+keys, save a task/experiment variant, check its actual files and parameters, run
+it on a supported GPU, and inspect the resulting records. Each notebook has a
+**Before you run** checklist that prints the exact preview and launch commands
+for the one saved experiment you select.
+
+These are **learning and execution demos**, not a claim of complete paper
+reproduction. Only TESS and one-band TIDMAD currently have notebooks. Fresh LLM
+searches may produce different models and scores. The demos do not reproduce
+the paper's coding-agent/orchestration comparisons or retrospective reviews.
+Archived-checkpoint replay and the original campaign launchers are separate
+routes. Changing a split defines a new scientific protocol.
+
+The real TESS smoke run produced diagnostic scores. The tiny one-epoch TIDMAD
+smoke run completed training/inference but all three attempts collapsed; it
+produced no valid model for final testing. The separate TIDMAD final-test path
+therefore does not yet have a successful real-run qualification. Do not treat
+small fractions or a completed command as proof of model quality.
+
+## Before you start
+
+- Linux, Python 3.12, `git`, `uv`, and one supported NVIDIA RTX 5090 or H100.
+  AMD/Intel GPUs and CPU training are unsupported; H100 has no local real-run witness.
+- Access to the selected LLM providers and exported API keys. Runs can incur
+  charges. Training budgets do not cap total script duration or API spending.
+- Two installed source repositories plus a **third, separate directory** for
+  your editable project, data references and results. No tutorial step asks you
+  to edit source-repository task templates.
+- Prepared data: TESS downloads about 31 MB and stages about 18 MB of NPZ inputs;
+  TIDMAD uses eight large HDF5 files for one band. Reuse existing shared files
+  when available instead of downloading again.
+
+The public release sources are [yuema137/siderius-exp](https://github.com/yuema137/siderius-exp)
+and [yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS). During pre-release,
+these repositories may require access; the commands below target that release
+pair. Development PRs are not the public installation source.
+
+**Reading order:** install the exact source pair in section 1. For TESS, continue
+through sections 2–4, then open your copied notebook and its **Before you run**
+checklist. For TIDMAD, continue with the [TIDMAD guide](tidmad/README.md) after
+section 1. The commands in the remaining sections of this page are TESS examples.
 
 ## Task package, experiment, notebook and script
 
@@ -49,15 +90,17 @@ with a working NVIDIA driver and the locked CUDA PyTorch installation. AMD,
 Intel GPU and CPU execution are not supported. The TESS paper deployment used
 RTX 5090 with an 8 GiB model budget; H100 is an additional tutorial route.
 
-From your siderius-exp checkout:
+Choose a new location for the public exp checkout:
 
 ```bash
-export EXP_CHECKOUT="$(pwd -P)"
+export EXP_CHECKOUT="/absolute/path/to/siderius-exp"
+git clone https://github.com/yuema137/siderius-exp.git "$EXP_CHECKOUT"
+cd "$EXP_CHECKOUT"
 uv sync --python 3.12 --group dev --group tutorial --frozen
 
 # Choose a NEW sibling checkout, outside the exp checkout.
 export INFRA_CHECKOUT="/absolute/path/to/SIDERIUS-tutorial"
-git clone git@github.com:Galileo-Sandbox/SIDERIUS.git "$INFRA_CHECKOUT"
+git clone https://github.com/yuema137/SIDERIUS.git "$INFRA_CHECKOUT"
 git -C "$INFRA_CHECKOUT" checkout --detach "$(cat "$EXP_CHECKOUT/SIDERIUS_REVISION")"
 (cd "$INFRA_CHECKOUT" && uv sync --python 3.12 --group dev --frozen)
 ```
@@ -178,6 +221,7 @@ separately defined experiment.
 On the shared 5090 machine, reuse the existing source files instead of downloading:
 
 ```bash
+cd "$EXP_CHECKOUT"
 .venv/bin/python -B -m tutorials.paper.data_entry --task tess \
   --project "$TUTORIAL_HOME" --source /home/klz/Data/TESS/split
 ```
@@ -208,6 +252,12 @@ the helper never overwrites existing data. It does not re-split stars. Changes
 to the population need a new task identity and separate qualification.
 
 ## 5. Preview, launch, inspect
+
+In the notebook, use **Before you run: one experiment, one checklist, one launch
+command** after saving your edits. Select one example; its report reloads the
+experiment JSON, checks the script binding, lists task/routing/data files, and
+shows effective budgets and exact commands. If you edited a demo, use that
+demo’s command—not the initial launcher below.
 
 Initialization already created an experiment with explicit paths to your task
 copy, your LLM routing and `runs/tess-demo-001`. From **any terminal directory**:
