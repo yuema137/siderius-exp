@@ -1,102 +1,119 @@
-# TIDMAD: one band, editable budgets, and two kinds of frequency holdout
+# TIDMAD: one band, saved configurations, and file-range holdout
 
-Use this tutorial to learn how a model denoises detector waveforms, change its
-Trial/Formal data allowances, and evaluate frequencies excluded from training.
-It uses band **0-3**, comprising four training and four validation HDF5 files.
-The [notebook](../notebooks/02_tidmad_tutorial.ipynb) explains and prepares inputs;
-terminal scripts run the search and, separately, final-test inference.
+The [notebook](../notebooks/02_tidmad_tutorial.ipynb) teaches a complete sequence:
+choose data, change settings, save your task/experiment, open the saved files,
+then run the script that selects them. It uses **band 0–3** only. The notebook
+prepares and explains; terminal scripts launch searches and final inference.
 
-## Start in your own directory
+## Initialize your own project
 
-First follow the [shared installation instructions](../README.md#1-install-in-the-two-exact-checkouts).
-Use the exact exp environment, including its `tutorial` dependency group, and
-the pinned infra checkout. From exp:
+Follow the [shared installation instructions](../README.md#1-install-in-the-two-exact-checkouts),
+then run from the exact exp checkout:
 
 ```bash
+export TUTORIAL_HOME=/absolute/path/to/my-tidmad-study
 .venv/bin/python -B -m tutorials.paper.tidmad.project \
-  --project /absolute/path/to/my-tidmad-study \
-  --infra-checkout /absolute/path/to/SIDERIUS-tutorial
+  --project "$TUTORIAL_HOME" --infra-checkout /absolute/path/to/SIDERIUS-tutorial
+.venv/bin/jupyter lab --ServerApp.root_dir="$TUTORIAL_HOME"
 ```
 
 The project directory must be new and outside both repositories. Open its
-`notebooks/02_tidmad_tutorial.ipynb` with the exp environment's Jupyter kernel.
-For example, from exp:
+`notebooks/02_tidmad_tutorial.ipynb` with the exp environment's kernel.
+
+## Choose existing data OR a download
+
+**Shared 5090 machine:** reuse the existing large files, without copying or
+re-downloading them:
 
 ```bash
-.venv/bin/jupyter lab --ServerApp.root_dir=/absolute/path/to/my-tidmad-study
+.venv/bin/python -B -m tutorials.paper.data_entry --task tidmad \
+  --project "$TUTORIAL_HOME" --source /home/klz/Data/TIDMAD
 ```
 
-| Location in your project | What belongs there |
-|---|---|
-| `notebooks/` | Editable explanation and configuration examples |
-| `tasks/tidmad/` | Copied task; frequency eligibility, waveform contract and metric |
-| `experiments/` | Your iteration, fraction, time/VRAM, hardware and run settings |
-| `llm/agents.json` | LLM routing; **no API-key values** |
-| `advice/README.txt` | Explains that human advice is disabled in this entrypoint |
-| `data/band-0-3/` | Eight original HDF5 files and initialized `segment_anchors.json` |
-| `data/frequency-catalog.json` | Reviewed per-segment injected-frequency catalog |
-| `scripts/` | Generated search and final-test entrypoints |
-| `runs/<name>/` | Each fresh search's models, logs and results |
-| `final-test/` | Selected-model declaration, selection seal and separate test outputs |
+This verifies the eight source hashes and creates only symbolic links in
+`data/band-0-3/`. The small scoring anchor is local. Keep the shared source
+paths available; tutorial execution reads them and writes outputs elsewhere.
 
-Credentials belong in the launching process's environment, sourced from a
-trusted external secret file/store. Do not put them anywhere in this project.
-The script reports names/presence only and refuses missing keys before launch.
-NoPrior disables human advice and data analysis here; literature review remains
-enabled, so its routed credentials are included in the check.
-
-## What to try in the notebook
-
-1. Change `iterations`/`epochs`, then Trial proportions and time/VRAM budgets.
-2. Inspect the **paper pool**: 20 frozen training segments per file. Trial `.5`
-   means 10/20; Formal `.1` identifies that 20/200 pool and uses all 20.
-3. Inspect a worked **frequency split**: distinct injected frequencies go to
-   train, workflow validation, or final test. All repeats of one frequency stay
-   together. This excludes examples; it does not zero Fourier coefficients.
-4. Prepare the real catalog and save a new task composition. In this new task,
-   Trial/Formal fractions apply to the remaining eligible segments. It is a
-   different scientific protocol from the paper pool.
-5. Launch your saved experiment from its script. After model selection, stop
-   search, seal one candidate, and run its final-test script without LLM calls.
-
-The official [TIDMAD distribution](https://github.com/jessicafry/TIDMAD) provides
-`download_data.py`; `--train_files 4 --validation_files 4 --science_files 0`
-selects this band's files. The notebook provides exact staging and catalog
-commands. A band still contains about 32 GB of uncompressed channel samples;
-no download occurs during notebook Run All. Source hashes and original segment
-indices are preserved for scoring.
-
-Preview and launch from the initialized project:
+**Your own machine:** use the official [TIDMAD downloader](https://github.com/jessicafry/TIDMAD),
+kept outside both source checkouts:
 
 ```bash
-/absolute/path/to/my-tidmad-study/scripts/run-tidmad.sh
-/absolute/path/to/my-tidmad-study/scripts/run-tidmad.sh --launch
+python /absolute/path/to/TIDMAD/download_data.py \
+  --output_dir "$TUTORIAL_HOME/data/band-0-3" \
+  --train_files 4 --validation_files 4 --science_files 0
 ```
 
-Preview needs no GPU/data/keys, but both source checkouts must be clean and
-correctly pinned. Launch accepts one NVIDIA RTX 5090 or H100. Budgets must leave
-VRAM headroom; the 40 GiB paper setting does not fit a 5090. Another NVIDIA GPU
-requires qualifying and extending the GPU check plus checking CUDA and
-calibration. AMD and Intel GPUs are unsupported. Per-stage time allowances are
-not total campaign deadlines or spending caps.
+Do not run both preparations. Both entrances yield the same `data_dir`: only
+training/validation files 0000–0003 and `segment_anchors.json`. One band still
+represents about 32 GB of uncompressed channel samples. No download occurs
+when you run notebook cells.
 
-## Interpret the two evaluations correctly
+## What files do my edits create?
 
-**Workflow validation** influences the agent and can be used during training
-validation. It tests frequencies excluded from training examples, but it is
-not untouched by model selection. **Final test** reserves a third frequency
-group until the selected model is fixed. Its script hashes the selected model,
-configuration and plugins, refuses changes after sealing, and writes results
-outside the search workspace. Do not use that result to choose another model.
+A task is a directory with a composition YAML entry. An experiment is one JSON
+file pointing to that entry. A script points to the JSON through `EXPERIMENT`.
+After section 5's `SAVE_EXAMPLES=True`, the file-split example is:
 
-This fixed workflow is a trusted local process without a separate security
-sandbox. Its files are locally readable; the final holdout is a procedural
-separation, not proof of access isolation. Frequency separation tests transfer
-across injected tones, not an absolute absence of memorization. Nearby tones,
-harmonics and amplitude distributions remain relevant scientific choices.
+```text
+YOUR_PROJECT/
+├── tasks/tidmad/compositions/file_holdout.yaml   train/validation/test file lists
+├── experiments/tidmad-file-split.json            task path, fractions and budgets
+├── llm/agents.json                              model/provider routing, NO keys
+├── advice/README.txt                            advice is inactive in NoPrior
+├── scripts/run-tidmad-file-split.sh              runs that experiment
+├── scripts/test-tidmad-file-split.sh             post-selection final test
+├── data/band-0-3/                               source inputs
+├── runs/tidmad_file_split_001/                   future search output
+└── final-test/                                 selected model and test output
+```
 
-The final report uses the task's TIDMAD metric, is **diagnostic**, and does not
-perform the full workflow Health assessment. Full-band catalog accuracy and
-real API/GPU performance have not yet been qualified for this tutorial. The
-catalog inspector refuses ambiguous/changing tones rather than guessing. If
-that happens on real data, investigate the data semantics before proceeding.
+Open these saved files in JupyterLab's file browser or use the notebook's
+read-back cells. Changing a Python variable alone does not change a file.
+The initial `run-tidmad.sh` continues to select `tidmad-experiment.json`; it
+does not automatically switch to your new demo. For the new split, run:
+
+```bash
+bash "$TUTORIAL_HOME/scripts/run-tidmad-file-split.sh"          # preview
+bash "$TUTORIAL_HOME/scripts/run-tidmad-file-split.sh" --launch # API/GPU work
+```
+
+The notebook provides equivalent experiment/script pairs for longer search,
+smaller Trial data and changed time/VRAM budgets. Launch always reads saved files.
+
+## Understand the split and the proportions
+
+The new task uses training indices `[0,1]`, workflow-validation index `[2]`, and
+final-test index `[3]`. It reads `abra_training_0000/0001.h5` for training and
+`abra_validation_0002/0003.h5` for validation/test respectively. Edit the three
+lists to define another disjoint partition of 0–3. All original segments in
+an assigned file remain eligible; no per-second FFT labeling or weak-signal
+filter is applied. This is file-index/frequency-range holdout, not proof of
+exact spectral non-overlap.
+
+In the new task, Trial `.25` takes 50/200 segments per training file; Formal
+`.5` takes 100/200. Evaluation fractions apply only to validation file 2.
+Final-test file 3 never enters workflow scopes. In contrast, the original
+paper-pool example fixes 20 training segments per file: Trial `.5` means
+10/20, while Formal `.1` declares the frozen 20/200 parent and uses all 20.
+Changing the split is a new scientific protocol, not the frozen paper result.
+
+Workflow validation influences the agent and training/model selection. Final
+test happens only after selection: stop search, declare the selected native
+model, seal its hashes, then run the separate test script. The notebook shows
+all candidate-file fields and commands. Its report uses the selected task's
+metric and scoreability contract, is diagnostic, and does not run the full
+workflow Health assessment. Do not adapt the model to that final score.
+
+## Keys, hardware and execution boundaries
+
+Export keys into the launching terminal from a trusted external secret store
+or mode-600 file. Never save values in notebooks, JSON, scripts or logs. The
+launcher checks names/presence only and refuses missing keys. TIDMAD NoPrior
+disables human advice and data analysis but retains literature review.
+
+Supported devices are one NVIDIA RTX 5090 or H100 with working CUDA and memory
+headroom. Another NVIDIA GPU needs GPU-check/CUDA/calibration qualification;
+AMD and Intel are unsupported. Per-stage time allowances are not total campaign
+or cost caps. The fixed workflow has no separate security sandbox: raw files
+are locally readable and the holdout is procedural. Keep results and edited
+inputs in your project; leave both source repositories unchanged.

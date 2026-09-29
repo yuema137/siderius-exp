@@ -209,13 +209,14 @@ The old `examples/tidmad` projection is historical and is not an authoring or
 launch surface. A new run must select this task explicitly; no task is inferred
 from a directory name.
 
-## Learn one band and change the frequency split
+## Learn one band and hold out different file ranges
 
 The [one-band tutorial](../../tutorials/paper/tidmad/README.md) copies this task
-into an external user project. It demonstrates the original frozen training
-pool and a separately identified frequency-holdout composition. The latter
-excludes held-out injected frequencies from training and reserves distinct
-workflow-validation and final-test groups. It preserves original segment
-indices and scoring references, but changes the scientific data protocol; its
-results are not the frozen paper experiment. Follow the notebook for data
-preparation, adjustable fractions/budgets and the separate final-test entrypoint.
+into an external user project. It teaches where task/experiment/script files
+live and how to inspect saved changes before launching. Its new file-holdout
+example uses training indices 0–1, workflow-validation index 2 and final-test
+index 3, with adjustable Trial/Formal proportions and budgets. All original
+segments remain eligible within assigned files; this is file-range separation,
+not per-frequency labeling. The original frozen paper-pool example remains
+separate. Shared 5090 users reuse existing large files; other users download
+only the required band. Neither route changes repository task templates.

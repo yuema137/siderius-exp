@@ -21,7 +21,7 @@ from experiments.shared.framework_pin import (
 )
 from experiments.shared.workflow_credentials import required_workflow_api_keys
 from experiments.tidmad.main_fixed_workflow.band_inputs import verify_band_inputs
-from tasks.tidmad.runtime.frequency_split import FrequencySplit
+from tasks.tidmad.runtime.file_split import FileSplit
 from tutorials.paper.runner import (
     ROOT,
     TutorialExperiment,
@@ -37,47 +37,49 @@ from tutorials.paper.runner import (
 
 class TidmadExperiment(TutorialExperiment):
     version: Literal["siderius-tidmad-tutorial-v1"] = "siderius-tidmad-tutorial-v1"
-    protocol: Literal["paper-pool", "frequency-holdout"] = "paper-pool"
+    protocol: Literal["paper-pool", "file-holdout"] = "paper-pool"
     formal_train_fraction: float = 0.1
-    catalog_reviewed: bool = False
 
     @model_validator(mode="after")
     def protocol_fraction(self):
         if self.protocol == "paper-pool" and self.formal_train_fraction != 0.1:
             raise ValueError(
-                "paper-pool Formal is the entire frozen 20/200 pool: keep .1; use a new frequency-holdout task to change its population"
+                "paper-pool Formal is the entire frozen 20/200 pool: keep .1; use a new file-holdout task to change its population"
             )
         if not 0 < self.formal_train_fraction <= 1:
             raise ValueError("formal_train_fraction must be in (0,1]")
         return self
 
 
-def selected_split(settings: TidmadExperiment) -> FrequencySplit | None:
+def selected_split(settings: TidmadExperiment) -> FileSplit | None:
     if settings.composition is None:
         raise ValueError("select your external task composition")
     declaration = yaml.safe_load(settings.composition.read_text())["task_data_path"]
     expected = (
         "TidmadFrozenPoolDataPath"
         if settings.protocol == "paper-pool"
-        else "FrequencySplitDataPath"
+        else "FileSplitDataPath"
     )
     if declaration["symbol"] != expected:
         raise ValueError(f"{settings.protocol} requires {expected}")
     return (
-        FrequencySplit.model_validate(declaration["config"]["split"])
-        if settings.protocol == "frequency-holdout"
+        FileSplit.model_validate(declaration["config"]["split"])
+        if settings.protocol == "file-holdout"
         else None
     )
 
 
 def build_command(settings: TidmadExperiment) -> list[str]:
-    selected_split(settings)
+    split = selected_split(settings)
+    health_files = (
+        "0-3" if split is None else ",".join(map(str, sorted(split.validation_files)))
+    )
     return shared_command(
         settings,
         workflow=ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json",
         treatment_path=ROOT
         / "experiments/tidmad/information_treatments/main-fixed-no-prior.yaml",
-    ) + ["--data_scope", "0-3", "--health_gate_files", "0-3"]
+    ) + ["--data_scope", "0-3", "--health_gate_files", health_files]
 
 
 def credential_status(settings: TidmadExperiment) -> dict[str, bool]:
@@ -107,16 +109,6 @@ def inspect(settings: TidmadExperiment, *, launch: bool = False) -> dict:
                 f"export required keys in this terminal: {', '.join(missing)}; never save them in notebooks/configuration"
             )
         data = verify_band_inputs(ROOT, settings.data_dir, "0-3")
-        split = selected_split(settings)
-        if split is not None:
-            if not settings.catalog_reviewed:
-                raise ValueError(
-                    "review channel-2 catalog assignments, then set catalog_reviewed=true"
-                )
-            if split.catalog.source_sha256 != data["file_sha256"]:
-                raise ValueError(
-                    "frequency catalog does not identify these source bytes"
-                )
         gpu = verify_gpu(settings)
     return {
         "kind": "tidmad-teaching-demo",

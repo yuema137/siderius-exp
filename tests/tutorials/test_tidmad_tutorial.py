@@ -1,8 +1,7 @@
-"""Scientific split and external-project regressions, without provider calls."""
+"""File-disjoint scientific scopes, source reuse and explicit launch bindings."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -13,31 +12,9 @@ from workflows.task_composition import (
     compose_run_task_bindings,
 )
 
-from tasks.tidmad.runtime.frequency_split import (
-    FrequencyCatalog,
-    FrequencyRow,
-    make_split,
-    sample_population,
-)
-from tutorials.paper.tidmad.project import create_project, write_frequency_task
+from tasks.tidmad.runtime.file_split import FileSplit, sample_population
+from tutorials.paper.tidmad.project import create_project, write_file_split_task
 from tutorials.paper.tidmad.runner import TidmadExperiment, build_command
-
-
-@pytest.fixture
-def catalog():
-    return FrequencyCatalog(
-        source_sha256={
-            f"abra_{family}_{i:04d}.h5": "0" * 64
-            for family in ("training", "validation")
-            for i in range(4)
-        },
-        rows=tuple(
-            FrequencyRow(family=f, file=i, segment=s, frequency_hz=1100 + s % 20 * 100)
-            for f in ("training", "validation")
-            for i in range(4)
-            for s in range(200)
-        ),
-    )
 
 
 @pytest.fixture
@@ -47,60 +24,35 @@ def project(tmp_path):
     return root
 
 
-def test_same_frequency_cannot_cross_splits(catalog):
-    split = make_split(catalog)
-    sets = [set(split.train_hz), set(split.validation_hz), set(split.test_hz)]
-    assert [len(s) for s in sets] == [12, 4, 4]
-    assert not sets[0] & sets[1] and not sets[0] & sets[2] and not sets[1] & sets[2]
-    for name, family in [
-        ("train", "training"),
-        ("validation", "validation"),
-        ("test", "validation"),
-    ]:
-        for index, segments in split.population(name).items():
-            assert segments == [
-                r.segment
-                for r in catalog.rows
-                if r.family == family
-                and r.file == index
-                and r.frequency_hz in set(getattr(split, name + "_hz"))
-            ]
-    data = split.model_dump()
-    data["test_hz"] = split.train_hz
-    with pytest.raises(ValueError, match="disjoint"):
-        type(split).model_validate(data)
+def test_file_partition_refuses_overlap_and_missing_band_members():
+    for updates in (
+        {"validation_files": (1,)},
+        {"test_files": ()},
+        {"train_files": (0,)},
+        {"train_files": (0, 0, 1)},
+        {"test_files": (4,)},
+    ):
+        with pytest.raises(ValueError):
+            FileSplit.model_validate({**FileSplit().model_dump(), **updates})
+    split = FileSplit()
+    assert set(split.population("train")) == {0, 1}
+    assert set(split.population("validation")) == {2}
+    assert set(split.population("test")) == {3}
+    assert all(rows == list(range(200)) for rows in split.population("train").values())
 
 
-def test_missing_or_duplicate_catalog_row_refused(catalog):
-    for rows in (catalog.rows[:-1], (*catalog.rows[:-1], catalog.rows[0])):
-        with pytest.raises(ValueError, match="exactly once"):
-            FrequencyCatalog(source_sha256=catalog.source_sha256, rows=rows)
-
-
-def test_fraction_is_relative_to_eligible_population(catalog):
-    split = make_split(catalog)
-    assert {
-        len(v) for v in sample_population(split.population("train"), 0.25, 42).values()
-    } == {30}
-    assert {
-        len(v) for v in sample_population(split.population("train"), 0.5, 42).values()
-    } == {60}
-    assert {
-        len(v)
-        for v in sample_population(split.population("validation"), 0.5, 42).values()
-    } == {20}
-    assert (
-        sample_population({0: [1, 3, 5]}, 0.5, 42)[0]
-        == sample_population({0: [1, 3, 5]}, 0.5, 42)[0]
-    )
+def test_fraction_uses_each_assigned_file_without_changing_membership():
+    split = FileSplit()
+    trial = sample_population(split.population("train"), 0.25, 42)
+    formal = sample_population(split.population("train"), 0.5, 42)
+    assert set(trial) == set(formal) == {0, 1}
+    assert sum(map(len, trial.values())) == 100
+    assert sum(map(len, formal.values())) == 200
     assert len(sample_population({0: [1, 3, 5]}, 0.5, 42)[0]) == 2
 
 
-def test_composed_runtime_excludes_test_and_preserves_original_indices(
-    project, catalog
-):
-    split = make_split(catalog)
-    path = write_frequency_task(project / "tasks/tidmad", split)
+def test_composed_scopes_hold_out_files_and_keep_original_indices(project):
+    path = write_file_split_task(project / "tasks/tidmad", FileSplit())
     composition = compose_run_task_bindings(str(path))
     request = ScopeBuildRequest(
         round_kind="trial",
@@ -114,25 +66,28 @@ def test_composed_runtime_excludes_test_and_preserves_original_indices(
         composition, physical_data_root=str(project / "data/band-0-3")
     ):
         adapter = composition.task_data_path
-        train = adapter.build_training_scope(request)
-        val = adapter.build_eval_scope(request)
-        assert {len(v) for v in train.sample_set.values()} == {30}
-        assert {len(v) for v in val.sample_set.values()} == {10}
+        train, val = (
+            adapter.build_training_scope(request),
+            adapter.build_eval_scope(request),
+        )
+        test = adapter.build_final_test_scope()
+        assert set(train.sample_set) == {0, 1}
+        assert set(val.sample_set) == {2}
+        assert test.sample_set == {3: list(range(200))}
+        assert sum(map(len, train.sample_set.values())) == 100
+        assert len(val.sample_set[2]) == 50
         assert not hasattr(adapter, "build_frozen_training_pool")
-        for i in range(4):
-            assert set(train.sample_set[i]) <= set(split.population("train")[i])
-            assert set(val.sample_set[i]) <= set(split.population("validation")[i])
-            assert not set(val.sample_set[i]) & set(split.population("test")[i])
-        assert adapter.build_final_test_scope().sample_set == split.population("test")
-        restored = adapter.deserialize_scope(adapter.serialize_scope(train))
-        assert restored.sample_set == train.sample_set
+        assert (
+            adapter.deserialize_scope(adapter.serialize_scope(train)).sample_set
+            == train.sample_set
+        )
         with pytest.raises(ValueError, match="snapshot"):
             adapter.build_training_scope(
                 request.model_copy(update={"selection_strategy": "anchors"})
             )
     changed = yaml.safe_load(path.read_text())
-    changed["task_data_path"]["config"]["split"] = make_split(
-        catalog, seed=43
+    changed["task_data_path"]["config"]["split"] = FileSplit(
+        train_files=(0, 2), validation_files=(1,), test_files=(3,)
     ).model_dump(mode="json")
     path.write_text(yaml.safe_dump(changed))
     assert (
@@ -141,66 +96,91 @@ def test_composed_runtime_excludes_test_and_preserves_original_indices(
     )
 
 
-def test_paper_and_frequency_commands(project, catalog):
+def test_command_uses_selected_file_split_for_health_and_formal_fraction(project):
     settings = TidmadExperiment.model_validate_json(
         (project / "experiments/tidmad-experiment.json").read_text()
     )
     command = build_command(settings)
     assert command[command.index("--formal_portion") + 1] == "0.1"
-    assert command[command.index("--trial_portion") + 1] == "0.5"
-    assert "--ml_lit_review_enabled" in command
-    assert "--no-data_analysis_enabled" in command
     assert (
-        "--no-human_advice_enabled" not in command
-    )  # Treatment uses absence, not an invented CLI flag.
+        "--ml_lit_review_enabled" in command and "--no-data_analysis_enabled" in command
+    )
     with pytest.raises(ValueError, match="frozen"):
         TidmadExperiment.model_validate(
             {**settings.model_dump(), "formal_train_fraction": 0.5}
         )
-    path = write_frequency_task(project / "tasks/tidmad", make_split(catalog))
+    path = write_file_split_task(project / "tasks/tidmad", FileSplit())
     custom = TidmadExperiment.model_validate(
         {
             **settings.model_dump(),
-            "protocol": "frequency-holdout",
+            "protocol": "file-holdout",
             "composition": path,
             "formal_train_fraction": 0.5,
         }
     )
     command = build_command(custom)
     assert command[command.index("--formal_portion") + 1] == "0.5"
-    assert command.count("--formal_portion") == 1
+    assert command[command.index("--health_gate_files") + 1] == "2"
     assert command[command.index("--formal_train_portion") + 1] == "1.0"
-    with pytest.raises(ValueError, match="frozen"):
-        TidmadExperiment.model_validate(
-            {**settings.model_dump(), "formal_train_fraction": 0.2}
-        )
+    assert command.count("--formal_portion") == 1
 
 
-def test_project_no_overwrite_and_source_unchanged(project):
-    assert (
-        "tutorials.paper.tidmad.runner"
-        in (project / "scripts/run-tidmad.sh").read_text()
+def test_existing_tidmad_entry_uses_links_and_never_copies_raw(
+    project, tmp_path, monkeypatch
+):
+    from tutorials.paper import data_entry
+
+    source = tmp_path / "shared raw"
+    source.mkdir()
+    names = {
+        f"abra_{family}_{i:04d}.h5"
+        for family in ("training", "validation")
+        for i in range(4)
+    }
+    for name in names:
+        (source / name).write_bytes(b"original raw bytes")
+
+    def verify(root, manifest, selected):
+        assert root == source
+        assert selected == names
+        return {}
+
+    monkeypatch.setattr(data_entry, "verify_selected_files", verify)
+    view = data_entry.use_existing_tidmad(project, source)
+    assert all(
+        (view / name).is_symlink() and (view / name).resolve() == source / name
+        for name in names
     )
-    assert json.loads((project / "project.json").read_text())[
-        "default_experiment"
-    ].startswith(str(project))
+    assert all((source / name).read_bytes() == b"original raw bytes" for name in names)
+    assert data_entry.use_existing_tidmad(project, source) == view
+    link = view / next(iter(names))
+    link.unlink()
+    link.write_bytes(b"user-owned existing file")
+    with pytest.raises(ValueError, match="existing data entry"):
+        data_entry.use_existing_tidmad(project, source)
+    assert link.read_bytes() == b"user-owned existing file"
+
+
+def test_project_and_task_write_refuse_overwrite(project):
     with pytest.raises(ValueError, match="fresh"):
         create_project(project, Path("/tmp/siderius-tutorial-infra"))
+    write_file_split_task(project / "tasks/tidmad", FileSplit())
+    with pytest.raises(FileExistsError):
+        write_file_split_task(project / "tasks/tidmad", FileSplit())
 
 
-def test_final_selection_change_refused_before_test_data(project, catalog, monkeypatch):
+def test_final_selection_change_refused_before_test_data(project, monkeypatch):
     from tutorials.paper.tidmad import final_test
 
     settings = TidmadExperiment.model_validate_json(
         (project / "experiments/tidmad-experiment.json").read_text()
     )
-    composition = write_frequency_task(project / "tasks/tidmad", make_split(catalog))
+    composition = write_file_split_task(project / "tasks/tidmad", FileSplit())
     settings = TidmadExperiment.model_validate(
         {
             **settings.model_dump(),
-            "protocol": "frequency-holdout",
+            "protocol": "file-holdout",
             "composition": composition,
-            "catalog_reviewed": True,
         }
     )
     experiment = project / "experiments/holdout.json"

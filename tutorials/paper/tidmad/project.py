@@ -10,7 +10,7 @@ from pathlib import Path
 
 import yaml
 
-from tasks.tidmad.runtime.frequency_split import FrequencySplit
+from tasks.tidmad.runtime.file_split import FileSplit
 from tutorials.paper.runner import ROOT, disjoint
 from tutorials.paper.tidmad.runner import TidmadExperiment
 
@@ -33,16 +33,16 @@ def write_launcher(
     destination.chmod(0o755)
 
 
-def write_frequency_task(task: Path, split: FrequencySplit) -> Path:
+def write_file_split_task(task: Path, split: FileSplit) -> Path:
     if task.resolve().is_relative_to(ROOT):
         raise ValueError("edit a user-owned task copy")
     source = task / "compositions/continuous_regression.yaml"
-    target = task / "compositions/frequency_holdout.yaml"
+    target = task / "compositions/file_holdout.yaml"
     declaration = yaml.safe_load(source.read_text())
     declaration["task_data_path"] = {
-        "file": "../runtime/frequency_split.py",
-        "symbol": "FrequencySplitDataPath",
-        "id": "tidmad_frequency_split",
+        "file": "../runtime/file_split.py",
+        "symbol": "FileSplitDataPath",
+        "id": "tidmad_file_split",
         "config": {"split": split.model_dump(mode="json")},
     }
     with target.open("x") as stream:

@@ -15,7 +15,7 @@ repositories. Keep data, credentials, edited notebooks and outputs outside them.
 | TESS | Notebook, pinned download/staging, editable experiment and formal entrypoint | [Task package](../../tasks/phyts_tess/README.md) |
 | LIGO | Next task; no runnable notebook here yet | [Task package](../../tasks/phyts_ligo/README.md) |
 | Project 8 | Next task; paper uses the time/frequency four-channel variant | [Dual representation](../../tasks/phyts_project8/DUAL_REPRESENTATION.md) |
-| TIDMAD | [One-band notebook, budgets and frequency holdout](tidmad/README.md) | [Task package](../../tasks/tidmad/README.md) |
+| TIDMAD | [One-band notebook, saved files and file-range holdout](tidmad/README.md) | [Task package](../../tasks/tidmad/README.md) |
 
 The demo teaches configuration and execution. Fresh LLM searches need not
 produce the paper's exact models or scores. Four fixed-workflow tutorials will
@@ -173,9 +173,21 @@ NoPrior experiment or put it in `llm/agents.json`. Keep a future active advice
 artifact under your project's `advice/` directory and bind it through that
 separately defined experiment.
 
-## 4. Prepare only the permitted data
+## 4. Choose existing data OR a download
 
-Run in a terminal from the exp root:
+On the shared 5090 machine, reuse the existing source files instead of downloading:
+
+```bash
+.venv/bin/python -B -m tutorials.paper.data_entry --task tess \
+  --project "$TUTORIAL_HOME" --source /home/klz/Data/TESS/split
+```
+
+This verifies the pinned Parquet files and writes only the two required NPZ run
+inputs (about 18 MB). Raw Parquet is neither downloaded nor copied. If a verified
+NPZ directory already exists, set your saved experiment's `data_dir` to that
+absolute path and reuse it without staging again. Do not expose the test split.
+
+On another machine, use the download entrance below instead. Run from exp:
 
 ```bash
 cd "$EXP_CHECKOUT"

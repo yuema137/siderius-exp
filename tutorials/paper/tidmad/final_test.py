@@ -1,4 +1,4 @@
-"""Seal one selected native model, then evaluate held-out frequencies without LLMs.
+"""Seal one selected native model, then evaluate held-out files without LLMs.
 
 The native inference child owns model loading and decoding. This entrypoint does
 not train, select a winner, change a checkpoint, or feed its result to a workflow.
@@ -96,8 +96,8 @@ def main():
         raise ValueError("choose exactly one of --seal or --evaluate")
     settings = TidmadExperiment.model_validate_json(args.experiment.read_text())
     split = selected_split(settings)
-    if split is None or not settings.catalog_reviewed:
-        raise ValueError("final testing requires a reviewed frequency-holdout task")
+    if split is None:
+        raise ValueError("final testing requires a file-holdout task")
     candidate = Candidate.model_validate_json(args.candidate.read_text())
     output = args.output.resolve()
     if any(
@@ -137,9 +137,7 @@ def main():
         return
     if json.loads((output / "selection.json").read_text()) != current:
         raise ValueError("selected model/config/task changed after sealing")
-    data = verify_band_inputs(ROOT, settings.data_dir, "0-3")
-    if data["file_sha256"] != split.catalog.source_sha256:
-        raise ValueError("held-out catalog source mismatch")
+    verify_band_inputs(ROOT, settings.data_dir, "0-3")
     verify_gpu(settings)
     # Exclusive marker prevents retries from quietly becoming model selection.
     with (output / "test-started.json").open("x") as stream:
@@ -196,7 +194,7 @@ def main():
         "--task_manifest",
         str(settings.composition),
         "--task_data_path_id",
-        "tidmad_frequency_split",
+        "tidmad_file_split",
     ]
     env = child_environment(settings)
     env["SIDERIUS_GENERATED_LIBRARY_DIR"] = str(candidate.generated_library)
