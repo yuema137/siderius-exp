@@ -74,6 +74,7 @@ class TutorialReceipt(BaseModel):
     exp_revision: str
     command: tuple[str, ...]
     required_api_keys: tuple[str, ...]
+    api_key_status: dict[str, bool]
     composition_fingerprint: str
     llm_config_sha256: str
     data_sha256: dict[str, str] | None = None
@@ -277,6 +278,14 @@ def composition_identity(settings: DemoSettings, manifest: str) -> str:
     return fingerprint
 
 
+def credential_status(config: Path) -> dict[str, bool]:
+    """Report names and presence only, using the selected enabled routing."""
+    required = required_workflow_api_keys(
+        config, disabled_roles=frozenset({"data_analysis", "lit_review"})
+    )
+    return {name: bool(os.environ.get(name, "").strip()) for name in sorted(required)}
+
+
 def inspect(settings: DemoSettings, *, launch: bool) -> TutorialReceipt:
     """Validate before any provider call; previews need neither data nor a GPU."""
     command = build_command(settings)
@@ -286,11 +295,8 @@ def inspect(settings: DemoSettings, *, launch: bool) -> TutorialReceipt:
     verify_installed_framework(revision, ROOT)
     config = Path(command_value(command, "--llm_config"))
     WorkflowLLMConfig.from_json(str(config))
-    required = sorted(
-        required_workflow_api_keys(
-            config, disabled_roles=frozenset({"data_analysis", "lit_review"})
-        )
-    )
+    key_status = credential_status(config)
+    required = tuple(key_status)
     composition = command_value(command, "--task_composition")
     fingerprint = composition_identity(settings, composition)
     data_hashes = None
@@ -298,9 +304,13 @@ def inspect(settings: DemoSettings, *, launch: bool) -> TutorialReceipt:
     if launch:
         if os.geteuid() == 0:
             raise ValueError("run the teaching demo as a normal user, not root")
-        missing = [key for key in required if not os.environ.get(key)]
+        missing = [key for key, present in key_status.items() if not present]
         if missing:
-            raise ValueError(f"required provider keys are absent: {', '.join(missing)}")
+            raise ValueError(
+                f"required provider keys are absent: {', '.join(missing)}. "
+                "Export them in this launching terminal from a trusted external "
+                "secret source; never put values in notebook cells or settings JSON."
+            )
         data_hashes = verify_data(settings.data_dir)
         gpu = verify_gpu(settings)
     return TutorialReceipt(
@@ -310,7 +320,8 @@ def inspect(settings: DemoSettings, *, launch: bool) -> TutorialReceipt:
             ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True
         ).strip(),
         command=tuple(command),
-        required_api_keys=tuple(required),
+        required_api_keys=required,
+        api_key_status=key_status,
         composition_fingerprint=fingerprint,
         llm_config_sha256=hashlib.sha256(config.read_bytes()).hexdigest(),
         data_sha256=data_hashes,
@@ -326,6 +337,17 @@ def main() -> int:
     settings = DemoSettings.model_validate_json(args.config.read_text())
     receipt = inspect(settings, launch=args.launch)
     if not args.launch:
+        missing = [
+            key for key, present in receipt.api_key_status.items() if not present
+        ]
+        if missing:
+            print(
+                "WARNING: missing environment variables: "
+                + ", ".join(missing)
+                + ". Export keys in the launching terminal; --launch will refuse. "
+                "Do not save secrets in notebooks or configuration JSON.",
+                file=sys.stderr,
+            )
         print(receipt.model_dump_json(indent=2))
         return 0
     # A sibling receipt cannot make the fresh workspace appear nonempty.

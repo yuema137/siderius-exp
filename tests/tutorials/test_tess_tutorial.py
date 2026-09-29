@@ -192,3 +192,89 @@ def test_composition_probe_uses_infra_python_and_isolated_plugin_environment(
     assert observed["env"]["SIDERIUS_GENERATED_LIBRARY_DIR"] == str(
         tmp_path / "workspace/generated_library"
     )
+
+
+def test_notebook_result_cell_reads_real_schema_and_keeps_failed_score_missing(
+    tmp_path,
+):
+    """Default Run All cannot catch a renamed field in the opt-in result reader."""
+    import json
+
+    from agent.schemas.hyperparam_tuning import ExperimentRecord, HyperparamTuningOutput
+    from execute_tools.evaluation_metric import MetricResult
+
+    rows = [
+        ExperimentRecord(
+            exp_id="trial",
+            status="error_training",
+            model_type="example",
+            timestamp="2026-01-01T00:00:00Z",
+            params={},
+            is_trial=True,
+            logical_round=1,
+        ),
+        ExperimentRecord(
+            exp_id="formal",
+            status="success",
+            model_type="example",
+            timestamp="2026-01-01T00:01:00Z",
+            params={},
+            is_trial=False,
+            logical_round=2,
+            denoising_score=0.25,
+            metric_result=MetricResult(metric_id="r2", direction="higher", scalar=0.25),
+        ),
+    ]
+    output = HyperparamTuningOutput(
+        run_name="example",
+        model_type="example",
+        file_index=0,
+        status="completed",
+        completed_rounds=2,
+        total_attempts=2,
+        started_at="2026-01-01T00:00:00Z",
+        finished_at="2026-01-01T00:01:00Z",
+        all_records=rows,
+    )
+    record_path = tmp_path / "run_output_example.json"
+    record_path.write_text(output.model_dump_json())
+    notebook = json.loads(
+        (runner.ROOT / "tutorials/paper/notebooks/01_tess_tutorial.ipynb").read_text()
+    )
+    cell = next(
+        "".join(c["source"])
+        for c in notebook["cells"]
+        if c["cell_type"] == "code" and "SELECTED_RECORD = None" in "".join(c["source"])
+    )
+    tables = []
+    exec(  # noqa: S102 -- execute the trusted committed notebook result cell
+        compile(
+            cell.replace("SELECTED_RECORD = None", "SELECTED_RECORD = record_path"),
+            "result-cell",
+            "exec",
+        ),
+        {"record_path": record_path, "Path": Path, "display": tables.append},
+    )
+    table = tables[0]
+    assert table["round"].tolist() == [1, 2]
+    assert table["role"].tolist() == ["Trial", "Formal"]
+    assert table["status"].tolist() == ["error_training", "success"]
+    assert np.isnan(table["score"][0]) and table["score"][1] == 0.25
+
+
+def test_credential_check_uses_selected_routing_and_never_returns_values(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "private-test-value")
+    assert runner.credential_status(runner.WORKFLOW.parent / "agents.json") == {
+        "OPENAI_API_KEY": True
+    }
+    monkeypatch.setenv("OPENAI_API_KEY", "   ")
+    assert runner.credential_status(runner.WORKFLOW.parent / "agents.json") == {
+        "OPENAI_API_KEY": False
+    }
+    monkeypatch.setattr(
+        runner, "required_workflow_api_keys", lambda *a, **k: {"GEMINI_API_KEY"}
+    )
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    assert runner.credential_status(runner.WORKFLOW.parent / "agents.json") == {
+        "GEMINI_API_KEY": False
+    }

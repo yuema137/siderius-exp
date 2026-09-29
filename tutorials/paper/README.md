@@ -107,6 +107,15 @@ same launching shell. Do not enter keys in notebook cells, settings JSON,
 command arguments or Git. A key in the Jupyter server is not thereby present
 in a separate terminal.
 
+**Start Jupyter from the configured terminal.** If its server was already
+running, stop and restart the server from that terminal, then restart the
+kernel. Restarting only a kernel does not update the server's environment.
+The notebook and script preview report each required variable's name and
+presence, and warn when any are missing. `--launch` refuses missing or
+whitespace-only values before contacting providers. Merely creating a local
+credential file does not export its contents. Neither check prints key values.
+These checks use the selected routing, including an external routing file.
+
 The historical model ID is retained. If your account cannot use it, copy
 `agents.json` to the external tutorial directory and select an available model
 there, as shown in the notebook. That is a new model treatment, not an exact
