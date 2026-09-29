@@ -104,7 +104,9 @@ how to select a saved successful attempt and generate `final-test/candidate.json
 from its recorded artifact paths. Search scripts retain the training checkpoint
 for this step. Its report uses the selected task's
 metric and scoreability contract, is diagnostic, and does not run the full
-workflow Health assessment. Do not adapt the model to that final score.
+workflow Health assessment. Do not adapt the model to that final score. If no attempt succeeds, stop before
+final testing and inspect the validation failure records. A tiny one-epoch
+smoke run can finish training yet produce a collapsed, unusable model.
 
 ## Keys, hardware and execution boundaries
 

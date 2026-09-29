@@ -95,9 +95,24 @@ refusals, scope construction, fraction counts, fingerprint changes, validation
 Health coverage flags, source-link reuse, selection sealing and missing-key
 refusal. Notebook and API/GPU qualification evidence must be reported separately.
 
-Current file-split validation (2026-09-29): 79 focused tests passed. Both notebooks
+Current file-split validation (2026-09-29): 80 focused tests passed. Both notebooks
 completed default and opt-in save/read-back execution against the existing
 shared data, with no download. TIDMAD staging used symlinks; TESS performed only
 the required NPZ conversion. The TESS re-split example also regenerated its
 matching task/data pair. Executed notebook outputs remain external; committed
 notebooks contain no outputs or execution counts.
+
+Real API/GPU smoke on 2026-09-29 used exp `62c7e66`, the pinned infra, RTX 5090,
+existing shared HDF5, and externally injected credentials. One iteration / one
+epoch, Trial train/eval .01/.01, Formal .02/.02, 2/5 minute training allowances
+and 8 GiB completed two Trial attempts and one Formal attempt in about 9 minutes
+(13 LLM calls, 150289 reported tokens). Persisted training scopes contained only
+files 0,1; evaluation and training-validation scopes contained only file 2.
+Training, inference, checkpoint retention and record persistence executed.
+All three attempts were `failed_mode_collapse`, with null scores; the chain
+exited 1 with `no_records`. The final-candidate helper correctly refused the
+real failed attempt. No final-test inference was run, and file 3 was not used
+for model selection. This is an execution/failure-handling witness, not a
+successful denoising result or completed final-test qualification. Do not treat
+the tiny smoke settings as a recipe for a useful model. Local evidence lives
+under `/tmp/tidmad-file-smoke-003-20260929`; it is not a portable input dependency.
