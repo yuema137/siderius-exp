@@ -71,7 +71,9 @@ native inference module in agent-model loading mode (this is not an LLM call),
 with the held-out original sample_set and explicit task/profile. Provider key
 variables ending in `_API_KEY` are removed from that child environment.
 
-Scoring delegates to `tasks.tidmad.runtime.scoring.score_vector`, using the
+Scoring invokes the selected composition metric handle, including its declared
+scoreability contract, with the task-owned final-test scope and evaluation
+payload. The TIDMAD handle delegates arithmetic to its `score_vector`, using the
 existing anchors and original segment identities. No new metric formula or
 selection loop exists here. The standalone result is diagnostic and explicitly
 records Health as not assessed. It is not a paper qualification or replacement

@@ -123,6 +123,7 @@ def test_composed_runtime_excludes_test_and_preserves_original_indices(
             assert set(train.sample_set[i]) <= set(split.population("train")[i])
             assert set(val.sample_set[i]) <= set(split.population("validation")[i])
             assert not set(val.sample_set[i]) & set(split.population("test")[i])
+        assert adapter.build_final_test_scope().sample_set == split.population("test")
         restored = adapter.deserialize_scope(adapter.serialize_scope(train))
         assert restored.sample_set == train.sample_set
         with pytest.raises(ValueError, match="snapshot"):

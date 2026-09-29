@@ -208,43 +208,40 @@ def main():
     subprocess.run(command, cwd=settings.infra_checkout, env=env, check=True)
     if current["artifacts"] != evidence(candidate, settings):
         raise ValueError("candidate changed during evaluation")
-    from execute_tools.dataset_config import load_dataset_profile
-    from execute_tools.deliverable_spec import derive_tidmad_deliverable_spec
+    import math
 
-    from tasks.tidmad.runtime.scoring import coerce_nonfinite_to_none, score_vector
+    from execute_tools.task_data_path import EvaluationReadRequest
+    from workflows.task_composition import bind_run_task_composition
 
-    profile = load_dataset_profile(str(task / "resolved/dataset_profile.json"))
-    naming = derive_tidmad_deliverable_spec(profile).naming
-    anchors = json.loads((settings.data_dir / "segment_anchors.json").read_text())
-    vector, score = score_vector(
-        data_dir=str(output),
-        raw_data_dir=str(settings.data_dir),
-        sample_set=split.population("test"),
-        anchor_map=anchors["anchors"],
-        s_max=anchors["s_max"],
-        profile=profile,
-        parallel=False,
-        denoised_filename_fn=lambda i: str(
-            output
-            / naming.name(
+    with bind_run_task_composition(
+        composition, physical_data_root=str(settings.data_dir)
+    ):
+        scope = composition.task_data_path.build_final_test_scope()
+        payload = composition.task_data_path.read_evaluation_payload(
+            EvaluationReadRequest(
+                deliverable_dir=str(output),
                 model_type=candidate.model_name,
                 run_name="final_test",
                 exp_id=candidate.exp_id,
-                input_identity=i,
             )
-        ),
-    )
-    import math
-
+        )
+        outcome = composition.metric.evaluate(
+            payload.deliverables,
+            evaluation_payload=payload.value,
+            task_scope=scope,
+            data_dir=str(settings.data_dir),
+        )
+    score = getattr(outcome, "scalar", None)
+    finite = score is not None and math.isfinite(score)
     (output / "result.json").write_text(
         json.dumps(
             {
                 "authority": "diagnostic",
                 "health": "not assessed",
-                "metric": "tidmad_denoising_score",
-                "score": score if math.isfinite(score) else None,
-                "finite": math.isfinite(score),
-                "per_file": coerce_nonfinite_to_none(vector),
+                "metric": outcome.metric_id,
+                "score": score if finite else None,
+                "finite": finite,
+                "metric_outcome": json.loads(outcome.model_dump_json()),
                 "selection": current,
             },
             indent=2,

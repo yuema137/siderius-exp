@@ -189,3 +189,11 @@ class FrequencySplitDataPath(_base().TidmadTaskDataPath):
 
     def build_eval_scope(self, request):
         return self._frequency_scope(request, "validation")
+
+    def build_final_test_scope(self):
+        """Explicit post-selection scope; never used by workflow evaluation."""
+        return _base().TidmadScope(
+            sample_set=self.split.population("test"),
+            seg_size=40000,
+            profile=_base().resolve_dataset_profile(),
+        )
