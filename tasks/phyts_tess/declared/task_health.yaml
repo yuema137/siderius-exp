@@ -24,13 +24,38 @@
 # threshold before any real artifact exists would be guessing at which
 # rounds to invalidate.
 #
-# PROMOTION PATH, so this does not quietly stay provisional: after the first
-# real run, read the recorded `sample_dispersion` metric from the persisted
-# gate results for the rounds whose R-squared was healthy, and if the
-# observed healthy dispersion sits comfortably above this floor, change
-# `disposition` to `blocking` and replace this note with the measured value
-# and its artifact sha256. Until then, a collapsed model is recorded and
-# scored, not invalidated.
+# MEASURED 2026-09-21 on the first real run — see
+# experiments/phyts_tess/main_fixed_workflow/runs/nop_004/RESULTS.md, whose
+# results.json carries the per-round `prediction_dispersion` values. The
+# gate fired on all 33 scored rounds and PASSED every one of them:
+#
+#     model quality              R-squared      dispersion     vs floor 0.05
+#     healthy (18 rounds)        0.58 - 0.85    0.353 - 0.576  7 - 11x
+#     poor    (iter 11 trial)    0.27           0.326          6.5x
+#     CATASTROPHIC (iter 15)     -1.79          0.129          2.6x
+#
+# THE ANSWER CAME OUT THE OPPOSITE WAY FROM THE EXPECTATION, which is why
+# the run was worth doing. The floor does not merely avoid false positives:
+# at 0.05 it is unreachable. A model scoring R-squared -1.79 — worse than
+# predicting the mean — still disperses 2.6x above it, because that model is
+# badly wrong rather than constant. No failure in sixteen iterations was a
+# literal collapse, so promoting this floor to `blocking` as it stands would
+# add a check that never fires.
+#
+# PROMOTION IS THEREFORE NOT TAKEN. The measured separation does suggest a
+# floor near 0.2: it sits below every healthy and poor round observed
+# (minimum 0.326, a 1.6x margin) and above the catastrophic one (0.129, a
+# 1.55x margin), so it would have invalidated iteration 15 and nothing else.
+# That rests on ONE catastrophic sample and is recorded as a CANDIDATE, not
+# applied. Raising a threshold from a single failure is how a check acquires
+# a number nobody can defend later.
+#
+# WHAT WOULD SETTLE IT: more catastrophic rounds, from any run of this task.
+# When a second and third arrive, compare their dispersion against the 0.326
+# healthy minimum; if the separation holds, set `min_dispersion: 0.2`, change
+# `disposition` to `blocking`, and replace this block with those values and
+# their run identities. Until then a collapsed model is recorded and scored,
+# not invalidated.
 
 facts:
   # Opaque family value. Its job is to make the int8-specific TIDMAD checks
