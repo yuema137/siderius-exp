@@ -132,3 +132,16 @@ Source `.venv` installation is allowed environment setup; tracked source is
 unchanged during tutorial use. Generated scripts use Python `-B`, child
 processes disable bytecode writes, and Jupyter registration uses the external
 project prefix. This is write-location discipline, not an OS security sandbox.
+
+
+### External project validation (2026-09-29)
+
+All 12 tutorial regressions pass, including quoted/space-containing project
+paths, source-alias refusal, independent task-copy editing and script execution
+from another cwd. A real external project was initialized with the pinned
+infra checkout, its notebook executed all 12 code cells with staged data and
+both editing exercises enabled, and its generated script was previewed from
+`/tmp`. Preview selected the edited task fingerprint, project-local LLM routing,
+two epochs and project-local run workspace. Missing-key launch refused with no
+run output. Exp and infra git status remained clean after these operations.
+This is offline handoff verification; no second paid smoke run is claimed.

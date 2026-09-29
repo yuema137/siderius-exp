@@ -143,6 +143,9 @@ cd "$EXP_CHECKOUT"
   --prefix "$TUTORIAL_HOME/.jupyter" --name siderius-exp-tutorial \
   --display-name "SIDERIUS exp tutorial"
 export JUPYTER_PATH="$TUTORIAL_HOME/.jupyter/share/jupyter"
+export IPYTHONDIR="$TUTORIAL_HOME/.ipython"
+export MPLCONFIGDIR="$TUTORIAL_HOME/.matplotlib"
+export JUPYTER_RUNTIME_DIR="$TUTORIAL_HOME/.jupyter/runtime"
 cd "$TUTORIAL_HOME"
 "$EXP_CHECKOUT/.venv/bin/jupyter" lab --ServerApp.root_dir="$TUTORIAL_HOME"
 ```
@@ -216,6 +219,21 @@ its description, and saves an experiment selecting that composition with
 saved experiment, so all results land in `runs/tess-edited-001`. The original
 experiment and repository task remain unchanged. Changing a Python variable
 without saving the experiment does not change the script's next run.
+
+The run directory holds framework records, generated models/plugins and
+calibration artifacts. Its sibling `.tutorial.json` stores the launch receipt.
+Terminal output is displayed in your terminal; to keep a console log too:
+
+```bash
+bash "$TUTORIAL_HOME/scripts/run-tess-edited.sh" --launch \
+  > "$TUTORIAL_HOME/runs/tess-edited-001.console.log" 2>&1
+```
+
+Choose a fresh run name/workspace before another launch. Do not save editable
+inputs inside `runs/<name>/`: the framework requires that run directory not
+yet exist. Input files and notebook checkpoints belong in their project
+folders. Jupyter/plot caches above stay in the project; package installation
+caches follow your normal `uv` configuration outside tracked source.
 
 The script has explicit `EXP_CHECKOUT` and `EXPERIMENT` bindings. Edit your
 script to choose another saved experiment. If you move the project or installed

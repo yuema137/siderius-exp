@@ -99,3 +99,9 @@ For notebook/task/experiment/launch responsibilities, follow the owning
 [tutorial support contract](tutorials/paper/implementation.md#tutorial-responsibility-boundary).
 Keep notebook teaching and opt-in configuration editing separate from script
 execution; do not add provider calls or workflow launch to notebook cells.
+
+Tutorial users edit only their initialized external project: copied notebooks,
+tasks, experiment JSON, LLM routing and generated scripts. Never prescribe
+changes to tracked repository templates as a tutorial step. Distinguish that
+project root from each fresh run's output workspace. Advice activation must be
+explicitly supported by the selected treatment; an example file is not active.
