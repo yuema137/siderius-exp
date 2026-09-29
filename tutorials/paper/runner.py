@@ -129,11 +129,16 @@ def validate_locations(settings: TutorialExperiment) -> None:
                 )
 
 
-def build_command(settings: TutorialExperiment) -> list[str]:
+def build_command(
+    settings: TutorialExperiment,
+    *,
+    workflow: Path = WORKFLOW,
+    treatment_path: Path = TREATMENT,
+) -> list[str]:
     """Reuse production workflow/treatment renderers, overriding only demo knobs."""
     validate_locations(settings)
     args = render_siderius_args(
-        WORKFLOW, repository_root=ROOT, siderius_checkout=settings.infra_checkout
+        workflow, repository_root=ROOT, siderius_checkout=settings.infra_checkout
     )
     replacements = {
         "--num_iterations": str(settings.iterations),
@@ -161,7 +166,7 @@ def build_command(settings: TutorialExperiment) -> list[str]:
         if value is not None:
             args.extend([flag, str(value)])
     treatment = resolve_information_treatment(
-        TREATMENT,
+        treatment_path,
         repository_root=ROOT,
         adapter="siderius",
         required_modules=("literature_review", "data_analysis"),

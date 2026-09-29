@@ -1,8 +1,10 @@
-# TESS tutorial support contract
+# Paper tutorial support contract
 
 ## Scope and owners
 
-This first tutorial supports TESS NoPrior fixed workflow only. It reuses task
+The TESS modules support the TESS NoPrior fixed workflow. TIDMAD has a separate
+[one-band support contract](tidmad/implementation.md); its treatment and fraction
+semantics must not be inferred from TESS. It reuses task
 staging, composition, workflow rendering, information-treatment rendering,
 provider-key derivation and framework pin verification. It does not modify
 task science, the historical supervisor or infra runtime behavior.

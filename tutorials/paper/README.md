@@ -15,7 +15,7 @@ repositories. Keep data, credentials, edited notebooks and outputs outside them.
 | TESS | Notebook, pinned download/staging, editable experiment and formal entrypoint | [Task package](../../tasks/phyts_tess/README.md) |
 | LIGO | Next task; no runnable notebook here yet | [Task package](../../tasks/phyts_ligo/README.md) |
 | Project 8 | Next task; paper uses the time/frequency four-channel variant | [Dual representation](../../tasks/phyts_project8/DUAL_REPRESENTATION.md) |
-| TIDMAD | Next task; four independent bands | [Task package](../../tasks/tidmad/README.md) |
+| TIDMAD | [One-band notebook, budgets and frequency holdout](tidmad/README.md) | [Task package](../../tasks/tidmad/README.md) |
 
 The demo teaches configuration and execution. Fresh LLM searches need not
 produce the paper's exact models or scores. Four fixed-workflow tutorials will

@@ -208,3 +208,14 @@ checkpoints, and reports stay outside this repository.
 The old `examples/tidmad` projection is historical and is not an authoring or
 launch surface. A new run must select this task explicitly; no task is inferred
 from a directory name.
+
+## Learn one band and change the frequency split
+
+The [one-band tutorial](../../tutorials/paper/tidmad/README.md) copies this task
+into an external user project. It demonstrates the original frozen training
+pool and a separately identified frequency-holdout composition. The latter
+excludes held-out injected frequencies from training and reserves distinct
+workflow-validation and final-test groups. It preserves original segment
+indices and scoring references, but changes the scientific data protocol; its
+results are not the frozen paper experiment. Follow the notebook for data
+preparation, adjustable fractions/budgets and the separate final-test entrypoint.
