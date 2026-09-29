@@ -1,7 +1,9 @@
 # Learn a paper task, then run it from a script
 
-Start with **TESS near-core rotation regression**. The notebook walks through
-the task's data, model contract, metric and settings. The terminal script runs
+Start with **TESS near-core rotation regression**: predict a star's rotation
+frequency from its brightness measurements over time. The notebook teaches
+four changes through runnable configuration examples: search longer, use less
+Trial data, adjust time/VRAM budgets, and create a new train/validation split. The terminal script runs
 the existing fixed workflow. You can close the notebook while the script runs.
 
 This is a self-contained teaching entrypoint inside siderius-exp, not a second
@@ -153,8 +155,8 @@ cd "$TUTORIAL_HOME"
 Open `notebooks/01_tess_tutorial.ipynb` and select **SIDERIUS exp tutorial**.
 The notebook reads `project.json` to find installed code, then inspects your
 copied task and experiment. Default Run All is read-only. Its opt-in exercises
-create a second task variant, a new experiment and a new launch script in your
-project, never in either repository.
+save example experiments/scripts and optionally create a re-split task/data
+pair in your project, never in either repository.
 
 ### Where human advice belongs
 
@@ -205,28 +207,47 @@ bash "$TUTORIAL_HOME/scripts/run-tess.sh"
 bash "$TUTORIAL_HOME/scripts/run-tess.sh" --launch
 ```
 
-To change it in the notebook, follow the editing exercises and enable
-`WRITE_CONFIG`. That creates `experiments/tess-edited.json` and
-`scripts/run-tess-edited.sh`. Launch the new script:
+The notebook starts by explaining iterations, epochs, Trial and Formal in
+plain language, then gives four demos. Each demo starts from the same original
+experiment, so its effect can be understood independently.
+
+| Demo | Edit | Effect |
+|---|---|---|
+| Search longer | `iterations=3`, `epochs=10` | Up to three candidate cycles, up to ten training passes per attempt |
+| Smaller Trial | `trial_train_fraction=0.25`, `trial_val_fraction=0.5`; Formal fractions stay `1.0` | Less data within the same split; Formal still uses full train/validation |
+| Resource allowance | `trial_minutes=3`, `formal_minutes=10`, `trial_vram_gib=6`, `formal_vram_gib=8` | Separate per-attempt limits; not a total script time/cost cap |
+| New split | `validation_fraction=0.2`, `seed=42` | Regroup released train+validation by whole stars into a new task/data pair |
+
+For the first three demos, enable `WRITE_DEMOS` to save experiment JSONs and
+scripts. For example, run the saved smaller-Trial example:
 
 ```bash
-bash "$TUTORIAL_HOME/scripts/run-tess-edited.sh" --launch
+bash "$TUTORIAL_HOME/scripts/run-less-trial-data.sh"
+bash "$TUTORIAL_HOME/scripts/run-less-trial-data.sh" --launch
 ```
 
-For example, the notebook copies `tasks/tess` to `tasks/tess-variant`, edits
-its description, and saves an experiment selecting that composition with
-`epochs=2` and `workspace=.../runs/tess-edited-001`. The new script selects that
-saved experiment, so all results land in `runs/tess-edited-001`. The original
-experiment and repository task remain unchanged. Changing a Python variable
-without saving the experiment does not change the script's next run.
+Its saved experiment is `experiments/less-trial-data.json`, and its output is
+`runs/demo_less_trial_data/`. Changing a Python variable without saving does
+not change the script's next run. The initialized project fixes both Trial
+fractions at `1.0`; `null` explicitly delegates a Trial fraction to the agent.
+Formal training and validation fractions are separate operator-owned controls.
+
+Demo 4 has a separate `MAKE_NEW_SPLIT` switch. It creates
+`tasks/tess-split-seed42/`, `data/tess-split-seed42/`, a new manifest and split
+receipt, `experiments/new-split.json`, and `scripts/run-new-split.sh`. The script
+writes results under `runs/demo_new_split/`. The test split is never used.
+This is a new scientific task variant: do not compare its score directly with
+paper scores or reuse a model trained on stars now in validation. The helper
+verifies the copied manifest, data keys, preserved curves and star grouping;
+that does not qualify the new split's scientific performance.
 
 The run directory holds framework records, generated models/plugins and
 calibration artifacts. Its sibling `.tutorial.json` stores the launch receipt.
 Terminal output is displayed in your terminal; to keep a console log too:
 
 ```bash
-bash "$TUTORIAL_HOME/scripts/run-tess-edited.sh" --launch \
-  > "$TUTORIAL_HOME/runs/tess-edited-001.console.log" 2>&1
+bash "$TUTORIAL_HOME/scripts/run-less-trial-data.sh" --launch \
+  > "$TUTORIAL_HOME/runs/demo_less_trial_data.console.log" 2>&1
 ```
 
 Choose a fresh run name/workspace before another launch. Do not save editable
@@ -248,6 +269,8 @@ in infra's environment. It refuses root execution.
 The default demo runs one iteration with one Trial and one Formal opportunity,
 one-epoch ceilings, 2/5-minute training attempt budgets and an 8 GiB VRAM budget. A
 candidate can fail validation or training; a Formal score is not guaranteed.
+Explicit data fractions can differ from the historical agent-controlled Trial
+smoke run described below.
 Proposal reasoning, generated-code implementation and planning make separate
 LLM requests before training. Even this one-iteration example may take much
 longer than the training budget. Attempt budgets are not a total wall-clock
@@ -277,7 +300,8 @@ outcome before retrying. This wrapper only starts fresh runs.
 | RTX 5090 ↔ H100 | `gpu` and suitable `vram_gib` | New hardware run; launcher checks physical card |
 | Provider/model | Your `llm/*.json` selected by `llm_config` | New model treatment and possibly new required keys |
 | Task description | Copy of the whole task package selected by `composition` | New fingerprint; notebook demonstrates a controlled edit |
-| Input length, split, metric, Health | Task declaration **and** runtime/tests | Qualify the changed task; not an arbitrary launcher override |
+| Train/validation membership | Demo 4 creates a new task manifest and matching NPZ archives | New scientific split; preserve whole-star independence |
+| Input length, metric, Health | Task declaration **and** runtime/tests | Qualify the changed task; not an arbitrary launcher override |
 
 For **another NVIDIA GPU**, first verify that locked PyTorch can allocate a
 CUDA tensor on it. Choose a VRAM budget below physical capacity; review RAM,

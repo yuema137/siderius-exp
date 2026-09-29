@@ -126,7 +126,9 @@ Advice is an inactive structured JSON example. `advice_file: None` rejects
 activation in this NoPrior adapter. An advice-enabled treatment remains separate
 work requiring explicit identity/digest/routing; do not imply support merely
 because an example file exists. Data preparation/verification still owns the
-original released population, so arbitrary split edits need separate qualification.
+released population on download. Launch verification now reads the selected
+composition's full train/validation scopes, so a re-split task is checked
+against its own membership. Arbitrary split edits still need qualification.
 
 Source `.venv` installation is allowed environment setup; tracked source is
 unchanged during tutorial use. Generated scripts use Python `-B`, child
@@ -145,3 +147,44 @@ both editing exercises enabled, and its generated script was previewed from
 two epochs and project-local run workspace. Missing-key launch refused with no
 run output. Exp and infra git status remained clean after these operations.
 This is offline handoff verification; no second paid smoke run is claimed.
+
+
+## Parameter demos and selected-task split verification
+
+`trial_train_fraction` maps to `--trial_portion`, `trial_val_fraction` to
+`--eval_portion`. Non-null values enter the framework's experiment-fixed plan
+lock; None omits the flag and delegates to the agent. Initialized projects set
+both to 1.0. `formal_train_fraction` maps to `--formal_portion` and
+`formal_val_fraction` to `--formal_eval_portion`, with operator-owned scope.
+The lower-level `formal_train_portion` stays 1.0: the TESS training adapter uses
+its selected scope each epoch. Per-round optional VRAM values override the
+shared `vram_gib`; GPU admission checks the maximum effective requirement.
+Time budgets remain training-attempt allowances, not a total API/wall cap.
+
+`task_view.inspect_task` uses the pinned infra interpreter, run-local plugin
+environment and composition resolver. It reads actual full train/val scopes
+and seed-42 fraction examples from the TESS data path; it does not replicate
+its sampling algorithm. Typed `TaskView` rejects duplicate curve identities
+and cross-split star overlap. `inspect` uses these selected populations for
+archive verification before launch, rather than always using the original
+repository's manifest. Read-only counts are illustrations, not attempt-seed
+or sample-identity promises.
+
+`resplit.resplit_task` supports the standard TESS package layout. It validates
+the selected composition against the source manifest and archives, pools ONLY
+train+validation, permutes sorted Gaia IDs with the requested seed, and assigns
+ceil(star_count * validation_fraction) stars to validation (clamped so both
+splits remain nonempty). All curves of a star move together. It copies the
+task, rewrites membership and matching raw-flux NPZ archives, updates population
+metadata and a fingerprint-bearing split digest, and writes provenance. It
+preserves flux arrays and target values and leaves original task/data unchanged.
+Destination trees must be fresh and disjoint from source inputs and both repos.
+Interrupted writes remain for inspection; choose fresh destinations to retry.
+No provider call or training occurs. Test data is neither read nor moved.
+
+The notebook explains four separate demos before the task/experiment reference.
+`WRITE_DEMOS` saves named experiment/script pairs; `MAKE_NEW_SPLIT` creates the
+new task/data pair and its experiment/script. Both default false. They perform
+preparation only; terminal scripts own launch. Old validation statements above
+refer to earlier notebook revisions (12 code cells); revalidate the current
+11-cell notebook, including both default and opt-in paths, after edits.

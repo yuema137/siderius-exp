@@ -53,6 +53,12 @@ class TutorialExperiment(BaseModel):
     trial_minutes: float = Field(default=2, gt=0, le=120)
     formal_minutes: float = Field(default=5, gt=0, le=120)
     vram_gib: float = Field(default=8, gt=0, le=80)
+    trial_train_fraction: float | None = Field(default=None, ge=0.01, le=1)
+    trial_val_fraction: float | None = Field(default=None, ge=0.01, le=1)
+    formal_train_fraction: float = Field(default=1.0, ge=0.01, le=1)
+    formal_val_fraction: float = Field(default=1.0, ge=0.01, le=1)
+    trial_vram_gib: float | None = Field(default=None, gt=0, le=80)
+    formal_vram_gib: float | None = Field(default=None, gt=0, le=80)
     composition: Path | None = None
     llm_config: Path | None = None
     # This entrypoint deliberately preserves the NoPrior treatment.
@@ -136,8 +142,10 @@ def build_command(settings: TutorialExperiment) -> list[str]:
         "--formal_max_epochs": str(settings.epochs),
         "--trial_time_budget_minutes": str(settings.trial_minutes),
         "--formal_time_budget_minutes": str(settings.formal_minutes),
-        "--trial_vram_budget_gb": str(settings.vram_gib),
-        "--formal_vram_budget_gb": str(settings.vram_gib),
+        "--trial_vram_budget_gb": str(settings.trial_vram_gib or settings.vram_gib),
+        "--formal_vram_budget_gb": str(settings.formal_vram_gib or settings.vram_gib),
+        "--formal_portion": str(settings.formal_train_fraction),
+        "--formal_eval_portion": str(settings.formal_val_fraction),
     }
     if settings.composition is not None:
         replacements["--task_composition"] = str(settings.composition)
@@ -145,6 +153,13 @@ def build_command(settings: TutorialExperiment) -> list[str]:
         replacements["--llm_config"] = str(settings.llm_config)
     for flag, value in replacements.items():
         args[args.index(flag) + 1] = value
+    # Explicit Trial fractions become the framework's experiment-fixed lock.
+    for flag, value in (
+        ("--trial_portion", settings.trial_train_fraction),
+        ("--eval_portion", settings.trial_val_fraction),
+    ):
+        if value is not None:
+            args.extend([flag, str(value)])
     treatment = resolve_information_treatment(
         TREATMENT,
         repository_root=ROOT,
@@ -176,7 +191,9 @@ def command_value(command: list[str], flag: str) -> str:
     return command[command.index(flag) + 1]
 
 
-def verify_data(data: Path) -> dict[str, str]:
+def verify_data(
+    data: Path, populations: dict[str, set[str]] | None = None
+) -> dict[str, str]:
     """Require exactly the two staged archives and every declared curve key."""
     import numpy as np
 
@@ -188,7 +205,9 @@ def verify_data(data: Path) -> dict[str, str]:
             "data_dir must contain only tess_rotation_train.npz and tess_rotation_val.npz"
         )
     hashes = {}
-    for split, keys in _manifest_keys().items():
+    for split, keys in (
+        populations if populations is not None else _manifest_keys()
+    ).items():
         path = data / STAGED_FILENAME.format(split=split)
         if path.is_symlink():
             raise ValueError("stage regular archives, not symlinks to a raw data tree")
@@ -222,7 +241,13 @@ def verify_gpu(settings: TutorialExperiment) -> str:
     if len(rows) != 1 or settings.gpu not in rows[0]:
         raise ValueError(f"expected one {settings.gpu}; observed {rows}")
     capacity_gib = float(rows[0].rsplit(",", 1)[1].strip()) / 1024
-    if settings.vram_gib >= capacity_gib:
+    if (
+        max(
+            settings.trial_vram_gib or settings.vram_gib,
+            settings.formal_vram_gib or settings.vram_gib,
+        )
+        >= capacity_gib
+    ):
         raise ValueError(
             "VRAM budget must be below physical capacity, leaving driver/runtime headroom"
         )
@@ -325,7 +350,10 @@ def inspect(settings: TutorialExperiment, *, launch: bool) -> TutorialReceipt:
                 "Export them in this launching terminal from a trusted external "
                 "secret source; never put values in notebook cells or settings JSON."
             )
-        data_hashes = verify_data(settings.data_dir)
+        from tutorials.paper.task_view import inspect_task
+
+        task = inspect_task(settings)
+        data_hashes = verify_data(settings.data_dir, task.populations())
         gpu = verify_gpu(settings)
     return TutorialReceipt(
         settings=settings,

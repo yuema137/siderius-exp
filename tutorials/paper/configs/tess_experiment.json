@@ -12,5 +12,11 @@
   "vram_gib": 8,
   "composition": "/absolute/path/to/my-tess-project/tasks/tess/compositions/rotation_regression.yaml",
   "llm_config": "/absolute/path/to/my-tess-project/llm/agents.json",
-  "advice_file": null
+  "advice_file": null,
+  "trial_train_fraction": 1.0,
+  "trial_val_fraction": 1.0,
+  "formal_train_fraction": 1.0,
+  "formal_val_fraction": 1.0,
+  "trial_vram_gib": null,
+  "formal_vram_gib": null
 }

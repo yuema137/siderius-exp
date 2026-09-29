@@ -341,3 +341,130 @@ def test_project_refuses_source_aliases_and_repo_config_inputs(tmp_path):
         runner.build_command(
             settings(tmp_path, llm_config=runner.WORKFLOW.parent / "agents.json")
         )
+
+
+def test_fraction_and_per_round_budget_overrides_reach_distinct_framework_flags(
+    tmp_path,
+):
+    command = runner.build_command(
+        settings(
+            tmp_path,
+            trial_train_fraction=0.25,
+            trial_val_fraction=0.5,
+            formal_train_fraction=0.75,
+            formal_val_fraction=0.9,
+            trial_vram_gib=6,
+            formal_vram_gib=12,
+        )
+    )
+    expected = {
+        "--trial_portion": 0.25,
+        "--eval_portion": 0.5,
+        "--formal_portion": 0.75,
+        "--formal_eval_portion": 0.9,
+        "--formal_train_portion": 1.0,
+        "--trial_vram_budget_gb": 6,
+        "--formal_vram_budget_gb": 12,
+    }
+    for flag, value in expected.items():
+        assert command.count(flag) == 1
+        assert float(runner.command_value(command, flag)) == value
+    assert runner.command_value(command, "--formal_training_scope_source") == "operator"
+
+
+def test_resplit_preserves_curves_targets_and_whole_star_independence(
+    tmp_path, monkeypatch
+):
+    import csv
+    import json
+
+    from tutorials.paper import resplit
+    from tutorials.paper.task_view import TaskView
+
+    task = tmp_path / "original-task"
+    (task / "data/manifests").mkdir(parents=True)
+    (task / "declared").mkdir()
+    (task / "compositions").mkdir()
+    (task / "compositions/rotation_regression.yaml").write_text("placeholder")
+    (task / "README.md").write_text("Original task")
+    (task / "declared/dataset_profile.json").write_text(
+        json.dumps({"topology": {"populations": {"train": 3, "val": 2}}})
+    )
+    rows = [
+        resplit.IdentityRow(
+            split=split,
+            gaia_id=star,
+            sector=sector,
+            tic=star,
+            frot=star / 10,
+            frot_err=0.1,
+        )
+        for split, star, sector in [
+            ("train", 1, 1),
+            ("train", 1, 2),
+            ("train", 2, 1),
+            ("val", 3, 1),
+            ("val", 4, 1),
+        ]
+    ]
+    manifest = task / "data/manifests/rotation_identity.csv"
+    with manifest.open("w", newline="") as stream:
+        writer = csv.DictWriter(
+            stream, fieldnames=list(resplit.IdentityRow.model_fields)
+        )
+        writer.writeheader()
+        writer.writerows(row.model_dump() for row in rows)
+    original_manifest = manifest.read_bytes()
+    data = tmp_path / "original-data"
+    data.mkdir()
+    curves = {
+        row.key: np.array([row.gaia_id, row.sector], dtype=np.float32) for row in rows
+    }
+    for split in ("train", "val"):
+        np.savez_compressed(
+            data / f"tess_rotation_{split}.npz",
+            **{row.key: curves[row.key] for row in rows if row.split == split},
+        )
+    monkeypatch.setattr(
+        resplit,
+        "inspect_task",
+        lambda e: TaskView(
+            fingerprint="a" * 64,
+            train=tuple(r.key for r in rows if r.split == "train"),
+            val=tuple(r.key for r in rows if r.split == "val"),
+            example_counts={},
+        ),
+    )
+    config = settings(
+        tmp_path,
+        composition=task / "compositions/rotation_regression.yaml",
+        data_dir=data,
+    )
+    choice = resplit.SplitChoice(validation_fraction=0.5, seed=42)
+    preview = resplit.choose_split(rows, choice)
+    assert resplit.choose_split(list(reversed(rows)), choice) == preview
+    target = tmp_path / "new-task"
+    target_data = tmp_path / "new-data"
+    resplit.resplit_task(config, target, target_data, choice)
+    changed = resplit.read_rows(target)
+    assert manifest.read_bytes() == original_manifest
+    assert {r.key: r.frot for r in changed} == {r.key: r.frot for r in rows}
+    assert not (
+        {r.gaia_id for r in changed if r.split == "train"}
+        & {r.gaia_id for r in changed if r.split == "val"}
+    )
+    for split in ("train", "val"):
+        with np.load(target_data / f"tess_rotation_{split}.npz") as archive:
+            assert set(archive.files) == {r.key for r in changed if r.split == split}
+            for key in archive.files:
+                np.testing.assert_array_equal(archive[key], curves[key])
+    # The new view is checked against its own membership, not the frozen old split.
+    runner.verify_data(
+        target_data,
+        {
+            split: {r.key for r in changed if r.split == split}
+            for split in ("train", "val")
+        },
+    )
+    with pytest.raises(ValueError, match="new"):
+        resplit.resplit_task(config, target, target_data, choice)
