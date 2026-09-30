@@ -5,8 +5,12 @@ from __future__ import annotations
 import os
 import shlex
 import shutil
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, ConfigDict
+
+if TYPE_CHECKING:
+    from tutorials.paper.runner import TutorialExperiment
 
 
 class SetupIssue(BaseModel):
@@ -15,7 +19,9 @@ class SetupIssue(BaseModel):
     fix: str
 
 
-def require_ready(settings, *, task: str) -> None:
+def require_ready(
+    settings: TutorialExperiment, *, task: Literal["tess", "tidmad"]
+) -> None:
     """Collect cheap setup failures before native hashes/CUDA/pin validation.
 
     This does not authenticate provider keys or replace native launch checks.
@@ -25,7 +31,7 @@ def require_ready(settings, *, task: str) -> None:
 
     issues: list[SetupIssue] = []
 
-    def add(problem: str, fix: str):
+    def add(problem: str, fix: str) -> None:
         issues.append(SetupIssue(problem=problem, fix=fix))
 
     for checkout, groups in (
