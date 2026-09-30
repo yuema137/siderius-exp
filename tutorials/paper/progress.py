@@ -144,6 +144,7 @@ def plot_progress(
         color = "#2468a0"
         scored = [p for p in points if p.score is not None]
         metric, direction = next(iter(metrics)) if metrics else ("r2", "higher")
+        bounded_r2 = metric.lower() == "r2"
         x = [p.iteration for p in scored]
         y = [p.score for p in scored]
         ax.plot(x, y, color=color, lw=0.8, ls="--")
@@ -154,7 +155,7 @@ def plot_progress(
             )
             if improves:
                 best = point.score
-                if 0 <= best <= 1 and point.validity == "pass":
+                if (not bounded_r2 or 0 <= best <= 1) and point.validity == "pass":
                     improvements.append((point.iteration, best))
             frontier.append(best)
         if x:
@@ -163,8 +164,8 @@ def plot_progress(
         outside = []
         for point in scored:
             score = point.score
-            clipped = min(1, max(0, score))
-            marker = "v" if score < 0 else ("^" if score > 1 else "o")
+            clipped = min(1, max(0, score)) if bounded_r2 else score
+            marker = ("v" if score < 0 else "^") if score != clipped else "o"
             if point.validity == "unknown":
                 # Do not manufacture a Health verdict absent from native records.
                 continue
@@ -225,12 +226,17 @@ def plot_progress(
                 zorder=5,
             )
         ax.set_title(title, loc="left", pad=6)
-        ax.set_ylabel(r"$R^2$" if metric.lower() == "r2" else metric)
+        ax.set_ylabel(
+            r"$R^2$"
+            if bounded_r2
+            else ("Denoising score" if metric == "tidmad_denoising_score" else metric)
+        )
         ax.set_xlabel("Iteration")
         ax.set_xlim(0, max(iterations) + 0.15)
         ax.set_xticks(sorted(iterations))
-        ax.set_ylim(0, 1)
-        ax.set_yticks([0, 0.5, 1])
+        if bounded_r2:
+            ax.set_ylim(0, 1)
+            ax.set_yticks([0, 0.5, 1])
         ax.grid(False)
         handles = [
             Line2D([], [], color=".25", ls="--", lw=0.8, label="Formal result"),

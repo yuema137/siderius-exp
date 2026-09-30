@@ -270,7 +270,8 @@ retrospective behavioral certification. The running-best raw-score line includes
 invalid observations, respecting metric direction. Figure 4 styling uses serif typography, inward ticks, no grid, dashed Formal
 results, a solid current-best line and stars for new bests with Health PASS
 (invalid improvements retain their hollow marker). The R² axis is 0–1;
-out-of-range scores use boundary triangles and exact CSV values. Missing
+out-of-range R² scores use boundary triangles and exact CSV values. TIDMAD’s
+custom denoising score uses its actual range instead of the R² bounds. Missing
 values/no Formal records remain in the CSV, without an extra diagnostic panel. PNG/SVG/CSV outputs live externally;
 the CSV retains source-record paths. A user can replot another workspace without
 executing any search.

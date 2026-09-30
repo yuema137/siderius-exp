@@ -111,3 +111,15 @@ def test_completed_demo_reuses_records_and_changed_settings_require_new_name(
     assert run_demo(files)["exit_code"] == 0
     with pytest.raises(ValueError, match="different saved settings"):
         prepare_demo(project, "tess", name="quick", settings={"iterations": 4})
+
+
+def test_task_score_is_not_clipped_to_r2_axis(tmp_path):
+    workspace = tmp_path / "run"
+    path = write_record(workspace, score=-10.2, status="failed_mode_collapse")
+    data = json.loads(path.read_text())
+    for record in data["all_records"]:
+        record["metric_result"]["metric_id"] = "tidmad_denoising_score"
+    path.write_text(json.dumps(data))
+    fig = plot_progress(workspace, tmp_path / "plots", title="TIDMAD")
+    assert fig.axes[0].collections[0].get_offsets()[0, 1] == -10.2
+    assert fig.axes[0].get_ylim()[0] < -10.2 < fig.axes[0].get_ylim()[1]
