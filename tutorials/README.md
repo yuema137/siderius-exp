@@ -6,7 +6,8 @@ the saved files, and start a run from a terminal script. The notebooks teach and
 edit configuration, then their Run All quick demo invokes the saved script and
 plots three iterations of real results. The scripts own research execution.
 Run All requires prepared data/exported keys and incurs API/GPU work;
-`RUN_QUICK_DEMO=False` is the inspection-only option.
+`RUN_QUICK_DEMO=False` skips API/GPU execution. Quick demo A still saves
+input files in your external project.
 
 **Start with [the paper tutorial guide](paper/README.md).** It explains installation,
 API keys, data preparation, supported hardware, and what the demos can establish.

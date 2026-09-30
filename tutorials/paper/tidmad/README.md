@@ -5,7 +5,8 @@ choose data, change settings, save your task/experiment, open the saved files,
 then run the script that selects them. It uses **band 0–3** only. The notebook
 prepares and explains; its Run All quick-demo cell invokes a saved search
 script and plots score versus iteration. Set `RUN_QUICK_DEMO=False` to skip paid
-execution. Final inference remains a separate, explicitly selected step.
+execution; Quick demo A still saves inputs in your project. Final inference
+belongs to a separate optional example, described below.
 
 ## Initialize your own project
 
@@ -14,13 +15,14 @@ then run from the exact exp checkout:
 
 ```bash
 export TUTORIAL_HOME=/absolute/path/to/my-tidmad-study
+export PYTHONDONTWRITEBYTECODE=1
+cd "$EXP_CHECKOUT"
 .venv/bin/python -B -m tutorials.paper.tidmad.project \
-  --project "$TUTORIAL_HOME" --infra-checkout /absolute/path/to/SIDERIUS-tutorial
-.venv/bin/jupyter lab --ServerApp.root_dir="$TUTORIAL_HOME"
+  --project "$TUTORIAL_HOME" --infra-checkout "$INFRA_CHECKOUT"
 ```
 
-The project directory must be new and outside both repositories. Open its
-`notebooks/02_tidmad_tutorial.ipynb` with the exp environment's kernel.
+The project directory must be new and outside both repositories. Prepare data
+and export keys below before starting Jupyter.
 
 ## Choose existing data OR a download
 
@@ -45,12 +47,63 @@ python /absolute/path/to/TIDMAD/download_data.py \
   --train_files 4 --validation_files 4 --science_files 0
 ```
 
-Do not run both preparations. Both entrances yield the same `data_dir`: only
+Do not run both preparations. Both options yield the same `data_dir`: only
 training/validation files 0000–0003 and `segment_anchors.json`. One band still
 represents about 32 GB of uncompressed channel samples. No download occurs
 when you run notebook cells.
 
-## What files do my edits create?
+## Export keys, select the kernel, then run the notebook
+
+The shipped routing needs **`OPENAI_API_KEY`**. In this same terminal:
+
+```bash
+read -r -s -p "OpenAI API key: " OPENAI_API_KEY
+echo
+export OPENAI_API_KEY
+```
+
+This keeps the value out of shell history and notebook cells. For repeat use,
+see the [shared key instructions](../README.md#2-configure-keys-without-storing-them-in-a-notebook).
+TIDMAD keeps literature review enabled; changing provider routing can change
+which key names are required. The launcher checks the selected routing.
+
+Register the exp checkout's kernel and start Jupyter only after data and keys
+are ready:
+
+```bash
+"$EXP_CHECKOUT/.venv/bin/python" -B -m ipykernel install \
+  --prefix "$TUTORIAL_HOME/.jupyter" --name siderius-exp-tutorial \
+  --display-name "SIDERIUS exp tutorial"
+export JUPYTER_PATH="$TUTORIAL_HOME/.jupyter/share/jupyter"
+export IPYTHONDIR="$TUTORIAL_HOME/.ipython"
+export MPLCONFIGDIR="$TUTORIAL_HOME/.matplotlib"
+export JUPYTER_RUNTIME_DIR="$TUTORIAL_HOME/.jupyter/runtime"
+cd "$TUTORIAL_HOME"
+"$EXP_CHECKOUT/.venv/bin/jupyter" lab --ServerApp.root_dir="$TUTORIAL_HOME"
+```
+
+Open `notebooks/02_tidmad_tutorial.ipynb`, select **SIDERIUS exp tutorial**, then
+use **Run All**. Quick A saves/checks inputs, Quick B runs the saved script,
+and Quick C plots the records. You can stop at the plot; no extra terminal
+launch is needed. With the default `DEMO_NAME="quick-demo-001"`, your files are:
+
+```text
+YOUR_PROJECT/
+├── tasks/tidmad-quick-demo-001/compositions/file_holdout.yaml
+├── experiments/tidmad_quick-demo-001.json
+├── scripts/run-tidmad_quick-demo-001.sh
+├── runs/tidmad_quick-demo-001/
+└── plots/tidmad_quick-demo-001/score-versus-iteration.png
+```
+
+The notebook prints absolute paths and lets you reopen the saved JSON. The
+quick demo is complete even if its scores are invalid; those points are hollow.
+A three-iteration run took about 35 minutes on our RTX 5090, including LLM work.
+
+## Optional advanced examples: what files do my edits create?
+
+These examples save **different experiments** from the quick demo above. Use
+them to learn a particular change; they do not automatically reuse its results.
 
 A task is a directory with a composition YAML entry. An experiment is one JSON
 file pointing to that entry. A script points to the JSON through `EXPERIMENT`.
@@ -96,8 +149,13 @@ In the new task, Trial `.25` takes 50/200 segments per training file; Formal
 `.5` takes 100/200. Evaluation fractions apply only to validation file 2.
 Final-test file 3 never enters workflow scopes. In contrast, the original
 paper-pool example fixes 20 training segments per file: Trial `.5` means
-10/20, while Formal `.1` declares the frozen 20/200 parent and uses all 20.
+10/20. Keep `formal_train_fraction=0.1` for that frozen task: it selects the
+original 20 of 200 segments, and Formal uses all 20.
 Changing the split is a new scientific protocol, not the frozen paper result.
+
+The final-test instructions below belong to `tidmad-file-split`, not the quick
+demo. To follow them, save and run that optional example in notebook sections
+5–6 first. They do not automatically select a model from the quick-demo run.
 
 Workflow validation influences the agent and training/model selection. Final
 test happens only after selection: stop search, declare the selected native
@@ -107,8 +165,7 @@ from its recorded artifact paths. Search scripts retain the training checkpoint
 for this step. Its report uses the selected task's
 metric and scoreability contract, is diagnostic, and does not run the full
 workflow Health assessment. Do not adapt the model to that final score. If no attempt succeeds, stop before
-final testing and inspect the validation failure records. A tiny one-epoch
-smoke run can finish training yet produce a collapsed, unusable model.
+final testing and inspect the validation failure records. This does not prevent completion of the workflow demo or plotting its results.
 
 ## Keys, hardware and execution boundaries
 

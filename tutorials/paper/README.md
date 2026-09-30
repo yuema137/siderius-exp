@@ -34,11 +34,10 @@ the paper's coding-agent/orchestration comparisons or retrospective reviews.
 Archived-checkpoint replay and the original campaign launchers are separate
 routes. Changing a split defines a new scientific protocol.
 
-The real TESS smoke run produced diagnostic scores. The tiny one-epoch TIDMAD
-smoke run completed training/inference but all three attempts collapsed; it
-produced no valid model for final testing. The separate TIDMAD final-test path
-therefore does not yet have a successful real-run qualification. Do not treat
-small fractions or a completed command as proof of model quality.
+Both three-iteration notebooks have been run end to end on an RTX 5090: about
+24 minutes for TESS and 35 minutes for TIDMAD. These times include LLM work,
+not just training; your run may take longer or shorter. The separate, optional
+TIDMAD final-test example has not yet completed a successful end-to-end run.
 
 ## What you will see after Run All
 
@@ -51,8 +50,11 @@ three-iteration experiment, displays its files/parameters, invokes its shell
 script, and draws **score versus iteration** from actual run records. Filled
 markers mean Health PASS; hollow markers mean Health FAIL/failed attempts.
 The plot follows the paper: dashed Formal results, a solid current-best line,
-and stars for new bests with Health PASS. Negative scores use boundary triangles;
-missing scores stay in the CSV. The current-best line can include invalid points. CSV, PNG and SVG outputs are saved under your project's `plots/`.
+and stars for new bests with Health PASS. TESS uses boundary triangles for
+negative R² values; TIDMAD displays its denoising score at its actual value,
+including negative values. Missing scores stay in the CSV. The current-best
+line can include invalid points. CSV, PNG and SVG outputs are saved under your
+project's `plots/`.
 
 Before a new run, the notebook and script check the checkout Python environments,
 required input files, exported API key names and NVIDIA GPU access. Errors list
@@ -71,7 +73,8 @@ manual model-selection step, not part of the quick-demo validation plot.
 ## Before you start
 
 - Linux, Python 3.12, `git`, `uv`, and one supported NVIDIA RTX 5090 or H100.
-  AMD/Intel GPUs and CPU training are unsupported; H100 has no local real-run witness.
+  AMD/Intel GPUs and CPU training are unsupported. The launcher supports H100,
+  but we have not tested this tutorial on an H100.
 - Access to the selected LLM providers and exported API keys. Runs can incur
   charges. Training budgets do not cap total script duration or API spending.
 - Two installed source repositories plus a **third, separate directory** for
@@ -87,8 +90,8 @@ these repositories may require access; the commands below target that release
 pair. Development PRs are not the public installation source.
 
 **Reading order:** install the exact source pair in section 1. For TESS, continue
-through sections 2–4, then open your copied notebook and its **Before you run**
-checklist. For TIDMAD, continue with the [TIDMAD guide](tidmad/README.md) after
+through sections 2–5, then follow Quick A → B → C in your copied notebook.
+Its **Before you run** checklist is for optional advanced/manual runs. For TIDMAD, continue with the [TIDMAD guide](tidmad/README.md) after
 section 1. The commands in the remaining sections of this page are TESS examples.
 
 ## Task package, experiment, notebook and script
@@ -173,7 +176,7 @@ The historical model ID is retained. If your account cannot use it, edit
 your project's `llm/agents.json` and select an available model there, as shown in the notebook. That is a new model treatment, not an exact
 paper rerun. Key presence does not prove provider access; only a request can.
 
-## 3. Create your own project, then open its notebook
+## 3. Create your own project and register its notebook kernel
 
 Source checkouts supply installed code and templates. **Do not edit their
 notebooks, scripts, task packages, experiments or LLM configuration.** The
@@ -220,18 +223,11 @@ export JUPYTER_PATH="$TUTORIAL_HOME/.jupyter/share/jupyter"
 export IPYTHONDIR="$TUTORIAL_HOME/.ipython"
 export MPLCONFIGDIR="$TUTORIAL_HOME/.matplotlib"
 export JUPYTER_RUNTIME_DIR="$TUTORIAL_HOME/.jupyter/runtime"
-cd "$TUTORIAL_HOME"
-"$EXP_CHECKOUT/.venv/bin/jupyter" lab --ServerApp.root_dir="$TUTORIAL_HOME"
 ```
 
-Open `notebooks/01_tess_tutorial.ipynb` and select **SIDERIUS exp tutorial**.
-The notebook reads `project.json` to find installed code, then inspects your
-copied task and experiment. **After preparing data in section 4**, Run All
-saves and executes a three-iteration quick demo, then plots its actual Formal
-scores and Health markers. This uses paid APIs and GPU time. Set
-`RUN_QUICK_DEMO=False` to skip execution. Advanced opt-in exercises save separate
-experiment/scripts and optionally create a re-split task/data pair in your
-project, never in either repository.
+The kernel is now registered as **SIDERIUS exp tutorial**. Prepare data in
+section 4 before starting Jupyter in section 5. Keep this terminal open so
+Jupyter inherits `TUTORIAL_HOME`, the kernel settings and your exported keys.
 
 ### Where human advice belongs
 
@@ -263,7 +259,7 @@ inputs (about 18 MB). Raw Parquet is neither downloaded nor copied. If a verifie
 NPZ directory already exists, set your saved experiment's `data_dir` to that
 absolute path and reuse it without staging again. Do not expose the test split.
 
-On another machine, use the download entrance below instead. Run from exp:
+On another machine, use the download option below instead. Run from exp:
 
 ```bash
 cd "$EXP_CHECKOUT"
@@ -283,7 +279,25 @@ If a download fails, inspect the error and choose new destinations for a retry;
 the helper never overwrites existing data. It does not re-split stars. Changes
 to the population need a new task identity and separate qualification.
 
-## 5. Preview, launch, inspect
+## 5. Run the notebook demo, or launch an advanced example
+
+After completing keys, project/kernel setup and data preparation, start Jupyter
+from the same terminal:
+
+```bash
+cd "$TUTORIAL_HOME"
+"$EXP_CHECKOUT/.venv/bin/jupyter" lab --ServerApp.root_dir="$TUTORIAL_HOME"
+```
+
+Open `notebooks/01_tess_tutorial.ipynb` and select **SIDERIUS exp tutorial**.
+For your first run, use **Run All**: Quick A saves/checks the demo inputs, Quick B
+runs its script, and Quick C plots the results. You can stop at the plot. You do
+not also need to run a terminal command. `RUN_QUICK_DEMO=False` skips API/GPU
+execution, but Quick A still saves inputs. Completed unchanged runs are reused.
+
+**Optional advanced/manual route:** continue below only when you want to save
+and launch a different example. Each has its own JSON, script and result folder;
+it does not change the quick demo you just ran.
 
 In the notebook, use **Before you run: one experiment, one checklist, one launch
 command** after saving your edits. Select one example; its report reloads the
@@ -301,9 +315,8 @@ bash "$TUTORIAL_HOME/scripts/run-tess.sh"
 bash "$TUTORIAL_HOME/scripts/run-tess.sh" --launch
 ```
 
-The notebook starts by explaining iterations, epochs, Trial and Formal in
-plain language, then gives four demos. Each demo starts from the same original
-experiment, so its effect can be understood independently.
+After the quick demo, four advanced exercises explain individual changes.
+Each starts from the initial experiment so you can understand its effect independently.
 
 | Demo | Edit | Effect |
 |---|---|---|
@@ -324,7 +337,7 @@ Its saved experiment is `experiments/less-trial-data.json`, and its output is
 `runs/demo_less_trial_data/`. Changing a Python variable without saving does
 not change the script's next run. The initialized project fixes both Trial
 fractions at `1.0`; `null` explicitly delegates a Trial fraction to the agent.
-Formal training and validation fractions are separate operator-owned controls.
+You set the Formal training and validation fractions separately.
 
 Demo 4 has a separate `MAKE_NEW_SPLIT` switch. It creates
 `tasks/tess-split-seed42/`, `data/tess-split-seed42/`, a new manifest and split
