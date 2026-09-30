@@ -1,0 +1,10 @@
+{
+  "factory": "experiments.shared.validation_client_factory:create_validation_client",
+  "settings": {
+    "row_declaration": "experiments.phyts_tess.main_orchestrator.validation_rows:declared_rows",
+    "deadline_epoch": 0,
+    "max_metadata_bytes": 1048576,
+    "max_state_bytes": 268435456
+  },
+  "training_launcher": ["sudo", "-n", "-u", "tess-coordinator", "/usr/local/sbin/tess-native-training"]
+}

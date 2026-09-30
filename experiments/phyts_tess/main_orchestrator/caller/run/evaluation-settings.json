@@ -1,0 +1,9 @@
+{
+  "command": ["sudo", "-n", "-u", "tess-coordinator", "/usr/local/sbin/tess-score"],
+  "candidate_root": "/var/lib/tess-candidates/onp_001",
+  "evaluation_root": "/var/lib/tess-evaluations",
+  "run_id": "onp_001",
+  "metric_declaration": "/home/klz/Data/SIDEREIS_DATA/phyts_tess/orchestration/bundle/caller/tasks/phyts_tess/declared/metric_r2.json",
+  "metric_declaration_sha256": "08f7cb79ecb8fa5a070c1fcc4dcf94ec0ca2fb291b00a4d708165e45ec9c0eda",
+  "evaluator_uid": 995
+}
