@@ -1,5 +1,10 @@
 # Notebook walkthroughs
 
+**Browse first:** each notebook includes real training-sample pictures, a recorded
+three-iteration result plot and exact scores. No setup is needed to view these
+archived examples; your own results appear after you configure and run the demo.
+See the [example gallery](../examples/README.md) for provenance and limitations.
+
 Choose one task, follow its setup guide, and open the notebook copied into your
 own external project. These are three-iteration workflow demos, not paper
 artifact reproductions. Do not execute or edit these repository templates.

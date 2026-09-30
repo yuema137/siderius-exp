@@ -1,0 +1,37 @@
+{
+  "kind": "recorded-workflow-demo-example-v1",
+  "task": "tess",
+  "run_name": "tess_quick-demo-001",
+  "scientific_reproduction": false,
+  "recorded_date": "2026-09-29",
+  "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+  "exp_revision": "0fb9fb7790d55d7f2e3ff0e25f8b5ba649b54b90",
+  "exit_code": 0,
+  "elapsed_seconds": 1448.3879012828693,
+  "settings": {
+    "gpu": "RTX 5090",
+    "iterations": 3,
+    "epochs": 5,
+    "trial_minutes": 1.0,
+    "formal_minutes": 2.0,
+    "vram_gib": 8.0,
+    "trial_train_fraction": 1.0,
+    "trial_val_fraction": 1.0,
+    "formal_train_fraction": 1.0,
+    "formal_val_fraction": 1.0
+  },
+  "health_policy": "required",
+  "data_example": "Training identity 1367871286194124032:25; 1030 observed samples \u2192 input [1, 1024]. Target: near-core rotation frequency 0.635032 cycles/day. Flux is stored in tess_rotation_train.npz, keyed by Gaia ID:sector; rotation_identity.csv supplies the target. The horizontal axis is sample index, not elapsed days.",
+  "interpretation": "The three scored Formal attempts passed their configured checks. This small run is an example, not a reproduction of the paper score.",
+  "original_launch_receipt_sha256": "9eb6781eaa5ff8c734e614ab891033934e1518824cb3b175dafebeb9ee9122d2",
+  "source_record_sha256": {
+    "iter_001/iteration_001/cadence_gated_spectral_resnet/run_output_iter_001.json": "70df21a924b999dba30d9ff9f7a1959a54a3660374f80480cb25b665942df179",
+    "iter_002/iteration_002/physical_grid_spacing_resnet/run_output_iter_002.json": "891a2777a299348f05670cc696b3f8a13e964eb129755c5508e24ee5f25b60e1",
+    "iter_003/iteration_003/cadence_relational_spectral_transformer/run_output_iter_003.json": "667104b58abf88ec22fbb814c284a4d4c3b70e38eb0259b31d73fd1216ee1b98"
+  },
+  "assets_sha256": {
+    "tess-data.png": "ae018b35b59e4dcf90a2c81ce8d807f761a4b4bf04dadda4c93fbda76dcdce7d",
+    "tess-progress.png": "d29005e115fdceec455662de46ec8a265e6e94f05f09c866e03ce19cb57e6983",
+    "tess-progress.csv": "9dcec0c5aa228e3e911fef0bf83ab2dc2b3b82db8ce3440111e5b2442e00e816"
+  }
+}

@@ -1,5 +1,10 @@
 # Tutorials: learn a task, save your experiment, run it
 
+**Browse first:** each notebook includes real training-sample pictures, a recorded
+three-iteration result plot and exact scores. No setup is needed to view these
+archived examples; your own results appear after you configure and run the demo.
+See the [example gallery](paper/examples/README.md) for provenance and limitations.
+
 These tutorials are for readers who are new to SIDERIUS. They show how to copy a
 scientific task into your own project, change its experiment settings, inspect
 the saved files, and start a run from a terminal script. The notebooks teach and

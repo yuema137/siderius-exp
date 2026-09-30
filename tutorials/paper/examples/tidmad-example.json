@@ -1,0 +1,37 @@
+{
+  "kind": "recorded-workflow-demo-example-v1",
+  "task": "tidmad",
+  "run_name": "tidmad_quick-demo-001",
+  "scientific_reproduction": false,
+  "recorded_date": "2026-09-29",
+  "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+  "exp_revision": "6e26c98f9402020d441cd71e4f0dba7d166cacbb",
+  "exit_code": 0,
+  "elapsed_seconds": 2089.9325557304546,
+  "settings": {
+    "gpu": "RTX 5090",
+    "iterations": 3,
+    "epochs": 5,
+    "trial_minutes": 2.0,
+    "formal_minutes": 5.0,
+    "vram_gib": 8.0,
+    "trial_train_fraction": 0.01,
+    "trial_val_fraction": 0.01,
+    "formal_train_fraction": 0.02,
+    "formal_val_fraction": 0.02
+  },
+  "health_policy": "required",
+  "data_example": "abra_training_0000.h5, training window 0: paired input/target [40000] arrays. Stored int8 ADC values are shifted by +128 for the model. HDF5 paths: timeseries/channel0001/timeseries (input) and timeseries/channel0002/timeseries (target). Only the first 600 samples are drawn; no holdout or final-test data is read.",
+  "interpretation": "All three scored Formal attempts failed mode-collapse checks. The hollow points deliberately retain their measured scores; completion of the workflow does not mean a scientifically acceptable denoiser. No separate final test was run.",
+  "original_launch_receipt_sha256": "b3713e8460f2c9596febae2744101e7ea29af4c8e8a16130a56316dd1c67536a",
+  "source_record_sha256": {
+    "iter_001/iteration_001/broadband_scalar_dilated_net/run_output_iter_001.json": "bb5504f73ba0abd1f63f2b442dc14362409dbdb7375237546dd879042b01b801",
+    "iter_002/iteration_002/compact_spectral_unet_regressor/run_output_iter_002.json": "4d9e9374da7ea3f70b9a4ce39d4b13bfedbf91b17f785ec1cbd260667be2134a",
+    "iter_003/iteration_003/full_range_gated_wavenet_regressor/run_output_iter_003.json": "d5c9088bb3076a7004f926829c96d71df87dd54f403c4084aca1e7f4cb2a6033"
+  },
+  "assets_sha256": {
+    "tidmad-data.png": "4842a8d01b01a8dd29733e0f2e0a4581503951ab05ca7a014b4389d9c99681ac",
+    "tidmad-progress.png": "42fab0d29a0c1ef7192181a5bd813a9576716bcb0486eef36e705724c63b432f",
+    "tidmad-progress.csv": "9e8c00b16a69e3b806fa5d2d4f849203bfe0fecc378a3edfaa7208cb89e5d59e"
+  }
+}

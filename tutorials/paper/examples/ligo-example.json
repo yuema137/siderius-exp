@@ -1,0 +1,38 @@
+{
+  "kind": "recorded-workflow-demo-example-v1",
+  "task": "ligo",
+  "run_name": "ligo_quick-demo-001",
+  "scientific_reproduction": false,
+  "recorded_date": "2026-09-30",
+  "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+  "exp_revision": "222dc7be11faeccc216c0b9d5e2f7378c1128259",
+  "exit_code": 0,
+  "elapsed_seconds": 1750.4174999436364,
+  "settings": {
+    "gpu": "RTX 5090",
+    "iterations": 3,
+    "epochs": 4,
+    "trial_minutes": 2.0,
+    "formal_minutes": 5.0,
+    "vram_gib": 8.0,
+    "trial_train_fraction": 0.5,
+    "trial_val_fraction": 0.5,
+    "formal_train_fraction": 1.0,
+    "formal_val_fraction": 1.0,
+    "batch_size": 1
+  },
+  "health_policy": "none",
+  "data_example": "Training event 0: input [2, 1024], target [1] = 1.47618 solar masses (chirp mass). Both detector channels belong to the same event. These are the prepared whitened/cropped inputs, not raw detector strain. Files: training/inputs.npy [N, C, L] and training/targets.npy [N, 1].",
+  "interpretation": "All three scored Formal attempts completed, but their R\u00b2 values are negative: they performed worse than the validation-mean baseline. This task explicitly declares no Health checks; filled markers mean successful scored execution, not Health PASS.",
+  "original_launch_receipt_sha256": "e835d41cc324d6ec940db149cdacbf13face47ed005d4afa5f8d371733874731",
+  "source_record_sha256": {
+    "iter_001/iteration_001/dual_detector_dilated_resnet/run_output_iter_001.json": "3dc7fc0a7c03e17273a472e218ad97336d57b2bc0f9caae7bff695182eb1190e",
+    "iter_002/iteration_002/aligned_fusion_dilated_resnet/run_output_iter_002.json": "43fcb90da9eaa146f95d5a1aa66fec3ef6f46c59e2c392f73d55aa8405ac0aa0",
+    "iter_003/iteration_003/aligned_token_attention_regressor/run_output_iter_003.json": "8c18049f75dc53bb7e7a83316e925bc8c696688a9e6757e6737256274ebae3d8"
+  },
+  "assets_sha256": {
+    "ligo-data.png": "42943b8b8e8f63decf412accac820d0270ae13941cbc723609fa4b1cfe1f0bd5",
+    "ligo-progress.png": "8874846f03e50f51eca192560a3fb870351582d81e16f45cbaf7dc7b62bfe472",
+    "ligo-progress.csv": "eb31183d3fa4c45be511f765d6350d9653866f6772f39169d8c894b1ce9a23fb"
+  }
+}

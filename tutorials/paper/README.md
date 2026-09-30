@@ -1,5 +1,10 @@
 # Paper tutorials: configure a scientific task and launch your own run
 
+**See the workflow before installing:** the [notebooks](notebooks/README.md) now
+include real training-sample figures and recorded three-iteration result plots.
+The [example gallery](examples/README.md) lists scores, provenance and limitations.
+These archived examples stay separate from results produced by your own run.
+
 Use these tutorials to learn **which files define a task, which parameters define
 an experiment, and which terminal command runs what you saved**. You work in your
 own project directory. The notebook explains and saves configurations; a separate

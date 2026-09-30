@@ -1,0 +1,38 @@
+{
+  "kind": "recorded-workflow-demo-example-v1",
+  "task": "project8",
+  "run_name": "project8_quick-demo-001",
+  "scientific_reproduction": false,
+  "recorded_date": "2026-09-30",
+  "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+  "exp_revision": "222dc7be11faeccc216c0b9d5e2f7378c1128259",
+  "exit_code": 0,
+  "elapsed_seconds": 1892.2114544659853,
+  "settings": {
+    "gpu": "RTX 5090",
+    "iterations": 3,
+    "epochs": 4,
+    "trial_minutes": 2.0,
+    "formal_minutes": 5.0,
+    "vram_gib": 8.0,
+    "trial_train_fraction": 0.5,
+    "trial_val_fraction": 0.5,
+    "formal_train_fraction": 1.0,
+    "formal_val_fraction": 1.0,
+    "batch_size": 1
+  },
+  "health_policy": "none",
+  "data_example": "Training event 0: input [4, 24576], target [1] = 18579.9 eV. Channels 0/1 are time I/Q; channels 2/3 are FFT real/imaginary values. Both views describe the same event; time samples and FFT bins are different axes. Files: training/inputs.npy [N, C, L] and training/targets.npy [N, 1].",
+  "interpretation": "All three scored Formal attempts completed, but their R\u00b2 values are negative: they performed worse than the validation-mean baseline. This task explicitly declares no Health checks; filled markers mean successful scored execution, not Health PASS.",
+  "original_launch_receipt_sha256": "a583d10bb6f477e6c111ee1b5774e81180b9fbcfd9e22243acfa74a5684bdc3d",
+  "source_record_sha256": {
+    "iter_001/iteration_001/dual_view_start_spectral_regressor/run_output_iter_001.json": "22a2750e9e238d33e9d457283832b3a1dc42a45c495fe844ed3d71604149ee67",
+    "iter_002/iteration_002/onset_stft_cross_gated_regressor/run_output_iter_002.json": "a2dbf45614dc49496120d5fb38d5f1de268b0a7f1140e612e4e080b5c182b552",
+    "iter_003/iteration_003/frequency_aligned_onset_film_regressor/run_output_iter_003.json": "a21af9ee560286ca096e43f21b62fb533459bdd1abfe818b6f572b6d0660365f"
+  },
+  "assets_sha256": {
+    "project8-data.png": "58fe83a7cd416b88fbbe38b1911269995bc9483192f490070c0df59a2aa7c993",
+    "project8-progress.png": "707178416cf9d7b5a3559f6b1ce4e388fa5145a599c24734bd7aa5218db3461d",
+    "project8-progress.csv": "5ad45f2c361761fb836d2e2b59b1f0b8c94ae137a1227263eaa7af8e5ca26470"
+  }
+}

@@ -44,7 +44,12 @@ Hugging Face LFS objects and are verified again locally. No test file is request
 
 ## Notebook effects
 
-The notebook is committed without outputs or execution counts. The operator's
+Code cells are committed without execution outputs or counts. Markdown cells
+embed explicitly labeled archived data/result images as notebook attachments;
+these survive copying to an external project and require no runtime environment
+to view. `examples/` owns the matching PNG/CSV/provenance files. They are actual
+recorded runs, not evidence that the reader has executed their notebook. The
+operator's
 Run All onboarding route supersedes the earlier read-only default: it writes a
 named external quick-demo JSON/script, reviews it, invokes that script with
 `--launch`, and renders real progress records. RUN_QUICK_DEMO=False suppresses
@@ -313,3 +318,32 @@ Health-PASS search objective. Qualify configuration → script → real attempts
 recorded scores/validity → plot. Keep the three-iteration limit regardless of
 Health outcomes; distinguish model rejection from setup/runtime failure, and do
 not extend runs or relax checks to obtain valid points.
+
+## Archived visual examples and live data previews
+
+`examples/README.md` indexes the four recorded runs and their limits. Each
+`*-example.json` allowlists run metadata and numerical settings, records exact
+exp/infra revisions and original receipt/record hashes, and hashes the exported
+assets. CSVs preserve every record classified as non-Trial by the native schema,
+including absent metrics, with workspace-relative source paths. Do not publish entire receipts or execution
+logs: they contain operator-local bindings. Raw data and checkpoints stay external.
+
+The two image attachments in each notebook match its checked-in data/progress
+PNGs byte-for-byte. Markdown labels distinguish permanent archived examples
+from Quick C's live results. Never replace invalid or negative scores for
+presentation. The existing progress renderer owns the paper-style plot.
+
+`data_preview.plot_training_example(experiment, task=..., row=0)` validates the
+saved experiment with its existing task-specific schema and reads training data
+only. TESS selects a manifest identity and reuses the task normalization function;
+TIDMAD requires the Quick A file-holdout experiment, validates its split and
+topology, then reads one 40,000-sample window
+from the first assigned training file and displays a contiguous 600-sample prefix;
+Project8/LIGO memory-map one already prepared event. It returns a figure and
+description, writes nothing, and never accesses evaluation/final-test data.
+The notebook calls it after Quick A saves the effective experiment. Runtime
+execution remains owned by the existing saved launcher.
+
+Missing data/fields produce setup and saved-config repair guidance. Out-of-range
+rows report the valid PREVIEW_ROW interval. These local-only checks do not
+require provider credentials or a GPU and do not replace launch preflight.
