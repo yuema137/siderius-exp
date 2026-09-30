@@ -173,7 +173,7 @@ def plot_progress(
                 point.iteration,
                 clipped,
                 marker=marker,
-                facecolors=color if point.validity == "pass" else "none",
+                facecolors=color if point.validity == "pass" else "white",
                 edgecolors=color,
                 s=12 if marker != "o" else 7.3,
                 linewidths=0.7,

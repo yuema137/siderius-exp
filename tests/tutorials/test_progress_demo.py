@@ -66,7 +66,7 @@ def test_plot_preserves_invalid_raw_score_and_outer_iteration(tmp_path):
     fig = plot_progress(
         workspace, tmp_path / "plots", title="test", expected_iterations=3
     )
-    assert fig.axes[0].collections[0].get_facecolors().size == 0
+    assert list(fig.axes[0].collections[0].get_facecolors()[0]) == [1, 1, 1, 1]
     assert (
         fig.axes[0].collections[0].get_offsets()[0, 1] == 0
     )  # Paper boundary triangle; CSV retains -0.4.
