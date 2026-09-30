@@ -50,6 +50,13 @@ The plot follows the paper: dashed Formal results, a solid current-best line,
 and stars for new bests with Health PASS. Negative scores use boundary triangles;
 missing scores stay in the CSV. The current-best line can include invalid points. CSV, PNG and SVG outputs are saved under your project's `plots/`.
 
+Before a new run, the notebook and script check the checkout Python environments,
+required input files, exported API key names and NVIDIA GPU access. Errors list
+missing items and repair steps. The native preflight also checks source pins,
+data integrity and CUDA allocation. Export keys **before starting Jupyter**;
+restart its server from that terminal after changing the environment. Key presence
+does not verify provider authentication or credit.
+
 Re-running an unchanged completed demo redraws results without another API call.
 To plot a different run, change `PLOT_WORKSPACE` and execute only the plotting
 cell. To launch changed settings, choose a new `DEMO_NAME`. Three iterations can

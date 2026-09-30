@@ -14,7 +14,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from tutorials.paper.runner import ROOT, TutorialExperiment, credential_status, disjoint
+from tutorials.paper.runner import ROOT, TutorialExperiment, disjoint
 
 
 class DemoFiles(BaseModel):
@@ -102,7 +102,6 @@ def run_demo(files: DemoFiles) -> dict:
     """
     from tutorials.paper.launch_review import launch_review
     from tutorials.paper.tidmad.runner import TidmadExperiment
-    from tutorials.paper.tidmad.runner import credential_status as tidmad_keys
 
     sha = hashlib.sha256(files.experiment.read_bytes()).hexdigest()
     if files.completion.exists():
@@ -120,18 +119,16 @@ def run_demo(files: DemoFiles) -> dict:
     settings = (
         TidmadExperiment if files.task == "tidmad" else TutorialExperiment
     ).model_validate_json(files.experiment.read_text())
-    keys = (
-        tidmad_keys(settings)
-        if files.task == "tidmad"
-        else credential_status(settings.llm_config)
-    )
-    missing = [k for k, present in keys.items() if not present]
-    if missing:
-        raise ValueError(
-            "Export keys before starting Jupyter, then restart its server/kernel: "
-            + ", ".join(missing)
-            + ". Never put key values in notebook cells."
-        )
+    from tutorials.paper.preflight import require_ready
+
+    require_ready(settings, task=files.task)
+    # Surface native preflight errors directly in Jupyter before opening a run log.
+    # The saved script repeats these checks when invoked on its own.
+    if files.task == "tidmad":
+        from tutorials.paper.tidmad.runner import inspect
+    else:
+        from tutorials.paper.runner import inspect
+    inspect(settings, launch=True)
     report = launch_review(files.experiment, files.script, task=files.task)
     if "**STOP" in report:
         raise ValueError(

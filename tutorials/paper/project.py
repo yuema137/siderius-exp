@@ -8,6 +8,7 @@ import shlex
 import shutil
 from pathlib import Path
 
+from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.runner import ROOT, TutorialExperiment, disjoint
 
 
@@ -24,7 +25,8 @@ def write_launcher(destination: Path, experiment: Path, infra: Path) -> None:
         f"EXP_CHECKOUT={shlex.quote(str(ROOT))}\n"
         f"EXPERIMENT={shlex.quote(str(experiment.resolve()))}\n"
         "# Credentials must already be exported in this terminal.\n"
-        'cd "$EXP_CHECKOUT"\n'
+        + shell_setup_guard()
+        + 'cd "$EXP_CHECKOUT"\n'
         'exec "$EXP_CHECKOUT/.venv/bin/python" -B -m tutorials.paper.runner '
         '--experiment "$EXPERIMENT" "$@"\n'
     )

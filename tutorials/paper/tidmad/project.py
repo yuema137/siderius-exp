@@ -11,6 +11,7 @@ from pathlib import Path
 import yaml
 
 from tasks.tidmad.runtime.file_split import FileSplit
+from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.runner import ROOT, disjoint
 from tutorials.paper.tidmad.runner import TidmadExperiment
 
@@ -27,7 +28,8 @@ def write_launcher(
         stream.write(
             "#!/usr/bin/env bash\nset -euo pipefail\n"
             f"EXP_CHECKOUT={shlex.quote(str(ROOT))}\nEXPERIMENT={shlex.quote(str(experiment))}\n"
-            'cd "$EXP_CHECKOUT"\n'
+            + shell_setup_guard()
+            + 'cd "$EXP_CHECKOUT"\n'
             f'exec "$EXP_CHECKOUT/.venv/bin/python" -B -m tutorials.paper.tidmad.{module} --experiment "$EXPERIMENT" "$@"\n'
         )
     destination.chmod(0o755)

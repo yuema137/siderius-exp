@@ -158,6 +158,10 @@ def main():
         for p in (settings.workspace, settings.data_dir)
     ):
         raise ValueError("keep the experiment outside sources, data and run output")
+    if args.launch:
+        from tutorials.paper.preflight import require_ready
+
+        require_ready(settings, task="tidmad")
     receipt = inspect(settings, launch=args.launch)
     if not args.launch:
         missing = [k for k, v in receipt["api_key_status"].items() if not v]

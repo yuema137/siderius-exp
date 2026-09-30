@@ -283,3 +283,20 @@ training_validation_portion=.1 is unchanged and explicitly explained: it
 materializes 20 validation-file segments even when scoring uses 2/4. The TESS
 quick demo retains full data and 1/2-minute allowances. Source-level policies
 and Health/runtime checks are unchanged.
+
+
+## User-environment diagnostics
+
+`preflight.require_ready` aggregates missing interpreter paths, task/LLM files,
+required exported key names, data files and NVIDIA utility availability, with
+repair instructions. It runs in both runner CLIs before launch and in
+`quick_demo.run_demo` before opening a log. The notebook additionally calls the
+selected native `inspect(launch=True)` so source/hash/CUDA failures appear in the
+cell before API work rather than only in a child log. The saved script repeats
+validation independently. This adds read-only preflight cost, not provider calls.
+Generated scripts contain dependency-independent shell guards for absent checkout,
+Python, experiment JSON and failed dependency imports. Notebook bootstrap checks
+TUTORIAL_HOME/project.json, the selected kernel and required Python modules before
+importing tutorial tools. CUDA/VRAM/device errors include configuration repair
+steps. Provider key presence is not authentication; no network key probe is made.
+Completed cached runs continue to bypass launch preflight and use no credentials.

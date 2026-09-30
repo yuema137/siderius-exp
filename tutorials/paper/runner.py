@@ -232,19 +232,27 @@ def verify_data(
 
 def verify_gpu(settings: TutorialExperiment) -> str:
     """Require one supported physical GPU and a working CUDA allocation in infra."""
-    probe = subprocess.run(
-        [
-            "nvidia-smi",
-            "--query-gpu=name,memory.total",
-            "--format=csv,noheader,nounits",
-        ],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        probe = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-gpu=name,memory.total",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError) as error:
+        raise ValueError(
+            "NVIDIA GPU detection failed. Run nvidia-smi in this terminal; install/enable the NVIDIA driver "
+            "and GPU access for this container/job. AMD and Intel GPUs are unsupported."
+        ) from error
     rows = probe.stdout.strip().splitlines()
     if len(rows) != 1 or settings.gpu not in rows[0]:
-        raise ValueError(f"expected one {settings.gpu}; observed {rows}")
+        raise ValueError(
+            f"expected one {settings.gpu}; observed {rows}. Set gpu in your saved experiment JSON to the actual supported device (RTX 5090 or H100). Other NVIDIA devices need the hardware adaptation described in the README; AMD/Intel are unsupported."
+        )
     capacity_gib = float(rows[0].rsplit(",", 1)[1].strip()) / 1024
     if (
         max(
@@ -254,21 +262,28 @@ def verify_gpu(settings: TutorialExperiment) -> str:
         >= capacity_gib
     ):
         raise ValueError(
-            "VRAM budget must be below physical capacity, leaving driver/runtime headroom"
+            "VRAM budget must be below physical capacity, leaving driver/runtime headroom. Lower vram_gib (and trial_vram_gib/formal_vram_gib if set) in your saved experiment JSON."
         )
-    subprocess.run(
-        [
-            str(settings.infra_checkout / ".venv/bin/python"),
-            "-c",
-            (
-                "import torch; assert torch.version.hip is None; "
-                "assert torch.cuda.is_available(); torch.empty(1, device='cuda'); "
-                "torch.cuda.synchronize()"
-            ),
-        ],
-        check=True,
-        env=child_environment(settings),
-    )
+    try:
+        subprocess.run(
+            [
+                str(settings.infra_checkout / ".venv/bin/python"),
+                "-c",
+                (
+                    "import torch; assert torch.version.hip is None; "
+                    "assert torch.cuda.is_available(); torch.empty(1, device='cuda'); "
+                    "torch.cuda.synchronize()"
+                ),
+            ],
+            check=True,
+            env=child_environment(settings),
+        )
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise ValueError(
+            f"CUDA allocation failed in {settings.infra_checkout}. "
+            "Run uv sync --group dev --frozen in the infra checkout, verify its own PyTorch CUDA installation "
+            "and NVIDIA driver, and free GPU memory before retrying."
+        ) from error
     return rows[0]
 
 
@@ -397,6 +412,10 @@ def main() -> int:
         settings.workspace
     ) or experiment_path.is_relative_to(settings.data_dir):
         raise ValueError("save the experiment outside data and the run workspace")
+    if args.launch:
+        from tutorials.paper.preflight import require_ready
+
+        require_ready(settings, task="tess")
     receipt = inspect(settings, launch=args.launch)
     if not args.launch:
         missing = [
