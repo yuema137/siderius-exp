@@ -271,3 +271,12 @@ invalid observations, respecting metric direction. Missing values/no Formal
 records appear in a separate unscored strip. PNG/SVG/CSV outputs live externally;
 the CSV retains source-record paths. A user can replot another workspace without
 executing any search.
+
+
+Operator sizing adjustment before TIDMAD Run All qualification: its quick demo
+uses Trial train/eval .01/.01 and Formal .02/.02, with 2/5-minute training
+allowances and five-epoch ceilings. The existing workflow's separate
+training_validation_portion=.1 is unchanged and explicitly explained: it
+materializes 20 validation-file segments even when scoring uses 2/4. The TESS
+quick demo retains full data and 1/2-minute allowances. Source-level policies
+and Health/runtime checks are unchanged.
