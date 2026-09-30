@@ -25,7 +25,9 @@ class ProgressPoint(BaseModel):
     source: str
 
 
-def read_progress(workspace: Path) -> list[ProgressPoint]:
+def read_progress(
+    workspace: Path, *, health_policy: Literal["required", "none"] = "required"
+) -> list[ProgressPoint]:
     """Only Formal attempts; no Trial substitution and no legacy score fallback."""
     workspace = workspace.resolve()
     points = []
@@ -61,7 +63,11 @@ def read_progress(workspace: Path) -> list[ProgressPoint]:
             validity = (
                 "fail"
                 if failed or record.status != "success"
-                else ("pass" if passed else "unknown")
+                else (
+                    "pass"
+                    if passed or (health_policy == "none" and score is not None)
+                    else "unknown"
+                )
             )
             points.append(
                 ProgressPoint(
@@ -85,6 +91,7 @@ def plot_progress(
     *,
     title: str,
     expected_iterations: int | None = None,
+    health_policy: Literal["required", "none"] = "required",
 ):
     """Save a portable PNG/SVG/CSV and return the Matplotlib figure.
 
@@ -101,7 +108,7 @@ def plot_progress(
         raise ValueError(f"no run workspace: {workspace}")
     if not disjoint(output_dir, ROOT) or output_dir == workspace:
         raise ValueError("save plots in an external project subdirectory")
-    points = read_progress(workspace)
+    points = read_progress(workspace, health_policy=health_policy)
     metrics = {(p.metric, p.direction) for p in points if p.score is not None}
     if len(metrics) > 1:
         raise ValueError("do not combine different metrics or directions in one chart")

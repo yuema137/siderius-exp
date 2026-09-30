@@ -16,11 +16,11 @@ API keys, data preparation, supported hardware, and what the demos can establish
 |---|---|---|
 | TESS: stellar rotation from light curves | Change iterations, Trial/Formal data fractions, time/VRAM budgets and whole-star train/validation membership | [TESS notebook](paper/notebooks/01_tess_tutorial.ipynb) · [setup guide](paper/README.md#1-install-in-the-two-exact-checkouts) |
 | TIDMAD: waveform denoising, one band | Change budgets and fractions; assign file indices to training, workflow validation and a separate final test | [TIDMAD guide](paper/tidmad/README.md) · [notebook](paper/notebooks/02_tidmad_tutorial.ipynb) |
+| Project8: electron energy from time and frequency views | Inspect four-channel inputs, change budgets/fractions and create a new event split | [Project8 notebook](paper/notebooks/03_project8_tutorial.ipynb) · [setup](paper/prepared/README.md) |
+| LIGO: chirp mass from two detector channels | Prepare a tiny real-data subset, run three iterations and inspect R² | [LIGO notebook](paper/notebooks/04_ligo_tutorial.ipynb) · [setup](paper/prepared/README.md) |
 
 The `paper/` directory groups teaching examples based on the paper's tasks.
-**It does not yet contain four completed paper-reproduction tutorials:** TESS
-and one-band TIDMAD are implemented; LIGO and Project 8 do not yet have runnable
-notebooks. New LLM searches are not guaranteed to recover the paper's models or
+**These four tutorials are workflow demos, not reproductions of paper artifacts.** New LLM searches are not guaranteed to recover the paper's models or
 scores, and very small training budgets can yield unusable models.
 
 Read notebooks here to browse, but execute only the copies initialized in your

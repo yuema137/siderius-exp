@@ -11,30 +11,38 @@ shell script launches the fixed workflow and writes results into that project.
 |---|---|---|---|
 | **TESS** | Predict a star's rotation frequency from its brightness measurements over time | Iterations, epochs, Trial/Formal fractions, time/VRAM budgets, and a new whole-star train/validation split | **[Open the TESS notebook](notebooks/01_tess_tutorial.ipynb)**; follow setup below before executing your own copy |
 | **TIDMAD, band 0–3** | Recover an injected waveform from noisy detector measurements | The same budgets/fractions, plus file-index training/validation/final-test groups | **[TIDMAD setup and walkthrough](tidmad/README.md)** · **[Open the TIDMAD notebook](notebooks/02_tidmad_tutorial.ipynb)** |
-| LIGO | Gravitational-wave task | No runnable tutorial yet | [Existing task package](../../tasks/phyts_ligo/README.md) |
-| Project 8 | Paper time/frequency four-channel task | No runnable tutorial yet | [Existing task documentation](../../tasks/phyts_project8/DUAL_REPRESENTATION.md) |
+| LIGO | Predict chirp mass from two detector channels | Small-data preparation, iteration/budget/fraction controls and new event splits | [Setup](prepared/README.md) · [LIGO notebook](notebooks/04_ligo_tutorial.ipynb) |
+| Project8 | Predict electron energy using time/frequency four-channel inputs | Small-data preparation, iteration/budget/fraction controls and new event splits | [Setup](prepared/README.md) · [Project8 notebook](notebooks/03_project8_tutorial.ipynb) |
 
 For the underlying TESS task and data contract, see the
 [TESS task package](../../tasks/phyts_tess/README.md). The tutorial downloads its
 pinned [PhyTS TESS data](https://huggingface.co/datasets/PhyTS-team/PhyTS-bench/tree/9f203f4c338645a1e4b2c9dc7d6f820269ca5114/TESS/split),
 or reuses the shared machine's existing files.
 
+## Browse this directory
+
+- [notebooks/](notebooks/README.md): all four walkthroughs and their setup routes.
+- [configs/](configs/README.md): TESS template and pinned download declaration.
+- [scripts/](scripts/README.md): the generic TESS runner wrapper; generated user scripts live in your external project.
+- [tidmad/](tidmad/README.md): TIDMAD setup, file splits and separate final testing.
+- [prepared/](prepared/README.md): Project8/LIGO setup, small datasets and event splits.
+
 ## What these tutorials can—and cannot—do
 
 You can use them to prepare data, configure model/provider routing without saving
 keys, save a task/experiment variant, check its actual files and parameters, run
-it on a supported GPU, and inspect the resulting records. Each notebook has a
-**Before you run** checklist that prints the exact preview and launch commands
-for the one saved experiment you select.
+it on a supported GPU, and inspect the resulting records. Quick A in each notebook shows the saved-file checklist and exact preview/launch
+commands for the experiment you select. TESS and TIDMAD also include an advanced
+**Before you run** section.
 
 These are **learning and execution demos**, not a claim of complete paper
-reproduction. Only TESS and one-band TIDMAD currently have notebooks. Fresh LLM
+reproduction. All four tasks have notebooks. Fresh LLM
 searches may produce different models and scores. The demos do not reproduce
 the paper's coding-agent/orchestration comparisons or retrospective reviews.
 Archived-checkpoint replay and the original campaign launchers are separate
 routes. Changing a split defines a new scientific protocol.
 
-Both three-iteration notebooks have been run end to end on an RTX 5090: about
+The TESS and TIDMAD three-iteration notebooks have been run end to end on an RTX 5090: about
 24 minutes for TESS and 35 minutes for TIDMAD. These times include LLM work,
 not just training; your run may take longer or shorter. The separate, optional
 TIDMAD final-test example has not yet completed a successful end-to-end run.
@@ -47,11 +55,14 @@ hollow marker. Do not add iterations or change checks just to obtain a filled po
 
 With the external project, data and exported keys ready, the notebook saves a
 three-iteration experiment, displays its files/parameters, invokes its shell
-script, and draws **score versus iteration** from actual run records. Filled
-markers mean Health PASS; hollow markers mean Health FAIL/failed attempts.
+script, and draws **score versus iteration** from actual run records. For TESS
+and TIDMAD, filled markers mean Health PASS and hollow markers mean Health
+FAIL/failed attempts. Project8 and LIGO explicitly declare no task-specific
+Health checks: filled markers mean successful scored execution under that
+declaration, not Health PASS; failed scored attempts remain hollow.
 The plot follows the paper: dashed Formal results, a solid current-best line,
-and stars for new bests with Health PASS. TESS uses boundary triangles for
-negative R² values; TIDMAD displays its denoising score at its actual value,
+and stars for new bests that meet the task's applicable validity policy. TESS uses boundary triangles for
+negative R² values, as do Project8 and LIGO; TIDMAD displays its denoising score at its actual value,
 including negative values. Missing scores stay in the CSV. The current-best
 line can include invalid points. CSV, PNG and SVG outputs are saved under your
 project's `plots/`.
@@ -64,11 +75,11 @@ restart its server from that terminal after changing the environment. Key presen
 does not verify provider authentication or credit.
 
 Re-running an unchanged completed demo redraws results without another API call.
-To plot a different run, change `PLOT_WORKSPACE` and execute only the plotting
-cell. To launch changed settings, choose a new `DEMO_NAME`. Three iterations can
+To plot a different run, change `PLOT_WORKSPACE` in TESS/TIDMAD or
+`PLOT_EXPERIMENT` in Project8/LIGO, then execute only the plotting cell. To launch changed settings, choose a new `DEMO_NAME`. Three iterations can
 still take many minutes because each includes LLM work and native checks; small
 budgets do not guarantee a valid model. Independent final testing is a separate,
-manual model-selection step, not part of the quick-demo validation plot.
+manual model-selection step in TIDMAD, not part of any quick-demo validation plot.
 
 ## Before you start
 
@@ -92,7 +103,8 @@ pair. Development PRs are not the public installation source.
 **Reading order:** install the exact source pair in section 1. For TESS, continue
 through sections 2–5, then follow Quick A → B → C in your copied notebook.
 Its **Before you run** checklist is for optional advanced/manual runs. For TIDMAD, continue with the [TIDMAD guide](tidmad/README.md) after
-section 1. The commands in the remaining sections of this page are TESS examples.
+section 1. For Project8 or LIGO, continue with the [small-data guide](prepared/README.md).
+The commands in the remaining sections of this page are TESS examples.
 
 ## Task package, experiment, notebook and script
 

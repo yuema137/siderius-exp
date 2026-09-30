@@ -2,6 +2,12 @@
 
 ## Scope and owners
 
+Project8 dual representation and LIGO use the [prepared-demo contract](prepared/implementation.md).
+Its data preparation, explicit no-Health plotting policy and external experiment
+schema are distinct from TESS/TIDMAD; shared script orchestration and environment
+checks serve all four. The task-specific sections below describe TESS unless
+marked otherwise; dated validation entries retain their original scope.
+
 The TESS modules support the TESS NoPrior fixed workflow. TIDMAD has a separate
 [one-band support contract](tidmad/implementation.md); its treatment and fraction
 semantics must not be inferred from TESS. It reuses task
@@ -249,7 +255,7 @@ No new paid model search was needed for these presentation changes.
 
 ## Three-iteration Run All and progress plotting
 
-`quick_demo.prepare_demo` validates settings through the existing TESS/TIDMAD
+`quick_demo.prepare_demo` validates settings through the selected task-specific
 experiment schema, saves a uniquely named external JSON/script, and refuses a
 same-name settings change. TIDMAD uses a separate copied file-holdout task.
 `run_demo` delegates to the saved bash launcher after key/presence/binding review,

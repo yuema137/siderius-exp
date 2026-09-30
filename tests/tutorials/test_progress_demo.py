@@ -123,3 +123,21 @@ def test_task_score_is_not_clipped_to_r2_axis(tmp_path):
     fig = plot_progress(workspace, tmp_path / "plots", title="TIDMAD")
     assert fig.axes[0].collections[0].get_offsets()[0, 1] == -10.2
     assert fig.axes[0].get_ylim()[0] < -10.2 < fig.axes[0].get_ylim()[1]
+
+
+def test_explicit_no_health_task_plots_success_without_inventing_health_result(
+    tmp_path,
+):
+    """Missing checks are unknown by default; an explicit no-Health task is different."""
+    workspace = tmp_path / "run"
+    path = write_record(workspace, score=0.4)
+    data = json.loads(path.read_text())
+    data["all_records"][1]["health_gate_results"] = []
+    for record in data["all_records"]:
+        record["denoising_score"] = 0.4
+    path.write_text(json.dumps(data))
+    assert read_progress(workspace)[0].validity == "unknown"
+    assert read_progress(workspace, health_policy="none")[0].validity == "pass"
+    data["all_records"][1]["status"] = "failed_mode_collapse"
+    path.write_text(json.dumps(data))
+    assert read_progress(workspace, health_policy="none")[0].validity == "fail"

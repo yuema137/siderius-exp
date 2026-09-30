@@ -19,7 +19,7 @@ from tutorials.paper.runner import ROOT, TutorialExperiment, disjoint
 
 class DemoFiles(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-    task: Literal["tess", "tidmad"]
+    task: Literal["tess", "tidmad", "project8", "ligo"]
     experiment: Path
     script: Path
     workspace: Path
@@ -28,9 +28,17 @@ class DemoFiles(BaseModel):
 
 
 def prepare_demo(
-    project: Path, task: Literal["tess", "tidmad"], *, name: str, settings: dict
+    project: Path,
+    task: Literal["tess", "tidmad", "project8", "ligo"],
+    *,
+    name: str,
+    settings: dict,
 ) -> DemoFiles:
     """Save a named demo once; changed inputs require a new name, never overwrite."""
+    if task in ("project8", "ligo"):
+        from tutorials.paper.prepared.project import prepare_demo as prepared_demo
+
+        return prepared_demo(project, task, name=name, settings=settings)
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,60}", name):
         raise ValueError("use a short filename-safe demo name")
     project = project.resolve()
@@ -116,15 +124,21 @@ def run_demo(files: DemoFiles) -> dict:
         raise ValueError(
             f"Unfinished/existing run: inspect {files.log}; choose a new DEMO_NAME after stopping any active run. Nothing was relaunched."
         )
-    settings = (
-        TidmadExperiment if files.task == "tidmad" else TutorialExperiment
-    ).model_validate_json(files.experiment.read_text())
+    if files.task in ("project8", "ligo"):
+        from tutorials.paper.prepared.runner import PreparedExperiment
+
+        schema = PreparedExperiment
+    else:
+        schema = TidmadExperiment if files.task == "tidmad" else TutorialExperiment
+    settings = schema.model_validate_json(files.experiment.read_text())
     from tutorials.paper.preflight import require_ready
 
     require_ready(settings, task=files.task)
     # Surface native preflight errors directly in Jupyter before opening a run log.
     # The saved script repeats these checks when invoked on its own.
-    if files.task == "tidmad":
+    if files.task in ("project8", "ligo"):
+        from tutorials.paper.prepared.runner import inspect
+    elif files.task == "tidmad":
         from tutorials.paper.tidmad.runner import inspect
     else:
         from tutorials.paper.runner import inspect

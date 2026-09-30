@@ -1,0 +1,320 @@
+{
+  "repository": "PhyTS-team/PhyTS-bench",
+  "revision": "9f203f4c338645a1e4b2c9dc7d6f820269ca5114",
+  "files": {
+    "project8": [
+      {
+        "path": "Project8/train/train_00000.hdf5",
+        "bytes": 4915391120,
+        "release_sha256": "242a118e703b67c68e8bf311f745851418d67e0b19aa2762906d2e0ffae185b6"
+      },
+      {
+        "path": "Project8/valid/valid_00000.hdf5",
+        "bytes": 4915387024,
+        "release_sha256": "ba2d75e308d5141834400236c8d2ef3ca877c9efb197ee909f4836b6cb5fe755"
+      }
+    ],
+    "ligo": [
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00000.h5",
+        "bytes": 39338128,
+        "release_sha256": "8c9adf1a8a64ea06339b8fdb7065634c2dfed72d0472c3f4608fb5c7b63693c4"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00050.h5",
+        "bytes": 39338128,
+        "release_sha256": "1bfa6d9c606f1bfdaa7690ff603d7a71e6426838c3fc585af2fac53ecf38bdb0"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00100.h5",
+        "bytes": 39338128,
+        "release_sha256": "7f7f1ccb81ccd3a7ebd25c4746927cb9647eda9e66ec8fc4e06220c51989429d"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00150.h5",
+        "bytes": 39338128,
+        "release_sha256": "173c5f715ec3e265e94eb60f42cf0fad7735d991dc11d1b83179015f679b357c"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00200.h5",
+        "bytes": 39338128,
+        "release_sha256": "0cf21c64ddbfa711fab91b3b9d4b7902853228c3acd302fdf2df3dcefd6d7359"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00250.h5",
+        "bytes": 39338128,
+        "release_sha256": "b4751d4f9c72b2871fa9d746095e036f37ad3b3d8a68cf5193c0b53a2ed6fbfd"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00300.h5",
+        "bytes": 39338128,
+        "release_sha256": "338901455c57cbefb9f35a30a664aecadccb28190d8c2c73063a108d59c91757"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00350.h5",
+        "bytes": 39338128,
+        "release_sha256": "e5dc09d427e0549e10a8bd0bd534a9aeae3f658844f3553c1c047ebc3ba3c0f0"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00400.h5",
+        "bytes": 39338128,
+        "release_sha256": "43734e8d6447a46a4309a3943d4729dd29463a8d162bb3dc2cdc74680f799482"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00450.h5",
+        "bytes": 39338128,
+        "release_sha256": "e0ca4c84edba8aae1d6b2b05d8564be2a2d38bd1d141778ea86f75b86cd69689"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00500.h5",
+        "bytes": 39338128,
+        "release_sha256": "96199aca8c6ed51b9a9e33dbd04d5c31cab5cb2c9e8f9e06fe04fc0e60adb43e"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00550.h5",
+        "bytes": 39338128,
+        "release_sha256": "2f3a456c611f9372301b492a3f02db3b167a436b2682ad690cd60d235b713e4b"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00600.h5",
+        "bytes": 39338128,
+        "release_sha256": "4f2bafb53c2810552549d4b38e3ec62693255026626ca9e24e3b44db5e8a8cb7"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00650.h5",
+        "bytes": 39338128,
+        "release_sha256": "5738c5907d00df25fe63f7f01d56020f15d26072e30011f0b950fed944cd6100"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00700.h5",
+        "bytes": 39338128,
+        "release_sha256": "5c49b7004ab2c1a86107b3d476b9b27ad6e610ea49af56c0a777d6f6797daefb"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00750.h5",
+        "bytes": 39338128,
+        "release_sha256": "4b44aa98010cfbe7fbf24ff4db753f1e869f982ef5daa36401211e9f048c0bc0"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00800.h5",
+        "bytes": 39338128,
+        "release_sha256": "905b1858d6260ac5696489b6f9fa111ea694ec8723ac0bc052e500d7991d5833"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00850.h5",
+        "bytes": 39338128,
+        "release_sha256": "dbe96fe75944eaf3529558e62c45a245a20581ce022d2fba076b32b6948de621"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00900.h5",
+        "bytes": 39338128,
+        "release_sha256": "4d0cc99be5ff7a143fdeffe2d5df40265de5dbf02108ab712c7224f27884b152"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_00950.h5",
+        "bytes": 39338128,
+        "release_sha256": "c5404a6d2d4d046e16cf060e4b6ee97414353ec96caceef6ba6528777e8ed362"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01000.h5",
+        "bytes": 39338128,
+        "release_sha256": "345a1e4ce9f261a2355f60a1a5c48f062d3e9d391405f6a2b68954988403cb14"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01050.h5",
+        "bytes": 39338128,
+        "release_sha256": "2ed8ac98b214dbaf9bbe87034d9dff2fefc135d5ae6521d3d997548845cf98d4"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01100.h5",
+        "bytes": 39338128,
+        "release_sha256": "f0fcd4a4ab2dfb8c66b4391576ddad1072c6be16f9f7b97ed6ecc45630b715ca"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01150.h5",
+        "bytes": 39338128,
+        "release_sha256": "6c2482aa3d74f28c1764d65e919a7baebfa37a03e30abe71d807dc6cc0154881"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01200.h5",
+        "bytes": 39338128,
+        "release_sha256": "6b15aa9a9ac5170fe4af9fda7365c3c706817325d4c1b554334b9897205ba1c6"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01250.h5",
+        "bytes": 39338128,
+        "release_sha256": "d88e2da8f3be351c7a05939343b00d5e2a438b3580f86b2a17ec2ae30b09eba5"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01300.h5",
+        "bytes": 39338128,
+        "release_sha256": "d1e802d9df396af9dce316071b34d59e3f3b57fbbf516461d53b958b8dfae94f"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01350.h5",
+        "bytes": 39338128,
+        "release_sha256": "16e1419dd74c6dcf50d45a5eda6ce1240aad99040fee1eb653da5bbca8f8dc1d"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01400.h5",
+        "bytes": 39338128,
+        "release_sha256": "6fb48e8217f44a851f629c257c5e37774a54de60d067de62ffbec46849a87bc0"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01450.h5",
+        "bytes": 39338128,
+        "release_sha256": "0955b85d3a7d5244adad26023816c7ac32b456231810a773b0a1adfa1948d14f"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01500.h5",
+        "bytes": 39338128,
+        "release_sha256": "a58aa2e58d3d7b989ba2c4548ade6dfc54d4d15497ed56135df0009130a1f35f"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01550.h5",
+        "bytes": 39338128,
+        "release_sha256": "6c8e1d813977bd9e42b14dacb185a8142acebd0102967df2275beb154f6a36fd"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01600.h5",
+        "bytes": 39338128,
+        "release_sha256": "199a262d1084a8300635036d1756dda418c809e5d73efc20259537ecad23945b"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01650.h5",
+        "bytes": 39338128,
+        "release_sha256": "bb0c8b406329b40af4508197358015f924af2b3156e75c5b68a17fef00107de6"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01700.h5",
+        "bytes": 39338128,
+        "release_sha256": "89c1047e0bbee56f8a61f1325e2bfa5b1a238d50dec7bc683551ce7d8d27e453"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01750.h5",
+        "bytes": 39338128,
+        "release_sha256": "91a0f8979e43aabc28b7591f088aa91f1bf3fc4af572969805b9689ee5abd5a3"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01800.h5",
+        "bytes": 39338128,
+        "release_sha256": "c6836e519671fdf9bf1a79b6ba4bbefb02bd920a6e1a62b6c61d681f0db714be"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01850.h5",
+        "bytes": 39338128,
+        "release_sha256": "5d8640c284040ea9c2234805a0bac18976ba2d77612c343a8a6e6cd585d9a1f9"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01900.h5",
+        "bytes": 39338128,
+        "release_sha256": "38ff9f9e9b175bc0ebcc01e37ad2a96a037b47944f9138c520ecbc742d6dd214"
+      },
+      {
+        "path": "LIGO/train/bns_snr_10_15/train_01950.h5",
+        "bytes": 39338128,
+        "release_sha256": "5fe68ceade16fd600dfd574a756c9e564fe52935474a85c8ac00d83f7fc59b68"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00000.h5",
+        "bytes": 39338128,
+        "release_sha256": "798318e593a6ceae72bc55a66782b70632b37e3bdf3bc731994bf3bd2ce6b8d4"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00050.h5",
+        "bytes": 39338128,
+        "release_sha256": "78c3d212a798adb60584c0740ef5a2f4cc285477d04c89cd075217eb99ca2c91"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00100.h5",
+        "bytes": 39338128,
+        "release_sha256": "8d072696b760bae74ade32af2093ac0e0f0cfde39cd789e04635a7f6cb999d94"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00150.h5",
+        "bytes": 39338128,
+        "release_sha256": "2e45340add58a47d9a7e05974cda937d5953219416a44eba93b45feb66deeed1"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00200.h5",
+        "bytes": 39338128,
+        "release_sha256": "47c20c9e05d8bd20c71a2a5bcd3852f45453ffc3baecbac218f63e7cff14d23c"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00250.h5",
+        "bytes": 39338128,
+        "release_sha256": "74ee8fb1e7225b3739a5bedb0eb061fc63dca7a1c1922b08f4768a14eabde6cb"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00300.h5",
+        "bytes": 39338128,
+        "release_sha256": "15bf0701c3d598b5ab08bb19f212e07ad38baceb7fe1ff0bf1e9193445802a90"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00350.h5",
+        "bytes": 39338128,
+        "release_sha256": "345eeeeca6d192eb99fee1f78ece0109fba4d8abc6608df5173faf5af8287723"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00400.h5",
+        "bytes": 39338128,
+        "release_sha256": "bb4c52ed9ea9f089a00640a771cfeecb991fb2c04cdda2a163e2c6dde403d827"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00450.h5",
+        "bytes": 39338128,
+        "release_sha256": "c50d5686a2b90326966d95271b16cafccaa63ea85c17b7e29b46246ee1bd99ef"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00500.h5",
+        "bytes": 39338128,
+        "release_sha256": "62446391df441d348d81fd317fcf3bdc864366b16b8816ae34bf5ad28217e1e7"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00550.h5",
+        "bytes": 39338128,
+        "release_sha256": "553d699657d6c1c0547c1e4e5359bc63db0743194bc96bfd867b28b4a4567807"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00600.h5",
+        "bytes": 39338128,
+        "release_sha256": "6b5e1e5de23f9d9ebb7d0d8d97721ade5ccf93c6365768bcf11e6221e1501ea1"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00650.h5",
+        "bytes": 39338128,
+        "release_sha256": "3dbd50c797e75e0d65e63a69f7c75a71a960da28b9ac91bac3345d5bf37080f2"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00700.h5",
+        "bytes": 39338128,
+        "release_sha256": "b4333519b3b4324983df9ac9017e77f6000c30d42261854d4324d1effad39924"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00750.h5",
+        "bytes": 39338128,
+        "release_sha256": "9f74467b2823b1d3192952f6211e990bec00521ddd71fea7fee04409ca766f85"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00800.h5",
+        "bytes": 39338128,
+        "release_sha256": "20b27146fa71687dc2e57468c38260199e59373a69129b72db14da84580d0fda"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00850.h5",
+        "bytes": 39338128,
+        "release_sha256": "3993703af993761c1f37982197f63c5281d4165daa93dcc8b3d723979186fae7"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00900.h5",
+        "bytes": 39338128,
+        "release_sha256": "b8503fdb6df2fe4ff1cf0e940f65f4930f0299bd1f134dd7e5804fb9eb47abf1"
+      },
+      {
+        "path": "LIGO/val/bns_snr_10_15/val_00950.h5",
+        "bytes": 39338128,
+        "release_sha256": "6bc8e79f81f556c537e713296c4fb4e67eac65779121e0449824499ef0567dbb"
+      }
+    ]
+  }
+}

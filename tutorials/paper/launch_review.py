@@ -23,13 +23,17 @@ def _binding(script: str, name: str) -> str:
 
 
 def launch_review(
-    config: Path, script: Path, *, task: Literal["tess", "tidmad"]
+    config: Path, script: Path, *, task: Literal["tess", "tidmad", "project8", "ligo"]
 ) -> str:
     """Re-read disk; show no launch command for mismatched or missing inputs.
 
     Presence checks are intentionally cheap. Native terminal preview/launch owns
     source pins, data integrity, composition, CUDA and credential admission.
     """
+    if task in ("project8", "ligo"):
+        from tutorials.paper.prepared.review import launch_review as prepared_review
+
+        return prepared_review(config, script, task=task)
     if task not in ("tess", "tidmad"):
         raise ValueError("choose tess or tidmad")
     config, script = config.resolve(), script.resolve()

@@ -7,8 +7,8 @@ the generic framework lives in the separate [SIDERIUS repository](https://github
 ## Start here
 
 For a guided notebook plus terminal-script example, start with the
-[tutorial index](tutorials/README.md), then choose the TESS or one-band TIDMAD
-notebook. The [paper tutorial guide](tutorials/paper/README.md) explains setup,
+[tutorial index](tutorials/README.md), then choose TESS, one-band TIDMAD,
+Project8 (time/frequency inputs), or LIGO. The [paper tutorial guide](tutorials/paper/README.md) explains setup,
 supported changes and the distinction between a demo and paper reproduction.
 
 1. Choose a scientific problem in [`tasks/`](tasks/README.md).

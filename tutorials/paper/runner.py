@@ -157,7 +157,10 @@ def build_command(
     if settings.llm_config is not None:
         replacements["--llm_config"] = str(settings.llm_config)
     for flag, value in replacements.items():
-        args[args.index(flag) + 1] = value
+        if flag in args:
+            args[args.index(flag) + 1] = value
+        else:
+            args.extend([flag, value])
     # Explicit Trial fractions become the framework's experiment-fixed lock.
     for flag, value in (
         ("--trial_portion", settings.trial_train_fraction),

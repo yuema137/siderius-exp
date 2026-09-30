@@ -20,7 +20,7 @@ class SetupIssue(BaseModel):
 
 
 def require_ready(
-    settings: TutorialExperiment, *, task: Literal["tess", "tidmad"]
+    settings: TutorialExperiment, *, task: Literal["tess", "tidmad", "project8", "ligo"]
 ) -> None:
     """Collect cheap setup failures before native hashes/CUDA/pin validation.
 
@@ -55,7 +55,13 @@ def require_ready(
             )
     if settings.llm_config is not None and settings.llm_config.is_file():
         try:
-            if task == "tidmad":
+            if task in ("project8", "ligo"):
+                from tutorials.paper.prepared.runner import (
+                    credential_status as prepared_keys,
+                )
+
+                status = prepared_keys(settings)
+            elif task == "tidmad":
                 from tutorials.paper.tidmad.runner import credential_status as keys
 
                 status = keys(settings)
@@ -74,7 +80,22 @@ def require_ready(
                 f"Invalid LLM routing: {settings.llm_config}",
                 "Restore the project's llm/agents.json template, then edit supported provider/model fields. Do not put API keys in this file.",
             )
-    if task == "tidmad":
+    if task in ("project8", "ligo"):
+        names = [
+            "manifest.json",
+            "training/inputs.npy",
+            "training/targets.npy",
+            "evaluator/validation/inputs.npy",
+            "evaluator/validation/targets.npy",
+            "evaluator/validation/loss_indices.npy",
+        ]
+        literature = getattr(settings, "literature_config", None)
+        if literature is None or not literature.is_file():
+            add(
+                f"Missing literature-review configuration: {literature}",
+                "Restore llm/literature_review.yaml in your external project.",
+            )
+    elif task == "tidmad":
         names = [
             f"abra_{family}_{i:04d}.h5"
             for family in ("training", "validation")
