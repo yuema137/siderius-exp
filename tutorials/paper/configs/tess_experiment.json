@@ -1,0 +1,22 @@
+{
+  "version": "siderius-tess-tutorial-v1",
+  "infra_checkout": "/absolute/path/to/SIDERIUS",
+  "data_dir": "/absolute/path/to/tess-run-data",
+  "workspace": "/absolute/path/to/new-tess-demo",
+  "run_name": "tess_demo_001",
+  "gpu": "RTX 5090",
+  "iterations": 1,
+  "epochs": 1,
+  "trial_minutes": 2,
+  "formal_minutes": 5,
+  "vram_gib": 8,
+  "composition": "/absolute/path/to/my-tess-project/tasks/tess/compositions/rotation_regression.yaml",
+  "llm_config": "/absolute/path/to/my-tess-project/llm/agents.json",
+  "advice_file": null,
+  "trial_train_fraction": 1.0,
+  "trial_val_fraction": 1.0,
+  "formal_train_fraction": 1.0,
+  "formal_val_fraction": 1.0,
+  "trial_vram_gib": null,
+  "formal_vram_gib": null
+}

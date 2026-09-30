@@ -1,10 +1,15 @@
 # siderius-exp
 
-Private scientific tasks and their experiments for the SIDERIUS framework.
+Scientific tasks and their experiments for the SIDERIUS framework.
 This repository is the place where task meaning and experiment choices live;
-the generic framework lives in the separate [SIDERIUS repository](https://github.com/Galileo-Sandbox/SIDERIUS).
+the generic framework lives in the separate [SIDERIUS repository](https://github.com/yuema137/SIDERIUS).
 
 ## Start here
+
+For a guided notebook plus terminal-script example, start with the
+[tutorial index](tutorials/README.md), then choose the TESS or one-band TIDMAD
+notebook. The [paper tutorial guide](tutorials/paper/README.md) explains setup,
+supported changes and the distinction between a demo and paper reproduction.
 
 1. Choose a scientific problem in [`tasks/`](tasks/README.md).
 2. Choose one bounded treatment in [`experiments/`](experiments/README.md).
@@ -89,4 +94,4 @@ be hidden in a shell argument or an old run receipt.
 - [experiment index](experiments/README.md)
 - [campaign index](campaigns/README.md)
 - [migration evidence](provenance/MIGRATION.md)
-- [framework task-composition contract](https://github.com/Galileo-Sandbox/SIDERIUS/blob/14494576671ad6f6b1a772d966b1fced02fab2a9/docs/reference/task-composition.md)
+- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/14494576671ad6f6b1a772d966b1fced02fab2a9/docs/reference/task-composition.md)

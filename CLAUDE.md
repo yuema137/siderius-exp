@@ -6,7 +6,8 @@ This rule applies at every directory depth, including source, tests, examples,
 deployments and archived documentation. Classify Markdown by filename,
 case-insensitively:
 
-- `README.md` files and Markdown files whose names contain `tutorial` are
+- `README.md` files, Markdown files whose names contain `tutorial`, and
+  tutorial Jupyter notebooks (`.ipynb`) are
   **human-facing**. Assume a technically literate reader who is new to this
   project. Lead with purpose and prerequisites, then give ordered steps,
   concrete commands, expected outputs and effects, and where to change inputs.
@@ -41,6 +42,12 @@ Apply this review whenever a page is created or changed; this does not require
 an unrelated repository-wide rewrite. Explicitly requested human reading
 mirrors remain reading aids for the authoritative source, not separate rule
 owners.
+
+Public installation/download examples and current repository entry links use
+`yuema137/SIDERIUS` and `yuema137/siderius-exp`. Development PRs remain in
+Galileo-Sandbox. Preserve historical issue/PR evidence links at their actual
+origin; changing documentation links does not authorize publishing or syncing
+a release.
 
 ## Repository and scientific ownership
 
@@ -90,3 +97,20 @@ inherited conflicting overlays. Follow the selected launcher's actual checks.
 
 Continue development and review in Galileo-Sandbox. Synchronize to yuema137
 only for a stable release selected by the operator.
+
+
+## Paper tutorial ownership
+
+For notebook/task/experiment/launch responsibilities, follow the owning
+[tutorial support contract](tutorials/paper/implementation.md#tutorial-responsibility-boundary).
+Keep training/execution owned by the saved scripts. The Run All quick-demo
+cell may explicitly invoke its saved script (operator-requested onboarding
+route); notebook cells must not reimplement training or construct provider calls.
+Disclose API/GPU effects before the cell and reuse completed runs without
+silently relaunching them.
+
+Tutorial users edit only their initialized external project: copied notebooks,
+tasks, experiment JSON, LLM routing and generated scripts. Never prescribe
+changes to tracked repository templates as a tutorial step. Distinguish that
+project root from each fresh run's output workspace. Advice activation must be
+explicitly supported by the selected treatment; an example file is not active.
