@@ -179,7 +179,7 @@ def run_demo(files: DemoFiles) -> dict:
     print(f"Search exit code: {code}. Evidence: {files.completion}", flush=True)
     if code != 0:
         print(
-            "The workflow did not finish with an authoritative result. Plotting will still show recorded failures; inspect the log for the cause.",
+            "The native search returned a nonzero code. Inspect the log to distinguish model rejection from a setup/runtime failure. Recorded results can still be plotted; this workflow demo does not require Health PASS.",
             flush=True,
         )
     return result

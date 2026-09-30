@@ -301,3 +301,9 @@ TUTORIAL_HOME/project.json, the selected kernel and required Python modules befo
 importing tutorial tools. CUDA/VRAM/device errors include configuration repair
 steps. Provider key presence is not authentication; no network key probe is made.
 Completed cached runs continue to bypass launch preflight and use no credentials.
+
+Operator acceptance clarification: this is a workflow demonstration, not a
+Health-PASS search objective. Qualify configuration → script → real attempts →
+recorded scores/validity → plot. Keep the three-iteration limit regardless of
+Health outcomes; distinguish model rejection from setup/runtime failure, and do
+not extend runs or relax checks to obtain valid points.

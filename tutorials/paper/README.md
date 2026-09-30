@@ -42,6 +42,10 @@ small fractions or a completed command as proof of model quality.
 
 ## What you will see after Run All
 
+This demo teaches the complete workflow; it does not aim to produce a model
+that passes Health checks. An invalid score is a real result: it appears as a
+hollow marker. Do not add iterations or change checks just to obtain a filled point.
+
 With the external project, data and exported keys ready, the notebook saves a
 three-iteration experiment, displays its files/parameters, invokes its shell
 script, and draws **score versus iteration** from actual run records. Filled
