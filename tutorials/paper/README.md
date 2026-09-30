@@ -46,9 +46,9 @@ With the external project, data and exported keys ready, the notebook saves a
 three-iteration experiment, displays its files/parameters, invokes its shell
 script, and draws **score versus iteration** from actual run records. Filled
 markers mean Health PASS; hollow markers mean Health FAIL/failed attempts.
-Missing scores have their own strip, never a fabricated y=0. The best-recorded
-score line can include invalid points, just as the paper separates score from
-validity. CSV, PNG and SVG outputs are saved under your project's `plots/`.
+The plot follows the paper: dashed Formal results, a solid current-best line,
+and stars for new bests with Health PASS. Negative scores use boundary triangles;
+missing scores stay in the CSV. The current-best line can include invalid points. CSV, PNG and SVG outputs are saved under your project's `plots/`.
 
 Re-running an unchanged completed demo redraws results without another API call.
 To plot a different run, change `PLOT_WORKSPACE` and execute only the plotting

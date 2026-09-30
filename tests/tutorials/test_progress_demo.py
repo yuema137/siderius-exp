@@ -67,7 +67,9 @@ def test_plot_preserves_invalid_raw_score_and_outer_iteration(tmp_path):
         workspace, tmp_path / "plots", title="test", expected_iterations=3
     )
     assert fig.axes[0].collections[0].get_facecolors().size == 0
-    assert fig.axes[0].collections[0].get_offsets()[0, 1] == -0.4
+    assert (
+        fig.axes[0].collections[0].get_offsets()[0, 1] == 0
+    )  # Paper boundary triangle; CSV retains -0.4.
     assert (tmp_path / "plots/score-versus-iteration.csv").is_file()
 
 
@@ -76,7 +78,7 @@ def test_no_score_is_not_fabricated_zero_and_health_unknown_is_not_pass(tmp_path
     p = write_record(workspace, score=None)
     fig = plot_progress(workspace, tmp_path / "plots", title="missing")
     assert len(fig.axes[0].collections) == 0
-    assert len(fig.axes[1].collections) == 1
+    assert len(fig.axes) == 1  # No extra diagnostic strip.
     d = json.loads(p.read_text())
     d["all_records"][1]["metric_result"]["scalar"] = 0.7
     d["all_records"][1]["denoising_score"] = 0.7

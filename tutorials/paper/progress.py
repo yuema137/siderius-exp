@@ -89,7 +89,7 @@ def plot_progress(
     """Save a portable PNG/SVG/CSV and return the Matplotlib figure.
 
     Filled/open points mean measured Health PASS/FAIL (or failed execution), not
-    retrospective scientific certification. Missing scores use a separate strip.
+    retrospective scientific certification. Unscored attempts remain in the CSV.
     """
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
@@ -115,120 +115,138 @@ def plot_progress(
         iterations.update(range(1, expected_iterations + 1))
     if not iterations:
         raise ValueError("no recorded or expected search iterations")
-    fig, (ax, missing_ax) = plt.subplots(
-        2, 1, figsize=(9, 5), sharex=True, gridspec_kw={"height_ratios": [5, 1]}
-    )
-    color = "#2468a0"
-    scored = [p for p in points if p.score is not None]
-    if scored:
-        # Running-best RAW Formal score, including hollow points, as in the paper.
-        direction = next(iter(metrics))[1]
-        best_x, best_y = [], []
-        best = None
-        for i in sorted(iterations):
-            values = [p.score for p in scored if p.iteration == i]
-            if values:
-                candidate = (max if direction == "higher" else min)(values)
-                best = (
-                    candidate
-                    if best is None
-                    else (max if direction == "higher" else min)(best, candidate)
-                )
-            if best is not None:
-                best_x.append(i)
-                best_y.append(best)
-        ax.plot(
-            best_x,
-            best_y,
-            color=color,
-            alpha=0.4,
-            linewidth=1.5,
-            label="Best recorded Formal score (includes invalid)",
-        )
-    for p in scored:
-        if p.validity == "unknown":
-            ax.scatter(p.iteration, p.score, color="gray", marker="x", s=65, zorder=3)
-        else:
+    # Figure 4 typography, line/marker conventions and uncluttered single panel.
+    # The tutorial changes only the horizontal coordinate to search iteration.
+    style = {
+        "font.family": "serif",
+        "font.serif": ["DejaVu Serif"],
+        "font.size": 8.5,
+        "mathtext.fontset": "dejavuserif",
+        "axes.labelsize": 8.5,
+        "axes.titlesize": 9,
+        "axes.linewidth": 0.7,
+        "xtick.labelsize": 8,
+        "ytick.labelsize": 8,
+        "xtick.direction": "in",
+        "ytick.direction": "in",
+        "xtick.top": True,
+        "ytick.right": True,
+        "xtick.major.size": 3,
+        "ytick.major.size": 3,
+        "xtick.major.width": 0.7,
+        "ytick.major.width": 0.7,
+        "legend.fontsize": 8,
+        "legend.frameon": False,
+    }
+    with plt.rc_context(style):
+        fig, ax = plt.subplots(figsize=(4.5, 2.8))
+        fig.subplots_adjust(left=0.14, right=0.97, bottom=0.18, top=0.78)
+        color = "#2468a0"
+        scored = [p for p in points if p.score is not None]
+        metric, direction = next(iter(metrics)) if metrics else ("r2", "higher")
+        x = [p.iteration for p in scored]
+        y = [p.score for p in scored]
+        ax.plot(x, y, color=color, lw=0.8, ls="--")
+        best, frontier, improvements = None, [], []
+        for point in scored:
+            improves = best is None or (
+                point.score > best if direction == "higher" else point.score < best
+            )
+            if improves:
+                best = point.score
+                if 0 <= best <= 1 and point.validity == "pass":
+                    improvements.append((point.iteration, best))
+            frontier.append(best)
+        if x:
+            tail = max(iterations)
+            ax.plot(x + [tail], frontier + [frontier[-1]], color=color, lw=1.3)
+        outside = []
+        for point in scored:
+            score = point.score
+            clipped = min(1, max(0, score))
+            marker = "v" if score < 0 else ("^" if score > 1 else "o")
+            if point.validity == "unknown":
+                # Do not manufacture a Health verdict absent from native records.
+                continue
             ax.scatter(
-                p.iteration,
-                p.score,
-                facecolors=color if p.validity == "pass" else "none",
+                point.iteration,
+                clipped,
+                marker=marker,
+                facecolors=color if point.validity == "pass" else "none",
                 edgecolors=color,
-                s=65,
-                linewidths=1.7,
-                zorder=3,
+                s=12 if marker != "o" else 7.3,
+                linewidths=0.7,
+                clip_on=False,
+                zorder=4,
             )
-    for i in sorted(iterations):
-        unscored = [p for p in points if p.iteration == i and p.score is None]
-        if unscored or not any(p.iteration == i for p in points):
-            missing_ax.scatter(
-                i, 0, facecolors="none", edgecolors=color, marker="o", s=45
-            )
-            label = f"{len(unscored)} unscored" if unscored else "no Formal record"
-            missing_ax.annotate(
-                label,
-                (i, 0),
-                xytext=(0, 8),
+            if score != clipped:
+                outside.append((point.iteration, score))
+        if len(outside) == 1:
+            iteration, score = outside[0]
+            ax.annotate(
+                f"{score:.3f}",
+                (iteration, 0 if score < 0 else 1),
+                xytext=(-3, 6 if score < 0 else -10),
                 textcoords="offset points",
-                ha="center",
+                ha="right",
                 fontsize=8,
-            )
-    if not scored:
-        ax.text(
-            0.5,
-            0.5,
-            "No finite Formal scores recorded\nSee the unscored strip and run records",
-            transform=ax.transAxes,
-            ha="center",
-        )
-    metric, direction = next(iter(metrics)) if metrics else ("Formal score", None)
-    ax.set_ylabel(f"{metric}" + (f" ({direction} is better)" if direction else ""))
-    ax.set_title(title + " — score versus iteration")
-    ax.grid(axis="y", alpha=0.2)
-    handles = [
-        Line2D(
-            [],
-            [],
-            marker="o",
-            color="none",
-            markeredgecolor=color,
-            markerfacecolor=color,
-            label="Health PASS / successful attempt",
-        ),
-        Line2D(
-            [],
-            [],
-            marker="o",
-            color="none",
-            markeredgecolor=color,
-            markerfacecolor="none",
-            label="Health FAIL / failed attempt",
-        ),
-        Line2D(
-            [], [], marker="x", color="gray", linestyle="none", label="Health unknown"
-        ),
-    ]
-    if scored:
-        handles += [
-            Line2D(
-                [],
-                [],
                 color=color,
-                alpha=0.4,
-                label="Best raw Formal score (may be invalid)",
             )
+        elif outside:
+            below = sum(score < 0 for _, score in outside)
+            if below:
+                ax.text(
+                    0.5,
+                    0.12,
+                    f"{below} scores < 0",
+                    transform=ax.transAxes,
+                    ha="center",
+                    fontsize=8,
+                    color=color,
+                )
+            if len(outside) > below:
+                ax.text(
+                    0.5,
+                    0.83,
+                    f"{len(outside) - below} scores > 1",
+                    transform=ax.transAxes,
+                    ha="center",
+                    fontsize=8,
+                    color=color,
+                )
+        if improvements:
+            ax.scatter(
+                *zip(*improvements),
+                marker="*",
+                s=38,
+                c=color,
+                edgecolors="white",
+                linewidths=0.3,
+                zorder=5,
+            )
+        ax.set_title(title, loc="left", pad=6)
+        ax.set_ylabel(r"$R^2$" if metric.lower() == "r2" else metric)
+        ax.set_xlabel("Iteration")
+        ax.set_xlim(0, max(iterations) + 0.15)
+        ax.set_xticks(sorted(iterations))
+        ax.set_ylim(0, 1)
+        ax.set_yticks([0, 0.5, 1])
+        ax.grid(False)
+        handles = [
+            Line2D([], [], color=".25", ls="--", lw=0.8, label="Formal result"),
+            Line2D([], [], color=".25", lw=1.3, label="Current best"),
+            Line2D([], [], color=".25", marker="*", ls="none", ms=6, label="New best"),
         ]
-    ax.legend(handles=handles, fontsize=8, loc="best")
-    missing_ax.set_ylim(-0.6, 0.8)
-    missing_ax.set_yticks([])
-    missing_ax.set_ylabel("No score", fontsize=9)
-    missing_ax.set_xlabel("Search iteration (not a tuning round)")
-    missing_ax.set_xticks(sorted(iterations))
-    missing_ax.set_xlim(min(iterations) - 0.35, max(iterations) + 0.35)
-    for spine in ("top", "right"):
-        ax.spines[spine].set_visible(False)
-        missing_ax.spines[spine].set_visible(False)
-    fig.tight_layout()
+        fig.legend(
+            handles=handles,
+            loc="upper center",
+            ncol=3,
+            frameon=False,
+            fontsize=8,
+            columnspacing=1.2,
+            handlelength=2,
+            handletextpad=0.5,
+        )
     output_dir.mkdir(parents=True, exist_ok=True)
     for extension in ("png", "svg"):
         fig.savefig(output_dir / f"score-versus-iteration.{extension}", dpi=160)

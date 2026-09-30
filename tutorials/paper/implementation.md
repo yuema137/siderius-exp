@@ -264,11 +264,14 @@ chain `iter_NNN` as x, keeps Formal records only, and reads `metric_result.scala
 even when accepted denoising_score has been nullified for invalidity. It never
 substitutes Trial, invents zero for missing/nonfinite values, mixes metrics or
 merges duplicate iteration/attempt identities. Filled/hollow markers record
-Health PASS/FAIL or failed attempt status; unknown Health uses a distinct cross.
+Health PASS/FAIL or failed attempt status; unknown Health remains in the CSV without a verdict marker.
 This follows the paper cross-task figure's Health fill convention but is not
 retrospective behavioral certification. The running-best raw-score line includes
-invalid observations, respecting metric direction. Missing values/no Formal
-records appear in a separate unscored strip. PNG/SVG/CSV outputs live externally;
+invalid observations, respecting metric direction. Figure 4 styling uses serif typography, inward ticks, no grid, dashed Formal
+results, a solid current-best line and stars for new bests with Health PASS
+(invalid improvements retain their hollow marker). The R² axis is 0–1;
+out-of-range scores use boundary triangles and exact CSV values. Missing
+values/no Formal records remain in the CSV, without an extra diagnostic panel. PNG/SVG/CSV outputs live externally;
 the CSV retains source-record paths. A user can replot another workspace without
 executing any search.
 
