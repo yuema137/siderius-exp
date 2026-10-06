@@ -1,6 +1,6 @@
 # Historical planner migration contract
 
-Status: under review with infra issue #372. No scientific migration is qualified
+This contract originated with infra issue #372. No scientific migration is qualified
 by this document alone. Source preservation and offline prompt comparisons are
 separate from historical response replay and fresh scientific execution.
 
@@ -70,6 +70,15 @@ defaults, must produce an error. Selecting `native-timing-v1` changes the planne
 treatment and must not be represented as historical replay.
 
 ## Current validation boundary
+
+For #447, the explicit `legacy-9b78d505cb11-ordering-v2` provider additionally
+projects newly persisted ordering evidence to the pre-#447 planner input format.
+The old providers and installed default are unchanged. The projection is owned
+by exp, runs only on a deep copy supplied to the archived user renderer, and
+does not rewrite records, consumer views, or locks. Record the new plugin identity
+and qualified infra/package revisions in a new workspace's migration receipt.
+See [ordering-parity.md](ordering-parity.md) for the producer mapping and evidence.
+The early `legacy-691617f04b42-v1` provider has no new-record v2 qualification.
 
 The operator-approved paper acceptance additionally uses LIGO startup captures
 and two sets of twelve shared-branch comparisons. See the authoritative

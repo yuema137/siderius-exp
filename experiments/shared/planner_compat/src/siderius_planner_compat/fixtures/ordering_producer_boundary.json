@@ -1,0 +1,764 @@
+{
+  "reference_commit": "d116d1561124819fa226e4debf89282c87a2e297",
+  "reference_tree": "7db002d1a04f076bff1c67b83476052bda569927",
+  "scope": "Controlled raw records through the actual pre-447 emission boundary; invocation mapping audited against producer call sites. No scientific run or recovered API request.",
+  "cases": [
+    {
+      "id": "success",
+      "raw": {
+        "exp_id": "success",
+        "status": "success",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": 0.5,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "success",
+        "status": "success",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": 0.5,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "proposed_order_strategy": "shuffle",
+        "proposed_file_order": null,
+        "ordering_proposal_rejected": false,
+        "ordering_proposal_rejection_reason": null,
+        "override_order_strategy": "sequential",
+        "override_file_order": [
+          2,
+          0,
+          1
+        ],
+        "resolved_order_strategy": "sequential",
+        "resolved_file_order": [
+          2,
+          0,
+          1
+        ],
+        "ordering_resolution_source": "operator_override",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "collapse",
+      "raw": {
+        "exp_id": "collapse",
+        "status": "failed_mode_collapse",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "collapse",
+        "status": "failed_mode_collapse",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "proposed_order_strategy": "shuffle",
+        "proposed_file_order": null,
+        "ordering_proposal_rejected": false,
+        "ordering_proposal_rejection_reason": null,
+        "override_order_strategy": "sequential",
+        "override_file_order": [
+          2,
+          0,
+          1
+        ],
+        "resolved_order_strategy": "sequential",
+        "resolved_file_order": [
+          2,
+          0,
+          1
+        ],
+        "ordering_resolution_source": "operator_override",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "training-error",
+      "raw": {
+        "exp_id": "training-error",
+        "status": "error_training",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "training-error",
+        "status": "error_training",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "proposed_order_strategy": "shuffle",
+        "proposed_file_order": null,
+        "ordering_proposal_rejected": false,
+        "ordering_proposal_rejection_reason": null,
+        "override_order_strategy": "sequential",
+        "override_file_order": [
+          2,
+          0,
+          1
+        ],
+        "resolved_order_strategy": "sequential",
+        "resolved_file_order": [
+          2,
+          0,
+          1
+        ],
+        "ordering_resolution_source": "operator_override",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "scoring-error",
+      "raw": {
+        "exp_id": "scoring-error",
+        "status": "error_scoring",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "scoring-error",
+        "status": "error_scoring",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "proposed_order_strategy": "shuffle",
+        "proposed_file_order": null,
+        "ordering_proposal_rejected": false,
+        "ordering_proposal_rejection_reason": null,
+        "override_order_strategy": "sequential",
+        "override_file_order": [
+          2,
+          0,
+          1
+        ],
+        "resolved_order_strategy": "sequential",
+        "resolved_file_order": [
+          2,
+          0,
+          1
+        ],
+        "ordering_resolution_source": "operator_override",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "outer-after-selection",
+      "raw": {
+        "exp_id": "outer-after-selection",
+        "status": "error",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure"
+      },
+      "unresolved": false,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "outer-after-selection",
+        "status": "error",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure",
+        "proposed_order_strategy": "shuffle",
+        "proposed_file_order": null,
+        "ordering_proposal_rejected": false,
+        "ordering_proposal_rejection_reason": null,
+        "override_order_strategy": "sequential",
+        "override_file_order": [
+          2,
+          0,
+          1
+        ],
+        "resolved_order_strategy": "sequential",
+        "resolved_file_order": [
+          2,
+          0,
+          1
+        ],
+        "ordering_resolution_source": "operator_override",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "provider-after-selection",
+      "raw": {
+        "exp_id": "provider-after-selection",
+        "status": "skipped_infrastructure_failure",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure"
+      },
+      "unresolved": false,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "provider-after-selection",
+        "status": "skipped_infrastructure_failure",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure",
+        "proposed_order_strategy": "shuffle",
+        "proposed_file_order": null,
+        "ordering_proposal_rejected": false,
+        "ordering_proposal_rejection_reason": null,
+        "override_order_strategy": "sequential",
+        "override_file_order": [
+          2,
+          0,
+          1
+        ],
+        "resolved_order_strategy": "sequential",
+        "resolved_file_order": [
+          2,
+          0,
+          1
+        ],
+        "ordering_resolution_source": "operator_override",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "outer-before-selection",
+      "raw": {
+        "exp_id": "outer-before-selection",
+        "status": "error",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure"
+      },
+      "unresolved": true,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "outer-before-selection",
+        "status": "error",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "provider-before-selection",
+      "raw": {
+        "exp_id": "provider-before-selection",
+        "status": "skipped_infrastructure_failure",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure"
+      },
+      "unresolved": true,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "provider-before-selection",
+        "status": "skipped_infrastructure_failure",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "record_type": "attempt_failure",
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "schema-preflight",
+      "raw": {
+        "exp_id": "schema-preflight",
+        "status": "skipped_schema_violation",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": "preflight",
+      "expected_record": {
+        "exp_id": "schema-preflight",
+        "status": "skipped_schema_violation",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "oom-preflight",
+      "raw": {
+        "exp_id": "oom-preflight",
+        "status": "skipped_oom_risk",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": "preflight",
+      "expected_record": {
+        "exp_id": "oom-preflight",
+        "status": "skipped_oom_risk",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "time-preflight",
+      "raw": {
+        "exp_id": "time-preflight",
+        "status": "skipped_time_risk",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": "preflight",
+      "expected_record": {
+        "exp_id": "time-preflight",
+        "status": "skipped_time_risk",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "measured-rejection",
+      "raw": {
+        "exp_id": "measured-rejection",
+        "status": "skipped_time_risk",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1,
+          "verification_stage": "in_subprocess"
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": null,
+      "expected_record": {
+        "exp_id": "measured-rejection",
+        "status": "skipped_time_risk",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1,
+          "verification_stage": "in_subprocess"
+        },
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "training-admission",
+      "raw": {
+        "exp_id": "training-admission",
+        "status": "skipped_resource_admission",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": "training",
+      "expected_record": {
+        "exp_id": "training-admission",
+        "status": "skipped_resource_admission",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "inference-admission",
+      "raw": {
+        "exp_id": "inference-admission",
+        "status": "skipped_resource_admission",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": "inference",
+      "expected_record": {
+        "exp_id": "inference-admission",
+        "status": "skipped_resource_admission",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    },
+    {
+      "id": "measurement-preflight",
+      "raw": {
+        "exp_id": "measurement-preflight",
+        "status": "skipped_infrastructure_failure",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        }
+      },
+      "unresolved": false,
+      "refused_before_phase": "preflight",
+      "expected_record": {
+        "exp_id": "measurement-preflight",
+        "status": "skipped_infrastructure_failure",
+        "model_type": "synthetic_model",
+        "timestamp": "2026-10-06T00:00:00Z",
+        "params": {
+          "train_config": {
+            "batch_size": 4
+          }
+        },
+        "denoising_score": null,
+        "memory": {
+          "expert_advice_followed": "",
+          "hypothesis": "controlled",
+          "conclusion": "Controlled producer evidence",
+          "round_index": 1
+        },
+        "candidate_id": null,
+        "task_composition_fingerprint": null
+      }
+    }
+  ]
+}
