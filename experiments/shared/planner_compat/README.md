@@ -204,9 +204,58 @@ history may have influenced later planning. LIGO and the eight audited TIDMAD
 workflow units had no such mismatch in the inspected run-output records. This
 is a bounded archive audit, not proof that every attempted iteration survived.
 
-TIDMAD analysis-on used generated external composition files. Their historical
-locations are explicitly listed under `external_inputs`, not presented as
-portable repository files. Recover and verify those inputs against the recorded
-composition fingerprint before attempting that historical treatment; this
-inventory does not claim to bundle them. The [role compatibility report](attempt-role-parity.md)
-states the exact verified boundary and remaining limits.
+TIDMAD analysis-on used generated external composition files. The historical
+composition and analysis-policy bytes have now been reconstructed for all four
+bands and verified against the launch-receipt hashes. See the
+[startup compatibility report](paper-startup-parity.md#tidmad-analysis-input-recovery)
+for their locations and how to regenerate them with local paths. The
+[role compatibility report](attempt-role-parity.md) describes the narrower v3
+record-conversion boundary.
+
+## Match the paper's actual planner startup
+
+For paper-era planner text, install package **0.4.0** into an infra version that
+supports `PlannerStrategy.config_manual_renderer`. V4 also restores the correct
+configuration manual, which v3 does not change. Select the profile in your copied
+LLM configuration's `tune.planner_strategy`:
+
+| Experiment | Selector |
+| --- | --- |
+| TESS, LIGO, TIDMAD NoPrior | `legacy-9b78d505cb11-paper-v4` |
+| Project8 dual, TIDMAD analysis-on | `legacy-9b78d505cb11-paper-late-v4` |
+
+For example, LIGO's historical manual predates three training options. Its v4
+profile renders that manual for the planner while the current executor keeps
+its validated schema. Project8 already had those options, so its profile keeps
+them. Unknown manual changes stop with an explicit qualification error. Neither
+profile becomes an installation default. Start in a new workspace.
+
+Four checks use each task's actual archived model, task text, model description
+and advice. Supply the archived first model file, not a newly generated file
+with the same name; its SHA-256 must match the frozen reference:
+
+```bash
+MODEL_PLUGIN=/absolute/path/to/archived/dual_domain_chirp_fuser.py
+"$INFRA_CHECKOUT/.venv/bin/python" -m siderius_planner_compat.startup_check \
+  --case ligo --model-plugin "$MODEL_PLUGIN"
+```
+
+Repeat with `--case tess`, `project8` or `tidmad` and the corresponding archived
+model listed in the [verification report](paper-startup-parity.md). Success
+prints the matching system/user hashes and `api_calls: 0`. These checks need no
+dataset, API key or GPU. They render the current manual through the installed
+historical profile, rather than bypassing production manual assembly.
+
+To recapture the startup through the tuner itself, `capture_startup.py` accepts
+`--input /path/to/startup-spec.json --output /path/to/new-capture`. Unlike the
+frozen check, this requires the declared task package and local dataset metadata.
+The input declares `composition`, `composition_fingerprint`, `seed_plugin_path`,
+`seed_plugin_sha256`, `model_description_path`, `model_description_sha256`,
+`data_dir`, and `tuner_parameters` (validated `HyperparamTuningInput` fields).
+The output directory contains `tuner_input.json`, `planner_arguments.json`,
+`messages.json`, and `receipt.json`, plus startup bookkeeping. The first planner
+message ends the capture; no model response or training follows.
+
+This verifies planner startup, supplemented by the existing later-round branch
+and history-format checks. Full interpret/propose/implement/analyze/reflect
+conversation replay is a separate follow-up; these checks do not claim it.

@@ -51,7 +51,8 @@ does not change its execution semantics. Original datasets, splits, agent
 settings and model code remain owned by the referenced experiment assets. The
 analysis-on TIDMAD launch also used generated external compositions; their
 historical paths and composition fingerprints are recorded separately, and
-this change does not claim to reconstruct or bundle those inputs.
+the subsequent v4 review reconstructs their exact bytes; see
+[the startup report](paper-startup-parity.md#tidmad-analysis-input-recovery).
 
 ## Verification and limits
 

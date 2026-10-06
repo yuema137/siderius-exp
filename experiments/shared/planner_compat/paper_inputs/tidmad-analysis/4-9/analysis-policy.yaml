@@ -1,0 +1,99 @@
+schema_version: 1
+scientific_goal: Characterize authorized raw waveform inputs in the selected band.
+input_description: Integer-coded SQUID detector waveform samples at the task-declared
+  physical cadence. The view contains one input channel and performs no interpolation,
+  resampling, filtering, or repair.
+target_description: Clean injected waveform, not visible in the initial raw-data analysis.
+scientific_constraints:
+- Every certified selection must cover the selected files [4, 5, 6, 7, 8, 9] or refuse.
+- Findings concern sampled raw validation windows, not unseen data or hidden targets.
+- Use the declared physical cadence; distinguish measured findings from hypotheses.
+available_assets:
+- asset_id: tidmad-band-validation-input
+  asset_type: dataset
+  description: Raw validation input windows from the selected band.
+  location:
+    kind: task_data
+    task_data_path_id: tidmad_frozen_training_pool
+    dataset_profile_sha256: a7801aba3058dbca35523b5d1a0f76afcaf31709c7717087a355371f5a525e74
+    logical_role: validation_input_windows
+  provenance:
+    producer: tidmad-task-package
+    source_asset_ids: []
+  authorized_scope:
+    kind: legacy_partitions
+    data_scope:
+      file_indices:
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+  split_id: validation
+  metadata:
+    sample_rate_hz: 10000000.0
+    window_samples: 262144
+    window_duration_seconds: 0.0262144
+    channel_semantics: raw_detector_input
+    band_file_indices:
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  metadata_sources:
+    sample_rate_hz:
+      information_class: identity
+      source_fields: []
+    window_samples:
+      information_class: identity
+      source_fields: []
+    window_duration_seconds:
+      information_class: identity
+      source_fields: []
+    channel_semantics:
+      information_class: identity
+      source_fields: []
+    band_file_indices:
+      information_class: identity
+      source_fields: []
+  allowed_operations:
+  - read
+  - materialize
+declared_scope:
+  raw_input_asset_ids:
+  - tidmad-band-validation-input
+  historical_model_asset_ids: []
+access_policy:
+  policy_id: tidmad-orchestrator-candidate-4-9
+  policy_version: 1
+  purpose: Candidate raw-only band analysis, pending main-run freeze.
+  split_rules:
+  - split_id: validation
+    data_visible: true
+    targets_visible: false
+    predictions_visible: false
+    residuals_visible: false
+    metadata:
+      mode: none
+      fields: []
+  allow_model_inference: false
+resource_envelope:
+  wall_time_budget_s: 600.0
+  per_skill_timeout_s: 12.0
+  preferred_device: cpu
+  max_host_memory_gb: 8.0
+  sampling_policy:
+    mode: fixed
+    max_items: 10
+    strategy: task_defined
+    strata_fields: []
+    seed: 20260915
+builtin_skill_packs:
+- core-analysis
+- time-series
+external_skill_packs: []
+allow_generated_skill_promotion: false
+report_schema_version: 1

@@ -4,11 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-planner-compat"
-version = "0.3.0"
+version = "0.4.0"
 description = "Experiment-owned historical SIDERIUS planner prompt providers"
 requires-python = ">=3.12"
 
 [project.entry-points."siderius.planner_strategies"]
+legacy-9b78d505cb11-paper-v4 = "siderius_planner_compat.paper_v4:historical_paper_v4"
+legacy-9b78d505cb11-paper-late-v4 = "siderius_planner_compat.paper_v4:historical_paper_late_v4"
 legacy-9b78d505cb11-attempt-role-v3 = "siderius_planner_compat.attempt_role_v3:historical_attempt_role_v3"
 legacy-9b78d505cb11-ordering-v2 = "siderius_planner_compat.ordering_v2:historical_ordering_v2"
 legacy-9b78d505cb11-v1 = "siderius_planner_compat:current_legacy"

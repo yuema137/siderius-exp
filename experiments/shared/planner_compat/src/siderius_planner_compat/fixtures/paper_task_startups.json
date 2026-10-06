@@ -1,0 +1,780 @@
+{
+  "schema": "paper-task-startups-v1",
+  "cases": {
+    "tess": {
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "model_type": "cadence_aligned_spectral_resnet",
+      "model_source_sha256": "6df78087f83fa46ffee1e17d319ef91cc24ee5623774e305b386b5ac51bcd799",
+      "model_description_sha256": "cf1b2764a8c146784d106dfe75f63397c5a758040b87b0256ef596c8d2a1d47d",
+      "composition_fingerprint": "baeb657a4e0d0c7063e8147364393b299ddd6fe89b0631dae148aca27ccc123b",
+      "arguments": {
+        "memory_history": [],
+        "planner_strategy": "legacy-9b78d505cb11-paper-v4",
+        "timing_context": {
+          "plan_overrides": {
+            "is_trial": true
+          },
+          "task_rules": {
+            "rules": {}
+          },
+          "workflow_rules": null,
+          "roles": [
+            {
+              "mode": "trial",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "resolved_plan",
+                  "source": "trial_strategy",
+                  "value": null
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "resolved_plan",
+                  "source": "trial_portion",
+                  "value": null
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "resolved_plan",
+                  "source": "train_portion",
+                  "value": null
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "resolved_plan",
+                  "source": "eval_strategy",
+                  "value": null
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "resolved_plan",
+                  "source": "eval_portion",
+                  "value": null
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "trial_max_epochs"
+            },
+            {
+              "mode": "formal",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "run",
+                  "source": "formal_strategy",
+                  "value": "snapshot"
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "run",
+                  "source": "formal_portion",
+                  "value": 1.0
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "run",
+                  "source": "formal_train_portion",
+                  "value": 1.0
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "execution_contract",
+                  "source": "formal evaluation strategy",
+                  "value": "snapshot"
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "run",
+                  "source": "formal_eval_portion",
+                  "value": 1.0
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "formal_max_epochs"
+            }
+          ],
+          "formal_training_scope_source": "operator",
+          "formal_eval_portion": 1.0,
+          "trial_allowed": true,
+          "forced_formal": false,
+          "inheritance_strategy": "full_clone",
+          "inheritance_values": {},
+          "inheritance_unless_authored": [],
+          "inheritance_winner": null,
+          "inheritance_recovery": null,
+          "partial_scope_strategy_overrides": {},
+          "validation_max_portion": null,
+          "validation_max_train_samples": null,
+          "validation_max_samples": null,
+          "training_validation_portion": null,
+          "training_budget_reserve_fraction": 0.2
+        },
+        "training_budget_reserve_fraction": 0.2,
+        "expert_advice": "NOTE: This implementation passes trainability checks but deviates from the proposed mathematical spec. The tuner is optimizing an approximation of the intended architecture. Deviations: The model has valid tensor shapes, differentiable trainable paths through the cadence gate, encoder, and regression head, and emits the declared [B, 1] regressor output. Fidelity is not exact because constant-tail detection uses a 1e-6 tolerance rather than exact equality, and the expected cadence and duration scalars are normalized before concatenation rather than used directly as mathematically defined.\n\nFocus areas: First verify that constant-tail mask extraction recovers plausible valid lengths; tune padding_tolerance and minimum trailing-run length before changing encoder capacity.; Tune cadence-gate inputs and entropy regularization, and inspect whether its posterior separates the two cadence populations rather than correlating spuriously with frot.; Tune the shared-grid resolution, upper frequency bound, Hann power normalization, and residual dilation schedule before increasing channel count.; Tune Smooth L1 beta and learning rate for robustness to rare extreme targets and the repeated negative sentinel.; Compare posterior-weighted two-hypothesis features against hard cadence assignment only if reliable cadence labels or a deterministic cadence rule become available.\nConstraints: Keep predicted peak VRAM at or below 6.4 GB, which is 80% of the 8.00 GB effective cap; reduce batch size before reducing the shared spectral grid.; Do not exceed the memo's 500000-trainable-parameter ceiling without evidence from a capacity sweep; the baseline is approximately 119000 parameters.; The final layer must remain Linear(features,1) with no ReLU, sigmoid, clipping, or other output squashing.; All pooling and preprocessing must exclude the detected constant padding tail.\nKnown failures: Cadence is not supplied by the forward contract, so an inaccurate learned cadence posterior can map peaks onto the wrong cycles-per-day axis.; Power-only spectra discard phase and time-localized amplitude modulation that may help identify pulsation modes.; The shorter physical baseline of a 10-minute, 1024-sample window intrinsically has poorer frequency resolution; interpolation cannot restore missing resolution.; Rare extreme targets and the repeated negative sentinel can still influence optimization even with Smooth L1.; Exact or near-exact naturally constant observations at the end of a real curve may be mistaken for padding if mask tolerance is too loose.\nSuggested directions: Run the baseline unchanged and record validation R-squared, cadence-posterior histograms, inferred valid-length distributions, and error stratified by inferred cadence.; Use an ablation replacing physical-frequency interpolation with sample-index spectra; a clear score drop would support the cadence-alignment hypothesis.; Use a second ablation with only one cadence hypothesis to determine whether the dual-hypothesis gate is necessary under the input-only contract.; If the result is at or below the memo's 0.35 refutation threshold, next test a hybrid spectral and time-domain branch rather than simply enlarging the spectral encoder.; Search preprocessing and Smooth L1 beta first, dilation and channels second, and batch size or dropout last.\nRationale: The model is small enough that representation correctness, especially padding removal and physical-frequency alignment, is more likely to dominate capacity. Diagnostics and ablations therefore target the causal mechanism directly, while the tuning order avoids spending trials on larger encoders before establishing that cadence inference and aligned spectra are informative.",
+        "force_model": "cadence_aligned_spectral_resnet",
+        "model_description": "# CadenceAlignedSpectralResnet\n\n## Overview\n\nA compact cadence-aware spectral regressor that extracts the valid, non-padded portion of each light curve, applies a Hann window, computes log-power RFFT features, and maps them onto a common physical-frequency grid under the two possible TESS cadence hypotheses. A lightweight gate estimates the cadence from input-derived validity and variation statistics because the forward contract provides no explicit cadence metadata. The two cadence-conditioned spectra are processed by a shared residual dilated Conv1d encoder with a physical-frequency coordinate channel. Cadence-weighted spectral mean and max summaries are concatenated with inferred cadence and physical-duration scalars, passed through a small MLP, and mapped by an unsquashed Linear head to one continuous rotation-frequency prediction.\n\n**Forward contract:** `[B, 1, 1024] float32 \u2192 [B, 1] float32` (regressor)\n\n## Architecture\n\nFor each input x, identify the maximal constant-valued right tail and construct a validity mask m that retains its first value as the final observation while excluding subsequent padding. Let n be the valid length, center the valid samples, and multiply them by a Hann window. Compute the one-sided Fourier transform and normalized power P=|RFFT(x_valid multiplied by Hann)|^2/E_Hann, followed by log(1+P). For each candidate cadence delta in the supported cadence set, assign every Fourier coefficient the physical frequency f_k=k/(n delta), then linearly interpolate log-power onto a shared physical-frequency grid to obtain S_delta and a spectral-support mask. Estimate a cadence posterior p_delta with a small softmax gate using input-derived features such as valid fraction, padding fraction, and normalized adjacent-difference energy. Append the normalized physical-frequency coordinate to each S_delta and process every cadence hypothesis with the same encoder. Each residual encoder block computes h_next=h+PointwiseConv(Dropout(GELU(Norm(DilatedConv(Norm(h)))))); dilation increases by block while convolution is noncausal because frequency has no causal ordering. Apply support-mask-aware mean and max pooling to each encoded spectrum and combine the summaries by the cadence posterior. Concatenate this representation with the posterior expected cadence and expected physical duration n times delta. Pass the result through a GELU MLP and a final Linear(features,1), without output activation, yielding a float32 tensor of shape [B,1].\n\n## Baseline Configuration\n\n```json\n{\n  \"model_config\": {\n    \"input_channels\": 1,\n    \"input_length\": 1024,\n    \"output_dim\": 1,\n    \"cadence_minutes\": [\n      10.0,\n      30.0\n    ],\n    \"cadence_handling\": \"learned_two_hypothesis_gate\",\n    \"cadence_gate_features\": [\n      \"valid_fraction\",\n      \"padding_fraction\",\n      \"normalized_adjacent_difference_energy\"\n    ],\n    \"cadence_gate_hidden_dim\": 16,\n    \"cadence_gate_temperature\": 1.0,\n    \"mask_extraction\": \"terminal_constant_run\",\n    \"padding_tolerance\": 1e-06,\n    \"minimum_padding_run\": 2,\n    \"retain_first_tail_value_as_observed\": true,\n    \"window_type\": \"hann\",\n    \"remove_valid_mean\": true,\n    \"power_normalization\": \"hann_energy\",\n    \"spectral_transform\": \"log1p_rfft_power\",\n    \"frequency_grid_min_cpd\": 0.0,\n    \"frequency_grid_max_cpd\": 24.0,\n    \"frequency_grid_bins\": 512,\n    \"frequency_interpolation\": \"linear\",\n    \"frequency_coordinate_channel\": true,\n    \"spectral_channels\": 64,\n    \"residual_blocks\": 4,\n    \"kernel_size\": 5,\n    \"dilations\": [\n      1,\n      2,\n      4,\n      8\n    ],\n    \"causal_convolution\": false,\n    \"normalization\": \"group_norm\",\n    \"activation\": \"gelu\",\n    \"dropout\": 0.1,\n    \"skip_connection\": true,\n    \"shared_encoder_across_cadence_hypotheses\": true,\n    \"spectral_pooling\": [\n      \"mask_aware_mean\",\n      \"mask_aware_max\"\n    ],\n    \"metadata_scalars\": [\n      \"posterior_expected_cadence\",\n      \"posterior_expected_physical_duration\"\n    ],\n    \"mlp_hidden_dim\": 128,\n    \"mlp_activation\": \"gelu\",\n    \"mlp_dropout\": 0.1,\n    \"head_type\": \"linear\",\n    \"head_output_dim\": 1,\n    \"head_activation\": null,\n    \"parameter_ceiling\": 500000,\n    \"peak_vram_target_gb\": 6.4\n  },\n  \"train_config\": {\n    \"lr\": 0.0003,\n    \"epochs\": 40,\n    \"batch_size\": 32,\n    \"optimizer_type\": \"adamw\",\n    \"weight_decay\": 1e-05,\n    \"device\": \"cuda\"\n  },\n  \"loss_config\": {\n    \"loss_type\": \"smooth_l1\",\n    \"beta\": 0.5,\n    \"reduction\": \"mean\"\n  }\n}\n```\n",
+        "exploration_checklist": "",
+        "plugin_source_excerpt": "## PLUGIN CONFIG SCHEMA (authoritative \u2014 read validators carefully)\nThe planner prompt's JSON schema below cannot represent `@model_validator(mode='after')` or cross-field `@field_validator` bodies. Treat the source below as the single source of truth for any cross-field invariants; a proposed config that violates one will be rejected by the resource-eval skill and burn a retry attempt.\n\n```python\nclass CadenceAlignedSpectralResnetConfig(BaseModel):\n    model_type: str = Field(default=\"cadence_aligned_spectral_resnet\", description=\"Plugin model type key.\")\n    segmentation_size: int = Field(ge=1)\n    batch_size: int = Field(default=32, ge=1)\n    frequency_grid_bins: int = Field(default=512, ge=128, le=1024, multiple_of=16)\n    frequency_grid_max_cpd: float = Field(default=24.0, ge=12.0, le=72.0)\n    cadence_gate_hidden_dim: int = Field(default=16, ge=4, le=64)\n    cadence_gate_temperature: float = Field(default=1.0, ge=0.25, le=4.0)\n    spectral_channels: int = Field(default=64, ge=16, le=96, multiple_of=8)\n    residual_blocks: int = Field(default=4, ge=1, le=6)\n    kernel_size: int = Field(default=5, ge=3, le=7)\n    dropout: float = Field(default=0.1, ge=0.0, le=0.5)\n    mlp_hidden_dim: int = Field(default=128, ge=32, le=256, multiple_of=8)\n    @model_validator(mode='after')\n    def check_constraints(self) -> Self:\n        if self.kernel_size % 2 == 0:\n            raise ValueError(f'kernel_size must be odd, got {self.kernel_size}')\n        gate_params = 6 * self.cadence_gate_hidden_dim + 2\n        stem_params = 3 * self.spectral_channels\n        block_params = self.residual_blocks * (\n            self.spectral_channels * self.spectral_channels * (self.kernel_size + 1)\n            + 6 * self.spectral_channels\n        )\n        head_params = self.mlp_hidden_dim * (2 * self.spectral_channels + 4) + 1\n        total_params = gate_params + stem_params + block_params + head_params\n        if total_params > 500000:\n            raise ValueError(f'estimated parameter count must be at most 500000, got {total_params}')\n        return self\n\n```\n",
+        "current_round": 1,
+        "max_rounds": 2,
+        "trial_allowed": true,
+        "force_formal_round": true,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "max_epochs": 100,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "resolved_data_scope": null,
+        "trial_vram_budget_gb": 8.0,
+        "formal_vram_budget_gb": 8.0,
+        "trial_time_budget_minutes": 5.0,
+        "formal_time_budget_minutes": 15.0,
+        "last_vram_estimate_gb": null,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": null,
+        "last_mode": null,
+        "score_table_md": null,
+        "task_description": "Regression of the near-core rotation frequency of a pulsating star from a\nsingle TESS light curve.\n\nEach sample is one star observed in one TESS sector: a univariate sequence\nof normalized brightness measurements. The target is frot, the star's\nnear-core rotation frequency in cycles per day. The population is the\nGDOR_SPB class of the PhyTS TESS benchmark \u2014 intermediate- and high-mass\ng-mode pulsators \u2014 for which a rotation frequency could be derived.\n\nThe physical signal is periodic: rotation shifts the frequencies of the\nstar's gravity-mode pulsations, so the information lives in the sequence's\nperiodic structure rather than in its amplitude. Each curve is z-scored\nindividually before the model sees it, which removes absolute brightness\nand per-star scale; what survives is the shape of the variability.\n\nWhat makes this hard. Sampling is uneven in a way the fixed-length tensor\ndoes not show: the released curves were taken at two different cadences\n(30-minute and 10-minute), so a fixed 1024-sample window covers a\ndifferent physical duration depending on which mission observed the star,\nand the frequency content is not aligned across samples. Targets span\nroughly -0.27 to 17.45 cycles per day but concentrate near 1, so a model\nthat predicts the mean is not obviously wrong and scores exactly 0.0.\n\nTwo properties of the labels are worth knowing because they bound what is\nachievable. First, frot is derived per LIGHT CURVE, not per star, so the\nsame star observed in different sectors can carry different target values;\nif a model predicted each star's mean target perfectly it would score\nR-squared 0.92 on train and 0.98 on validation, which is the label-noise\nceiling. Second, 26 of 4,183 released rows carry a negative frot, 23 of\nthem the exact repeated constant -0.271916. That value is almost certainly\na pipeline sentinel rather than 23 independent measurements; it is\nretained unfiltered because the task definition is the released data, but\na model is not expected to reproduce it.\n\nPublished reference points. These are the benchmark's own numbers, known\nto anyone who reads it, and they describe the task rather than recommend\nan approach. All were computed on a TEST split while a run here is scored\non VALIDATION, and R-squared is normalized by the evaluation set's own\nvariance, so they are not a target to beat on the same footing.\n\n  supervised baselines, all at 300K parameters:\n    S4D                 R-squared 0.665   diagonal state-space model\n    CNN                 R-squared 0.617   described only as a vanilla CNN\n    LinOSS              R-squared 0.612   oscillatory state-space model\n    mean predictor      R-squared -0.017  predicts the training mean\n\n  the same three across a capacity sweep (~10k / ~100k / ~300k / ~700k),\n  each cell the top-3 mean of a 100-iteration hyperparameter sweep:\n    LinOSS   0.536 / 0.589 / 0.612 / 0.598\n    S4D      0.581 / 0.624 / 0.665 / 0.522\n    CNN      0.573 / 0.580 / 0.617 / 0.591\n\n  six pretrained time-series foundation models, zero-shot, on the paper's\n  own re-split rather than this one: 0.074 to 0.305, with the strongest\n  being Chronos at 0.3049 and MOMENT at 0.2631. Fine-tuning raises the\n  best of them to 0.4095.\n\nBaseline architectures, read from the benchmark's code repository rather\nthan the paper, which publishes only family names:\n\n  CNN     five blocks of Conv1d(kernel 15, same padding) -> BatchNorm1d\n          -> GELU -> MaxPool1d(2) -> Dropout(0.4), channels\n          64/64/128/128/256, then a global average pool over time and one\n          Linear to the output. An optional validity mask multiplies the\n          input first.\n  S4D     Linear encoder to d_model 64, then 4 residual blocks of\n          S4D(d_state 16, dt 0.001-0.1) -> dropout 0.2 -> residual add\n          -> LayerNorm, then a mask-aware mean pool over time and one\n          Linear to the output.\n  LinOSS  4 blocks, each a BatchNorm, an oscillatory state-space layer\n          with diagonal A/B/C/D and learnable step sizes, a GLU, dropout\n          and a residual connection. ssm_size 100, H 200, IM\n          discretization.\n\nAll three pool over the whole sequence and then read a single linear head,\nand all three are mask-aware or made so, which is what lets them handle the\npadded tail.\n\nThree things about those published numbers do not line up, and are worth\nknowing before treating any of them as a target. The committed configs\nmeasure far larger than the 300K the paper reports: the CNN config counts\n926,536 parameters and the LinOSS config's own comment targets S4D near\n662K, which places them at the sweep's ~700k point rather than the ~300k\npoint the headline results come from, and at ~700k the sweep shows S4D\nfalling to 0.522. The committed configs also use a 70/15/15 split rather\nthan the released 80/10/10 one used here. And the repository commits no\nregression config for TESS at all, only a classification one.\n\nThe full record, including the foundation-model architectures, the\npublished training setup and the exact discrepancies above, is in\n`declared/reference_baselines.json`.",
+        "custom_loss_inventory": {
+          "composed": true,
+          "expected_snapshot": null,
+          "entries": [],
+          "unavailable": [],
+          "unavailable_reason": "expected custom-loss snapshot is missing",
+          "generation_allowed": true
+        },
+        "task_render": {
+          "loss_context": {
+            "output_semantic": "continuous",
+            "output_has_temporal_axis": false,
+            "objective": null
+          },
+          "builtin_model_roster": "punet | fcnet | transformer | wavenet | rnn | gated_fno",
+          "full_scope_segments": null,
+          "output_contract_shape": "[B, 1]",
+          "focal_alpha_default": "0.5",
+          "focal_gamma_default": "2.0",
+          "gate_check_names": [
+            "sample_dispersion_floor"
+          ],
+          "efficiency_band_pct": "5",
+          "available_models_block": "### THE MODEL UNDER TUNING:\nThis run tunes ONE model, supplied by the task package. Its architecture description \u2014 when the task declares one \u2014 appears in the [MODEL ARCHITECTURE DESCRIPTION] block of the user message. Do not assume a built-in architecture or its properties.\n",
+          "per_file_table_protocol": "",
+          "score_field_noun": "field",
+          "target_strategy_impact_note": "",
+          "sampling_impact_tradeoff": "",
+          "per_file_comparison_block": "",
+          "score_display_noun": "score"
+        },
+        "metric_spec": {
+          "id": "r2",
+          "direction": "higher",
+          "aggregation": "one_minus_residual_over_total_sum_of_squares_on_the_evaluation_scope",
+          "transform": null,
+          "transform_params": {},
+          "references": [],
+          "scoreability": {
+            "contract_id": "phyts_tess_rotation_predictions"
+          }
+        }
+      },
+      "expected": {
+        "system": "4bd6119c979afcd470013e6c3fc2db5a25d5b7bfeeffb0891b9907a48b14ced0",
+        "user": "39ca1c956e72fd37c433c5d88ad3df9d3c120f5ac5beeb7e5fb517ad47251625"
+      },
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    "ligo": {
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "model_type": "dual_domain_chirp_fuser",
+      "model_source_sha256": "9df1e16d8bd36814b70148f2c1ea857102765bf3907962aac8c2143ded5220ba",
+      "model_description_sha256": "0a79b23a1f662929d6ea2e16164e2118d0c8f1d636f5689c24a097bb35c3b86a",
+      "composition_fingerprint": "bb90719d145d77bbd7382a8d25814c0325262f5d686333af8e0b0930361808d3",
+      "arguments": {
+        "memory_history": [],
+        "planner_strategy": "legacy-9b78d505cb11-paper-v4",
+        "timing_context": {
+          "plan_overrides": {
+            "is_trial": true
+          },
+          "task_rules": {
+            "rules": {}
+          },
+          "workflow_rules": null,
+          "roles": [
+            {
+              "mode": "trial",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "resolved_plan",
+                  "source": "trial_strategy",
+                  "value": null
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "resolved_plan",
+                  "source": "trial_portion",
+                  "value": null
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "resolved_plan",
+                  "source": "train_portion",
+                  "value": null
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "resolved_plan",
+                  "source": "eval_strategy",
+                  "value": null
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "resolved_plan",
+                  "source": "eval_portion",
+                  "value": null
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "trial_max_epochs"
+            },
+            {
+              "mode": "formal",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "resolved_plan",
+                  "source": "trial_strategy",
+                  "value": null
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "resolved_plan",
+                  "source": "trial_portion",
+                  "value": null
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "resolved_plan",
+                  "source": "train_portion",
+                  "value": null
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "execution_contract",
+                  "source": "formal evaluation strategy",
+                  "value": "snapshot"
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "run",
+                  "source": "formal_eval_portion",
+                  "value": 1.0
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "formal_max_epochs"
+            }
+          ],
+          "formal_training_scope_source": "agent",
+          "formal_eval_portion": 1.0,
+          "trial_allowed": true,
+          "forced_formal": false,
+          "inheritance_strategy": "full_clone",
+          "inheritance_values": {},
+          "inheritance_unless_authored": [],
+          "inheritance_winner": null,
+          "inheritance_recovery": null,
+          "partial_scope_strategy_overrides": {},
+          "validation_max_portion": null,
+          "validation_max_train_samples": null,
+          "validation_max_samples": null,
+          "training_validation_portion": 0.1,
+          "training_budget_reserve_fraction": 0.2
+        },
+        "training_budget_reserve_fraction": 0.2,
+        "expert_advice": "NOTE: This implementation passes trainability checks but deviates from the proposed mathematical spec. The tuner is optimizing an approximation of the intended architecture. Deviations: The model has consistent tensor shapes, differentiable temporal and spectral paths, and emits the required [B, 1] regressor output. Fidelity is not exact because the temporal stem adds GELU and optional dropout/configurable dimensions and block counts extend beyond the fixed mathematical definition. Training-fitted normalization and target-statistic buffers must be populated externally.\n\nFocus areas: Tune learning rate and weight decay before increasing branch width, because the baseline already has a full-window temporal receptive field and full spectral-mode retention.; Monitor the separate temporal and spectral branch feature norms so one branch does not dominate the fusion MLP.; Tune Smooth L1 beta and dropout in the fusion and residual blocks if low-SNR examples produce unstable residuals.; Evaluate global validation R2 on all validation examples after training; use only the fixed 10% validation subset for per-epoch monitoring and checkpoint selection.; Preserve all 513 modes in the first trial so the falsifiable prediction tests the proposed all-mode mechanism rather than a frequency-truncated variant.\nConstraints: Keep measured peak allocated VRAM below 12.8 GB, which is 80% of the effective 16 GB cap, and reduce batch size from 256 before changing architecture if the complex spectral implementation approaches that limit.; Never exceed the hard 16 GB effective VRAM cap.; Input must remain float32 with shape [B,2,1024], and the exported model must return float32 [B,1] in solar masses.; Fit input and target statistics using the training split only; validation examples must not influence any stored normalization buffer.; Do not introduce per-example amplitude normalization because it could remove SNR- and amplitude-related information present in the materialized observations.\nKnown failures: At low injected SNR, learned all-mode spectral weights may encode detector-background spectra rather than chirp morphology and reduce global validation R2.; Mean/max spectral summaries may discard phase-frequency coupling required to separate nearby chirp masses.; The temporal branch may over-rely on its boundary-aligned final-state summary instead of robust multiscale summaries.; An implementation that materializes unnecessary complex tensors or retains every intermediate RFFT activation can exceed the expected memory footprint at batch size 256.\nSuggested directions: Run the stated full-split baseline first and test the memo prediction that global validation R2 exceeds 0.50, with 0.70 as the point prediction.; If the baseline misses the threshold, run temporal-only and spectral-only ablations with the same training protocol to determine whether the failure is branch-specific or caused by fusion.; If the spectral branch overfits, first add modest spectral-block dropout or regularization; do not immediately truncate modes because that would change the central mechanism under test.; If final-state dependence is excessive, compare fusion using mean/max summaries alone while retaining the same dilated stack.; Use batch-size reductions of 256 to 128 to 64 as the primary VRAM response, preserving widths, dilation schedule, and retained modes.\nRationale: This guidance isolates the cold-start hypothesis with a conservative first trial and makes subsequent ablations diagnostic. It protects the all-mode and full-receptive-field mechanisms from being confounded by premature capacity changes, while explicitly addressing the memo's predicted low-SNR overfitting, phase-information loss, boundary-summary dependence, and complex-tensor memory risks.",
+        "force_model": "dual_domain_chirp_fuser",
+        "model_description": "# DualDomainChirpFuser\n\n## Overview\n\nA compact dual-domain regressor processes the two whitened detector channels without per-example amplitude normalization. Its temporal branch uses a causal stem and nine exponentially dilated gated residual blocks with residual and multiscale skip paths, then concatenates the final-time, global-mean, and global-max summaries. Its spectral branch lifts both detectors to a width-32 representation and applies two residual spectral-convolution blocks whose learned complex channel mixers retain all 513 RFFT modes, followed by inverse transformation and mean/max pooling. The resulting 256-feature joint representation passes through a 256-to-64-to-1 fusion MLP. Global input statistics and target mean/standard deviation are fitted exclusively on the released training split; the final affine inverse target transform is part of the model so its output is one chirp-mass prediction in solar masses.\n\n**Forward contract:** `[B, 2, 1024] float32 \u2192 [B, 1] float32` (regressor)\n\n## Architecture\n\nLet x be the two-channel observation and let x_tilde=(x-mu_x)/(sigma_x+epsilon), where the channelwise statistics are fitted on training examples only. The temporal branch begins with a causal convolution h_0. At residual block l, a left-padded dilated convolution produces a_l and b_l, the gated activation is g_l=tanh(a_l) elementwise multiplied by sigmoid(b_l), and learned pointwise projections update h_l=h_{l-1}+R_l(g_l) and emit skip feature s_l=S_l(g_l). Aggregate the multiscale skips as s=phi(sum_l s_l), then form t by concatenating the last temporal position, temporal mean, and temporal maximum of s. For the spectral branch, lift x_tilde to features v_0 and transform them with an RFFT. In each residual spectral block, every retained frequency mode k is mixed by a learned complex channel matrix W_l(k); inverse RFFT returns the result to the temporal grid, where it is combined with a learned pointwise path and the block input: v_l=v_{l-1}+phi(IRFFT_k(W_l(k)RFFT(v_{l-1})(k))+P_l(v_{l-1})). Form f by concatenating temporal mean and maximum pooling of the final spectral features. Concatenate z=[t;f], pass z through a nonlinear fusion MLP to obtain standardized latent prediction q, and return y_hat=mu_y+sigma_y*q. The target statistics mu_y and sigma_y are fitted only on the training split and stored as non-trainable model buffers, making the exported forward output physical chirp mass with shape [B,1].\n\n## Baseline Configuration\n\n```json\n{\n  \"model_config\": {\n    \"input_channels\": 2,\n    \"input_length\": 1024,\n    \"input_normalization\": \"training_global_channel_zscore\",\n    \"input_statistics_source\": \"training_split_only\",\n    \"normalization_epsilon\": 1e-06,\n    \"temporal_branch\": {\n      \"stem_channels\": 64,\n      \"stem_kernel_size\": 3,\n      \"num_blocks\": 9,\n      \"residual_channels\": 64,\n      \"skip_channels\": 64,\n      \"kernel_size\": 3,\n      \"dilations\": [\n        1,\n        2,\n        4,\n        8,\n        16,\n        32,\n        64,\n        128,\n        256\n      ],\n      \"dilated_causal_conv\": true,\n      \"gated_activation\": \"tanh_sigmoid\",\n      \"skip_connection\": true,\n      \"residual_connection\": true,\n      \"summary_pooling\": [\n        \"final_state\",\n        \"mean\",\n        \"max\"\n      ],\n      \"dropout\": 0.0\n    },\n    \"spectral_branch\": {\n      \"spectral_conv\": true,\n      \"width\": 32,\n      \"num_blocks\": 2,\n      \"rfft_modes\": 513,\n      \"retain_all_modes\": true,\n      \"complex_channel_mixing\": true,\n      \"pointwise_residual_path\": true,\n      \"residual_connection\": true,\n      \"activation\": \"gelu\",\n      \"summary_pooling\": [\n        \"mean\",\n        \"max\"\n      ],\n      \"dropout\": 0.0\n    },\n    \"fusion_input_features\": 256,\n    \"fusion_hidden_features\": 64,\n    \"fusion_output_features\": 1,\n    \"fusion_activation\": \"gelu\",\n    \"fusion_dropout\": 0.0,\n    \"target_standardization\": \"training_only\",\n    \"target_statistics_source\": \"training_split_only\",\n    \"exported_target_inverse\": true,\n    \"output_units\": \"solar_masses\",\n    \"output_shape\": [\n      1\n    ]\n  },\n  \"train_config\": {\n    \"lr\": 0.0001,\n    \"epochs\": 10,\n    \"batch_size\": 256,\n    \"optimizer_type\": \"adamw\",\n    \"weight_decay\": 1e-05,\n    \"device\": \"cuda\",\n    \"train_fraction\": 1.0,\n    \"per_epoch_validation_fraction\": 0.1,\n    \"final_validation_fraction\": 1.0,\n    \"selection_metric\": \"r2\"\n  },\n  \"loss_config\": {\n    \"loss_type\": \"smooth_l1\",\n    \"beta\": 1.0,\n    \"reduction\": \"mean\"\n  }\n}\n```\n",
+        "exploration_checklist": "",
+        "plugin_source_excerpt": "## PLUGIN CONFIG SCHEMA (authoritative \u2014 read validators carefully)\nThe planner prompt's JSON schema below cannot represent `@model_validator(mode='after')` or cross-field `@field_validator` bodies. Treat the source below as the single source of truth for any cross-field invariants; a proposed config that violates one will be rejected by the resource-eval skill and burn a retry attempt.\n\n```python\nclass DualDomainChirpFuserConfig(BaseModel):\n    model_type: str = Field(default=\"dual_domain_chirp_fuser\", description=\"Plugin model type key.\")\n    segmentation_size: int = Field(ge=1)\n    batch_size: int = Field(default=256, ge=1)\n    stem_channels: int = Field(default=64, ge=16, le=128, multiple_of=2)\n    residual_channels: int = Field(default=64, ge=16, le=128, multiple_of=2)\n    skip_channels: int = Field(default=64, ge=16, le=128, multiple_of=2)\n    temporal_blocks: int = Field(default=9, ge=5, le=9)\n    spectral_width: int = Field(default=32, ge=8, le=64)\n    spectral_blocks: int = Field(default=2, ge=1, le=4)\n    fusion_hidden: int = Field(default=64, ge=16, le=256)\n    temporal_dropout: float = Field(default=0.0, ge=0.0, le=0.3)\n    spectral_dropout: float = Field(default=0.0, ge=0.0, le=0.3)\n    fusion_dropout: float = Field(default=0.0, ge=0.0, le=0.3)\n\n```\n",
+        "current_round": 1,
+        "max_rounds": 2,
+        "trial_allowed": true,
+        "force_formal_round": true,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "max_epochs": 100,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "resolved_data_scope": null,
+        "trial_vram_budget_gb": 16.0,
+        "formal_vram_budget_gb": 16.0,
+        "trial_time_budget_minutes": 10.0,
+        "formal_time_budget_minutes": 30.0,
+        "last_vram_estimate_gb": null,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": null,
+        "last_mode": null,
+        "score_table_md": null,
+        "task_description": "Estimate binary-neutron-star chirp mass from H1/L1 whitened detector observations containing injected signals. Each prepared sample is whitened_injected[:, 15104:16128], the fixed [59, 63) second window at 256 Hz. Inputs are float32, two channels of 1024 samples. No per-example amplitude normalization is applied. The target is stored chirp_mass in solar masses. Source masses, SNR, clean signals, backgrounds, and other simulation parameters are excluded from model inputs.\nPreprocessing follows the owner-supplied PhyTS paper and is already materialized. The released training and validation splits are preserved. The full training split is the available pool; select training fractions within the experiment budget. Predict one scalar in physical units for each example. Any target standardization must use training statistics only and be inverted inside the exported model. The primary selection metric is global validation R2 (higher is better); global RMSE is also reported. Formal scoring uses all validation examples; per-epoch validation loss uses the fixed 10% subset. Test data are absent. Paper test scores and campaign validation scores describe different populations.\n\nTRAINING VALIDATION OVERRIDE: Per-epoch validation loss uses an operator-fixed snapshot fraction 0.1 of the task's eligible validation population within the declared data scope. The recorded evaluation seed selects it once per attempt; all epochs reuse it. This overrides any description of epoch loss sharing the score scope. Your eval_portion changes Trial final inference/scoring only, not this epoch-loss snapshot. Formal final inference/scoring retains the operator's formal_eval_portion. Budget validation cost using the snapshot row count and completed epochs, separately from final inference.",
+        "custom_loss_inventory": {
+          "composed": true,
+          "expected_snapshot": null,
+          "entries": [],
+          "unavailable": [],
+          "unavailable_reason": "expected custom-loss snapshot is missing",
+          "generation_allowed": true
+        },
+        "task_render": {
+          "loss_context": {
+            "output_semantic": "continuous",
+            "output_has_temporal_axis": false,
+            "objective": null
+          },
+          "builtin_model_roster": "punet | fcnet | transformer | wavenet | rnn | gated_fno",
+          "full_scope_segments": null,
+          "output_contract_shape": "[B, 1]",
+          "focal_alpha_default": "0.5",
+          "focal_gamma_default": "2.0",
+          "gate_check_names": [],
+          "efficiency_band_pct": "5",
+          "available_models_block": "### THE MODEL UNDER TUNING:\nThis run tunes ONE model, supplied by the task package. Its architecture description \u2014 when the task declares one \u2014 appears in the [MODEL ARCHITECTURE DESCRIPTION] block of the user message. Do not assume a built-in architecture or its properties.\n",
+          "per_file_table_protocol": "",
+          "score_field_noun": "field",
+          "target_strategy_impact_note": "",
+          "sampling_impact_tradeoff": "",
+          "per_file_comparison_block": "",
+          "score_display_noun": "score"
+        },
+        "metric_spec": {
+          "id": "r2",
+          "direction": "higher",
+          "aggregation": "global_over_exact_evaluation_scope",
+          "transform": null,
+          "transform_params": {},
+          "references": [],
+          "scoreability": {
+            "contract_id": "prepared_scalar_predictions"
+          }
+        }
+      },
+      "expected": {
+        "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+        "user": "337e6f7d697bfe0ff6803ce5144365563cde9da3c700079e573f070a2f84d646"
+      },
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    "project8": {
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "model_type": "dual_axis_crossattn_regressor",
+      "model_source_sha256": "d1459d0a704cc31c518dbeb7c31e65427d191517a8c656c5d7fb898a6f281326",
+      "model_description_sha256": "582dd994520586850e741ad3ca58f99b3902b091e8bc2be2cb54aa57accd0435",
+      "composition_fingerprint": "83e7d59c4d87ceb75083a3a8310cd2e6b03e87ea3d9cbab4efb062dca58424a4",
+      "arguments": {
+        "memory_history": [],
+        "planner_strategy": "legacy-9b78d505cb11-paper-late-v4",
+        "timing_context": {
+          "plan_overrides": {
+            "is_trial": true
+          },
+          "task_rules": {
+            "rules": {}
+          },
+          "workflow_rules": {
+            "rules": {
+              "train_config.checkpoint_selection": {
+                "exact": "best_validation_loss"
+              },
+              "train_config.target_standardization": {
+                "exact": "training_pool_global"
+              },
+              "train_config.drop_last": {
+                "exact": false
+              }
+            }
+          },
+          "roles": [
+            {
+              "mode": "trial",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "resolved_plan",
+                  "source": "trial_strategy",
+                  "value": null
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "resolved_plan",
+                  "source": "trial_portion",
+                  "value": null
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "resolved_plan",
+                  "source": "train_portion",
+                  "value": null
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "resolved_plan",
+                  "source": "eval_strategy",
+                  "value": null
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "resolved_plan",
+                  "source": "eval_portion",
+                  "value": null
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "trial_max_epochs"
+            },
+            {
+              "mode": "formal",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "run",
+                  "source": "formal_strategy",
+                  "value": "snapshot"
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "run",
+                  "source": "formal_portion",
+                  "value": 1.0
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "run",
+                  "source": "formal_train_portion",
+                  "value": 1.0
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "execution_contract",
+                  "source": "formal evaluation strategy",
+                  "value": "snapshot"
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "run",
+                  "source": "formal_eval_portion",
+                  "value": 1.0
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "formal_max_epochs"
+            }
+          ],
+          "formal_training_scope_source": "operator",
+          "formal_eval_portion": 1.0,
+          "trial_allowed": true,
+          "forced_formal": false,
+          "inheritance_strategy": "full_clone",
+          "inheritance_values": {},
+          "inheritance_unless_authored": [],
+          "inheritance_winner": null,
+          "inheritance_recovery": null,
+          "partial_scope_strategy_overrides": {},
+          "validation_max_portion": null,
+          "validation_max_train_samples": null,
+          "validation_max_samples": null,
+          "training_validation_portion": 0.1,
+          "training_budget_reserve_fraction": 0.2
+        },
+        "training_budget_reserve_fraction": 0.2,
+        "expert_advice": "NOTE: This implementation passes trainability checks but deviates from the proposed mathematical spec. The tuner is optimizing an approximation of the intended architecture. Deviations: The default configuration has consistent tensor shapes, preserves differentiable paths through both mandatory branches, and emits [B, 1]. Fidelity is not exact because the implementation adds post-attention dropout, permits token widths other than the specified 128, hard-codes the input length despite exposing segmentation_size, and does not itself configure the framework-required training_pool_global target standardization policy.\n\nNOTE: The implementation passes trainability checks, but the following claimed inherited_components could not be verified in the plugin source by pattern match: positional_encoding. The regex check is brittle (e.g. a primitive implemented via F.interpolate may not match a pattern that expects 'upsample'). Treat confirmation credit for these components with caution.\n\nFocus areas: Tune token resolution before increasing width: compare seven stride-two stages against a less aggressive final downsampling stage because onset timing and narrow spectral structure may be lost at 192 tokens.; Tune cross-attention dropout, feed-forward dropout, and weight decay together; the deterministic relationship between FFT and I/Q makes redundant-feature overfitting plausible.; Monitor gradient norms and learned-query pooling entropy separately for the time and FFT branches to detect branch collapse.; Prioritize attention head count and feed-forward width only after confirming through controlled branch masking that both representations influence predictions.\nConstraints: Keep predicted peak VRAM at or below 32 GB for the baseline and all initial tuning trials, providing at least 8 GB of headroom below the binding 40 GB effective cap.; Do not combine the four channels before their independent coordinate-aware encoders, because the last axis denotes time in one pair and FFT-bin index in the other.; Use all 24576 samples and all full unshifted FFT bins; do not crop, fftshift, convert to magnitude only, or invent an absolute frequency calibration.; Target statistics must be fitted only through target_standardization=training_pool_global, and the plugin must not perform a second target inversion.\nKnown failures: Optimization may collapse onto one representation because the FFT is deterministically derived from I/Q, yielding negligible prediction sensitivity to the other branch despite structural routing.; The cumulative 128-fold downsampling may erase short onset features or narrow spectral structure needed to estimate starting energy.; Cross-attention may overfit simulation-specific phase, cavity-response, or noise correlations in the fixed split.\nSuggested directions: Run the stated baseline first and test the falsifiable cold-start prediction: validation R2 should approach 0.60, while R2 at or below 0.30 refutes the proposed fusion or token-resolution choice.; After normal validation, audit representation use by separately zero-masking the time pair and FFT pair without retraining; report prediction change and metric degradation, but never use masked inputs for formal scoring.; If branch collapse is observed, first adjust branch dropout and pooling capacity rather than adding parameters; if both branches matter but R2 remains low, preserve more tokens near the event onset and across the frequency axis.; Use best_validation_loss checkpoint selection for every comparable trial and vary one structural factor at a time: token count, number of fusion blocks, then embedding width.\nRationale: This guidance targets the memo's three predicted failure modes while preserving the experiment's central test of cross-view interaction. Resolution and branch-dependence audits are more informative at cold start than immediately scaling model width, and the compact token sequences leave substantial memory headroom for controlled tuner variation.",
+        "force_model": "dual_axis_crossattn_regressor",
+        "model_description": "# DualAxisCrossattnRegressor\n\n## Overview\n\nA dual-encoder scalar regressor routes normalized time-domain I/Q and unshifted complex FFT real/imaginary channels through separate seven-stage residual Conv1d tokenizers. The time encoder uses ordinary same padding, while the FFT encoder uses circular frequency-axis padding to respect the wraparound of the unshifted discrete spectrum. Each branch produces 192 tokens of width 128 and receives its own learned positional embedding, avoiding any assumption that equal time and frequency indices are aligned. Two pre-normalized bidirectional cross-attention blocks update each stream using the other stream as context, after which learned attention pooling summarizes both updated streams. Their pooled vectors are concatenated and processed by a 256-128-1 regression head. The base model emits one standardized scalar, and the framework-owned training-pool target transform converts the exported prediction to physical eV.\n\n**Forward contract:** `[B, 4, 24576] float32 \u2192 [B, 1] float32` (regressor)\n\n## Architecture\n\nLet x_t be channels 0:2 and x_f be channels 2:4, preserving the supplied I+iQ and FFT-real+i\u00b7FFT-imag conventions. Independent residual encoders produce T = E_t(x_t) and F = E_f(x_f). Each encoder consists of repeated stride-two Conv1d stages with normalization and GELU, followed by a second convolution and an additive projected skip connection; E_t uses ordinary same padding and E_f uses circular padding along the frequency-bin axis. Add distinct learned coordinate embeddings P_t and P_f to obtain T_0 = T + P_t and F_0 = F + P_f. For each bidirectional fusion block l, compute simultaneous pre-normalized updates U_t = T_l + MHA_t(LN(T_l), LN(F_l), LN(F_l)) and U_f = F_l + MHA_f(LN(F_l), LN(T_l), LN(T_l)), where the first argument supplies queries and the latter two supply keys and values. Then apply branch-specific residual feed-forward updates T_(l+1) = U_t + FFN_t(LN(U_t)) and F_(l+1) = U_f + FFN_f(LN(U_f)). Learned-query attention pooling independently maps the final token sequences to vectors z_t and z_f. The standardized scalar is y_hat_std = MLP(concat(z_t,z_f)), with GELU and dropout between hidden affine layers, and is returned with shape [B,1]. The native framework compares y_hat_std with globally standardized training targets and incorporates its stored training-pool affine inverse into export so the externally visible [B,1] output is energy_eV. Both pooled branch vectors are mandatory inputs to the final head.\n\n## Baseline Configuration\n\n```json\n{\n  \"model_config\": {\n    \"input_channels\": 4,\n    \"input_length\": 24576,\n    \"time_channel_indices\": [\n      0,\n      1\n    ],\n    \"fft_channel_indices\": [\n      2,\n      3\n    ],\n    \"time_channels\": 2,\n    \"fft_channels\": 2,\n    \"output_dim\": 1,\n    \"encoder_stage_channels\": [\n      32,\n      48,\n      64,\n      80,\n      96,\n      112,\n      128\n    ],\n    \"encoder_stage_strides\": [\n      2,\n      2,\n      2,\n      2,\n      2,\n      2,\n      2\n    ],\n    \"encoder_kernel_sizes\": [\n      5,\n      5,\n      5,\n      5,\n      5,\n      5,\n      5\n    ],\n    \"residual_kernel_size\": 3,\n    \"encoder_normalization\": \"group_norm\",\n    \"activation\": \"gelu\",\n    \"time_padding_mode\": \"zeros\",\n    \"fft_padding_mode\": \"circular\",\n    \"token_count\": 192,\n    \"token_width\": 128,\n    \"positional_encoding\": \"independent_learned\",\n    \"cross_attention_blocks\": 2,\n    \"attention_heads\": 4,\n    \"attention_head_dim\": 32,\n    \"ffn_width\": 256,\n    \"attention_dropout\": 0.1,\n    \"ffn_dropout\": 0.1,\n    \"attention_norm\": \"pre_layer_norm\",\n    \"bidirectional_update\": \"simultaneous\",\n    \"pooling\": \"learned_query_attention\",\n    \"pool_each_branch\": true,\n    \"fusion\": \"concatenate\",\n    \"regression_head_dims\": [\n      256,\n      128,\n      1\n    ],\n    \"head_dropout\": 0.1,\n    \"base_output_space\": \"standardized_target\",\n    \"dtype\": \"float32\"\n  },\n  \"train_config\": {\n    \"lr\": 0.0001,\n    \"epochs\": 10,\n    \"batch_size\": 16,\n    \"segmentation_size\": 24576,\n    \"optimizer_type\": \"adamw\",\n    \"weight_decay\": 1e-05,\n    \"device\": \"cuda\",\n    \"checkpoint_selection\": \"best_validation_loss\",\n    \"drop_last\": false,\n    \"target_standardization\": \"training_pool_global\"\n  },\n  \"loss_config\": {\n    \"loss_type\": \"smooth_l1\",\n    \"beta\": 1.0,\n    \"reduction\": \"mean\"\n  }\n}\n```\n",
+        "exploration_checklist": "",
+        "plugin_source_excerpt": "## PLUGIN CONFIG SCHEMA (authoritative \u2014 read validators carefully)\nThe planner prompt's JSON schema below cannot represent `@model_validator(mode='after')` or cross-field `@field_validator` bodies. Treat the source below as the single source of truth for any cross-field invariants; a proposed config that violates one will be rejected by the resource-eval skill and burn a retry attempt.\n\n```python\nclass DualAxisCrossattnRegressorConfig(BaseModel):\n    model_type: str = Field(default=\"dual_axis_crossattn_regressor\", description=\"Plugin model type key.\")\n    segmentation_size: int = Field(default=24576, ge=1)\n    batch_size: int = Field(default=16, ge=1)\n    token_width: int = Field(default=128, ge=64, le=256)\n    cross_attention_blocks: int = Field(default=2, ge=1, le=4)\n    attention_heads: int = Field(default=4, ge=1, le=8)\n    ffn_width: int = Field(default=256, ge=128, le=1024)\n    attention_dropout: float = Field(default=0.1, ge=0.0, le=0.4)\n    ffn_dropout: float = Field(default=0.1, ge=0.0, le=0.4)\n    head_dropout: float = Field(default=0.1, ge=0.0, le=0.4)\n    @model_validator(mode='after')\n    def check_constraints(self) -> Self:\n        if self.token_width % self.attention_heads != 0:\n            raise ValueError(f'token_width ({self.token_width}) must be divisible by attention_heads ({self.attention_heads})')\n        return self\n\n```\n",
+        "current_round": 1,
+        "max_rounds": 2,
+        "trial_allowed": true,
+        "force_formal_round": true,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "max_epochs": 100,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "resolved_data_scope": null,
+        "trial_vram_budget_gb": 40.0,
+        "formal_vram_budget_gb": 40.0,
+        "trial_time_budget_minutes": 30.0,
+        "formal_time_budget_minutes": 120.0,
+        "last_vram_estimate_gb": null,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": null,
+        "last_mode": null,
+        "score_table_md": null,
+        "task_description": "Estimate the starting electron kinetic energy (energy_eV, in eV) of one simulated cyclotron radiation emission spectroscopy (CRES) event. This task explicitly requires both the supplied time-domain and frequency-domain representations to contribute to the prediction during training and inference. Accepting four channels but discarding one representation does not satisfy the task. Choose the architecture and fusion mechanism yourself; describe where each representation enters the model. No named architecture is prescribed.\n\nPhysical context: An electron moving in a magnetic field emits cyclotron radiation. In an ideal uniform field, f_c = |e| B / (2*pi*m_e*gamma), with gamma = 1 + E_kin/(m_e*c^2); at fixed B, higher kinetic energy gives lower cyclotron frequency. Radiation loss can produce a frequency chirp. Starting energy is associated with the beginning of the event, not necessarily with its time-averaged frequency. Pitch angle means the angle between electron momentum and the magnetic field. Orbital motion and detector response can affect the observed spectral structure. These are physical context, not extra measured inputs or a supplied frequency-to-energy calibration. [Project 8 overview, Sec. 3: https://arxiv.org/abs/1703.02037]\n\nDataset: PhyTS provides simulated cavity CRES events generated with Kassiopeia particle tracking and Locust RF simulation. The two observations are in-phase (I) and quadrature (Q) readouts of the same event, not independent examples. The input source is output_ts_I + output_ts_I_cav_noise and output_ts_Q + output_ts_Q_cav_noise. Use the frequency-dependent cavity noise condition, not the alternative Gaussian noise fields. Each event has 24576 samples per channel at 403 MHz (about 61 microseconds). Simulated energies span about 100 eV; pitch angle and radial position vary across events. The cavity response and noise vary with frequency. Temporal/phase structure may carry information about electron motion and position that a magnitude-only spectral summary discards. [Owner-supplied PhyTS manuscript, Secs. 3.4 and 5, Appendix A/Table 7; Locust: https://arxiv.org/abs/1907.11124]\n\nPrepared input: float32 [B,4,24576], ordered as time_I, time_Q, fft_real, fft_imag. The first two channels are the full noisy I/Q traces, individually centered and divided by their per-event population standard deviation; a constant channel becomes zero. Their original amplitude scales and offsets are not available. The next two channels are the real and imaginary parts of FFT(time_I + 1j*time_Q, norm='ortho'), computed over the entire event and stored in float32. The complex spectrum is full, unshifted and not cropped or converted to magnitude-only. There is no second frequency-domain normalization. These representations contain the same observed information up to numerical precision; FFT does not introduce labels or additional measurements.\n\nAxis semantics: the last axis is sample time for channels 0:2 and frequency-bin index for channels 2:4. Equal indices across the two pairs do not denote the same physical coordinate. Time spacing is 1/403000000 seconds; the FFT frequencies are numpy.fft.fftfreq(24576, d=1/403000000), with spacing about 16.398 kHz and both positive and negative bins. Preserve the declared I + iQ convention. The sampled readout-frequency axis is not a calibrated absolute cyclotron-frequency axis; do not invent a magnetic field, receiver offset, or per-event calibration to plug into the ideal formula. The bin spacing alone is not an absolute limit on learned frequency estimation accuracy.\n\nAllowed information and evaluation: Only the prepared noisy inputs are model features. Clean signals, separate noise arrays, start/average carrier frequency, axial frequency, pitch angle, radius, track slope, and all other simulation truth fields are unavailable as input features or auxiliary labels. energy_eV is the supervised training target only; do not read validation targets or fit preprocessing on them. Identifiers and row order are not features. Predict exactly one scalar in physical eV. Target standardization must use training statistics only and be inverted in the exported model. Original train/validation split and row order are preserved; test data are absent. Global validation R2 is the primary score and RMSE is also reported. Per-epoch validation loss uses the fixed 10% snapshot; final Formal scoring uses all validation examples. Workflow configuration owns training fractions and budgets.\n\nThis is a separately versioned dual-representation task. It adds an explicit FFT view and a both-representations requirement to the earlier time-domain task; it is not a claim of exact reproduction of a published baseline protocol.\n\nTRAINING VALIDATION OVERRIDE: Per-epoch validation loss uses an operator-fixed snapshot fraction 0.1 of the task's eligible validation population within the declared data scope. The recorded evaluation seed selects it once per attempt; all epochs reuse it. This overrides any description of epoch loss sharing the score scope. Your eval_portion changes Trial final inference/scoring only, not this epoch-loss snapshot. Formal final inference/scoring retains the operator's formal_eval_portion. Budget validation cost using the snapshot row count and completed epochs, separately from final inference.",
+        "custom_loss_inventory": {
+          "composed": true,
+          "expected_snapshot": null,
+          "entries": [],
+          "unavailable": [],
+          "unavailable_reason": "expected custom-loss snapshot is missing",
+          "generation_allowed": true
+        },
+        "task_render": {
+          "loss_context": {
+            "output_semantic": "continuous",
+            "output_has_temporal_axis": false,
+            "objective": null
+          },
+          "builtin_model_roster": "punet | fcnet | transformer | wavenet | rnn | gated_fno",
+          "full_scope_segments": null,
+          "output_contract_shape": "[B, 1]",
+          "focal_alpha_default": "0.5",
+          "focal_gamma_default": "2.0",
+          "gate_check_names": [],
+          "efficiency_band_pct": "5",
+          "available_models_block": "### THE MODEL UNDER TUNING:\nThis run tunes ONE model, supplied by the task package. Its architecture description \u2014 when the task declares one \u2014 appears in the [MODEL ARCHITECTURE DESCRIPTION] block of the user message. Do not assume a built-in architecture or its properties.\n",
+          "per_file_table_protocol": "",
+          "score_field_noun": "field",
+          "target_strategy_impact_note": "",
+          "sampling_impact_tradeoff": "",
+          "per_file_comparison_block": "",
+          "score_display_noun": "score"
+        },
+        "metric_spec": {
+          "id": "r2",
+          "direction": "higher",
+          "aggregation": "global_over_exact_evaluation_scope",
+          "transform": null,
+          "transform_params": {},
+          "references": [],
+          "scoreability": {
+            "contract_id": "prepared_scalar_predictions"
+          }
+        }
+      },
+      "expected": {
+        "system": "b2abecd0315f2f3a0e3beebebfbb3431629123465418da550f69635910861aef",
+        "user": "516f520d1b2f181ef3e35478a91aa0e6748d5f5761416256f504840c3afbc9cd"
+      },
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    "tidmad": {
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "model_type": "wholeband_gated_dilated_regressor",
+      "model_source_sha256": "dee04c968956def15c4e02899bd347840e812cc2a00e6db1d94f4d113984313c",
+      "model_description_sha256": "046e9489dae885f215eecdbd61c774c57d171d3b4c0e7903fd840db91712a0a9",
+      "composition_fingerprint": "6db1cebc74e390b422329d18e657970f532c5276a6fc496afc86368c05e3e913",
+      "arguments": {
+        "memory_history": [],
+        "planner_strategy": "legacy-9b78d505cb11-paper-v4",
+        "timing_context": {
+          "plan_overrides": {},
+          "task_rules": {
+            "rules": {}
+          },
+          "workflow_rules": {
+            "rules": {
+              "model_config.segmentation_size": {
+                "exact": 40000
+              }
+            }
+          },
+          "roles": [
+            {
+              "mode": "trial",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "resolved_plan",
+                  "source": "trial_strategy",
+                  "value": null
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "resolved_plan",
+                  "source": "trial_portion",
+                  "value": null
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "resolved_plan",
+                  "source": "train_portion",
+                  "value": null
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "resolved_plan",
+                  "source": "eval_strategy",
+                  "value": null
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "resolved_plan",
+                  "source": "eval_portion",
+                  "value": null
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "trial_max_epochs"
+            },
+            {
+              "mode": "formal",
+              "workload": [
+                {
+                  "field": "trial_strategy",
+                  "owner": "run",
+                  "source": "formal_strategy",
+                  "value": "snapshot"
+                },
+                {
+                  "field": "trial_portion",
+                  "owner": "run",
+                  "source": "formal_portion",
+                  "value": 0.1
+                },
+                {
+                  "field": "train_portion",
+                  "owner": "run",
+                  "source": "formal_train_portion",
+                  "value": 1.0
+                },
+                {
+                  "field": "eval_strategy",
+                  "owner": "execution_contract",
+                  "source": "formal evaluation strategy",
+                  "value": "snapshot"
+                },
+                {
+                  "field": "eval_portion",
+                  "owner": "run",
+                  "source": "formal_eval_portion",
+                  "value": 1.0
+                }
+              ],
+              "epoch_cap": 100,
+              "epoch_cap_source": "formal_max_epochs"
+            }
+          ],
+          "formal_training_scope_source": "operator",
+          "formal_eval_portion": 1.0,
+          "trial_allowed": true,
+          "forced_formal": false,
+          "inheritance_strategy": "full_clone",
+          "inheritance_values": {},
+          "inheritance_unless_authored": [],
+          "inheritance_winner": null,
+          "inheritance_recovery": null,
+          "partial_scope_strategy_overrides": {
+            "trial_strategy": "snapshot",
+            "eval_strategy": "snapshot"
+          },
+          "validation_max_portion": null,
+          "validation_max_train_samples": null,
+          "validation_max_samples": null,
+          "training_validation_portion": null,
+          "training_budget_reserve_fraction": 0.2
+        },
+        "training_budget_reserve_fraction": 0.2,
+        "expert_advice": "NOTE: This implementation passes trainability checks but deviates from the proposed mathematical spec. The tuner is optimizing an approximation of the intended architecture. Deviations: The forward pass is shape-correct, differentiable, causally padded, and emits float32 [B, T] regression output. The four-cycle dilation schedule and receptive field match the description. Spec alignment is false only because the specified SmoothL1 training loss is not implemented or exposed by the plugin; it must be supplied externally.\n\nFocus areas: Tune hidden and skip widths only after confirming that the full 45,013-sample theoretical receptive field is implemented with left-only causal padding and length-preserving cropping.; Monitor waveform error and spectral residuals by frequency bin so aggregate regression loss does not conceal weak regions of the selected band.; Tune SmoothL1 beta against the target waveform scale; compare values around the empirical noise standard deviation rather than treating beta as scale-independent.; Check gate saturation statistics and residual activation scales across all four dilation cycles.; Prioritize dilation-cycle count, kernel size, and width as controlled ablations while retaining one whole-band model and the scalar regression head.\nConstraints: Keep predicted peak training VRAM at or below 32 GB, which is 80% of the binding 40 GB effective cap, leaving tuner headroom.; Use segmentation_size exactly 40000 and preserve an output length of exactly 40000 for every input segment.; The forward method must accept [B,T] int64 values in the range 0-255 and return [B,T] float32 without logits or argmax.; Do not increase batch size, channel width, or retained diagnostic activations unless the measured peak remains below 32 GB at baseline precision.\nKnown failures: Strict causal padding cannot exploit future context, so symmetric noise and phase-coherent structures may be reconstructed less accurately than with a noncausal model.; A pointwise regression objective may emphasize high-energy or low-frequency structure and leave frequency-localized residuals elsewhere in the selected band.; Retaining filter, gate, residual, and skip tensors for all 40 blocks can cause unexpectedly high activation memory on 40,000-sample windows.; Incorrect causal padding or failure to crop the convolution output can shift targets or violate the exact sequence-length contract.; Saturated sigmoid gates can suppress gradient flow despite the residual and skip paths.\nSuggested directions: First run the exact baseline and verify tensor shapes, alignment using an impulse test, receptive field using an input-gradient test, and measured peak VRAM before score-oriented tuning.; Evaluate the cold-start falsifiable prediction that the held-out tidmad_denoising_score reaches 4.5; treat a score at or below 2.5 as evidence against the receptive-field-plus-continuous-regression hypothesis.; Report SmoothL1, ordinary MSE as an evaluation metric, frequency-stratified waveform error, bandwise spectral residuals, and the detector-specific denoising score.; If high-frequency residuals persist systematically, first test a frequency-balanced auxiliary objective in a later iteration rather than splitting the model into frequency-specific models.; If symmetric-context limitations dominate, compare a noncausal same-receptive-field ablation while holding width, block count, and regression head fixed.; Profile activation checkpointing only if measured memory approaches the limit; leave it disabled initially to avoid unnecessary recomputation.\nRationale: The guidance isolates the memo's central claim that a long dilated receptive field, gating, residual skips, and direct continuous output are sufficient for one-model full-band denoising. Shape, alignment, gate behavior, frequency-stratified metrics, and activation memory are the most direct diagnostics for the stated causal mechanism and predicted failure modes.",
+        "force_model": "wholeband_gated_dilated_regressor",
+        "model_description": "# WholebandGatedDilatedRegressor\n\n## Overview\n\nA single whole-band WaveNet-style continuous regressor that converts integer-coded samples to normalized scalar features, processes them through four repeated cycles of gated causal dilated residual blocks, sums multiscale skip features, and applies two pointwise convolutions to emit exactly one continuous float32 value per timestep. The exponentially increasing dilations provide a receptive field slightly larger than the complete 40,000-sample segment, while gated activations select useful multiscale features and residual/skip paths preserve alignment and gradient flow. The scalar regression head directly satisfies the waveform contract without class logits, argmax decoding, attention, spectral layers, or frequency-specific subnetworks.\n\n**Forward contract:** `[B, T] int64 \u2192 [B, T] float32` (regressor)\n\n## Architecture\n\nFor integer input x in {0,...,255}^{B x T}, form a float32 scalar sequence h_0(t) = Conv1x1((x(t)-c)/s), where c and s are fixed input-normalization constants. For residual block l with dilation d_l, apply a left-padded causal convolution with kernel K_l and split its output into filter and gate branches: z_l(t) = tanh((K_l^f *_{d_l} h_l)(t)) elementwise-multiplied by sigmoid((K_l^g *_{d_l} h_l)(t)). Produce a residual update r_l = W_l^r z_l and a skip feature q_l = W_l^s z_l using pointwise convolutions, then set h_{l+1} = h_l + r_l. Dilations increase exponentially within each cycle and the complete schedule is repeated across cycles. Aggregate q = sum_l q_l, then compute y_hat = W_2 ReLU(W_1 ReLU(q)), where W_1 and W_2 are pointwise convolutions and W_2 has one output channel. Squeezing that channel gives y_hat in R^{B x T} and explicitly casting the head output gives float32. Training uses elementwise SmoothL1(y_hat,y) with mean reduction as the permitted robust regression surrogate; the DiscoveryMemo's inherited mean_squared_error objective is not used because MSE is absent from the legal built-in loss set for this task.\n\n## Baseline Configuration\n\n```json\n{\n  \"model_config\": {\n    \"segmentation_size\": 40000,\n    \"input_dtype\": \"int64\",\n    \"input_value_min\": 0,\n    \"input_value_max\": 255,\n    \"input_channels\": 1,\n    \"output_channels\": 1,\n    \"output_dtype\": \"float32\",\n    \"input_representation\": \"normalized_scalar\",\n    \"normalization_offset\": 127.5,\n    \"normalization_scale\": 127.5,\n    \"whole_band_single_model_training\": true,\n    \"selected_files\": [\n      0,\n      1,\n      2,\n      3\n    ],\n    \"hidden_channels\": 64,\n    \"skip_channels\": 128,\n    \"stem_type\": \"causal_conv1d\",\n    \"stem_kernel_size\": 1,\n    \"residual_blocks\": 40,\n    \"dilation_cycles\": 4,\n    \"dilations_per_cycle\": [\n      1,\n      2,\n      4,\n      8,\n      16,\n      32,\n      64,\n      128,\n      256,\n      512\n    ],\n    \"dilated_kernel_size\": 12,\n    \"causal_padding\": true,\n    \"causal_padding_side\": \"left\",\n    \"gated_activation\": \"tanh_sigmoid\",\n    \"residual_connection\": true,\n    \"skip_connection\": true,\n    \"skip_aggregation\": \"sum\",\n    \"receptive_field_samples\": 45013,\n    \"regression_head\": \"relu_1x1_relu_1x1_linear\",\n    \"regression_head_channels\": 128,\n    \"scalar_regression_head\": true,\n    \"use_attention\": false,\n    \"use_spectral_layers\": false,\n    \"gradient_checkpointing\": false,\n    \"discovery_memo_requested_objective\": \"mean_squared_error\",\n    \"implemented_objective\": \"smooth_l1\"\n  },\n  \"train_config\": {\n    \"lr\": 0.0001,\n    \"epochs\": 10,\n    \"batch_size\": 2,\n    \"optimizer_type\": \"adamw\",\n    \"weight_decay\": 1e-05,\n    \"device\": \"cuda\",\n    \"precision\": \"bfloat16\"\n  },\n  \"loss_config\": {\n    \"loss_type\": \"smooth_l1\",\n    \"beta\": 1.0,\n    \"reduction\": \"mean\"\n  }\n}\n```\n",
+        "exploration_checklist": "",
+        "plugin_source_excerpt": "## PLUGIN CONFIG SCHEMA (authoritative \u2014 read validators carefully)\nThe planner prompt's JSON schema below cannot represent `@model_validator(mode='after')` or cross-field `@field_validator` bodies. Treat the source below as the single source of truth for any cross-field invariants; a proposed config that violates one will be rejected by the resource-eval skill and burn a retry attempt.\n\n```python\nclass WholebandGatedDilatedRegressorConfig(BaseModel):\n    model_type: str = Field(default=\"wholeband_gated_dilated_regressor\", description=\"Plugin model type key.\")\n    segmentation_size: int = Field(default=40000, ge=1)\n    batch_size: int = Field(default=2, ge=1)\n    hidden_channels: int = Field(default=64, ge=32, le=128)\n    skip_channels: int = Field(default=128, ge=64, le=256)\n    regression_head_channels: int = Field(default=128, ge=64, le=256)\n    dilated_kernel_size: int = Field(default=12, ge=12, le=16)\n    smooth_l1_beta: float = Field(default=1.0, gt=0.0, le=10.0)\n\n```\n",
+        "current_round": 1,
+        "max_rounds": 3,
+        "trial_allowed": true,
+        "force_formal_round": true,
+        "plan_overrides": {},
+        "max_epochs": 100,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "resolved_data_scope": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "trial_vram_budget_gb": 40.0,
+        "formal_vram_budget_gb": 40.0,
+        "trial_time_budget_minutes": 30.0,
+        "formal_time_budget_minutes": 120.0,
+        "last_vram_estimate_gb": null,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": null,
+        "last_mode": null,
+        "score_table_md": null,
+        "task_description": "full-spectrum 1-D time-series denoising of SQUID dark-matter\ndetector data: map a noisy [B, T] integer signal to a clean\n[B, T] continuous waveform, trained across the whole frequency\nspectrum within the selected band at once (not split into per-file or\nper-frequency models). This is a\ncontinuous regression task \u2014 the model predicts waveform values\ndirectly, not a distribution over discrete levels.",
+        "custom_loss_inventory": {
+          "composed": true,
+          "expected_snapshot": null,
+          "entries": [],
+          "unavailable": [],
+          "unavailable_reason": "expected custom-loss snapshot is missing",
+          "generation_allowed": true
+        },
+        "task_render": {
+          "loss_context": {
+            "output_semantic": "continuous",
+            "output_has_temporal_axis": true,
+            "objective": null
+          },
+          "builtin_model_roster": "punet | fcnet | transformer | wavenet | rnn | gated_fno",
+          "full_scope_segments": 4000,
+          "output_contract_shape": "[B, T]",
+          "focal_alpha_default": "0.5",
+          "focal_gamma_default": "2.0",
+          "gate_check_names": [
+            "output_diversity",
+            "output_std",
+            "amplitude_collapse",
+            "pearson_dispersion",
+            "spectral_peak_ratio",
+            "per_file_output_std"
+          ],
+          "efficiency_band_pct": "5",
+          "available_models_block": "### THE MODEL UNDER TUNING:\nThis run tunes ONE model, supplied by the task package. Its architecture description \u2014 when the task declares one \u2014 appears in the [MODEL ARCHITECTURE DESCRIPTION] block of the user message. Do not assume a built-in architecture or its properties.\n",
+          "per_file_table_protocol": "",
+          "score_field_noun": "field",
+          "target_strategy_impact_note": "",
+          "sampling_impact_tradeoff": "",
+          "per_file_comparison_block": "",
+          "score_display_noun": "score"
+        },
+        "metric_spec": {
+          "id": "tidmad_denoising_score",
+          "direction": "higher",
+          "aggregation": "tidmad_anchor_normalised_linear_grand_mean",
+          "transform": "log",
+          "transform_params": {
+            "log_base": 5.27
+          },
+          "references": [
+            "anchor_map",
+            "raw_baseline",
+            "ground_truth"
+          ],
+          "scoreability": {
+            "contract_id": "tidmad_denoised_h5",
+            "input_channel_group": "channel0001",
+            "required_attrs": [
+              "voltage_range_mV",
+              "sampling_frequency"
+            ],
+            "required_storage_dtype": "int8"
+          }
+        }
+      },
+      "expected": {
+        "system": "d59f2d173ad44f205083d5414acbcb3ea1f0e29bbf1767b4ba24aa94f76c73fd",
+        "user": "3ed12413a37d9546ec36f13ce198bc22336dd54be6eac55f27d2e9b496603bbd"
+      },
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    }
+  }
+}

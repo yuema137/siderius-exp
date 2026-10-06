@@ -1,8 +1,7 @@
 {
-  "schema": "paper-replay-conditions-369-v1",
+  "schema": "paper-replay-conditions-369-v2",
   "scope": "Archived declared launch conditions, not a complete artifact replay receipt or executable launcher config",
   "native_planner_selector": "native-timing-v1",
-  "explicit_historical_planner_selector": "legacy-9b78d505cb11-attempt-role-v3",
   "evidence": "Archived launch commands omit both flags; revision-bound CLI and schema defaults are None. No assertion about unrecorded external per-iteration overrides.",
   "units": [
     {
@@ -43,7 +42,8 @@
         "validation_max_portion": null,
         "validation_max_samples": null
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
     },
     {
       "task": "LIGO",
@@ -82,7 +82,8 @@
         "validation_max_portion": null,
         "validation_max_samples": null
       },
-      "composition_fingerprint": "bb90719d145d77bbd7382a8d25814c0325262f5d686333af8e0b0930361808d3"
+      "composition_fingerprint": "bb90719d145d77bbd7382a8d25814c0325262f5d686333af8e0b0930361808d3",
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
     },
     {
       "task": "Project 8",
@@ -124,7 +125,8 @@
         "validation_max_portion": null,
         "validation_max_samples": null
       },
-      "composition_fingerprint": "83e7d59c4d87ceb75083a3a8310cd2e6b03e87ea3d9cbab4efb062dca58424a4"
+      "composition_fingerprint": "83e7d59c4d87ceb75083a3a8310cd2e6b03e87ea3d9cbab4efb062dca58424a4",
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4"
     },
     {
       "task": "TIDMAD",
@@ -165,7 +167,8 @@
         "validation_max_portion": null,
         "validation_max_samples": null
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
     },
     {
       "task": "TIDMAD",
@@ -206,7 +209,8 @@
         "validation_max_portion": null,
         "validation_max_samples": null
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
     },
     {
       "task": "TIDMAD",
@@ -247,7 +251,8 @@
         "validation_max_portion": null,
         "validation_max_samples": null
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
     },
     {
       "task": "TIDMAD",
@@ -288,7 +293,8 @@
         "validation_max_portion": null,
         "validation_max_samples": null
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
     },
     {
       "task": "TIDMAD",
@@ -332,10 +338,21 @@
       "external_inputs": {
         "--task_composition": {
           "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-0-3/composition.yaml",
-          "status": "external historical input; not bundled or automatically remapped by this inventory"
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
         }
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/0-3/composition.yaml",
+          "sha256": "72e538bc3c6cc8d92b28e0d77a78442f15d4bf3c6a90d8057e62004b5e13f0f5"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/0-3/analysis-policy.yaml",
+          "sha256": "6a4109a287d93743ed68e2be254117c54d8755773c39e5be881cbaff0e60d7d7"
+        }
+      }
     },
     {
       "task": "TIDMAD",
@@ -379,10 +396,21 @@
       "external_inputs": {
         "--task_composition": {
           "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-4-9/composition.yaml",
-          "status": "external historical input; not bundled or automatically remapped by this inventory"
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
         }
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/4-9/composition.yaml",
+          "sha256": "ccd4ac8e8f895c1846142988729434e35dd841039f44b09b0054956f06ebed25"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/4-9/analysis-policy.yaml",
+          "sha256": "7e61c1607bf795b9ecb2a43d9d1efc5abd2f78f5e27e166095b1e36c5b9517ab"
+        }
+      }
     },
     {
       "task": "TIDMAD",
@@ -426,10 +454,21 @@
       "external_inputs": {
         "--task_composition": {
           "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-10-14/composition.yaml",
-          "status": "external historical input; not bundled or automatically remapped by this inventory"
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
         }
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/10-14/composition.yaml",
+          "sha256": "3c9e5cc891c38c6771798268875d065479da5bfabb1130ae5e762b3d4208ae7a"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/10-14/analysis-policy.yaml",
+          "sha256": "7094430e0cc67cb74132396f9c6f2965c670583df92aa1e3888971b68ce6966c"
+        }
+      }
     },
     {
       "task": "TIDMAD",
@@ -473,10 +512,21 @@
       "external_inputs": {
         "--task_composition": {
           "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-15-19/composition.yaml",
-          "status": "external historical input; not bundled or automatically remapped by this inventory"
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
         }
       },
-      "composition_fingerprint": null
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/15-19/composition.yaml",
+          "sha256": "e26bbe4a8646929f36e3f02704b0b0e04fcf4a7987d755c07257fba6c5f9822b"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/15-19/analysis-policy.yaml",
+          "sha256": "e1c92373755811a5d54fd8216f21b8395b87fabd032e21599c62012622f56f8f"
+        }
+      }
     }
   ]
 }

@@ -31,13 +31,8 @@ def check(
     manual: str,
     planner_strategy: str = "legacy-9b78d505cb11-v1",
 ):
-    if (
-        hashlib.sha256(model_plugin.read_bytes()).hexdigest()
-        != fixture["model_source_sha256"]
-    ):
-        raise ValueError(
-            "Historical model plugin does not match the frozen source digest"
-        )
+    if hashlib.sha256(model_plugin.read_bytes()).hexdigest() != fixture["model_source_sha256"]:
+        raise ValueError("Historical model plugin does not match the frozen source digest")
 
     def forbidden(*args, **kwargs):
         raise AssertionError("No network or scoring is permitted in this offline check")
@@ -68,9 +63,7 @@ def check(
             "reference_revision" if manual == "historical" else "pre_pr_revision"
         ]
         if revision != expected_revision:
-            raise ValueError(
-                "Reference checkout revision does not match the frozen oracle"
-            )
+            raise ValueError("Reference checkout revision does not match the frozen oracle")
 
     class UnexecutedScoreability(ScoreabilityContract):
         """Preserve serialized metric identity; refuse any actual scoring."""
@@ -84,9 +77,7 @@ def check(
 
     class Capture(LLMBridge):
         def __init__(self):
-            super().__init__(
-                provider="openai", model_id="offline", api_key="offline-no-key"
-            )
+            super().__init__(provider="openai", model_id="offline", api_key="offline-no-key")
             self.client = NoClient()
             self.reflect_client = NoClient()
             self.messages = []
@@ -95,15 +86,27 @@ def check(
             self.messages.append((system_prompt, user_prompt))
             return {}
 
-    if (
-        register_model_in_memory(str(model_plugin))
-        != fixture["base_arguments"]["force_model"]
-    ):
+    if register_model_in_memory(str(model_plugin)) != fixture["base_arguments"]["force_model"]:
         raise AssertionError("Unexpected registered model identity")
     results = []
     for case in fixture["cases"]:
         args = copy.deepcopy(fixture["base_arguments"] | case["arguments"])
-        args["config_manual"] = fixture["config_manuals"][manual]
+        if (
+            planner_strategy
+            in {
+                "legacy-9b78d505cb11-paper-v4",
+                "legacy-9b78d505cb11-paper-late-v4",
+            }
+            and not reference
+        ):
+            from agent.skills.check_config_format_skill.wrapper import run_skill
+
+            result = run_skill(None)
+            if result["status"] != "success":
+                raise ValueError("Current configuration manual could not be assembled")
+            args["config_manual"] = result["data"]
+        else:
+            args["config_manual"] = fixture["config_manuals"][manual]
         task = fixture["task_description"]
         if case["training_validation_portion"] is not None:
             task += fixture["validation_disclosure"]
@@ -168,8 +171,7 @@ def main():
     parser.add_argument("--planner-strategy", default="legacy-9b78d505cb11-v1")
     args = parser.parse_args()
     fixture_path = (
-        Path(__file__).parent
-        / "src/siderius_planner_compat/fixtures/paper_ligo_boundary.json"
+        Path(__file__).parent / "src/siderius_planner_compat/fixtures/paper_ligo_boundary.json"
     )
     fixture = json.loads(fixture_path.read_text())
     with tempfile.TemporaryDirectory(prefix="siderius-paper-prompt-") as directory:
