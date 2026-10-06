@@ -160,3 +160,53 @@ call. The recorded reference digests came from the original infra checkout,
 not from the new renderer. All clients are blocked from network access. These
 checks use synthetic inputs; the early comparisons cover an empty registry only
 and do not establish scientific replay.
+
+## Correct new runs or inspect historical prompts (#369)
+
+New infra records the actual trial/formal role even when an attempt is skipped
+or fails. Use that corrected behavior for ordinary runs. Do not change a trial
+back to formal to reproduce a known recording bug.
+
+For an explicitly requested historical **planner text** comparison, package
+0.3.0 provides `legacy-9b78d505cb11-attempt-role-v3`. Copy the experiment's
+`agents.json` into your new workspace and set its `tune.planner_strategy` to
+that selector. Pass your copied file through `--llm_config`. This is opt-in:
+it changes neither the installed default nor old provider identities. The
+adapter changes only a copy of raw history presented to the historical planner;
+the saved records retain their correct roles. Choose `native-timing-v1` when you
+want the framework's current planner strategy instead of historical policy.
+
+After installing this package into the qualified infra environment using the
+installation instructions above, check the pair without credentials or a GPU:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" -m siderius_planner_compat.attempt_role_check
+```
+
+Success reports 15 producer cases, 30 identical final system/user prompt pairs,
+and zero API calls. This is an offline controlled boundary check, not a promise
+of identical new LLM responses, scientific trajectories or final artifacts.
+
+[paper-replay-369.json](paper-replay-369.json) records the audited launch parameters
+and source revisions for the 11 native paper workflow units, including TIDMAD's
+bands. It is an evidence inventory, not a file to pass directly to the launcher.
+Use its `launch_parameters` with the referenced experiment, remap data/config
+paths to your machine, and use a new workspace. Both validation limits are
+`null` (disabled); omit their CLI flags, rather than passing the string `null`.
+The dataset/split definitions, models and agent settings remain owned by the
+referenced experiment revisions. This inventory does not replace those assets
+or provide an automatic historical-workspace import.
+
+Archived TESS has 28 skipped trial records labeled formal; Project8 has one.
+Their saved per-attempt configurations identify the actual trial role. The
+archives remain unchanged. These skips produced no successful score, but their
+history may have influenced later planning. LIGO and the eight audited TIDMAD
+workflow units had no such mismatch in the inspected run-output records. This
+is a bounded archive audit, not proof that every attempted iteration survived.
+
+TIDMAD analysis-on used generated external composition files. Their historical
+locations are explicitly listed under `external_inputs`, not presented as
+portable repository files. Recover and verify those inputs against the recorded
+composition fingerprint before attempting that historical treatment; this
+inventory does not claim to bundle them. The [role compatibility report](attempt-role-parity.md)
+states the exact verified boundary and remaining limits.
