@@ -87,6 +87,42 @@ historical run and report successful replay.
 
 ## Keep old results intact
 
+### Historical prompts with the ordering provenance repair (#447)
+
+Use `legacy-9b78d505cb11-ordering-v2` explicitly when a new run on repaired infra
+must retain the pre-#447 planner history format. Change only `tune.planner_strategy`
+in the LLM configuration shown above, or pass
+`--planner_strategy legacy-9b78d505cb11-ordering-v2` to the standalone tuner.
+The installation default remains `legacy-9b78d505cb11-v1`; upgrading this package
+does not switch an existing experiment to v2.
+
+The repair records whether ordering was selected and which phase refused an
+attempt. For example, a new record may say "sequential order selected; training
+admission refused." That evidence remains in the saved record. Before rendering
+the historical planner prompt, v2 makes a separate copy in the old format: this
+kind of refusal had no ordering fields before #447, so those fields are omitted
+from that copy. A successful record keeps its original ordering fields. Records
+without the new observation pass through unchanged.
+
+Install package version 0.2.0 or later into an infra checkout containing the
+paired [infra PR #599](https://github.com/Galileo-Sandbox/SIDERIUS/pull/599),
+using the installation command above. Then check the installed pair offline:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" -m siderius_planner_compat.ordering_check
+```
+
+Success reports 15 producer cases, 17 matching final prompt pairs, and zero API
+calls. This check needs no dataset or GPU. It tests raw saved history records;
+reconstructed records with newly filled defaults are not a qualified substitute.
+Contradictory observations raise an error instead of silently discarding evidence.
+
+The new plugin has a different identity. Start in a **new workspace** and retain
+a migration record linking to the old evidence; do not change an old workspace's
+lock. This package does not import models or history for you. The
+[ordering compatibility report](ordering-parity.md) states the verified scope
+and explains why exact prompt text does not promise identical stochastic results.
+
 Do not edit an old `run_invariants_lock.json` to make a new run start. A lock
 without a strategy identity cannot prove which installed plugin it used. The
 new framework refuses that resume rather than filling in a guess.
