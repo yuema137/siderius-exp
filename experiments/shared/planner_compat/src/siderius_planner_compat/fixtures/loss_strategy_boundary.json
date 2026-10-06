@@ -1,0 +1,154 @@
+{
+  "reference_infra_revision": "a2eb55dfb2853870a8294eb675a8060043d9c68b",
+  "reference_uv_lock_sha256": "a4d4d1b3fdc9749048ff1cd61f25d28cb72c5cf8853f2978a4eeac7414340cff",
+  "base_fixture": "current_legacy_boundary.json",
+  "scope": "Synthetic composed loss contexts: free continuous, free categorical with/without time axis, locked builtin and locked custom objective. Original bridge captured with blocked clients in its own frozen environment. Not scientific replay or custom registry qualification.",
+  "cases": [
+    {
+      "id": "loss-0-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "continuous",
+        "output_has_temporal_axis": false
+      },
+      "expected_system_sha256": "da6a80a490f24e7f90a44fb81bed8378fb3c0557beec687cf1265b6eb7f6190b",
+      "expected_user_sha256": "b5a5f94d0212d69e0aa9cd503fce1964ee3dd8587ec9a768c5f9fc42efe77126"
+    },
+    {
+      "id": "loss-0-round-4",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "continuous",
+        "output_has_temporal_axis": false
+      },
+      "expected_system_sha256": "da6a80a490f24e7f90a44fb81bed8378fb3c0557beec687cf1265b6eb7f6190b",
+      "expected_user_sha256": "175764d3aa7aea3600ad566ad29574b8d40db0659ceb6e423a87e1fbf9e8f606"
+    },
+    {
+      "id": "loss-1-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "categorical",
+        "output_has_temporal_axis": false
+      },
+      "expected_system_sha256": "b2f01b6041845f9709e683f4a49eb4bcbe8ae32f05e9aa50c7e8c1cd260101af",
+      "expected_user_sha256": "0d2b32e4830290c570143eb364102ab2064d87c32b3025c7b8d357892db00c70"
+    },
+    {
+      "id": "loss-1-round-4",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "categorical",
+        "output_has_temporal_axis": false
+      },
+      "expected_system_sha256": "b2f01b6041845f9709e683f4a49eb4bcbe8ae32f05e9aa50c7e8c1cd260101af",
+      "expected_user_sha256": "eb496b2014c1b09473448395ce0b146b1dd5ba5085ff67d7f19837c23675718a"
+    },
+    {
+      "id": "loss-2-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "categorical",
+        "output_has_temporal_axis": true
+      },
+      "expected_system_sha256": "0c011c8dab8b99af434092572423bf7f4310835b40771c1d725f43e83abf35b8",
+      "expected_user_sha256": "aa6ca695d979d89c123f9bee7ee3170e416a16b3daed92673783951417e94681"
+    },
+    {
+      "id": "loss-2-round-4",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "categorical",
+        "output_has_temporal_axis": true
+      },
+      "expected_system_sha256": "0c011c8dab8b99af434092572423bf7f4310835b40771c1d725f43e83abf35b8",
+      "expected_user_sha256": "ef638f0699197333b69e1cdc550ac5d2f35dcc9194dc49b020a6018e3c0f2108"
+    },
+    {
+      "id": "loss-3-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "categorical",
+        "output_has_temporal_axis": false,
+        "objective": {
+          "loss_type": "ce",
+          "reduction": "sum"
+        }
+      },
+      "expected_system_sha256": "07a4daf0d2fa1d4339393ff0cd331c4a56d6c9e252732f8584d4e297b262b35d",
+      "expected_user_sha256": "1bd0a71496922115fccdc981c88daa16096e448c772a81d62080946db6c448d9"
+    },
+    {
+      "id": "loss-3-round-4",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "categorical",
+        "output_has_temporal_axis": false,
+        "objective": {
+          "loss_type": "ce",
+          "reduction": "sum"
+        }
+      },
+      "expected_system_sha256": "07a4daf0d2fa1d4339393ff0cd331c4a56d6c9e252732f8584d4e297b262b35d",
+      "expected_user_sha256": "bc96e102f2b74073cbab3305a1ba1d9e08dde8361d6a68b20a4fb9c4272774c1"
+    },
+    {
+      "id": "loss-4-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "continuous",
+        "output_has_temporal_axis": false,
+        "objective": {
+          "loss_type": "custom",
+          "loss_name": "fixture_loss"
+        }
+      },
+      "expected_system_sha256": "857fce5aca0e2e155090c23c8ea3944f301663b1454b86250970d8bf27d12375",
+      "expected_user_sha256": "abc5546566c169560c79643aeed848ae56c6baaacc67332272bda3e6ea283ce3"
+    },
+    {
+      "id": "loss-4-round-4",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4
+      },
+      "loss_context": {
+        "output_semantic": "continuous",
+        "output_has_temporal_axis": false,
+        "objective": {
+          "loss_type": "custom",
+          "loss_name": "fixture_loss"
+        }
+      },
+      "expected_system_sha256": "857fce5aca0e2e155090c23c8ea3944f301663b1454b86250970d8bf27d12375",
+      "expected_user_sha256": "01cc6770e3174814587edc8e87481d93e68ea82899523eb7b3c731093d2bb538"
+    }
+  ]
+}

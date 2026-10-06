@@ -1,0 +1,23 @@
+[
+  {
+    "module": "legacy_9b78d505cb11",
+    "source_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+    "source_path": "src/agent/prompts.py",
+    "sha256": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+    "status": "source preserved; 12 synthetic final prompt pairs verified; scientific migration pending"
+  },
+  {
+    "module": "legacy_691617f04b42",
+    "source_revision": "6bcdeb2f55b47ced6bcadaa08ddfd88875964261",
+    "source_path": "agent/prompts.py",
+    "sha256": "691617f04b42f8e903188ac6aa701afedc09a54148d0fba826275b6bf794c013",
+    "status": "source preserved; 6 synthetic empty-registry final prompt pairs verified; scientific migration and non-empty registry qualification pending"
+  },
+  {
+    "module": "legacy_loss_rendering",
+    "source_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+    "source_path": "src/agent/prompt_templates/tuner/loss_rendering.py",
+    "sha256": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4",
+    "status": "source preserved; final assembly parity covered by current legacy fixtures"
+  }
+]

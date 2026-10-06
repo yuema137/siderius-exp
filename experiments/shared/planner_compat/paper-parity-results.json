@@ -1,0 +1,40 @@
+{
+  "scope": "Shared strategy migration, not historical API-request or scientific-result replay",
+  "new_infra_revision": "0f7738bbe6b3217b368c5f3a948a2256a34b9d0f",
+  "historical_reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+  "pre_pr_reference_revision": "a2eb55dfb2853870a8294eb675a8060043d9c68b",
+  "pre_pr_tree": "ff6dfbe2d8f66187ca86ac0045921905daf58782",
+  "provider_identity": {
+    "name": "legacy-9b78d505cb11-v1",
+    "version": "1",
+    "content_sha256": "0c36e016618dbc3d2d16000cdf4eedc1e49f8759e5bf886129866be760d4acde",
+    "assembly_sha256": "c7cfb09419340c81fe1d3ecd07d3c31264d0b5a1d30740a3528e790bee1815ee"
+  },
+  "fixture_sha256": "b64e428a36fad17d031822abb14dddd431e8447a3bcf5abce3cab7145efc0aa3",
+  "historical_manual_pairs": 12,
+  "pre_pr_manual_pairs": 12,
+  "production_startup_prompt_hashes": {
+    "old": {
+      "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+      "user": "feb0d63851995cbea1d771b2670fdca909501024e09a1347cbcf4810d347b762"
+    },
+    "base": {
+      "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+      "user": "71441323e99a3af28b7514363db62dd619f02df027a2f9b7de687b132c7e516f"
+    },
+    "new": {
+      "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+      "user": "71441323e99a3af28b7514363db62dd619f02df027a2f9b7de687b132c7e516f"
+    }
+  },
+  "startup_pre_pr_vs_new_equal": true,
+  "startup_historical_vs_new_equal": false,
+  "historical_startup_user_difference": "Three preexisting TrainConfig properties, not introduced by issue372.",
+  "independent_review": "Both 12-pair sets recaptured; expected-digest mutation rejected.",
+  "api_calls": 0,
+  "gpu_training_runs": 0,
+  "installed_default_matches_explicit_provider": true,
+  "existing_installed_self_check_prompt_pairs": 28,
+  "historical_reference_vs_provider_equal": true,
+  "pre_pr_reference_vs_provider_equal": true
+}

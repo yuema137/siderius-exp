@@ -1,0 +1,635 @@
+{
+  "kind": "issue372-controlled-planner-comparison-v1",
+  "recorded_date": "2026-10-04",
+  "infra_revisions": {
+    "original": "a2eb55dfb2853870a8294eb675a8060043d9c68b",
+    "native": "0f7738bbe6b3217b368c5f3a948a2256a34b9d0f"
+  },
+  "exp_revision": "8789ec8",
+  "manifest_sha256": "765efba2e12bdc5bc557e5162d11a3a0ff74f33fb44071cde837b3fe43bfd085",
+  "history_sha256": "fefb9f9bc32ba2c2bbadff88bc03f428d690b70d32821fbac228ec2a7e0222ba",
+  "ledger_sha256": "68f720c717ea1ee3b7f0ff25509297a92eaa3fb60583e87146abb027a8158a33",
+  "model": "gpt-5.6-sol",
+  "reasoning_effort": "medium",
+  "service_tier": "default",
+  "price_source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+  "api_cap_usd": "20",
+  "conservative_total_usd": "5.115000",
+  "paid_requests": 18,
+  "gpu_training_runs": 0,
+  "scientific_reproduction": false,
+  "rows": [
+    {
+      "id": "01-fixed-original-r1",
+      "arm": "original",
+      "case": "fixed",
+      "repeat": 1,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "reasoning": "Establish the required reference using the successful baseline architecture and training recipe without changing tunable hyperparameters. Batch size 11 has passed runtime verification, the configuration is far below the VRAM limit, and prior validation loss was minimized at epoch 3, matching the trial epoch cap. Snapshot sampling and aligned validation preserve broad population coverage.",
+      "usage": {
+        "prompt_tokens": 52005,
+        "completion_tokens": 911,
+        "conservative_usd": "0.278245"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "ad1381dc9344c465496e338e12ff894c3f3fca2be1b7b9761295299bf88d837a",
+        "response-00.json": "2361cb84c10aeeb719bcb0ac52b7fda41eebb2f9c00d3f67b6387072566953cb",
+        "decision.json": "0888f55fc9c0d42c2f68def8fd531bea5d8be45a013847307e5bab69f24682d7",
+        "receipt.json": "7f30a341cbdc20b28216921995ecb20ae83d4c3c1152de6be4cf1fec7c3cd683",
+        "effective-preflight-input.json": "dbde2b09d96f58423e2b2abf1af78a39185a1042c4496bb6c46d37ce1422aa79",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "8e4b4eeba05f355ec519544a2ca24d0d2acd2f4fe4230b17fdf26d51d62408c1"
+      }
+    },
+    {
+      "id": "02-fixed-native-r1",
+      "arm": "native",
+      "case": "fixed",
+      "repeat": 1,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "reasoning": "The prior configuration achieved R-squared 0.74805 and selected the epoch-3 checkpoint in both successful runs, while epochs 4-5 increased validation loss. This trial therefore retains the proven architecture, AdamW learning rate, batch size, target standardization, and checkpoint policy, uses the three-epoch trial cap, and isolates Smooth-L1 beta as the only scientific change. Reducing beta from 1.0 to 0.5 should make optimization more robust to the rare extreme targets and negative sentinel labels. Full snapshot training coverage is inexpensive given the measured runtime, while the evaluation portion is set to the operator-mandated 0.23.",
+      "usage": {
+        "prompt_tokens": 51378,
+        "completion_tokens": 1063,
+        "conservative_usd": "0.27815"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "3af40266eff452335fe675710f654bc17fb858c081ea80ac8d4be7a620a09aaf",
+        "response-00.json": "5584057a164cb174cb80c5c15339b79a9f5416e0274aec473e74aeb9575f205e",
+        "decision.json": "8802a8221e057ea4c9327eab701c0c2d6931e0e70405c3d1d2de27fca7481ea2",
+        "receipt.json": "9de26297f900be593a865ec4293df467d94c71ec18d6a03b531d139a987f0a34",
+        "effective-preflight-input.json": "11e8a3d54e0ac3dceeb9a593d246edb4f0661b76175c417034c7dac515005238",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "d5bd3a99f426cb05a190b13bb7520f6d2348caf6b59411afe2292ab36d7e3dda"
+      }
+    },
+    {
+      "id": "03-free-native-r1",
+      "arm": "native",
+      "case": "free",
+      "repeat": 1,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "reasoning": "Run a controlled trial that changes only Smooth-L1 beta from 1.0 to 0.5 while retaining the successful 359715-parameter architecture, learning rate, batch size, target standardization, and best-validation checkpointing. This follows the expert's recommendation to tune beta before changing capacity. The incumbent reached its best validation loss at epoch 3 and then overfit mildly, so the trial cap of 3 epochs is scientifically appropriate. The matching configuration previously required about 10 seconds for 5 epochs and only 0.26 GB estimated VRAM, making this trial comfortably feasible under the 60-second and 8-GB budgets.",
+      "usage": {
+        "prompt_tokens": 51354,
+        "completion_tokens": 1554,
+        "conservative_usd": "0.28785"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "278b213e309402dec1e15735da19e098c37a45b93ce2e4bd2f11cebddba2e0a5",
+        "response-00.json": "1d1701a6fd772332e82e0768ef713cfb4d08ee1526625a404950f1002dd411e7",
+        "decision.json": "682bf4028b7f8d71e68cd98c825cdc512f8a6f551cbae9f00edfba597743b91e",
+        "receipt.json": "82aebd33ebdfd6d50aeb89283d88079781209fe914dec704715d151035fcd5ad",
+        "effective-preflight-input.json": "d2f112579391e41faacaa957567b9fe7d14a2f779dd24d4fea32d8534d7073e7",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "bec4560203cabab7d22ac0a9bbf5c6ab1db99fb386a2a45a5cdb64eaecf42d4b"
+      }
+    },
+    {
+      "id": "04-free-original-r1",
+      "arm": "original",
+      "case": "free",
+      "repeat": 1,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "reasoning": "The established full-data baseline reached R-squared 0.730-0.748 and selected epoch 3 in both successful runs, while later epochs increased validation loss. This trial therefore retains the proven architecture, Smooth-L1 beta, batch size 11, target standardization, and best-validation checkpointing, but raises the learning rate moderately from 0.0003 to 0.0004 to improve convergence within the operator-fixed three-epoch cap. Keeping all model fields unchanged isolates the learning-rate effect and preserves the configuration known to pass runtime verification comfortably.",
+      "usage": {
+        "prompt_tokens": 51983,
+        "completion_tokens": 1532,
+        "conservative_usd": "0.290555"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "217981e9848860418ccd34efc11578d9e36339c07dd1b5c7d7e432e9c6aa6779",
+        "response-00.json": "ef14a89053811b69f3fa326ac934f908530885ae8f8343d184fff92fa3292ff9",
+        "decision.json": "482f89157c72a90e6ff47186a0ff0dd3c624559139c60c10f87e8113c59e9c28",
+        "receipt.json": "1a3633359b8da55b43d7834352eb06877a9844e5889fbf65c048aa4d66e04760",
+        "effective-preflight-input.json": "d87f78813ca8e3d2251973f5398c942cee6e99ab02cc37fdee9a59518ead774b",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "bec4560203cabab7d22ac0a9bbf5c6ab1db99fb386a2a45a5cdb64eaecf42d4b"
+      }
+    },
+    {
+      "id": "05-independent-original-r1",
+      "arm": "original",
+      "case": "independent",
+      "repeat": 1,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "reasoning": "The established architecture is stable and already achieves R-squared 0.7481, with validation consistently best near epoch 3. This trial preserves every architectural and regularization field while increasing learning rate from 0.0003 to 0.0004, isolating whether faster convergence improves the checkpoint under the three-epoch trial cap. Batch size 11 is retained because it repeatedly passed runtime verification, unlike several nearby batch sizes. Full training scope is retained, while the operator-fixed 0.23 final evaluation fraction provides a meaningful comparison.",
+      "usage": {
+        "prompt_tokens": 52116,
+        "completion_tokens": 1544,
+        "conservative_usd": "0.29146"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "848e9250c9030f005cc4c6442d5d54d4c71cfa9ed50f9cc7c4059f05d02f47e4",
+        "response-00.json": "80781eedfda10ca852fd576d07552624e7e184926ad56f03f9ff4af46aa10f67",
+        "decision.json": "96a1c19866e39bbe92c35ba823cd901e9dd88f1720e153cdc587e455039ac818",
+        "receipt.json": "363d54da046fa1fb9306edc59c1b9237d959480f9ca246dd57a6a0a9d8a30fab",
+        "effective-preflight-input.json": "0bc948147e6f1dd92387341b806c0e95c98df1c384405ad838a7427aa03684de",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "28db93ffa75c5e0a442a6f0b589a877dcd7f952e2515b49145fa7d81588b0fb5"
+      }
+    },
+    {
+      "id": "06-independent-native-r1",
+      "arm": "native",
+      "case": "independent",
+      "repeat": 1,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "reasoning": "Run a controlled trial that isolates Smooth-L1 beta while preserving the successful architecture, optimizer, learning rate, batch size, target standardization, and best-validation checkpointing. The incumbent reached R-squared 0.74805 and selected epoch 3 in both successful runs, so the trial cap of 3 epochs is appropriate. Increasing beta from 1.0 to 2.0 makes the objective more quadratic across typical standardized residuals and therefore better aligned with the R-squared metric, while retaining linear robustness for large residuals and sentinel-like labels. Prior measured runtime and VRAM are safely within the current trial budgets. Final evaluation uses the operator-overridden 0.23 portion, while epoch validation remains the independent fixed 0.11 snapshot.",
+      "usage": {
+        "prompt_tokens": 51492,
+        "completion_tokens": 1075,
+        "conservative_usd": "0.27896"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "6292f5e39a029f6b52c16598648174bde245af0a92d77cb7025b3a701aaaa94d",
+        "response-00.json": "fde3a375ad14c1ad4642e14817eb3516b1cb44ed7a17802d265e2b27a6ed082e",
+        "decision.json": "f3763bb55b6fe859fe78381913e054a149478499f60cc75ab2536d847fdee6a9",
+        "receipt.json": "49728e9d1c1401199b6664f4c12f8cb76b7862483557fd7d175f53f9232ce46a",
+        "effective-preflight-input.json": "c22e81e00121e2bab24fbd787d54e697fadb74066b8178b12c0cb95ead601bb4",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "01527613131c139cdd19f6a8875731252c3805e20d65ff8db3e5410e6710f255"
+      }
+    },
+    {
+      "id": "07-fixed-native-r2",
+      "arm": "native",
+      "case": "fixed",
+      "repeat": 2,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "reasoning": "The established configuration is stable, inexpensive, and achieved R-squared 0.73015 in trial and 0.74805 in formal mode, with validation loss minimized at epoch 3 in both runs. This trial preserves the architecture, batch size 11, learning rate, target standardization, and best-validation checkpointing while isolating Smooth-L1 beta as advised. Reducing beta from 1.0 to 0.5 should lessen the influence of the rare negative sentinel and extreme targets without changing model capacity. Three epochs match the observed validation optimum and satisfy the trial epoch cap. Snapshot coverage and full available training scope provide the most comparable evidence, while eval_portion follows the fixed 0.23 override.",
+      "usage": {
+        "prompt_tokens": 51378,
+        "completion_tokens": 1067,
+        "conservative_usd": "0.27823"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "3af40266eff452335fe675710f654bc17fb858c081ea80ac8d4be7a620a09aaf",
+        "response-00.json": "8354723e7aa24cdf0f6fa07478f7c6bac7fe334b52b912c7b9551c6c1e3791fb",
+        "decision.json": "6f69f5793346af0aa955a64b8f6ca86e644a957a32b53e921017b0b2e96be283",
+        "receipt.json": "350f25ceaba2cb3e4bec79ed979fa5d7777965a7aca20bf0473bc59d07293135",
+        "effective-preflight-input.json": "52881b1fbb27e3b9afdfaa1f2c6a7b3cd83bac4e4bbc4b9fc1bbec74fd75cd2b",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "d5bd3a99f426cb05a190b13bb7520f6d2348caf6b59411afe2292ab36d7e3dda"
+      }
+    },
+    {
+      "id": "08-fixed-original-r2",
+      "arm": "original",
+      "case": "fixed",
+      "repeat": 2,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "reasoning": "Establish the required sparse baseline using the successful reference architecture and training recipe without changing tunable hyperparameters. The prior full-scope runs achieved R-squared 0.7302-0.7481, with best-validation checkpoints consistently selected at epoch 3, so the trial epoch cap of 3 should retain the useful training phase while avoiding the late validation drift seen in epochs 4-5. Snapshot evaluation provides broad coverage, and the mandated eval_portion of 0.23 is used verbatim.",
+      "usage": {
+        "prompt_tokens": 52005,
+        "completion_tokens": 1013,
+        "conservative_usd": "0.280285"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "ad1381dc9344c465496e338e12ff894c3f3fca2be1b7b9761295299bf88d837a",
+        "response-00.json": "5ddc2444c57fd06f43485c3e5ce0a67732fd365a686fa14dfb5045a3a097a63f",
+        "decision.json": "942cac69696da34950dc237232bd982868ca5ceaaba17b6d2639509ab92d22be",
+        "receipt.json": "3057850df4c6e0d1c88eb2235410a993e90737baf0ba6c36ec0621158cc5616f",
+        "effective-preflight-input.json": "b818cbb62d738a418360dc10556b634eef9f0d4b63a36f2418270dd3bbfd23aa",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "28db93ffa75c5e0a442a6f0b589a877dcd7f952e2515b49145fa7d81588b0fb5"
+      }
+    },
+    {
+      "id": "09-free-original-r2",
+      "arm": "original",
+      "case": "free",
+      "repeat": 2,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "reasoning": "This round establishes the required trial reference using the successful baseline configuration from memory without changing architecture, learning rate, batch size, optimizer, regularization, target standardization, or Smooth-L1 settings. The only effective difference is the operator-imposed three-epoch trial cap, which is appropriate because both successful prior runs selected epoch 3 as their best-validation checkpoint. Snapshot evaluation over the full available scope provides the most reliable comparison, while batch size 11 retains the runtime-verification behavior and low VRAM usage previously demonstrated.",
+      "usage": {
+        "prompt_tokens": 51983,
+        "completion_tokens": 915,
+        "conservative_usd": "0.278215"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "217981e9848860418ccd34efc11578d9e36339c07dd1b5c7d7e432e9c6aa6779",
+        "response-00.json": "98b34e02b9e52e0b8a09d6cd423b18d6a903074e0e185553c87bfda296b1646b",
+        "decision.json": "1733b50bab4647c877741d0efdf83213061ae777d9b73b16608a93508bd067a7",
+        "receipt.json": "8920eb2f7eb2d33ec0265993a6fa87e118ee3b91c28b1a96fabb6360f8ac8aa0",
+        "effective-preflight-input.json": "2b1f49e16d9e3f9dc38bd0a86a329d7323a45c9722cfe3d676f4028968c3916e",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "bec4560203cabab7d22ac0a9bbf5c6ab1db99fb386a2a45a5cdb64eaecf42d4b"
+      }
+    },
+    {
+      "id": "10-free-native-r2",
+      "arm": "native",
+      "case": "free",
+      "repeat": 2,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "reasoning": "The established configuration is stable, inexpensive, and achieved R-squared 0.73015 in trial and 0.74805 in formal evaluation, with validation loss minimized at epoch 3 in both runs. This trial preserves the architecture, batch size, checkpointing, target standardization, and prior trial scope while testing the expert-prioritized Smooth-L1 beta. Increasing beta from 1.0 to 2.0 makes the objective more quadratic across moderately large standardized residuals, which may better align training with the R-squared metric while retaining linear robustness for extreme targets and sentinel labels. A learning rate of 0.0005 offsets some reduction in local Smooth-L1 gradient magnitude and should permit useful convergence within the three-epoch trial cap. Batch size 11 is retained because it previously passed runtime verification and used far less than the VRAM and time budgets.",
+      "usage": {
+        "prompt_tokens": 51354,
+        "completion_tokens": 1369,
+        "conservative_usd": "0.28415"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "278b213e309402dec1e15735da19e098c37a45b93ce2e4bd2f11cebddba2e0a5",
+        "response-00.json": "898d381b657af278a96daf79f81cbfdca7e71107c271ebe12b58cd7c0423aa90",
+        "decision.json": "a2ef93e53670d75ab94c3ff47f622b25d3455c70f9e4e6f3e6c8b5ccb9c2fe13",
+        "receipt.json": "5399c111f4ff44e3eaa98ada2bd42046cfb6af240364ea6a90c3f0eae87526fb",
+        "effective-preflight-input.json": "6b37aa81f4ca51c83a68e310af593f6b2ad31068b918a7b5a3df2eff48dc450c",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "bec4560203cabab7d22ac0a9bbf5c6ab1db99fb386a2a45a5cdb64eaecf42d4b"
+      }
+    },
+    {
+      "id": "11-independent-native-r2",
+      "arm": "native",
+      "case": "independent",
+      "repeat": 2,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "reasoning": "Use a full-coverage snapshot trial to isolate a modest learning-rate increase while preserving the successful 359715-parameter architecture, batch size 11, target standardization, Smooth-L1 beta 1.0, and best-validation checkpointing. The prior configuration achieved R-squared 0.73015 and 0.74805, with validation loss reaching its minimum at epoch 3 before later overfitting. Raising the learning rate from 0.0003 to 0.0004 may reach the useful basin within the current three-epoch trial cap. Batch size 11 has passed runtime verification, and the measured full-data workload was far below the 60-second budget. Final scoring uses the operator-overridden 0.23 evaluation portion, while epoch validation remains the independent fixed 0.11 snapshot.",
+      "usage": {
+        "prompt_tokens": 51492,
+        "completion_tokens": 1570,
+        "conservative_usd": "0.28886"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "6292f5e39a029f6b52c16598648174bde245af0a92d77cb7025b3a701aaaa94d",
+        "response-00.json": "2690f26dd16deaec39ca3fcf022599f21344072268c1c232e0fd31cfa9ec53b7",
+        "decision.json": "cc969001c6eee6bafe9ebeeabdf5d71486ee9c0ee6771e69707815f938683c4b",
+        "receipt.json": "c9f01528d4048278eecb6bbe96077313e0120337a9f938ffb19d89f40bce9920",
+        "effective-preflight-input.json": "e5f5964e478084e9777178f9c9ffdfa0fc35c193f885c29732a5cbdc44e5f598",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "01527613131c139cdd19f6a8875731252c3805e20d65ff8db3e5410e6710f255"
+      }
+    },
+    {
+      "id": "12-independent-original-r2",
+      "arm": "original",
+      "case": "independent",
+      "repeat": 2,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "reasoning": "The established architecture is stable and achieved R-squared 0.74805, with both successful runs selecting epoch 3 and showing validation degradation afterward. This trial therefore retains the full baseline model, regularization, batch size 11, target standardization, and Smooth-L1 beta while isolating a modest learning-rate increase from 0.0003 to 0.0004. The higher rate may reach a stronger solution within the operator-fixed three-epoch cap without introducing the instability risk of a large change. Full training scope is retained because runtime and VRAM were far below budget.",
+      "usage": {
+        "prompt_tokens": 52116,
+        "completion_tokens": 1661,
+        "conservative_usd": "0.2938"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "848e9250c9030f005cc4c6442d5d54d4c71cfa9ed50f9cc7c4059f05d02f47e4",
+        "response-00.json": "d55e64674cb4592f5e9896348a66991918f25da8cd65c280d79ef19ae06ff929",
+        "decision.json": "3ee9c89f454d806319763f87691111e0103d6667f277e4d51d653126ee75ec49",
+        "receipt.json": "988ce3830f8262dd425fd5aa70ce05bf55a0544abfcde0f4cd976da07ad936bd",
+        "effective-preflight-input.json": "f32d1385fa2940c27fb39eba8ef9328b5f4c0930a198ab180626fc19827007fe",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "8e4b4eeba05f355ec519544a2ca24d0d2acd2f4fe4230b17fdf26d51d62408c1"
+      }
+    },
+    {
+      "id": "13-fixed-original-r3",
+      "arm": "original",
+      "case": "fixed",
+      "repeat": 3,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": "1.0",
+        "train_portion": "0.1",
+        "eval_portion": "0.23"
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "reasoning": "Establish the required reference using the successful baseline architecture, Smooth-L1 beta, learning rate, batch size, regularization, target standardization, and validation-based checkpoint selection. The only material execution change is the operator-imposed three-epoch trial cap; this is well matched to prior dynamics because both successful runs selected epoch 3 and subsequently overfit. Snapshot evaluation at the fixed 0.23 portion provides broad validation coverage, while the full training scope preserves the data-rich setting responsible for prior R-squared scores of 0.73-0.75.",
+      "usage": {
+        "prompt_tokens": 52005,
+        "completion_tokens": 1551,
+        "conservative_usd": "0.291045"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "ad1381dc9344c465496e338e12ff894c3f3fca2be1b7b9761295299bf88d837a",
+        "response-00.json": "e73fa8350a433465b688be4a7ab65db982bc92f024200ce72fe2374cdba2d9be",
+        "decision.json": "9739fa4c83fa253200e859937f21d40072b52b493c4ab18f2d1c12bad67b9004",
+        "receipt.json": "f59a86583dc6c17ebfdfd2cf87ff286b646987ff6cce51a44946e16777b5fcc0",
+        "effective-preflight-input.json": "27504e615c5e40b76d167d3ee0502d8efd64811285ad273ff1a067dd92fe9d91",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "8e4b4eeba05f355ec519544a2ca24d0d2acd2f4fe4230b17fdf26d51d62408c1"
+      }
+    },
+    {
+      "id": "14-fixed-native-r3",
+      "arm": "native",
+      "case": "fixed",
+      "repeat": 3,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "reasoning": "The established configuration is stable, inexpensive, and achieved R-squared 0.73015 in trial and 0.74805 in formal evaluation, with validation loss minimized at epoch 3 in both runs. This trial therefore retains the architecture, batch size 11, learning rate, target standardization, and best-validation checkpointing while isolating Smooth-L1 beta as advised. Reducing beta from 1.0 to 0.5 should make optimization less sensitive to the rare negative sentinel and extreme targets without confounding the test with capacity changes. Three epochs match the observed validation optimum and comply with the trial cap. Snapshot sampling provides broad coverage, while the requested evaluation portion is consistent with the operator-fixed 0.23 override.",
+      "usage": {
+        "prompt_tokens": 51378,
+        "completion_tokens": 1085,
+        "conservative_usd": "0.27859"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "3af40266eff452335fe675710f654bc17fb858c081ea80ac8d4be7a620a09aaf",
+        "response-00.json": "f3e3c40f08e12d53dd36fdf2c46087311078b25801b4361a12c0037b6b9ef1bf",
+        "decision.json": "8d924cc9aa327176868f041b336e4a6c85c56c4488c546d8797dbd79bab2902a",
+        "receipt.json": "b2eef7c02039a0a6dc9b6cb0d8ce34ebd7266be1595d842a6cf99b5bb1614739",
+        "effective-preflight-input.json": "518827fcbae182d817cc53da41061d9672bbe6ef7c61a33ea17435aaef01c516",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "01527613131c139cdd19f6a8875731252c3805e20d65ff8db3e5410e6710f255"
+      }
+    },
+    {
+      "id": "15-free-native-r3",
+      "arm": "native",
+      "case": "free",
+      "repeat": 3,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 1.0
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 1.0
+      },
+      "reasoning": "Use a controlled trial that changes only Smooth-L1 beta from 1.0 to 0.5. The fixed FIR parameters recommended by the expert are not exposed by the authoritative schema, while beta is explicitly controllable and may better prioritize the dense target region while retaining robustness to the long tail and negative sentinel labels. The incumbent architecture, batch size 11, learning rate 0.0003, target standardization, and best-validation checkpointing are retained because they produced stable R-squared scores of 0.73015 and 0.74805. Both prior runs reached their best validation loss at epoch 3, matching the trial epoch cap. A comparable five-epoch formal run took only about 14 seconds and used little VRAM, so this three-epoch full-snapshot trial is feasible within the one-minute and 8 GB budgets.",
+      "usage": {
+        "prompt_tokens": 51354,
+        "completion_tokens": 1253,
+        "conservative_usd": "0.28183"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "278b213e309402dec1e15735da19e098c37a45b93ce2e4bd2f11cebddba2e0a5",
+        "response-00.json": "54013dcff982824211c47f72c528f60512bad3b1a1b558e6f1c7fbd5a7150159",
+        "decision.json": "3cce08e79d819a2f0bbad6f90ca4fbd1235a6c2ca5b25c5c72c05cbc8d435e0b",
+        "receipt.json": "ace78c731614d44886a4b7b1caf6540875db501f97fe22a4efdd5228bdf00a7d",
+        "effective-preflight-input.json": "7d4684a337c3e3ada78865f6f866e25626f80566cef7f593f7365cdc863c47ec",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "cae8e2d8a140de17d2bff46f8a08e0a591850e5fbeeca0fec4d8bac0be0337a0"
+      }
+    },
+    {
+      "id": "16-free-original-r3",
+      "arm": "original",
+      "case": "free",
+      "repeat": 3,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 1.0
+      },
+      "reasoning": "This establishes the required current-run reference using the successful baseline architecture, optimizer, learning rate, batch size, target standardization, and Smooth-L1 configuration from memory. The only difference is the operator-imposed three-epoch trial cap; this is appropriate because both previous runs selected their best checkpoint at epoch 3. Full snapshot training and evaluation preserve comparability and avoid confounding the reference with sparse-data variance.",
+      "usage": {
+        "prompt_tokens": 51983,
+        "completion_tokens": 968,
+        "conservative_usd": "0.279275"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "217981e9848860418ccd34efc11578d9e36339c07dd1b5c7d7e432e9c6aa6779",
+        "response-00.json": "f3fbf123aa1c639c2dfcd894435e0e5039bc77ee30527678e6afe53b65444e5c",
+        "decision.json": "af044ea2ad9cf6b962dd48d4677bff758b7c9579d26cabafe186feb5faa10563",
+        "receipt.json": "0eaef58c0191bd6e7fde57a6700a179e4fdba8b2dddae2351039587a364ede85",
+        "effective-preflight-input.json": "6cee204cc328a61b55a439d2b4cb916cb980f4a5d8d15743c2cd498d4dcad4b1",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "bec4560203cabab7d22ac0a9bbf5c6ab1db99fb386a2a45a5cdb64eaecf42d4b"
+      }
+    },
+    {
+      "id": "17-independent-original-r3",
+      "arm": "original",
+      "case": "independent",
+      "repeat": 3,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 0.1,
+        "eval_portion": 0.23
+      },
+      "reasoning": "The two successful reference runs used the same configuration and showed consistent late-epoch overfitting: training loss continued decreasing after validation loss was best at epoch 3. This trial isolates a model-regularization change by increasing embedding_dropout from 0.1 to 0.2 while preserving the proven spectral resolution, capacity, learning rate, batch size, target standardization, and Smooth-L1 objective. Three epochs match the observed optimal checkpoint and the operator cap.",
+      "usage": {
+        "prompt_tokens": 52116,
+        "completion_tokens": 1458,
+        "conservative_usd": "0.28974"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "848e9250c9030f005cc4c6442d5d54d4c71cfa9ed50f9cc7c4059f05d02f47e4",
+        "response-00.json": "1e8a735bba69bde2a43123cbfd9f751729e59a8571b38644e59a90769a343f7d",
+        "decision.json": "704bacb855f7cb2c8f28624d9b04f7089a5d298ed9600c2b8ee94b9fcdcabc0b",
+        "receipt.json": "794cb65dc005ddc4a7dc7383cb6f184272d3a61d2ec0f740e2c825c7b970d413",
+        "effective-preflight-input.json": "94f70136a53cddeb790909ed76a0d9f2182e9142342defa69e8af4739952bfd3",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "8e4b4eeba05f355ec519544a2ca24d0d2acd2f4fe4230b17fdf26d51d62408c1"
+      }
+    },
+    {
+      "id": "18-independent-native-r3",
+      "arm": "native",
+      "case": "independent",
+      "repeat": 3,
+      "status": "completed",
+      "plan_schema_validation": "passed",
+      "proposed": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "resolved_before_preflight": {
+        "epochs": 3,
+        "trial_portion": 1.0,
+        "train_portion": 1.0,
+        "eval_portion": 0.23
+      },
+      "reasoning": "The incumbent architecture is stable and achieved R-squared 0.74805, with the best checkpoint at epoch 3 in both successful runs. This trial preserves the proven architecture, optimizer, learning rate, batch size, target standardization, and checkpoint policy while isolating Smooth-L1 beta. Increasing beta from 1.0 to 1.5 modestly increases the relative emphasis on larger standardized residuals, which may improve the tail-sensitive R-squared metric without becoming excessively sensitive to the rare sentinel labels. Full snapshot training is affordable given the measured runtime and memory usage.",
+      "usage": {
+        "prompt_tokens": 51492,
+        "completion_tokens": 1415,
+        "conservative_usd": "0.28576"
+      },
+      "artifacts_sha256": {
+        "request-00.json": "6292f5e39a029f6b52c16598648174bde245af0a92d77cb7025b3a701aaaa94d",
+        "response-00.json": "3cbf8cc7fd46d401b5dcdf82323bde70eb0829f072fcad7bf4790107f698f42f",
+        "decision.json": "0db527b3410b30d10d04f4949e8eb1b62beaf3434b4ff51506ca5ff5ca1107b6",
+        "receipt.json": "98782247c799cd6d0afe85d4928769bffe461240c76d4a5a6ea7ca98e672f63e",
+        "effective-preflight-input.json": "b6d5376e3bd13e48fc61ae67bb5298d27f7b56f90ddea42fdc560a9bb3d6eff1",
+        "trial_config_cadence_gated_spectral_resnet_context_capture_001.json": "01527613131c139cdd19f6a8875731252c3805e20d65ff8db3e5410e6710f255"
+      }
+    }
+  ]
+}

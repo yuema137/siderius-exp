@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "siderius-planner-compat"
+version = "0.1.0"
+description = "Experiment-owned historical SIDERIUS planner prompt providers"
+requires-python = ">=3.12"
+
+[project.entry-points."siderius.planner_strategies"]
+legacy-9b78d505cb11-v1 = "siderius_planner_compat:current_legacy"
+legacy-691617f04b42-v1 = "siderius_planner_compat:early_legacy"
+
+[project.entry-points."siderius.planner_strategy_defaults"]
+legacy-9b78d505cb11-v1 = "siderius_planner_compat:current_legacy"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+siderius_planner_compat = ["fixtures/*.json"]

@@ -1,0 +1,74 @@
+{
+  "reference_infra_revision": "6bcdeb2f55b47ced6bcadaa08ddfd88875964261",
+  "reference_uv_lock_sha256": "55caeb1ee47f7b03f230269a43e04e441eec87a68a90808aa17da4db1ac03336",
+  "base_fixture": "current_legacy_boundary.json",
+  "scope": "Synthetic empty-registry inputs only; no archived scientific responses. Original bridge executed in its own frozen environment; provider clients blocked. The early schema lacks loss_context; its absent value corresponds to the explicit null in the base fixture.",
+  "cases": [
+    {
+      "id": "early-round-1-unlocked",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4,
+        "plan_overrides": {}
+      },
+      "expected_system_sha256": "48e31a7bed397c9d2ddd4ab734517501b6328e92604b4ed36b806b31d7762040",
+      "expected_user_sha256": "f17815458336613efe9a20094d0d5e33de7225f26e83323c65bf0353ab4981ee"
+    },
+    {
+      "id": "early-round-1-partial",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "eval_portion": 0.23
+        }
+      },
+      "expected_system_sha256": "48e31a7bed397c9d2ddd4ab734517501b6328e92604b4ed36b806b31d7762040",
+      "expected_user_sha256": "e160e5ed3705c7695cfcb258071a944d43b82a561c69674557bf53da707d55ec"
+    },
+    {
+      "id": "early-round-2-unlocked",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 4,
+        "plan_overrides": {}
+      },
+      "expected_system_sha256": "48e31a7bed397c9d2ddd4ab734517501b6328e92604b4ed36b806b31d7762040",
+      "expected_user_sha256": "9d9ccecb7cff1949d8e00158acd1ec2bdce11128b809cbb7d094a72289f71850"
+    },
+    {
+      "id": "early-round-2-partial",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "eval_portion": 0.23
+        }
+      },
+      "expected_system_sha256": "48e31a7bed397c9d2ddd4ab734517501b6328e92604b4ed36b806b31d7762040",
+      "expected_user_sha256": "06beeae6c3728404e3da509537cb0570a3c7170c9a3f65e61a2125966cdc0837"
+    },
+    {
+      "id": "early-round-4-unlocked",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4,
+        "plan_overrides": {}
+      },
+      "expected_system_sha256": "48e31a7bed397c9d2ddd4ab734517501b6328e92604b4ed36b806b31d7762040",
+      "expected_user_sha256": "6787079491397786e188d9cb3fc5f6fe0ba017dfe9ae49f851f8ca9dfa84b675"
+    },
+    {
+      "id": "early-round-4-partial",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "eval_portion": 0.23
+        }
+      },
+      "expected_system_sha256": "48e31a7bed397c9d2ddd4ab734517501b6328e92604b4ed36b806b31d7762040",
+      "expected_user_sha256": "3e19f584364ad7ff7eb7f382bda6c33b20933a6d1033d5d737bb01793e8b3299"
+    }
+  ]
+}

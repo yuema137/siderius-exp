@@ -1,0 +1,1461 @@
+{
+  "reference_infra_revision": "a2eb55dfb2853870a8294eb675a8060043d9c68b",
+  "reference_capture": "Original LLMBridge plus the task_description expression extracted from original planning.py; each reference ran in that checkout own frozen environment. No provider requests.",
+  "scope": "Synthetic current-legacy fixtures only. Not archived scientific responses, old-registry qualification or GPU replay.",
+  "base_arguments": {
+    "memory_history": [
+      {
+        "exp_id": "fixture_001",
+        "status": "success",
+        "model_type": "fixture_model",
+        "denoising_score": 0.4,
+        "is_trial": true,
+        "params": {
+          "loss_config": {
+            "loss_type": "cross_entropy"
+          }
+        },
+        "memory": {
+          "hypothesis": "Try the baseline.",
+          "conclusion": "Completed."
+        }
+      },
+      {
+        "exp_id": "fixture_002",
+        "status": "skipped_oom_risk",
+        "model_type": "fixture_model",
+        "denoising_score": null,
+        "is_trial": true,
+        "params": {
+          "loss_config": {
+            "loss_type": "cross_entropy"
+          }
+        },
+        "memory": {
+          "hypothesis": "Increase width.",
+          "conclusion": "Refused."
+        }
+      },
+      {
+        "exp_id": "fixture_003",
+        "status": "success",
+        "model_type": "fixture_model",
+        "denoising_score": 0.5,
+        "is_trial": false,
+        "training_history": {
+          "objective_kind": "cross_entropy"
+        },
+        "training_diagnosis": {
+          "state": "ok",
+          "validation_state": "present",
+          "comparability": "established",
+          "epochs_planned": 1,
+          "epochs_completed": 1,
+          "truncated": false,
+          "train_first": 0.0189,
+          "train_last": 0.0123,
+          "train_min": 0.0123,
+          "train_min_epoch": 0,
+          "validation_first": 0.0201,
+          "validation_last": 0.0155,
+          "validation_min": 0.0155,
+          "best_validation_epoch": 0,
+          "validation_degradation_verdict": "not_applicable",
+          "final_vs_best_validation_degradation": 0.0,
+          "final_vs_best_validation_degradation_rel": 0.0,
+          "validation_degraded_after_best": false,
+          "train_validation_gap_final": 0.0032,
+          "train_validation_gap_final_rel": 0.26,
+          "train_trend": "decreasing",
+          "validation_trend": "decreasing",
+          "flat_rel_tol": 0.01
+        },
+        "params": {
+          "loss_config": {
+            "loss_type": "cross_entropy"
+          }
+        },
+        "memory": {
+          "hypothesis": "Use the trial.",
+          "conclusion": "Improved."
+        }
+      }
+    ],
+    "expert_advice": "Compare the recorded evidence.",
+    "force_model": "auto",
+    "config_manual": {
+      "hidden_dim": {
+        "minimum": 8,
+        "maximum": 64
+      }
+    },
+    "model_description": "A test-owned supervised model.",
+    "exploration_checklist": "",
+    "plugin_source_excerpt": "",
+    "current_round": 2,
+    "max_rounds": 3,
+    "trial_allowed": true,
+    "force_formal_round": true,
+    "plan_overrides": {},
+    "max_epochs": 1,
+    "resolved_data_scope": [
+      0,
+      1
+    ],
+    "trial_vram_budget_gb": 1.0,
+    "formal_vram_budget_gb": 2.0,
+    "trial_time_budget_minutes": 2.0,
+    "formal_time_budget_minutes": 5.0,
+    "last_vram_estimate_gb": 0.2,
+    "last_time_estimate_minutes": 0.5,
+    "last_batch_size": 4,
+    "last_mode": "trial",
+    "score_table_md": "| model | score |\n|---|---|\n| fixture | 0.5 |",
+    "task_description": "A synthetic supervised task.",
+    "custom_loss_inventory": null
+  },
+  "task_render": {
+    "loss_context": null,
+    "builtin_model_roster": "",
+    "full_scope_segments": null,
+    "output_contract_shape": null,
+    "focal_alpha_default": "0.25",
+    "focal_gamma_default": "2",
+    "gate_check_names": [],
+    "efficiency_band_pct": "5",
+    "available_models_block": "No framework-owned model roster is declared.",
+    "per_file_table_protocol": "",
+    "score_field_noun": "metric",
+    "target_strategy_impact_note": "",
+    "sampling_impact_tradeoff": "",
+    "per_file_comparison_block": "",
+    "score_display_noun": "score"
+  },
+  "metric_spec": {
+    "id": "fixture_quality",
+    "direction": "higher",
+    "aggregation": "mean_over_deliverables",
+    "transform": null,
+    "transform_params": {},
+    "references": [],
+    "scoreability": {
+      "contract_id": "deliverable_presence"
+    }
+  },
+  "cases": [
+    {
+      "id": "round-1-overrides-False-owner-operator",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4,
+        "plan_overrides": null,
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "run",
+                "source": "formal_strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "trial_portion",
+                "owner": "run",
+                "source": "formal_portion",
+                "value": 0.1
+              },
+              {
+                "field": "train_portion",
+                "owner": "run",
+                "source": "formal_train_portion",
+                "value": 1.0
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "operator",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "186cc4cab3c67bcc50f8ed4b519ba3f3cf6a79ade9d2fc993845d6606b2e650a",
+      "expected_user_sha256": "dca7526d179d5d5146b8e95bd9861cd9f26c6533defbbe752ad49074fb11b531"
+    },
+    {
+      "id": "round-1-overrides-False-owner-agent",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4,
+        "plan_overrides": null,
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "agent",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "9e2e04b09c290be63ef4b900638acaddb670bf393acdbb59f7d4cc7a05561117",
+      "expected_user_sha256": "dca7526d179d5d5146b8e95bd9861cd9f26c6533defbbe752ad49074fb11b531"
+    },
+    {
+      "id": "round-1-overrides-True-owner-operator",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "trial_portion": 0.37,
+          "eval_portion": 0.23
+        },
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "run",
+                "source": "formal_strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "trial_portion",
+                "owner": "run",
+                "source": "formal_portion",
+                "value": 0.1
+              },
+              {
+                "field": "train_portion",
+                "owner": "run",
+                "source": "formal_train_portion",
+                "value": 1.0
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "operator",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "186cc4cab3c67bcc50f8ed4b519ba3f3cf6a79ade9d2fc993845d6606b2e650a",
+      "expected_user_sha256": "8ddba6b510f625881dddecae5598a8e2fd80d63702a3fe9ce3667e23ef5a5ea5"
+    },
+    {
+      "id": "round-1-overrides-True-owner-agent",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "trial_portion": 0.37,
+          "eval_portion": 0.23
+        },
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "agent",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "9e2e04b09c290be63ef4b900638acaddb670bf393acdbb59f7d4cc7a05561117",
+      "expected_user_sha256": "8ddba6b510f625881dddecae5598a8e2fd80d63702a3fe9ce3667e23ef5a5ea5"
+    },
+    {
+      "id": "round-2-overrides-False-owner-operator",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 4,
+        "plan_overrides": null,
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "run",
+                "source": "formal_strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "trial_portion",
+                "owner": "run",
+                "source": "formal_portion",
+                "value": 0.1
+              },
+              {
+                "field": "train_portion",
+                "owner": "run",
+                "source": "formal_train_portion",
+                "value": 1.0
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "operator",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "186cc4cab3c67bcc50f8ed4b519ba3f3cf6a79ade9d2fc993845d6606b2e650a",
+      "expected_user_sha256": "9f79487dc812908828d651cff55d03e9f9ff60cc638b8f51f7ae6c29f11076c7"
+    },
+    {
+      "id": "round-2-overrides-False-owner-agent",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 4,
+        "plan_overrides": null,
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "agent",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "9e2e04b09c290be63ef4b900638acaddb670bf393acdbb59f7d4cc7a05561117",
+      "expected_user_sha256": "9f79487dc812908828d651cff55d03e9f9ff60cc638b8f51f7ae6c29f11076c7"
+    },
+    {
+      "id": "round-2-overrides-True-owner-operator",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "trial_portion": 0.37,
+          "eval_portion": 0.23
+        },
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "run",
+                "source": "formal_strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "trial_portion",
+                "owner": "run",
+                "source": "formal_portion",
+                "value": 0.1
+              },
+              {
+                "field": "train_portion",
+                "owner": "run",
+                "source": "formal_train_portion",
+                "value": 1.0
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "operator",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "186cc4cab3c67bcc50f8ed4b519ba3f3cf6a79ade9d2fc993845d6606b2e650a",
+      "expected_user_sha256": "28dbac1f724e0a1cc87f6389c39d8589cb3486551c70fab64fd44fedb2a0a2c4"
+    },
+    {
+      "id": "round-2-overrides-True-owner-agent",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "trial_portion": 0.37,
+          "eval_portion": 0.23
+        },
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "agent",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "9e2e04b09c290be63ef4b900638acaddb670bf393acdbb59f7d4cc7a05561117",
+      "expected_user_sha256": "28dbac1f724e0a1cc87f6389c39d8589cb3486551c70fab64fd44fedb2a0a2c4"
+    },
+    {
+      "id": "round-4-overrides-False-owner-operator",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4,
+        "plan_overrides": null,
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "run",
+                "source": "formal_strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "trial_portion",
+                "owner": "run",
+                "source": "formal_portion",
+                "value": 0.1
+              },
+              {
+                "field": "train_portion",
+                "owner": "run",
+                "source": "formal_train_portion",
+                "value": 1.0
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "operator",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "186cc4cab3c67bcc50f8ed4b519ba3f3cf6a79ade9d2fc993845d6606b2e650a",
+      "expected_user_sha256": "b5cb9f52bf873eb91dabf893f0029fb09d5032fc9afff304713385e13d21d881"
+    },
+    {
+      "id": "round-4-overrides-False-owner-agent",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4,
+        "plan_overrides": null,
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "agent",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "9e2e04b09c290be63ef4b900638acaddb670bf393acdbb59f7d4cc7a05561117",
+      "expected_user_sha256": "b5cb9f52bf873eb91dabf893f0029fb09d5032fc9afff304713385e13d21d881"
+    },
+    {
+      "id": "round-4-overrides-True-owner-operator",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "trial_portion": 0.37,
+          "eval_portion": 0.23
+        },
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "run",
+                "source": "formal_strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "trial_portion",
+                "owner": "run",
+                "source": "formal_portion",
+                "value": 0.1
+              },
+              {
+                "field": "train_portion",
+                "owner": "run",
+                "source": "formal_train_portion",
+                "value": 1.0
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "operator",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "186cc4cab3c67bcc50f8ed4b519ba3f3cf6a79ade9d2fc993845d6606b2e650a",
+      "expected_user_sha256": "9ab27c11176cd575c9938a329ce06ce47ed76075eddabcd013685f5dfc240796"
+    },
+    {
+      "id": "round-4-overrides-True-owner-agent",
+      "arguments": {
+        "current_round": 4,
+        "max_rounds": 4,
+        "plan_overrides": {
+          "trial_portion": 0.37,
+          "eval_portion": 0.23
+        },
+        "trial_max_epochs": 7,
+        "formal_max_epochs": 9
+      },
+      "timing_context": {
+        "plan_overrides": {},
+        "task_rules": null,
+        "workflow_rules": null,
+        "roles": [
+          {
+            "mode": "trial",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "resolved_plan",
+                "source": "eval_strategy",
+                "value": null
+              },
+              {
+                "field": "eval_portion",
+                "owner": "resolved_plan",
+                "source": "eval_portion",
+                "value": null
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          },
+          {
+            "mode": "formal",
+            "workload": [
+              {
+                "field": "trial_strategy",
+                "owner": "resolved_plan",
+                "source": "trial_strategy",
+                "value": null
+              },
+              {
+                "field": "trial_portion",
+                "owner": "resolved_plan",
+                "source": "trial_portion",
+                "value": null
+              },
+              {
+                "field": "train_portion",
+                "owner": "resolved_plan",
+                "source": "train_portion",
+                "value": null
+              },
+              {
+                "field": "eval_strategy",
+                "owner": "execution_contract",
+                "source": "formal evaluation strategy",
+                "value": "snapshot"
+              },
+              {
+                "field": "eval_portion",
+                "owner": "run",
+                "source": "formal_eval_portion",
+                "value": 0.29
+              }
+            ],
+            "epoch_cap": null,
+            "epoch_cap_source": null
+          }
+        ],
+        "formal_training_scope_source": "agent",
+        "formal_eval_portion": 0.29,
+        "trial_allowed": true,
+        "forced_formal": false,
+        "inheritance_strategy": "full_clone",
+        "inheritance_values": {},
+        "inheritance_unless_authored": [],
+        "inheritance_winner": null,
+        "inheritance_recovery": null,
+        "partial_scope_strategy_overrides": {},
+        "validation_max_portion": null,
+        "validation_max_train_samples": null,
+        "validation_max_samples": null,
+        "training_validation_portion": null,
+        "training_budget_reserve_fraction": null
+      },
+      "expected_system_sha256": "9e2e04b09c290be63ef4b900638acaddb670bf393acdbb59f7d4cc7a05561117",
+      "expected_user_sha256": "9ab27c11176cd575c9938a329ce06ce47ed76075eddabcd013685f5dfc240796"
+    }
+  ]
+}

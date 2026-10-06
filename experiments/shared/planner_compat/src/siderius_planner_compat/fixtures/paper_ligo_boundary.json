@@ -1,0 +1,1660 @@
+{
+  "kind": "paper-planner-branch-parity-v1",
+  "scope": "LIGO-derived offline shared-logic fixtures; other task names label control-branch projections, not full historical calls. History is an explicitly selected archived Trial record projection.",
+  "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+  "pre_pr_revision": "a2eb55dfb2853870a8294eb675a8060043d9c68b",
+  "pre_pr_tree": "ff6dfbe2d8f66187ca86ac0045921905daf58782",
+  "model_source_sha256": "9df1e16d8bd36814b70148f2c1ea857102765bf3907962aac8c2143ded5220ba",
+  "history_source_sha256": "fde00b278bd6d2d310d5483bdad4aabda23b9c76ac543cea550484c174c331bf",
+  "base_arguments": {
+    "training_budget_reserve_fraction": 0.2,
+    "expert_advice": "",
+    "force_model": "dual_domain_chirp_fuser",
+    "model_description": null,
+    "exploration_checklist": "",
+    "plugin_source_excerpt": "## PLUGIN CONFIG SCHEMA (authoritative \u2014 read validators carefully)\nThe planner prompt's JSON schema below cannot represent `@model_validator(mode='after')` or cross-field `@field_validator` bodies. Treat the source below as the single source of truth for any cross-field invariants; a proposed config that violates one will be rejected by the resource-eval skill and burn a retry attempt.\n\n```python\nclass DualDomainChirpFuserConfig(BaseModel):\n    model_type: str = Field(default=\"dual_domain_chirp_fuser\", description=\"Plugin model type key.\")\n    segmentation_size: int = Field(ge=1)\n    batch_size: int = Field(default=256, ge=1)\n    stem_channels: int = Field(default=64, ge=16, le=128, multiple_of=2)\n    residual_channels: int = Field(default=64, ge=16, le=128, multiple_of=2)\n    skip_channels: int = Field(default=64, ge=16, le=128, multiple_of=2)\n    temporal_blocks: int = Field(default=9, ge=5, le=9)\n    spectral_width: int = Field(default=32, ge=8, le=64)\n    spectral_blocks: int = Field(default=2, ge=1, le=4)\n    fusion_hidden: int = Field(default=64, ge=16, le=256)\n    temporal_dropout: float = Field(default=0.0, ge=0.0, le=0.3)\n    spectral_dropout: float = Field(default=0.0, ge=0.0, le=0.3)\n    fusion_dropout: float = Field(default=0.0, ge=0.0, le=0.3)\n\n```\n",
+    "current_round": 1,
+    "max_rounds": 2,
+    "trial_allowed": true,
+    "force_formal_round": true,
+    "plan_overrides": {
+      "is_trial": true
+    },
+    "max_epochs": 100,
+    "trial_max_epochs": 100,
+    "formal_max_epochs": 100,
+    "resolved_data_scope": null,
+    "trial_vram_budget_gb": 16.0,
+    "formal_vram_budget_gb": 16.0,
+    "trial_time_budget_minutes": 10.0,
+    "formal_time_budget_minutes": 30.0,
+    "last_vram_estimate_gb": null,
+    "last_time_estimate_minutes": null,
+    "last_batch_size": null,
+    "last_mode": null,
+    "score_table_md": null,
+    "custom_loss_inventory": {
+      "composed": true,
+      "expected_snapshot": null,
+      "entries": [],
+      "unavailable": [],
+      "unavailable_reason": "expected custom-loss snapshot is missing",
+      "generation_allowed": true
+    },
+    "task_render": {
+      "loss_context": {
+        "output_semantic": "continuous",
+        "output_has_temporal_axis": false,
+        "objective": null
+      },
+      "builtin_model_roster": "punet | fcnet | transformer | wavenet | rnn | gated_fno",
+      "full_scope_segments": null,
+      "output_contract_shape": "[B, 1]",
+      "focal_alpha_default": "0.5",
+      "focal_gamma_default": "2.0",
+      "gate_check_names": [],
+      "efficiency_band_pct": "5",
+      "available_models_block": "### THE MODEL UNDER TUNING:\nThis run tunes ONE model, supplied by the task package. Its architecture description \u2014 when the task declares one \u2014 appears in the [MODEL ARCHITECTURE DESCRIPTION] block of the user message. Do not assume a built-in architecture or its properties.\n",
+      "per_file_table_protocol": "",
+      "score_field_noun": "field",
+      "target_strategy_impact_note": "",
+      "sampling_impact_tradeoff": "",
+      "per_file_comparison_block": "",
+      "score_display_noun": "score"
+    },
+    "metric_spec": {
+      "id": "r2",
+      "direction": "higher",
+      "aggregation": "global_over_exact_evaluation_scope",
+      "transform": null,
+      "transform_params": {},
+      "references": [],
+      "scoreability": {
+        "contract_id": "prepared_scalar_predictions"
+      }
+    },
+    "memory_history": []
+  },
+  "config_manuals": {
+    "historical": {
+      "schemas": {
+        "PUNetConfig": {
+          "properties": {
+            "model_type": {
+              "const": "punet",
+              "default": "punet",
+              "title": "Model Type",
+              "type": "string"
+            },
+            "segmentation_size": {
+              "default": 40000,
+              "description": "Input time series length",
+              "minimum": 1000,
+              "title": "Segmentation Size",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "num_classes": {
+              "default": 256,
+              "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+              "exclusiveMinimum": 0,
+              "title": "Num Classes",
+              "type": "integer"
+            },
+            "multi": {
+              "default": 40,
+              "description": "Base channel multiplier",
+              "maximum": 128,
+              "minimum": 8,
+              "title": "Multi",
+              "type": "integer"
+            },
+            "depth": {
+              "default": 4,
+              "description": "Number of downsampling steps",
+              "maximum": 5,
+              "minimum": 1,
+              "title": "Depth",
+              "type": "integer"
+            },
+            "bilinear": {
+              "default": true,
+              "description": "Whether to use bilinear upsampling or conv transpose",
+              "title": "Bilinear",
+              "type": "boolean"
+            },
+            "pe_factor": {
+              "default": 1.0,
+              "description": "Positional encoding weight",
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "title": "Pe Factor",
+              "type": "number"
+            },
+            "kernel_size": {
+              "default": 9,
+              "description": "Convolutional kernel size",
+              "maximum": 15,
+              "minimum": 3,
+              "title": "Kernel Size",
+              "type": "integer"
+            },
+            "embedding_dim": {
+              "default": 32,
+              "description": "Latent space dimension for ADC values",
+              "maximum": 256,
+              "minimum": 8,
+              "title": "Embedding Dim",
+              "type": "integer"
+            }
+          },
+          "title": "PUNetConfig",
+          "type": "object"
+        },
+        "AEConfig": {
+          "description": "Configuration for Fully Connected AutoEncoder.\nDesigned for global feature compression and noise filtering.",
+          "properties": {
+            "model_type": {
+              "const": "fcnet",
+              "default": "fcnet",
+              "title": "Model Type",
+              "type": "string"
+            },
+            "segmentation_size": {
+              "default": 40000,
+              "description": "Input time series length",
+              "minimum": 1000,
+              "title": "Segmentation Size",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "num_classes": {
+              "default": 256,
+              "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+              "exclusiveMinimum": 0,
+              "title": "Num Classes",
+              "type": "integer"
+            },
+            "latent_dims": {
+              "default": [
+                4000,
+                400,
+                40
+              ],
+              "description": "List of hidden layer dimensions for the encoder",
+              "items": {
+                "type": "integer"
+              },
+              "maxItems": 6,
+              "minItems": 1,
+              "title": "Latent Dims",
+              "type": "array"
+            },
+            "dropout": {
+              "default": 0.0,
+              "maximum": 0.5,
+              "minimum": 0.0,
+              "title": "Dropout",
+              "type": "number"
+            }
+          },
+          "title": "AEConfig",
+          "type": "object"
+        },
+        "TransformerConfig": {
+          "properties": {
+            "model_type": {
+              "const": "transformer",
+              "default": "transformer",
+              "title": "Model Type",
+              "type": "string"
+            },
+            "segmentation_size": {
+              "default": 20000,
+              "maximum": 40000,
+              "minimum": 1000,
+              "title": "Segmentation Size",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "num_classes": {
+              "default": 256,
+              "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+              "exclusiveMinimum": 0,
+              "title": "Num Classes",
+              "type": "integer"
+            },
+            "embedding_dim": {
+              "default": 32,
+              "maximum": 256,
+              "minimum": 8,
+              "title": "Embedding Dim",
+              "type": "integer"
+            },
+            "nhead": {
+              "default": 4,
+              "maximum": 16,
+              "minimum": 1,
+              "title": "Nhead",
+              "type": "integer"
+            },
+            "num_layers": {
+              "default": 2,
+              "maximum": 10,
+              "minimum": 1,
+              "title": "Num Layers",
+              "type": "integer"
+            },
+            "dim_feedforward": {
+              "default": 128,
+              "maximum": 1024,
+              "minimum": 64,
+              "title": "Dim Feedforward",
+              "type": "integer"
+            },
+            "dropout": {
+              "default": 0.1,
+              "maximum": 0.5,
+              "minimum": 0.0,
+              "title": "Dropout",
+              "type": "number"
+            },
+            "pe_factor": {
+              "default": 1.0,
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "title": "Pe Factor",
+              "type": "number"
+            }
+          },
+          "title": "TransformerConfig",
+          "type": "object"
+        },
+        "LossConfig": {
+          "description": "Configuration for the Denoising Scoring Functions (Loss).\nStrictly validates parameters based on the chosen loss_type.\n\nThe four built-in ``loss_type`` values (``focal``, ``focal_cw``, ``ce``,\n``smooth_l1``) use the ``alpha`` / ``gamma`` / ``beta`` fields below.\nThe ``custom`` value (L2 \u2014 see ``docs/design/enable_loss_inventory.md``)\nroutes to a plugin loss in ``agent_generated/losses/``; the plugin's own\n``PLUGIN_LOSS_CONFIG_CLASS`` carries any plugin-specific hyperparameters.\nLossConfig is purely the *router* in custom mode \u2014 ``alpha`` / ``gamma``\n/ ``beta`` are nullified by ``enforce_parameter_consistency`` so the\nagent can't accidentally pass them through.",
+          "properties": {
+            "loss_type": {
+              "default": "focal",
+              "enum": [
+                "focal",
+                "focal_cw",
+                "ce",
+                "smooth_l1",
+                "custom"
+              ],
+              "title": "Loss Type",
+              "type": "string"
+            },
+            "alpha": {
+              "anyOf": [
+                {
+                  "maximum": 1.0,
+                  "minimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 0.5,
+              "title": "Alpha"
+            },
+            "gamma": {
+              "anyOf": [
+                {
+                  "maximum": 5.0,
+                  "minimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 2.0,
+              "title": "Gamma"
+            },
+            "beta": {
+              "anyOf": [
+                {
+                  "maximum": 10.0,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 1.0,
+              "title": "Beta"
+            },
+            "reduction": {
+              "default": "mean",
+              "enum": [
+                "mean",
+                "sum"
+              ],
+              "title": "Reduction",
+              "type": "string"
+            },
+            "use_class_weights": {
+              "default": false,
+              "title": "Use Class Weights",
+              "type": "boolean"
+            },
+            "loss_name": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "PLUGIN_LOSS_TYPE key of the agent-generated loss to use. Required when loss_type='custom'. The loss plugin must exist in agent_generated/losses/ (or in a SIDERIUS_LOSS_DIRS-resolved per-run directory) before training begins.",
+              "title": "Loss Name"
+            }
+          },
+          "title": "LossConfig",
+          "type": "object"
+        },
+        "TrainConfig": {
+          "description": "Configuration for the training execution.\nAgent can optimize learning rate, optimizer type, and epochs.",
+          "properties": {
+            "lr": {
+              "default": 0.0005,
+              "maximum": 0.1,
+              "minimum": 1e-06,
+              "title": "Lr",
+              "type": "number"
+            },
+            "epochs": {
+              "default": 10,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Epochs",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "description": "Batch size for training",
+              "maximum": 1024,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "optimizer_type": {
+              "default": "adamw",
+              "enum": [
+                "adam",
+                "adamw",
+                "sgd"
+              ],
+              "title": "Optimizer Type",
+              "type": "string"
+            },
+            "weight_decay": {
+              "default": 1e-05,
+              "maximum": 0.1,
+              "minimum": 0,
+              "title": "Weight Decay",
+              "type": "number"
+            },
+            "device": {
+              "default": "cuda",
+              "title": "Device",
+              "type": "string"
+            }
+          },
+          "title": "TrainConfig",
+          "type": "object"
+        }
+      },
+      "quick_notes": "Returned schemas define configuration format only. For model/loss compatibility, output shape and class cardinality, segmentation legality, and resource limits, consult the resolved task contracts and execution validators; those authorities decide whether a proposal is valid."
+    },
+    "pre_pr": {
+      "schemas": {
+        "PUNetConfig": {
+          "properties": {
+            "model_type": {
+              "const": "punet",
+              "default": "punet",
+              "title": "Model Type",
+              "type": "string"
+            },
+            "segmentation_size": {
+              "default": 40000,
+              "description": "Input time series length",
+              "minimum": 1000,
+              "title": "Segmentation Size",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "num_classes": {
+              "default": 256,
+              "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+              "exclusiveMinimum": 0,
+              "title": "Num Classes",
+              "type": "integer"
+            },
+            "multi": {
+              "default": 40,
+              "description": "Base channel multiplier",
+              "maximum": 128,
+              "minimum": 8,
+              "title": "Multi",
+              "type": "integer"
+            },
+            "depth": {
+              "default": 4,
+              "description": "Number of downsampling steps",
+              "maximum": 5,
+              "minimum": 1,
+              "title": "Depth",
+              "type": "integer"
+            },
+            "bilinear": {
+              "default": true,
+              "description": "Whether to use bilinear upsampling or conv transpose",
+              "title": "Bilinear",
+              "type": "boolean"
+            },
+            "pe_factor": {
+              "default": 1.0,
+              "description": "Positional encoding weight",
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "title": "Pe Factor",
+              "type": "number"
+            },
+            "kernel_size": {
+              "default": 9,
+              "description": "Convolutional kernel size",
+              "maximum": 15,
+              "minimum": 3,
+              "title": "Kernel Size",
+              "type": "integer"
+            },
+            "embedding_dim": {
+              "default": 32,
+              "description": "Latent space dimension for ADC values",
+              "maximum": 256,
+              "minimum": 8,
+              "title": "Embedding Dim",
+              "type": "integer"
+            }
+          },
+          "title": "PUNetConfig",
+          "type": "object"
+        },
+        "AEConfig": {
+          "description": "Configuration for Fully Connected AutoEncoder.\nDesigned for global feature compression and noise filtering.",
+          "properties": {
+            "model_type": {
+              "const": "fcnet",
+              "default": "fcnet",
+              "title": "Model Type",
+              "type": "string"
+            },
+            "segmentation_size": {
+              "default": 40000,
+              "description": "Input time series length",
+              "minimum": 1000,
+              "title": "Segmentation Size",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "num_classes": {
+              "default": 256,
+              "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+              "exclusiveMinimum": 0,
+              "title": "Num Classes",
+              "type": "integer"
+            },
+            "latent_dims": {
+              "default": [
+                4000,
+                400,
+                40
+              ],
+              "description": "List of hidden layer dimensions for the encoder",
+              "items": {
+                "type": "integer"
+              },
+              "maxItems": 6,
+              "minItems": 1,
+              "title": "Latent Dims",
+              "type": "array"
+            },
+            "dropout": {
+              "default": 0.0,
+              "maximum": 0.5,
+              "minimum": 0.0,
+              "title": "Dropout",
+              "type": "number"
+            }
+          },
+          "title": "AEConfig",
+          "type": "object"
+        },
+        "TransformerConfig": {
+          "properties": {
+            "model_type": {
+              "const": "transformer",
+              "default": "transformer",
+              "title": "Model Type",
+              "type": "string"
+            },
+            "segmentation_size": {
+              "default": 20000,
+              "maximum": 40000,
+              "minimum": 1000,
+              "title": "Segmentation Size",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "num_classes": {
+              "default": 256,
+              "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+              "exclusiveMinimum": 0,
+              "title": "Num Classes",
+              "type": "integer"
+            },
+            "embedding_dim": {
+              "default": 32,
+              "maximum": 256,
+              "minimum": 8,
+              "title": "Embedding Dim",
+              "type": "integer"
+            },
+            "nhead": {
+              "default": 4,
+              "maximum": 16,
+              "minimum": 1,
+              "title": "Nhead",
+              "type": "integer"
+            },
+            "num_layers": {
+              "default": 2,
+              "maximum": 10,
+              "minimum": 1,
+              "title": "Num Layers",
+              "type": "integer"
+            },
+            "dim_feedforward": {
+              "default": 128,
+              "maximum": 1024,
+              "minimum": 64,
+              "title": "Dim Feedforward",
+              "type": "integer"
+            },
+            "dropout": {
+              "default": 0.1,
+              "maximum": 0.5,
+              "minimum": 0.0,
+              "title": "Dropout",
+              "type": "number"
+            },
+            "pe_factor": {
+              "default": 1.0,
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "title": "Pe Factor",
+              "type": "number"
+            }
+          },
+          "title": "TransformerConfig",
+          "type": "object"
+        },
+        "LossConfig": {
+          "description": "Configuration for the Denoising Scoring Functions (Loss).\nStrictly validates parameters based on the chosen loss_type.\n\nThe four built-in ``loss_type`` values (``focal``, ``focal_cw``, ``ce``,\n``smooth_l1``) use the ``alpha`` / ``gamma`` / ``beta`` fields below.\nThe ``custom`` value (L2 \u2014 see ``docs/design/enable_loss_inventory.md``)\nroutes to a plugin loss in ``agent_generated/losses/``; the plugin's own\n``PLUGIN_LOSS_CONFIG_CLASS`` carries any plugin-specific hyperparameters.\nLossConfig is purely the *router* in custom mode \u2014 ``alpha`` / ``gamma``\n/ ``beta`` are nullified by ``enforce_parameter_consistency`` so the\nagent can't accidentally pass them through.",
+          "properties": {
+            "loss_type": {
+              "default": "focal",
+              "enum": [
+                "focal",
+                "focal_cw",
+                "ce",
+                "smooth_l1",
+                "custom"
+              ],
+              "title": "Loss Type",
+              "type": "string"
+            },
+            "alpha": {
+              "anyOf": [
+                {
+                  "maximum": 1.0,
+                  "minimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 0.5,
+              "title": "Alpha"
+            },
+            "gamma": {
+              "anyOf": [
+                {
+                  "maximum": 5.0,
+                  "minimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 2.0,
+              "title": "Gamma"
+            },
+            "beta": {
+              "anyOf": [
+                {
+                  "maximum": 10.0,
+                  "minimum": 0.1,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 1.0,
+              "title": "Beta"
+            },
+            "reduction": {
+              "default": "mean",
+              "enum": [
+                "mean",
+                "sum"
+              ],
+              "title": "Reduction",
+              "type": "string"
+            },
+            "use_class_weights": {
+              "default": false,
+              "title": "Use Class Weights",
+              "type": "boolean"
+            },
+            "loss_name": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "PLUGIN_LOSS_TYPE key of the agent-generated loss to use. Required when loss_type='custom'. The loss plugin must exist in agent_generated/losses/ (or in a SIDERIUS_LOSS_DIRS-resolved per-run directory) before training begins.",
+              "title": "Loss Name"
+            }
+          },
+          "title": "LossConfig",
+          "type": "object"
+        },
+        "TrainConfig": {
+          "description": "Configuration for the training execution.\nAgent can optimize learning rate, optimizer type, and epochs.",
+          "properties": {
+            "lr": {
+              "default": 0.0005,
+              "maximum": 0.1,
+              "minimum": 1e-06,
+              "title": "Lr",
+              "type": "number"
+            },
+            "epochs": {
+              "default": 10,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Epochs",
+              "type": "integer"
+            },
+            "batch_size": {
+              "default": 1,
+              "description": "Batch size for training",
+              "maximum": 1024,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "optimizer_type": {
+              "default": "adamw",
+              "enum": [
+                "adam",
+                "adamw",
+                "sgd"
+              ],
+              "title": "Optimizer Type",
+              "type": "string"
+            },
+            "weight_decay": {
+              "default": 1e-05,
+              "maximum": 0.1,
+              "minimum": 0,
+              "title": "Weight Decay",
+              "type": "number"
+            },
+            "device": {
+              "default": "cuda",
+              "title": "Device",
+              "type": "string"
+            },
+            "checkpoint_selection": {
+              "default": "last_completed_epoch",
+              "enum": [
+                "last_completed_epoch",
+                "best_validation_loss"
+              ],
+              "title": "Checkpoint Selection",
+              "type": "string"
+            },
+            "target_standardization": {
+              "default": "none",
+              "enum": [
+                "none",
+                "training_pool_global"
+              ],
+              "title": "Target Standardization",
+              "type": "string"
+            },
+            "drop_last": {
+              "default": true,
+              "title": "Drop Last",
+              "type": "boolean"
+            }
+          },
+          "title": "TrainConfig",
+          "type": "object"
+        }
+      },
+      "quick_notes": "Returned schemas define configuration format only. For model/loss compatibility, output shape and class cardinality, segmentation legality, and resource limits, consult the resolved task contracts and execution validators; those authorities decide whether a proposal is valid."
+    }
+  },
+  "timing_context": {
+    "plan_overrides": {
+      "is_trial": true
+    },
+    "task_rules": {
+      "rules": {}
+    },
+    "workflow_rules": null,
+    "roles": [
+      {
+        "mode": "trial",
+        "workload": [
+          {
+            "field": "trial_strategy",
+            "owner": "resolved_plan",
+            "source": "trial_strategy",
+            "value": null
+          },
+          {
+            "field": "trial_portion",
+            "owner": "resolved_plan",
+            "source": "trial_portion",
+            "value": null
+          },
+          {
+            "field": "train_portion",
+            "owner": "resolved_plan",
+            "source": "train_portion",
+            "value": null
+          },
+          {
+            "field": "eval_strategy",
+            "owner": "resolved_plan",
+            "source": "eval_strategy",
+            "value": null
+          },
+          {
+            "field": "eval_portion",
+            "owner": "resolved_plan",
+            "source": "eval_portion",
+            "value": null
+          }
+        ],
+        "epoch_cap": 100,
+        "epoch_cap_source": "trial_max_epochs"
+      },
+      {
+        "mode": "formal",
+        "workload": [
+          {
+            "field": "trial_strategy",
+            "owner": "resolved_plan",
+            "source": "trial_strategy",
+            "value": null
+          },
+          {
+            "field": "trial_portion",
+            "owner": "resolved_plan",
+            "source": "trial_portion",
+            "value": null
+          },
+          {
+            "field": "train_portion",
+            "owner": "resolved_plan",
+            "source": "train_portion",
+            "value": null
+          },
+          {
+            "field": "eval_strategy",
+            "owner": "execution_contract",
+            "source": "formal evaluation strategy",
+            "value": "snapshot"
+          },
+          {
+            "field": "eval_portion",
+            "owner": "run",
+            "source": "formal_eval_portion",
+            "value": 1.0
+          }
+        ],
+        "epoch_cap": 100,
+        "epoch_cap_source": "formal_max_epochs"
+      }
+    ],
+    "formal_training_scope_source": "agent",
+    "formal_eval_portion": 1.0,
+    "trial_allowed": true,
+    "forced_formal": false,
+    "inheritance_strategy": "full_clone",
+    "inheritance_values": {},
+    "inheritance_unless_authored": [],
+    "inheritance_winner": null,
+    "inheritance_recovery": null,
+    "partial_scope_strategy_overrides": {},
+    "validation_max_portion": null,
+    "validation_max_train_samples": null,
+    "validation_max_samples": null,
+    "training_validation_portion": 0.1,
+    "training_budget_reserve_fraction": 0.2
+  },
+  "cases": [
+    {
+      "id": "ligo-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        }
+      },
+      "formal_training_scope_source": "agent",
+      "training_validation_portion": 0.1,
+      "output_has_temporal_axis": false,
+      "expected": {
+        "historical": {
+          "id": "ligo-round-1",
+          "system_sha256": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+          "user_sha256": "feb0d63851995cbea1d771b2670fdca909501024e09a1347cbcf4810d347b762"
+        },
+        "pre_pr": {
+          "id": "ligo-round-1",
+          "system_sha256": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+          "user_sha256": "71441323e99a3af28b7514363db62dd619f02df027a2f9b7de687b132c7e516f"
+        }
+      }
+    },
+    {
+      "id": "ligo-round-2",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "memory_history": [
+          {
+            "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+            "status": "success",
+            "model_type": "dual_domain_chirp_fuser",
+            "params": {
+              "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+              "run_name": "iter_001",
+              "model_type": "dual_domain_chirp_fuser",
+              "model_config": {
+                "segmentation_size": 1024,
+                "batch_size": 256,
+                "stem_channels": 64,
+                "residual_channels": 64,
+                "skip_channels": 64,
+                "temporal_blocks": 9,
+                "spectral_width": 32,
+                "spectral_blocks": 2,
+                "fusion_hidden": 64,
+                "temporal_dropout": 0.0,
+                "spectral_dropout": 0.0,
+                "fusion_dropout": 0.0,
+                "model_type": "dual_domain_chirp_fuser"
+              },
+              "train_config": {
+                "lr": 0.0001,
+                "epochs": 10,
+                "batch_size": 256,
+                "optimizer_type": "adamw",
+                "weight_decay": 1e-05,
+                "device": "cuda"
+              },
+              "loss_config": {
+                "loss_type": "smooth_l1",
+                "beta": 1.0,
+                "reduction": "mean"
+              },
+              "inference_batch": 64
+            },
+            "denoising_score": 0.6265948985106088,
+            "final_loss": 0.014135786919731377,
+            "is_trial": true,
+            "trial_strategy": "snapshot",
+            "trial_portion": 1.0,
+            "eval_strategy": "snapshot",
+            "eval_portion": 1.0,
+            "train_portion": 1.0,
+            "timing": {
+              "train_time_s": 453.6,
+              "validation_time_s": 5.9,
+              "inference_time_s": 10.4,
+              "scoring_time_s": 3.8
+            },
+            "memory": {
+              "time_estimate_minutes": null,
+              "time_budget_minutes": null,
+              "time_mode": null,
+              "vram_estimate_gb": 1.503,
+              "vram_budget_gb": 16.0
+            }
+          }
+        ],
+        "last_vram_estimate_gb": 1.503,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": 256,
+        "last_mode": null
+      },
+      "formal_training_scope_source": "agent",
+      "training_validation_portion": 0.1,
+      "output_has_temporal_axis": false,
+      "expected": {
+        "historical": {
+          "id": "ligo-round-2",
+          "system_sha256": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+          "user_sha256": "d8142e16fb5147c90e15ac5f8a9e2f2a37c12013e35849d8c1349d994336c627"
+        },
+        "pre_pr": {
+          "id": "ligo-round-2",
+          "system_sha256": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+          "user_sha256": "d83c31dfb492c15f863e5214f6408992bfa6cbd097fb164534701d911462a683"
+        }
+      }
+    },
+    {
+      "id": "tess-branch-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        }
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": null,
+      "output_has_temporal_axis": false,
+      "expected": {
+        "historical": {
+          "id": "tess-branch-round-1",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "feb0d63851995cbea1d771b2670fdca909501024e09a1347cbcf4810d347b762"
+        },
+        "pre_pr": {
+          "id": "tess-branch-round-1",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "71441323e99a3af28b7514363db62dd619f02df027a2f9b7de687b132c7e516f"
+        }
+      }
+    },
+    {
+      "id": "tess-branch-round-2",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "memory_history": [
+          {
+            "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+            "status": "success",
+            "model_type": "dual_domain_chirp_fuser",
+            "params": {
+              "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+              "run_name": "iter_001",
+              "model_type": "dual_domain_chirp_fuser",
+              "model_config": {
+                "segmentation_size": 1024,
+                "batch_size": 256,
+                "stem_channels": 64,
+                "residual_channels": 64,
+                "skip_channels": 64,
+                "temporal_blocks": 9,
+                "spectral_width": 32,
+                "spectral_blocks": 2,
+                "fusion_hidden": 64,
+                "temporal_dropout": 0.0,
+                "spectral_dropout": 0.0,
+                "fusion_dropout": 0.0,
+                "model_type": "dual_domain_chirp_fuser"
+              },
+              "train_config": {
+                "lr": 0.0001,
+                "epochs": 10,
+                "batch_size": 256,
+                "optimizer_type": "adamw",
+                "weight_decay": 1e-05,
+                "device": "cuda"
+              },
+              "loss_config": {
+                "loss_type": "smooth_l1",
+                "beta": 1.0,
+                "reduction": "mean"
+              },
+              "inference_batch": 64
+            },
+            "denoising_score": 0.6265948985106088,
+            "final_loss": 0.014135786919731377,
+            "is_trial": true,
+            "trial_strategy": "snapshot",
+            "trial_portion": 1.0,
+            "eval_strategy": "snapshot",
+            "eval_portion": 1.0,
+            "train_portion": 1.0,
+            "timing": {
+              "train_time_s": 453.6,
+              "validation_time_s": 5.9,
+              "inference_time_s": 10.4,
+              "scoring_time_s": 3.8
+            },
+            "memory": {
+              "time_estimate_minutes": null,
+              "time_budget_minutes": null,
+              "time_mode": null,
+              "vram_estimate_gb": 1.503,
+              "vram_budget_gb": 16.0
+            }
+          }
+        ],
+        "last_vram_estimate_gb": 1.503,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": 256,
+        "last_mode": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": null,
+      "output_has_temporal_axis": false,
+      "expected": {
+        "historical": {
+          "id": "tess-branch-round-2",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "d8142e16fb5147c90e15ac5f8a9e2f2a37c12013e35849d8c1349d994336c627"
+        },
+        "pre_pr": {
+          "id": "tess-branch-round-2",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "d83c31dfb492c15f863e5214f6408992bfa6cbd097fb164534701d911462a683"
+        }
+      }
+    },
+    {
+      "id": "project8-branch-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        }
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": 0.1,
+      "output_has_temporal_axis": false,
+      "expected": {
+        "historical": {
+          "id": "project8-branch-round-1",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "feb0d63851995cbea1d771b2670fdca909501024e09a1347cbcf4810d347b762"
+        },
+        "pre_pr": {
+          "id": "project8-branch-round-1",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "71441323e99a3af28b7514363db62dd619f02df027a2f9b7de687b132c7e516f"
+        }
+      }
+    },
+    {
+      "id": "project8-branch-round-2",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "memory_history": [
+          {
+            "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+            "status": "success",
+            "model_type": "dual_domain_chirp_fuser",
+            "params": {
+              "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+              "run_name": "iter_001",
+              "model_type": "dual_domain_chirp_fuser",
+              "model_config": {
+                "segmentation_size": 1024,
+                "batch_size": 256,
+                "stem_channels": 64,
+                "residual_channels": 64,
+                "skip_channels": 64,
+                "temporal_blocks": 9,
+                "spectral_width": 32,
+                "spectral_blocks": 2,
+                "fusion_hidden": 64,
+                "temporal_dropout": 0.0,
+                "spectral_dropout": 0.0,
+                "fusion_dropout": 0.0,
+                "model_type": "dual_domain_chirp_fuser"
+              },
+              "train_config": {
+                "lr": 0.0001,
+                "epochs": 10,
+                "batch_size": 256,
+                "optimizer_type": "adamw",
+                "weight_decay": 1e-05,
+                "device": "cuda"
+              },
+              "loss_config": {
+                "loss_type": "smooth_l1",
+                "beta": 1.0,
+                "reduction": "mean"
+              },
+              "inference_batch": 64
+            },
+            "denoising_score": 0.6265948985106088,
+            "final_loss": 0.014135786919731377,
+            "is_trial": true,
+            "trial_strategy": "snapshot",
+            "trial_portion": 1.0,
+            "eval_strategy": "snapshot",
+            "eval_portion": 1.0,
+            "train_portion": 1.0,
+            "timing": {
+              "train_time_s": 453.6,
+              "validation_time_s": 5.9,
+              "inference_time_s": 10.4,
+              "scoring_time_s": 3.8
+            },
+            "memory": {
+              "time_estimate_minutes": null,
+              "time_budget_minutes": null,
+              "time_mode": null,
+              "vram_estimate_gb": 1.503,
+              "vram_budget_gb": 16.0
+            }
+          }
+        ],
+        "last_vram_estimate_gb": 1.503,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": 256,
+        "last_mode": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": 0.1,
+      "output_has_temporal_axis": false,
+      "expected": {
+        "historical": {
+          "id": "project8-branch-round-2",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "d8142e16fb5147c90e15ac5f8a9e2f2a37c12013e35849d8c1349d994336c627"
+        },
+        "pre_pr": {
+          "id": "project8-branch-round-2",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "d83c31dfb492c15f863e5214f6408992bfa6cbd097fb164534701d911462a683"
+        }
+      }
+    },
+    {
+      "id": "tidmad-noprior-branch-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 3,
+        "plan_overrides": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": null,
+      "output_has_temporal_axis": true,
+      "expected": {
+        "historical": {
+          "id": "tidmad-noprior-branch-round-1",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "3b96ff13cebbb4d5cfea634b0b50c32b480bf90520b96a5ac199c20455808ae3"
+        },
+        "pre_pr": {
+          "id": "tidmad-noprior-branch-round-1",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "543255dff3afa919b7584391aeb71b84b0304e2988c0ac505c8df0848c3dcfb2"
+        }
+      }
+    },
+    {
+      "id": "tidmad-noprior-branch-round-2",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "memory_history": [
+          {
+            "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+            "status": "success",
+            "model_type": "dual_domain_chirp_fuser",
+            "params": {
+              "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+              "run_name": "iter_001",
+              "model_type": "dual_domain_chirp_fuser",
+              "model_config": {
+                "segmentation_size": 1024,
+                "batch_size": 256,
+                "stem_channels": 64,
+                "residual_channels": 64,
+                "skip_channels": 64,
+                "temporal_blocks": 9,
+                "spectral_width": 32,
+                "spectral_blocks": 2,
+                "fusion_hidden": 64,
+                "temporal_dropout": 0.0,
+                "spectral_dropout": 0.0,
+                "fusion_dropout": 0.0,
+                "model_type": "dual_domain_chirp_fuser"
+              },
+              "train_config": {
+                "lr": 0.0001,
+                "epochs": 10,
+                "batch_size": 256,
+                "optimizer_type": "adamw",
+                "weight_decay": 1e-05,
+                "device": "cuda"
+              },
+              "loss_config": {
+                "loss_type": "smooth_l1",
+                "beta": 1.0,
+                "reduction": "mean"
+              },
+              "inference_batch": 64
+            },
+            "denoising_score": 0.6265948985106088,
+            "final_loss": 0.014135786919731377,
+            "is_trial": true,
+            "trial_strategy": "snapshot",
+            "trial_portion": 1.0,
+            "eval_strategy": "snapshot",
+            "eval_portion": 1.0,
+            "train_portion": 1.0,
+            "timing": {
+              "train_time_s": 453.6,
+              "validation_time_s": 5.9,
+              "inference_time_s": 10.4,
+              "scoring_time_s": 3.8
+            },
+            "memory": {
+              "time_estimate_minutes": null,
+              "time_budget_minutes": null,
+              "time_mode": null,
+              "vram_estimate_gb": 1.503,
+              "vram_budget_gb": 16.0
+            }
+          }
+        ],
+        "last_vram_estimate_gb": 1.503,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": 256,
+        "last_mode": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": null,
+      "output_has_temporal_axis": true,
+      "expected": {
+        "historical": {
+          "id": "tidmad-noprior-branch-round-2",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "b396485f75c3e8e033a61c9a8970a4cecd3752ffc9a8a6d8f4f764e6084fb52e"
+        },
+        "pre_pr": {
+          "id": "tidmad-noprior-branch-round-2",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "785ff859a95de4ac831dde2c48eaa41a7eb8da83590b7ab7f66cc277aadd2f58"
+        }
+      }
+    },
+    {
+      "id": "tidmad-noprior-branch-round-3",
+      "arguments": {
+        "current_round": 3,
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "memory_history": [
+          {
+            "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+            "status": "success",
+            "model_type": "dual_domain_chirp_fuser",
+            "params": {
+              "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+              "run_name": "iter_001",
+              "model_type": "dual_domain_chirp_fuser",
+              "model_config": {
+                "segmentation_size": 1024,
+                "batch_size": 256,
+                "stem_channels": 64,
+                "residual_channels": 64,
+                "skip_channels": 64,
+                "temporal_blocks": 9,
+                "spectral_width": 32,
+                "spectral_blocks": 2,
+                "fusion_hidden": 64,
+                "temporal_dropout": 0.0,
+                "spectral_dropout": 0.0,
+                "fusion_dropout": 0.0,
+                "model_type": "dual_domain_chirp_fuser"
+              },
+              "train_config": {
+                "lr": 0.0001,
+                "epochs": 10,
+                "batch_size": 256,
+                "optimizer_type": "adamw",
+                "weight_decay": 1e-05,
+                "device": "cuda"
+              },
+              "loss_config": {
+                "loss_type": "smooth_l1",
+                "beta": 1.0,
+                "reduction": "mean"
+              },
+              "inference_batch": 64
+            },
+            "denoising_score": 0.6265948985106088,
+            "final_loss": 0.014135786919731377,
+            "is_trial": true,
+            "trial_strategy": "snapshot",
+            "trial_portion": 1.0,
+            "eval_strategy": "snapshot",
+            "eval_portion": 1.0,
+            "train_portion": 1.0,
+            "timing": {
+              "train_time_s": 453.6,
+              "validation_time_s": 5.9,
+              "inference_time_s": 10.4,
+              "scoring_time_s": 3.8
+            },
+            "memory": {
+              "time_estimate_minutes": null,
+              "time_budget_minutes": null,
+              "time_mode": null,
+              "vram_estimate_gb": 1.503,
+              "vram_budget_gb": 16.0
+            }
+          }
+        ],
+        "last_vram_estimate_gb": 1.503,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": 256,
+        "last_mode": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": null,
+      "output_has_temporal_axis": true,
+      "expected": {
+        "historical": {
+          "id": "tidmad-noprior-branch-round-3",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "5978bd242e3771587cbaac55ce181f4ce2d5208e39e3ff1205a7d762695f5872"
+        },
+        "pre_pr": {
+          "id": "tidmad-noprior-branch-round-3",
+          "system_sha256": "b8ae18a8ca1ae0e748b4b554e68c30a442abb150afc051425166a0ee9793e51b",
+          "user_sha256": "bbbc21da9427ffea1ffbb8c99764f9af7c6dc02d4f5e23149f15acb529eace99"
+        }
+      }
+    },
+    {
+      "id": "tidmad-analysis-branch-round-1",
+      "arguments": {
+        "current_round": 1,
+        "max_rounds": 3,
+        "plan_overrides": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": 0.1,
+      "output_has_temporal_axis": true,
+      "expected": {
+        "historical": {
+          "id": "tidmad-analysis-branch-round-1",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "3b96ff13cebbb4d5cfea634b0b50c32b480bf90520b96a5ac199c20455808ae3"
+        },
+        "pre_pr": {
+          "id": "tidmad-analysis-branch-round-1",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "543255dff3afa919b7584391aeb71b84b0304e2988c0ac505c8df0848c3dcfb2"
+        }
+      }
+    },
+    {
+      "id": "tidmad-analysis-branch-round-2",
+      "arguments": {
+        "current_round": 2,
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "memory_history": [
+          {
+            "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+            "status": "success",
+            "model_type": "dual_domain_chirp_fuser",
+            "params": {
+              "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+              "run_name": "iter_001",
+              "model_type": "dual_domain_chirp_fuser",
+              "model_config": {
+                "segmentation_size": 1024,
+                "batch_size": 256,
+                "stem_channels": 64,
+                "residual_channels": 64,
+                "skip_channels": 64,
+                "temporal_blocks": 9,
+                "spectral_width": 32,
+                "spectral_blocks": 2,
+                "fusion_hidden": 64,
+                "temporal_dropout": 0.0,
+                "spectral_dropout": 0.0,
+                "fusion_dropout": 0.0,
+                "model_type": "dual_domain_chirp_fuser"
+              },
+              "train_config": {
+                "lr": 0.0001,
+                "epochs": 10,
+                "batch_size": 256,
+                "optimizer_type": "adamw",
+                "weight_decay": 1e-05,
+                "device": "cuda"
+              },
+              "loss_config": {
+                "loss_type": "smooth_l1",
+                "beta": 1.0,
+                "reduction": "mean"
+              },
+              "inference_batch": 64
+            },
+            "denoising_score": 0.6265948985106088,
+            "final_loss": 0.014135786919731377,
+            "is_trial": true,
+            "trial_strategy": "snapshot",
+            "trial_portion": 1.0,
+            "eval_strategy": "snapshot",
+            "eval_portion": 1.0,
+            "train_portion": 1.0,
+            "timing": {
+              "train_time_s": 453.6,
+              "validation_time_s": 5.9,
+              "inference_time_s": 10.4,
+              "scoring_time_s": 3.8
+            },
+            "memory": {
+              "time_estimate_minutes": null,
+              "time_budget_minutes": null,
+              "time_mode": null,
+              "vram_estimate_gb": 1.503,
+              "vram_budget_gb": 16.0
+            }
+          }
+        ],
+        "last_vram_estimate_gb": 1.503,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": 256,
+        "last_mode": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": 0.1,
+      "output_has_temporal_axis": true,
+      "expected": {
+        "historical": {
+          "id": "tidmad-analysis-branch-round-2",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "b396485f75c3e8e033a61c9a8970a4cecd3752ffc9a8a6d8f4f764e6084fb52e"
+        },
+        "pre_pr": {
+          "id": "tidmad-analysis-branch-round-2",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "785ff859a95de4ac831dde2c48eaa41a7eb8da83590b7ab7f66cc277aadd2f58"
+        }
+      }
+    },
+    {
+      "id": "tidmad-analysis-branch-round-3",
+      "arguments": {
+        "current_round": 3,
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "memory_history": [
+          {
+            "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+            "status": "success",
+            "model_type": "dual_domain_chirp_fuser",
+            "params": {
+              "exp_id": "dual_domain_chirp_fuser_iter_001_001",
+              "run_name": "iter_001",
+              "model_type": "dual_domain_chirp_fuser",
+              "model_config": {
+                "segmentation_size": 1024,
+                "batch_size": 256,
+                "stem_channels": 64,
+                "residual_channels": 64,
+                "skip_channels": 64,
+                "temporal_blocks": 9,
+                "spectral_width": 32,
+                "spectral_blocks": 2,
+                "fusion_hidden": 64,
+                "temporal_dropout": 0.0,
+                "spectral_dropout": 0.0,
+                "fusion_dropout": 0.0,
+                "model_type": "dual_domain_chirp_fuser"
+              },
+              "train_config": {
+                "lr": 0.0001,
+                "epochs": 10,
+                "batch_size": 256,
+                "optimizer_type": "adamw",
+                "weight_decay": 1e-05,
+                "device": "cuda"
+              },
+              "loss_config": {
+                "loss_type": "smooth_l1",
+                "beta": 1.0,
+                "reduction": "mean"
+              },
+              "inference_batch": 64
+            },
+            "denoising_score": 0.6265948985106088,
+            "final_loss": 0.014135786919731377,
+            "is_trial": true,
+            "trial_strategy": "snapshot",
+            "trial_portion": 1.0,
+            "eval_strategy": "snapshot",
+            "eval_portion": 1.0,
+            "train_portion": 1.0,
+            "timing": {
+              "train_time_s": 453.6,
+              "validation_time_s": 5.9,
+              "inference_time_s": 10.4,
+              "scoring_time_s": 3.8
+            },
+            "memory": {
+              "time_estimate_minutes": null,
+              "time_budget_minutes": null,
+              "time_mode": null,
+              "vram_estimate_gb": 1.503,
+              "vram_budget_gb": 16.0
+            }
+          }
+        ],
+        "last_vram_estimate_gb": 1.503,
+        "last_time_estimate_minutes": null,
+        "last_batch_size": 256,
+        "last_mode": null
+      },
+      "formal_training_scope_source": "operator",
+      "training_validation_portion": 0.1,
+      "output_has_temporal_axis": true,
+      "expected": {
+        "historical": {
+          "id": "tidmad-analysis-branch-round-3",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "5978bd242e3771587cbaac55ce181f4ce2d5208e39e3ff1205a7d762695f5872"
+        },
+        "pre_pr": {
+          "id": "tidmad-analysis-branch-round-3",
+          "system_sha256": "e24870f9f3149943562c538e9128a1550f289ef312e6fc7b4b8973bc7d5036e7",
+          "user_sha256": "bbbc21da9427ffea1ffbb8c99764f9af7c6dc02d4f5e23149f15acb529eace99"
+        }
+      }
+    }
+  ],
+  "task_description": "Estimate binary-neutron-star chirp mass from H1/L1 whitened detector observations containing injected signals. Each prepared sample is whitened_injected[:, 15104:16128], the fixed [59, 63) second window at 256 Hz. Inputs are float32, two channels of 1024 samples. No per-example amplitude normalization is applied. The target is stored chirp_mass in solar masses. Source masses, SNR, clean signals, backgrounds, and other simulation parameters are excluded from model inputs.\nPreprocessing follows the owner-supplied PhyTS paper and is already materialized. The released training and validation splits are preserved. The full training split is the available pool; select training fractions within the experiment budget. Predict one scalar in physical units for each example. Any target standardization must use training statistics only and be inverted inside the exported model. The primary selection metric is global validation R2 (higher is better); global RMSE is also reported. Formal scoring uses all validation examples; per-epoch validation loss uses the fixed 10% subset. Test data are absent. Paper test scores and campaign validation scores describe different populations.",
+  "validation_disclosure": "\n\nTRAINING VALIDATION OVERRIDE: Per-epoch validation loss uses an operator-fixed snapshot fraction 0.1 of the task's eligible validation population within the declared data scope. The recorded evaluation seed selects it once per attempt; all epochs reuse it. This overrides any description of epoch loss sharing the score scope. Your eval_portion changes Trial final inference/scoring only, not this epoch-loss snapshot. Formal final inference/scoring retains the operator's formal_eval_portion. Budget validation cost using the snapshot row count and completed epochs, separately from final inference.",
+  "historical_formal_appendix": "\n\nRUN-SPECIFIC DATA/SCORE CONTRACT: Trial training strategy and fractions (`trial_portion`, `train_portion`) and Trial validation fraction (`eval_portion`) are your choices. Formal training strategy and fractions also come from your validated plan's `trial_strategy`, `trial_portion` and `train_portion`; choose them for the Formal round. Formal validation does not use your `eval_portion`: it is operator-fixed at 1 of the declared validation scope. A valid full-scope Formal score is the official comparable result; Trial scores are development feedback, not the official result."
+}

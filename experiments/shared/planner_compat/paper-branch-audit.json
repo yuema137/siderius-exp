@@ -1,0 +1,564 @@
+{
+  "scope": "Native planner consumers; TIDMAD CLI and external orchestrator prompt owners are not rebound by this audit. Existing records remain unchanged.",
+  "units": [
+    {
+      "task": "TESS",
+      "run_id": "nop_004",
+      "infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "launch_sha256": "6113995ba7a7f734f22f9511ac2506a1d397403165b52ff5ab180509790c9270",
+      "explicit_launch_fields": {
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": null,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": 1,
+              "symbolic": null,
+              "dynamic": false
+            },
+            "role": null
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 17,
+      "task_snapshot_sha256": "ca76e6dfca488005bdc0a4ab01301677179971615757b2be0de35177312de09a"
+    },
+    {
+      "task": "LIGO",
+      "run_id": "ligo-no-prior-run2",
+      "infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "launch_sha256": "ab7301ec45879af5ffa0841c90c7f5b1cf97da8dba523405cab1e6f3c23fc2ba",
+      "explicit_launch_fields": {
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "formal_training_scope_source": "agent",
+        "training_validation_portion": 0.1,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": 1,
+              "symbolic": null,
+              "dynamic": false
+            },
+            "role": null
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 18,
+      "task_snapshot_sha256": "99ede60cb77fa78a22df29d0ca856a3b8ec66af228acbde16e99534fc1b4900a"
+    },
+    {
+      "task": "Project 8",
+      "run_id": "project8-dual-no-prior-run5",
+      "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "launch_sha256": "b01824e6b5b0e479e7dd0e47eb3b57b821f8bfefc867883dc29fa185d71a1ea5",
+      "explicit_launch_fields": {
+        "max_rounds": 2,
+        "plan_overrides": {
+          "is_trial": true
+        },
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": 0.1,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": 1,
+              "symbolic": null,
+              "dynamic": false
+            },
+            "role": null
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 13,
+      "task_snapshot_sha256": "ae2b65e5c78314132c33831d7bac1d5128b730a20858f53c658a41ce3ec986b0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:0-3",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "5e30778d84ec2f949e54477bff249b922c3fb63674835a6452bf1c001c828c67",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": null,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 10,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:4-9",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "f7aaeac280bd262086ce3ea8bd8687027aa2b8fe40080f96e2e5b4c0184e26f8",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": null,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 9,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:10-14",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "9b24b5c82973723be3007656db78974aeaff2bf7f0c45a523b2c18cdfcc4212d",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": null,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 9,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:15-19",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "58cd36d52452a304cdf9abd26d61dad2422526828db2c0b72a56944cfadb7dcf",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": null,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 8,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:0-3",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "e012bd15a73fc92c4649dbd7d8993f043a834106d2693461a46b9295e3b954e1",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": 0.1,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 9,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:4-9",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "b547c9fa986c13d08fe3e7ad40942c4319fc8bdae3d071402d7b278e6e661d1c",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": 0.1,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 9,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:10-14",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "35013fffb13a40434627fe62080d4b7ea302ea7993bf78ed52fa92e6a1a2bb6a",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": 0.1,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 9,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:15-19",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "2b5fbb83eb3f0cdf7b15d4550065c4f50585553d01caf2222257aa3a657bb10f",
+      "explicit_launch_fields": {
+        "max_rounds": 3,
+        "plan_overrides": null,
+        "formal_training_scope_source": "operator",
+        "training_validation_portion": 0.1,
+        "formal_eval_portion": 1.0,
+        "trial_max_epochs": 100,
+        "formal_max_epochs": 100,
+        "training_budget_reserve_fraction": 0.2
+      },
+      "common_source_sha256": {
+        "src/agent/prompts.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+        "src/agent/llm_bridge.py": "db399f241a3a70ac250890b9940daf244981554e87cd033a69902cec121a49bf",
+        "src/agent/prompt_templates/tuner/loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4"
+      },
+      "compatible_provider": "legacy-9b78d505cb11-v1",
+      "task_output_contract": {
+        "axes": [
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "B",
+              "dynamic": false
+            },
+            "role": "batch"
+          },
+          {
+            "dimension": {
+              "fixed": null,
+              "symbolic": "T",
+              "dynamic": false
+            },
+            "role": "temporal"
+          }
+        ],
+        "dtype": {
+          "admissible": [
+            "float32"
+          ]
+        }
+      },
+      "task_snapshot_count": 9,
+      "task_snapshot_sha256": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0"
+    }
+  ],
+  "preexisting_schema_changes": [
+    {
+      "field": "checkpoint_selection",
+      "commit": "b1e472a5"
+    },
+    {
+      "field": "target_standardization",
+      "commit": "95c5ad21"
+    },
+    {
+      "field": "drop_last",
+      "commit": "441061cd"
+    }
+  ]
+}
