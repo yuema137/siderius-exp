@@ -3018,7 +3018,7 @@ tutorial = [
 
 [[package]]
 name = "siderius-planner-compat"
-version = "0.5.0"
+version = "0.6.0"
 source = { directory = "experiments/shared/planner_compat" }
 
 [[package]]

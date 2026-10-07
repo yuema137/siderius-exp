@@ -313,3 +313,42 @@ Use the matching `cases` entry for TESS, Project8 or TIDMAD. The check compares
 the resulting system/user hashes with the original capture and makes no API
 request. The `tidmad-analysis` entry has separate rendering and archived retry
 checks; it is not a fifth `startup_check --case` value.
+
+## Passing static-preflight evidence (v6)
+
+The paired infra #615 change records why its resource estimate accepted a
+batch. This adds two fields to experiment history. They are useful for new
+experiments, but displaying them would change a historical planner prompt.
+Version 0.6.0 adds an explicit historical view that removes those two fields
+from a temporary copy before rendering the prompt. The saved record keeps the
+evidence, its original numbers, and its training or scoring result.
+
+Use the matching provider in `tune.planner_strategy` in your external project's
+LLM JSON:
+
+| Historical configuration | Provider |
+| --- | --- |
+| TESS, LIGO, TIDMAD NoPrior | `legacy-9b78d505cb11-paper-preflight-v6` |
+| Project8, TIDMAD analysis-on | `legacy-9b78d505cb11-paper-late-preflight-v6` |
+
+Retain the other settings and compatibility overlays described for v5 above.
+Install this package normally in both environments with the installation
+command above, and use a **new workspace**. A v6 provider has a different
+identity; it cannot be substituted into an existing workspace lock. Installing
+0.6.0 does not select v6 automatically or change existing experiment files.
+The infra environment must include the paired #615 evidence schema; this
+package does not change the repository's published infra pin.
+
+For example, preflight may accept a batch and training may subsequently fail.
+V6 removes only `memory.static_preflight_evidence` and
+`memory.preflight_outcome` after validating that the preflight passed. The
+training failure remains in the prompt. Records predating these fields pass
+through unchanged. An unknown evidence version, an incomplete pair of fields,
+or a static refusal stops historical rendering with an error before an LLM
+request. V6 cannot truthfully reconstruct the old, potentially misleading
+refusal explanation from a new refusal.
+
+The [compatibility contract and archive audit](static-preflight-compatibility.md)
+describe the covered records and the limits of this check. The check concerns
+prompt inputs; it does not promise identical future LLM responses or retraining
+results, and it does not fix the estimator's remaining conservative refusals.

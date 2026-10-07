@@ -1,0 +1,1996 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-07",
+  "scope": "Existing archive metadata only; no raw datasets, model execution, reconstruction of missing artifacts, or historical decision-trace equivalence claim",
+  "selection": {
+    "run_outputs": "iter_*/iteration_*/*/run_output_*.json",
+    "worker_results": "iter_*/iteration_*/*/preflight_workers/*.json excluding *.spec.json",
+    "record_deduplication": "(model_type, exp_id) within each archive root"
+  },
+  "cases": [
+    {
+      "case": "tess",
+      "archive_root": "/home/klz/Data/SIDEREIS_DATA/phyts_tess/units/nop_004/workspace",
+      "run_output_files": 16,
+      "unique_record_count": 62,
+      "status_counts": {
+        "skipped_time_risk": 30,
+        "success": 32
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 65,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 65
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/cadence_aligned_spectral_resnet/run_output_iter_001.json",
+          "sha256": "2231330f37943dee1fae9cd5baaa7d38cc6faad36c32805985fc9415774d70ae"
+        },
+        {
+          "path": "iter_002/iteration_002/cadence_spacing_pyramid/run_output_iter_002.json",
+          "sha256": "192f72584ef817c4a0dee63445f1f4804cec05d031b004aff5abc01a2c868727"
+        },
+        {
+          "path": "iter_003/iteration_003/cadence_peak_relation_transformer/run_output_iter_003.json",
+          "sha256": "2f20840893e236a6341f6d2e189e12622974d0732f4bb20d2fcdc90de2c5633e"
+        },
+        {
+          "path": "iter_004/iteration_004/cadence_multitaper_expert_resnet/run_output_iter_004.json",
+          "sha256": "b568a3775277a79ae1576eda98d3757a42720b10c93fce5ce93c0d94454eaa0c"
+        },
+        {
+          "path": "iter_005/iteration_005/cadence_metric_aligned_expert_resnet/run_output_iter_005.json",
+          "sha256": "3663ea02ca7af543579a9841e2f1c04b4bf1a266b4a5d69b3627d6f5b7a05344"
+        },
+        {
+          "path": "iter_006/iteration_006/cadence_metric_bagged_ensemble/run_output_iter_006.json",
+          "sha256": "95afcf1770af664ec640ca48100c35e11d05c18b729b05adeee4d6a1d1cce82b"
+        },
+        {
+          "path": "iter_007/iteration_007/cadence_metric_query_pool_resnet/run_output_iter_007.json",
+          "sha256": "32b6f82aee125b6f66d0aa9477e0a1c674de3e7e8b64241a1e0328ca6bf4d557"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/run_output_iter_008.json",
+          "sha256": "b431a53949d316ccf3d9807bbd517590b30332b6eee636328207b6b2349f0ffa"
+        },
+        {
+          "path": "iter_009/iteration_009/cadence_highres_metric_expert_resnet/run_output_iter_009.json",
+          "sha256": "a8014557023e2c9d6270660afda1bbeee8605389f9c9f070fb8cc2ed0b4b04c0"
+        },
+        {
+          "path": "iter_010/iteration_010/cadence_independent_checkpoint_ensemble/run_output_iter_010.json",
+          "sha256": "e2e9b2b59270c6634f5223da6151c52b99e81173ef53cb8dc9f70b5630650be6"
+        },
+        {
+          "path": "iter_011/iteration_011/cadence_five_seed_checkpoint_average/run_output_iter_011.json",
+          "sha256": "454ced9f5bb5a5f958c9b210272af0c60a00bcd922aca453998313ef27894ca3"
+        },
+        {
+          "path": "iter_012/iteration_012/cadence_crossfit_ridge_stack/run_output_iter_012.json",
+          "sha256": "5dc036fd827d5e585e5e44b44faad91ff72ad9ecc3a5edea5d2e08a85b70495e"
+        },
+        {
+          "path": "iter_013/iteration_013/cadence_genuine_oof_ridge_stack/run_output_iter_013.json",
+          "sha256": "7791c76467b427d270ca298ba1bfb344d5623f48b6570796df4d09afd4861429"
+        },
+        {
+          "path": "iter_014/iteration_014/cadence_temporal_checkpoint_soup/run_output_iter_014.json",
+          "sha256": "ba1189b8096aa2884837a12f54917f5da3ad278edc05bdf6e1cbccc902d7161b"
+        },
+        {
+          "path": "iter_015/iteration_015/cadence_greedy_diverse_checkpoint_ensemble/run_output_iter_015.json",
+          "sha256": "b9090a13639d7468cf175f7b35ff5bfb42f5341d743bfdf9f394f85a00409cdc"
+        },
+        {
+          "path": "iter_016/iteration_016/cadence_quadratic_best_r2_ensemble/run_output_iter_016.json",
+          "sha256": "1720ebe629e6caa940917b6b9d5d9aabbda256a4d51e974e31b6877e886394eb"
+        },
+        {
+          "path": "iter_001/iteration_001/cadence_aligned_spectral_resnet/preflight_workers/cadence_aligned_spectral_resnet_iter_001_001.json",
+          "sha256": "1eeb1751e4d26e6590519b4fb73101d352de38684ac8bfd597b6c8b75affc000"
+        },
+        {
+          "path": "iter_001/iteration_001/cadence_aligned_spectral_resnet/preflight_workers/cadence_aligned_spectral_resnet_iter_001_002.json",
+          "sha256": "62b8df7ca3e66256617bd348d6f379fcfcfad7a5b5203943b9af676c319523b4"
+        },
+        {
+          "path": "iter_001/iteration_001/cadence_aligned_spectral_resnet/preflight_workers/cadence_aligned_spectral_resnet_iter_001_003.json",
+          "sha256": "cad4d311e22d108ad14cf9395e98dfa983749e4afc9f0ceea108d2df2fa1b028"
+        },
+        {
+          "path": "iter_001/iteration_001/cadence_aligned_spectral_resnet/preflight_workers/cadence_aligned_spectral_resnet_iter_001_004.json",
+          "sha256": "54263294ffc1662a7e62bd1bf8c7b76a08c52fcb862849a0ddc4c46c3d2e6b25"
+        },
+        {
+          "path": "iter_001/iteration_001/cadence_aligned_spectral_resnet/preflight_workers/cadence_aligned_spectral_resnet_iter_001_005.json",
+          "sha256": "e15801e497670ec2d3cd6d8189e3ec198bfcf5cd0db2d9cf601707e0961c1c05"
+        },
+        {
+          "path": "iter_001/iteration_001/cadence_aligned_spectral_resnet/preflight_workers/cadence_aligned_spectral_resnet_iter_001_006.json",
+          "sha256": "e15801e497670ec2d3cd6d8189e3ec198bfcf5cd0db2d9cf601707e0961c1c05"
+        },
+        {
+          "path": "iter_002/iteration_002/cadence_spacing_pyramid/preflight_workers/cadence_spacing_pyramid_iter_002_001.json",
+          "sha256": "19699c43f8a71e4707510d0f06ec3be70e3f79c3c22807b0a4cb543d843cf8dc"
+        },
+        {
+          "path": "iter_002/iteration_002/cadence_spacing_pyramid/preflight_workers/cadence_spacing_pyramid_iter_002_002.json",
+          "sha256": "33bd221de35b35bbc2c080d96378972d3675dbf9832a0cdb07a50589ea7d749e"
+        },
+        {
+          "path": "iter_002/iteration_002/cadence_spacing_pyramid/preflight_workers/cadence_spacing_pyramid_iter_002_003.json",
+          "sha256": "858470d33180c4d7d6e49d4f44b692ee746d3ff1707efd7b5c0ac8e270ea3be6"
+        },
+        {
+          "path": "iter_003/iteration_003/cadence_peak_relation_transformer/preflight_workers/cadence_peak_relation_transformer_iter_003_001.json",
+          "sha256": "c687cfaa0386cdbe66cf40f07d051dcf6f81800de3f9ad342f936c3567252a08"
+        },
+        {
+          "path": "iter_003/iteration_003/cadence_peak_relation_transformer/preflight_workers/cadence_peak_relation_transformer_iter_003_002.json",
+          "sha256": "e124c8f9a72db27b64acaf07f625f04dff1bcc93876d4f5b93b6326cbfe1d655"
+        },
+        {
+          "path": "iter_003/iteration_003/cadence_peak_relation_transformer/preflight_workers/cadence_peak_relation_transformer_iter_003_003.json",
+          "sha256": "e124c8f9a72db27b64acaf07f625f04dff1bcc93876d4f5b93b6326cbfe1d655"
+        },
+        {
+          "path": "iter_004/iteration_004/cadence_multitaper_expert_resnet/preflight_workers/cadence_multitaper_expert_resnet_iter_004_001.json",
+          "sha256": "38f2798415fc01b86487ea5285dcd8fe6dcf3a336a976af43e9919408837724f"
+        },
+        {
+          "path": "iter_004/iteration_004/cadence_multitaper_expert_resnet/preflight_workers/cadence_multitaper_expert_resnet_iter_004_002.json",
+          "sha256": "862126e370decf7e1455e2fd6e1273a6f312535cff695a8adacddd579f37a53e"
+        },
+        {
+          "path": "iter_004/iteration_004/cadence_multitaper_expert_resnet/preflight_workers/cadence_multitaper_expert_resnet_iter_004_003.json",
+          "sha256": "38f2798415fc01b86487ea5285dcd8fe6dcf3a336a976af43e9919408837724f"
+        },
+        {
+          "path": "iter_004/iteration_004/cadence_multitaper_expert_resnet/preflight_workers/cadence_multitaper_expert_resnet_iter_004_004.json",
+          "sha256": "f3099fc788a92fe6732b2798839975546501e4d8ed027e9a1cfb427e691fa381"
+        },
+        {
+          "path": "iter_005/iteration_005/cadence_metric_aligned_expert_resnet/preflight_workers/cadence_metric_aligned_expert_resnet_iter_005_001.json",
+          "sha256": "c0630ea6c4463cc02574b23a5d2eddb5d627c377ca0b12def790581ebd6638da"
+        },
+        {
+          "path": "iter_005/iteration_005/cadence_metric_aligned_expert_resnet/preflight_workers/cadence_metric_aligned_expert_resnet_iter_005_002.json",
+          "sha256": "94a034a1221141a7fdd9db890a373b0f0ec9749ffb3f40c519aeb52569d5c860"
+        },
+        {
+          "path": "iter_005/iteration_005/cadence_metric_aligned_expert_resnet/preflight_workers/cadence_metric_aligned_expert_resnet_iter_005_003.json",
+          "sha256": "488889f39068fe0be9f658a30648a47bbacf791c74e0106416e0299963083b9a"
+        },
+        {
+          "path": "iter_005/iteration_005/cadence_metric_aligned_expert_resnet/preflight_workers/cadence_metric_aligned_expert_resnet_iter_005_004.json",
+          "sha256": "3808f018469dce197ff43a3dcf24745cbd9bd38ddd86e07ff9daf0a48fdbe924"
+        },
+        {
+          "path": "iter_005/iteration_005/cadence_metric_aligned_expert_resnet/preflight_workers/cadence_metric_aligned_expert_resnet_iter_005_005.json",
+          "sha256": "c7ee00df8bba2bde31919eb4f9f74eb555bd7659caff1ad4076eea4070b28236"
+        },
+        {
+          "path": "iter_005/iteration_005/cadence_metric_aligned_expert_resnet/preflight_workers/cadence_metric_aligned_expert_resnet_iter_005_006.json",
+          "sha256": "6eeb2121749ff272a08f2b17bf7491e9fd386f919df3bc50e3d700460680f9e8"
+        },
+        {
+          "path": "iter_006/iteration_006/cadence_metric_bagged_ensemble/preflight_workers/cadence_metric_bagged_ensemble_iter_006_001.json",
+          "sha256": "d49b1485079852906b13d75a80b2aac63f455dcdd4034d6e85b361eaf2040560"
+        },
+        {
+          "path": "iter_006/iteration_006/cadence_metric_bagged_ensemble/preflight_workers/cadence_metric_bagged_ensemble_iter_006_002.json",
+          "sha256": "784828179757997da7566fc9e744b2dc4344775a12478ccbee6bf99e051e7e4e"
+        },
+        {
+          "path": "iter_006/iteration_006/cadence_metric_bagged_ensemble/preflight_workers/cadence_metric_bagged_ensemble_iter_006_003.json",
+          "sha256": "1d82a6d48acafb5243b65307fdbb728a87d0b7d96bea36d56af6111c5e3339bd"
+        },
+        {
+          "path": "iter_007/iteration_007/cadence_metric_query_pool_resnet/preflight_workers/cadence_metric_query_pool_resnet_iter_007_001.json",
+          "sha256": "888398d2e35597d4f7527800de2d2f91f92367c2f885bb2209c90256f0947863"
+        },
+        {
+          "path": "iter_007/iteration_007/cadence_metric_query_pool_resnet/preflight_workers/cadence_metric_query_pool_resnet_iter_007_002.json",
+          "sha256": "e6dd42f493fe5ee9b1b16afb6ee352a423f849ba269597eda4d8f58a202dad8f"
+        },
+        {
+          "path": "iter_007/iteration_007/cadence_metric_query_pool_resnet/preflight_workers/cadence_metric_query_pool_resnet_iter_007_003.json",
+          "sha256": "888398d2e35597d4f7527800de2d2f91f92367c2f885bb2209c90256f0947863"
+        },
+        {
+          "path": "iter_007/iteration_007/cadence_metric_query_pool_resnet/preflight_workers/cadence_metric_query_pool_resnet_iter_007_004.json",
+          "sha256": "a00455f80e02b125436fa216438538450c9e9549eb72eeedb3487056b79d76c4"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_001.json",
+          "sha256": "cce9d90697481d23346df4f3e050f1b3fff47be38f80b82ca3c05dc6b62e1ba6"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_002.json",
+          "sha256": "cce9d90697481d23346df4f3e050f1b3fff47be38f80b82ca3c05dc6b62e1ba6"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_003.json",
+          "sha256": "055e88abb13c5e5c3c3fec3fc9b60e7094427fd6ca741be98a111305fb40da04"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_004.json",
+          "sha256": "89f7346767c646eb40d83410478ca15c4aaeefe87b5a2f84307c12d79d6ba27c"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_005.json",
+          "sha256": "eef90cebe7969f8c08979afed76d77754a503cda0adcb12d03a64adb20c2db02"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_006.json",
+          "sha256": "96c3025234bf283721d16d8e87415e01f680150462ae8cc559df1c61aa16aaeb"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_007.json",
+          "sha256": "d5fffe1b5e264b09abaeb1cef277a2b9da8cb1cdc9e6a02f42d6044dec892153"
+        },
+        {
+          "path": "iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/preflight_workers/cadence_disagreement_calibrated_expert_resnet_iter_008_008.json",
+          "sha256": "96c3025234bf283721d16d8e87415e01f680150462ae8cc559df1c61aa16aaeb"
+        },
+        {
+          "path": "iter_009/iteration_009/cadence_highres_metric_expert_resnet/preflight_workers/cadence_highres_metric_expert_resnet_iter_009_001.json",
+          "sha256": "57e66db9c9f08e751a4e52de303560d2ef1703df4f5be1e6897e8cf8c96a7967"
+        },
+        {
+          "path": "iter_009/iteration_009/cadence_highres_metric_expert_resnet/preflight_workers/cadence_highres_metric_expert_resnet_iter_009_002.json",
+          "sha256": "67af29d1309070a03400a6e12b796f00bde2601bbb6bc9597168895e53566c3c"
+        },
+        {
+          "path": "iter_009/iteration_009/cadence_highres_metric_expert_resnet/preflight_workers/cadence_highres_metric_expert_resnet_iter_009_003.json",
+          "sha256": "67af29d1309070a03400a6e12b796f00bde2601bbb6bc9597168895e53566c3c"
+        },
+        {
+          "path": "iter_010/iteration_010/cadence_independent_checkpoint_ensemble/preflight_workers/cadence_independent_checkpoint_ensemble_iter_010_001.json",
+          "sha256": "04ce8714b01951ba48221e055c8a316d3c2b3c90b48532ee7b71ab717d29f507"
+        },
+        {
+          "path": "iter_010/iteration_010/cadence_independent_checkpoint_ensemble/preflight_workers/cadence_independent_checkpoint_ensemble_iter_010_002.json",
+          "sha256": "d326590edb99f8f1cd9af5e7683aed8251c698849858f46eda5fc99850b80c4b"
+        },
+        {
+          "path": "iter_010/iteration_010/cadence_independent_checkpoint_ensemble/preflight_workers/cadence_independent_checkpoint_ensemble_iter_010_003.json",
+          "sha256": "cb77df6817620d588ed8a5e69b98bcc2b3a75e4379b32e3e90e1544531960642"
+        },
+        {
+          "path": "iter_011/iteration_011/cadence_five_seed_checkpoint_average/preflight_workers/cadence_five_seed_checkpoint_average_iter_011_001.json",
+          "sha256": "c15e763cb501608252e5e491cb1ae2297c1c31e3a5be93ed133d7ca2cabf6e79"
+        },
+        {
+          "path": "iter_011/iteration_011/cadence_five_seed_checkpoint_average/preflight_workers/cadence_five_seed_checkpoint_average_iter_011_002.json",
+          "sha256": "f3e4bef19a87f5c340cf40172da774af02e033626c5da8a67354d862c1a58074"
+        },
+        {
+          "path": "iter_011/iteration_011/cadence_five_seed_checkpoint_average/preflight_workers/cadence_five_seed_checkpoint_average_iter_011_003.json",
+          "sha256": "f3e4bef19a87f5c340cf40172da774af02e033626c5da8a67354d862c1a58074"
+        },
+        {
+          "path": "iter_012/iteration_012/cadence_crossfit_ridge_stack/preflight_workers/cadence_crossfit_ridge_stack_iter_012_001.json",
+          "sha256": "6015f2abbb1de8551e12bb8a9fce4cd9022b42c5518d8b3d0ebb3328f8e528c8"
+        },
+        {
+          "path": "iter_012/iteration_012/cadence_crossfit_ridge_stack/preflight_workers/cadence_crossfit_ridge_stack_iter_012_002.json",
+          "sha256": "836ae310dcf9223ee7628e1cd56290bc542b805121bb04be4d54c2d24657735c"
+        },
+        {
+          "path": "iter_012/iteration_012/cadence_crossfit_ridge_stack/preflight_workers/cadence_crossfit_ridge_stack_iter_012_003.json",
+          "sha256": "ec1eedbc4342f9fdfc3ca7cf1010978d6fc43a27b44b1e29368f71613b5f1631"
+        },
+        {
+          "path": "iter_012/iteration_012/cadence_crossfit_ridge_stack/preflight_workers/cadence_crossfit_ridge_stack_iter_012_004.json",
+          "sha256": "4da93b43c314599014d3c4e70603ef98a7de9f7b6c8f6069de2f2c71acd3c524"
+        },
+        {
+          "path": "iter_013/iteration_013/cadence_genuine_oof_ridge_stack/preflight_workers/cadence_genuine_oof_ridge_stack_iter_013_001.json",
+          "sha256": "8b0ef5b33ff5590a962757b43f1d86e3605c99a14624094f8253713ed73e02cc"
+        },
+        {
+          "path": "iter_013/iteration_013/cadence_genuine_oof_ridge_stack/preflight_workers/cadence_genuine_oof_ridge_stack_iter_013_002.json",
+          "sha256": "836ae310dcf9223ee7628e1cd56290bc542b805121bb04be4d54c2d24657735c"
+        },
+        {
+          "path": "iter_013/iteration_013/cadence_genuine_oof_ridge_stack/preflight_workers/cadence_genuine_oof_ridge_stack_iter_013_003.json",
+          "sha256": "5625c47a06e229fc64cfc850efc0a439024d13fae3230bcbc66d302dea8f20db"
+        },
+        {
+          "path": "iter_013/iteration_013/cadence_genuine_oof_ridge_stack/preflight_workers/cadence_genuine_oof_ridge_stack_iter_013_004.json",
+          "sha256": "c27768d5d0d576f2f909ca69cd484e3190be47f5af6404fd81c6fdb1ca09fab1"
+        },
+        {
+          "path": "iter_014/iteration_014/cadence_temporal_checkpoint_soup/preflight_workers/cadence_temporal_checkpoint_soup_iter_014_001.json",
+          "sha256": "2eb8c6529ec776332673e96f9da5a7a78a72fb1e7115e2c27d31367aa9fbfec8"
+        },
+        {
+          "path": "iter_014/iteration_014/cadence_temporal_checkpoint_soup/preflight_workers/cadence_temporal_checkpoint_soup_iter_014_002.json",
+          "sha256": "a8d2c221822baeb4090febbfc2da65cec6c752b8f03135a3ff69e8f912850861"
+        },
+        {
+          "path": "iter_014/iteration_014/cadence_temporal_checkpoint_soup/preflight_workers/cadence_temporal_checkpoint_soup_iter_014_003.json",
+          "sha256": "5e2d34e4a1f42d8a9e05fd054e67dc0dff34f58371728488ea08e2e99302b196"
+        },
+        {
+          "path": "iter_015/iteration_015/cadence_greedy_diverse_checkpoint_ensemble/preflight_workers/cadence_greedy_diverse_checkpoint_ensemble_iter_015_001.json",
+          "sha256": "cdb72d6779af8933f1af9cd685a19c97831a60fb5109f4ba26a5b8af731b2e64"
+        },
+        {
+          "path": "iter_015/iteration_015/cadence_greedy_diverse_checkpoint_ensemble/preflight_workers/cadence_greedy_diverse_checkpoint_ensemble_iter_015_002.json",
+          "sha256": "39bfd85b627fc9c973cfe28a13a89b68e4ae99f70a92380c43b74e6ba9ff8d7c"
+        },
+        {
+          "path": "iter_015/iteration_015/cadence_greedy_diverse_checkpoint_ensemble/preflight_workers/cadence_greedy_diverse_checkpoint_ensemble_iter_015_003.json",
+          "sha256": "39bfd85b627fc9c973cfe28a13a89b68e4ae99f70a92380c43b74e6ba9ff8d7c"
+        },
+        {
+          "path": "iter_016/iteration_016/cadence_quadratic_best_r2_ensemble/preflight_workers/cadence_quadratic_best_r2_ensemble_iter_016_001.json",
+          "sha256": "0817262f410cc0bf2f5318ecd9495b0bd1cae8af0fb0338cc3b0e8f99c92b56a"
+        },
+        {
+          "path": "iter_016/iteration_016/cadence_quadratic_best_r2_ensemble/preflight_workers/cadence_quadratic_best_r2_ensemble_iter_016_002.json",
+          "sha256": "6389234a1aa8c70f8b12cc6023fdddf800098f5bca02c85806cb8ed94534cd33"
+        },
+        {
+          "path": "iter_017/iteration_017/cadence_diagnostic_prior_ensemble/preflight_workers/cadence_diagnostic_prior_ensemble_iter_017_001.json",
+          "sha256": "1864db035606df0b698db9b7a407d752e5d6d1859a8ade1df0ce7ff4f349f0e0"
+        },
+        {
+          "path": "iter_017/iteration_017/cadence_diagnostic_prior_ensemble/preflight_workers/cadence_diagnostic_prior_ensemble_iter_017_002.json",
+          "sha256": "979a52a3d1510b8911f7c668a93656053cfd43f88b6f2600b351d52002ee3cde"
+        },
+        {
+          "path": "iter_017/iteration_017/cadence_diagnostic_prior_ensemble/preflight_workers/cadence_diagnostic_prior_ensemble_iter_017_003.json",
+          "sha256": "3a1469715ef71790a8d0988740f67c9d783e0408645b1ae9e2ab7433796bd6ab"
+        }
+      ],
+      "source_run_id": "nop_004",
+      "source_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d"
+    },
+    {
+      "case": "ligo",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/ligo-run2-completed-20260922/unit/workspace",
+      "run_output_files": 17,
+      "unique_record_count": 34,
+      "status_counts": {
+        "success": 34
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 36,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 36
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/dual_domain_chirp_fuser/run_output_iter_001.json",
+          "sha256": "fde00b278bd6d2d310d5483bdad4aabda23b9c76ac543cea550484c174c331bf"
+        },
+        {
+          "path": "iter_002/iteration_002/coherent_chirpogram_fuser/run_output_iter_002.json",
+          "sha256": "eef5e1ec1499afc46fcf917d96ce0acfceb6068bb6d8ed6930d79c1e6b8f80c8"
+        },
+        {
+          "path": "iter_003/iteration_003/ridge_attention_chirp_fuser/run_output_iter_003.json",
+          "sha256": "835b26367ef37e1393637027f815e7cd977e5565e8053f0a7149bc522448dad4"
+        },
+        {
+          "path": "iter_004/iteration_004/monotonic_trajectory_chirp_fuser/run_output_iter_004.json",
+          "sha256": "cb2a619b8871991c66cc084f28eff89f3cb42afdc94af4e25cb38a0dc873a1d0"
+        },
+        {
+          "path": "iter_005/iteration_005/context_refined_ridge_fuser/run_output_iter_005.json",
+          "sha256": "87707ec5f8013c785630e3a1521ed0a0113c2510a9fdd019b7916c070ef0e7e4"
+        },
+        {
+          "path": "iter_006/iteration_006/residual_global_ridge_fuser/run_output_iter_006.json",
+          "sha256": "aaf41c966189db3275251a4cd46342ca1a4950a4dda11b33e7c3ba7bf145b4d7"
+        },
+        {
+          "path": "iter_007/iteration_007/additive_global_ridge_fuser/run_output_iter_007.json",
+          "sha256": "727c926573c8a4c89a358e3fec230cf183f275b0a5f62597b8c856fac2f8fbf7"
+        },
+        {
+          "path": "iter_008/iteration_008/matched_global_ridge_gate/run_output_iter_008.json",
+          "sha256": "9daf5781daf954298ff3774b3b95df8032f847abde17f881c1659b05168270ab"
+        },
+        {
+          "path": "iter_009/iteration_009/compact_metric_aligned_ridge_gate/run_output_iter_009.json",
+          "sha256": "b229f47ef370fa563819333bc1f0205468c68b104da32abb0338f3b5e111dc2d"
+        },
+        {
+          "path": "iter_010/iteration_010/band_stratified_matched_ridge_gate/run_output_iter_010.json",
+          "sha256": "c5dba27dcc2a716f93e07e5d5e60bbdf0f5cde97bd48e3a7f4d59ba59031af68"
+        },
+        {
+          "path": "iter_011/iteration_011/cross_resolution_band_consensus_gate/run_output_iter_011.json",
+          "sha256": "763058c27e5f1edb559658b357ebdbc24dd83fffa9a74b503828cd81abde8e20"
+        },
+        {
+          "path": "iter_012/iteration_012/unbiased_eight_query_ridge_gate/run_output_iter_012.json",
+          "sha256": "5c683dd4fbb00bc28dff808d678ca346708b0e90e1d15dff0209937b342c9827"
+        },
+        {
+          "path": "iter_013/iteration_013/adaptive_bandwidth_ridge_gate/run_output_iter_013.json",
+          "sha256": "a277ee9019a35754c89ed78802c2b14bf2183c5423cad5578ad6288dd0d18927"
+        },
+        {
+          "path": "iter_014/iteration_014/checkpoint_aligned_band_ridge_control/run_output_iter_014.json",
+          "sha256": "c5cc0f74b988d8d12eba701645d31c2c9d70ef00902ef59babf77a13c194a8dd"
+        },
+        {
+          "path": "iter_015/iteration_015/multi_view_ridge_head_ensemble/run_output_iter_015.json",
+          "sha256": "e741532ca011cc5ad187f923b09695a8d45c275af0d794b8318ba3be84de1c5c"
+        },
+        {
+          "path": "iter_016/iteration_016/compact_four_band_matched_ridge_gate/run_output_iter_016.json",
+          "sha256": "489c626d8de3b8c54b2a0119c4a9e244dde36cf21c0dc0efc80835bae38a07c1"
+        },
+        {
+          "path": "iter_017/iteration_017/replicated_compact_four_band_ridge_gate/run_output_iter_017.json",
+          "sha256": "66e12e971efb125d13be4f90923eef3ace0cdbfb779f5d23ec4ba6c0a4354613"
+        },
+        {
+          "path": "iter_001/iteration_001/dual_domain_chirp_fuser/preflight_workers/dual_domain_chirp_fuser_iter_001_001.json",
+          "sha256": "db67dd6726a7ff44b5da1518046535041b6381e32ae96aa74e490f2d76afade9"
+        },
+        {
+          "path": "iter_001/iteration_001/dual_domain_chirp_fuser/preflight_workers/dual_domain_chirp_fuser_iter_001_002.json",
+          "sha256": "db67dd6726a7ff44b5da1518046535041b6381e32ae96aa74e490f2d76afade9"
+        },
+        {
+          "path": "iter_002/iteration_002/coherent_chirpogram_fuser/preflight_workers/coherent_chirpogram_fuser_iter_002_001.json",
+          "sha256": "7e69f2a0f7ab62968e6b347ae2ebf05a0b95b53c9249b34ad7d5e322e829e556"
+        },
+        {
+          "path": "iter_002/iteration_002/coherent_chirpogram_fuser/preflight_workers/coherent_chirpogram_fuser_iter_002_002.json",
+          "sha256": "a903eb1a90bda4c9d4fb0dc68acad914e3a07a8fa79fac305bfed052a18a7e6e"
+        },
+        {
+          "path": "iter_003/iteration_003/ridge_attention_chirp_fuser/preflight_workers/ridge_attention_chirp_fuser_iter_003_001.json",
+          "sha256": "4782827e7b75ff19fc6097370f620609dc5a734158ef803c59a0510b38e96178"
+        },
+        {
+          "path": "iter_003/iteration_003/ridge_attention_chirp_fuser/preflight_workers/ridge_attention_chirp_fuser_iter_003_002.json",
+          "sha256": "7d3cd9dbf4e5394c83291754c33181cd0573201da6e49acff283c8af095965e7"
+        },
+        {
+          "path": "iter_004/iteration_004/monotonic_trajectory_chirp_fuser/preflight_workers/monotonic_trajectory_chirp_fuser_iter_004_001.json",
+          "sha256": "d312a9ef2c6fa95f2b0b06019690c8231b9fa3fd3f18eb621c7b1c822b8d0476"
+        },
+        {
+          "path": "iter_004/iteration_004/monotonic_trajectory_chirp_fuser/preflight_workers/monotonic_trajectory_chirp_fuser_iter_004_002.json",
+          "sha256": "bcfee90b85a7196808e487a8a5d347591ae523c3a55aaea1fd2f380acbfc169a"
+        },
+        {
+          "path": "iter_005/iteration_005/context_refined_ridge_fuser/preflight_workers/context_refined_ridge_fuser_iter_005_001.json",
+          "sha256": "367b7dd432ddc752c6c2947bdd5d37e44556de69c31a592330490e7cedd8ef94"
+        },
+        {
+          "path": "iter_005/iteration_005/context_refined_ridge_fuser/preflight_workers/context_refined_ridge_fuser_iter_005_002.json",
+          "sha256": "59410e2deed4431404e8053f11213a04ad3fc02a68f2627c453aca92e61e5b9a"
+        },
+        {
+          "path": "iter_006/iteration_006/residual_global_ridge_fuser/preflight_workers/residual_global_ridge_fuser_iter_006_001.json",
+          "sha256": "bf51d84b78dec6e4812e20a050b004c982b211094c0e386888a5aacb4acefd52"
+        },
+        {
+          "path": "iter_006/iteration_006/residual_global_ridge_fuser/preflight_workers/residual_global_ridge_fuser_iter_006_002.json",
+          "sha256": "6e1b9722043e6e170583bcafc7fab7b34c9bb16c97b3d90dbec21d0d0456a24e"
+        },
+        {
+          "path": "iter_007/iteration_007/additive_global_ridge_fuser/preflight_workers/additive_global_ridge_fuser_iter_007_001.json",
+          "sha256": "29660feeb0d82137e43dc13b34a18323878ceec9ebd45d6a1972d20b47e3a029"
+        },
+        {
+          "path": "iter_007/iteration_007/additive_global_ridge_fuser/preflight_workers/additive_global_ridge_fuser_iter_007_002.json",
+          "sha256": "5e1300fab8ec02937c61661176fccb9030043835a268923fb40dcb5f3512d559"
+        },
+        {
+          "path": "iter_008/iteration_008/matched_global_ridge_gate/preflight_workers/matched_global_ridge_gate_iter_008_001.json",
+          "sha256": "fc892dd22cce9bbaaf4f96b926838d236a7dd44915d3b7ce04ce6fadd4a9b037"
+        },
+        {
+          "path": "iter_008/iteration_008/matched_global_ridge_gate/preflight_workers/matched_global_ridge_gate_iter_008_002.json",
+          "sha256": "568655372a71507832e82d0d092658321030508f51dec61447679c7f0513e27d"
+        },
+        {
+          "path": "iter_009/iteration_009/compact_metric_aligned_ridge_gate/preflight_workers/compact_metric_aligned_ridge_gate_iter_009_001.json",
+          "sha256": "192ef21a9c5750e86dd5646078305a647c62b662f6f174fe5788096d6fdc3615"
+        },
+        {
+          "path": "iter_009/iteration_009/compact_metric_aligned_ridge_gate/preflight_workers/compact_metric_aligned_ridge_gate_iter_009_002.json",
+          "sha256": "7ecc8f811596aeac8f4f3cbdf95916484c24eaca6316bdef4e48f0a7a3b11609"
+        },
+        {
+          "path": "iter_010/iteration_010/band_stratified_matched_ridge_gate/preflight_workers/band_stratified_matched_ridge_gate_iter_010_001.json",
+          "sha256": "a1ef5dcf64365b34006b06830641b29ded3cc51403941c183b13f2003f741e28"
+        },
+        {
+          "path": "iter_010/iteration_010/band_stratified_matched_ridge_gate/preflight_workers/band_stratified_matched_ridge_gate_iter_010_002.json",
+          "sha256": "8b3dc021708300dc186f1647193d615a472e25fb99006d1fc6168143edecec1f"
+        },
+        {
+          "path": "iter_011/iteration_011/cross_resolution_band_consensus_gate/preflight_workers/cross_resolution_band_consensus_gate_iter_011_001.json",
+          "sha256": "dc83d58480b290e86666f5a63f9ac35c112ee36cd2fc13ca6bc2f886c687ac3e"
+        },
+        {
+          "path": "iter_011/iteration_011/cross_resolution_band_consensus_gate/preflight_workers/cross_resolution_band_consensus_gate_iter_011_002.json",
+          "sha256": "b054040c7a2679d5de2730ecbef9aa56ba8267053d684789c4ec4199c1922044"
+        },
+        {
+          "path": "iter_012/iteration_012/unbiased_eight_query_ridge_gate/preflight_workers/unbiased_eight_query_ridge_gate_iter_012_001.json",
+          "sha256": "b9d13a0b83ee8dc8390627625eb44d15fb590474eb59646cf181b84c1a7f7b5e"
+        },
+        {
+          "path": "iter_012/iteration_012/unbiased_eight_query_ridge_gate/preflight_workers/unbiased_eight_query_ridge_gate_iter_012_002.json",
+          "sha256": "43c707ae245d6f4413c61212ad73abc5912d53edcd1e591694f5b6a3248909a8"
+        },
+        {
+          "path": "iter_013/iteration_013/adaptive_bandwidth_ridge_gate/preflight_workers/adaptive_bandwidth_ridge_gate_iter_013_001.json",
+          "sha256": "ee459aaa2cdf28892b0f575270b161cffee46cf79a60be5d6f92c82928215eaa"
+        },
+        {
+          "path": "iter_013/iteration_013/adaptive_bandwidth_ridge_gate/preflight_workers/adaptive_bandwidth_ridge_gate_iter_013_002.json",
+          "sha256": "dfd58ce6138779f6aee5aae346fdd37a738d396c70d10f8d9cef89ffe9856c42"
+        },
+        {
+          "path": "iter_014/iteration_014/checkpoint_aligned_band_ridge_control/preflight_workers/checkpoint_aligned_band_ridge_control_iter_014_001.json",
+          "sha256": "af7568a94dc9fbfc34a551c7e0034dc8d3575a02dbd3235ed5ea171458c20736"
+        },
+        {
+          "path": "iter_014/iteration_014/checkpoint_aligned_band_ridge_control/preflight_workers/checkpoint_aligned_band_ridge_control_iter_014_002.json",
+          "sha256": "3bd991568af280c052809a042befdf391f7246a6e05d04eb1d5a78a3bedf4eb2"
+        },
+        {
+          "path": "iter_015/iteration_015/multi_view_ridge_head_ensemble/preflight_workers/multi_view_ridge_head_ensemble_iter_015_001.json",
+          "sha256": "57f140a53ff390e6b06fa20f06aedcd5794ddc9a27a68a35fc0c0b7b905e7d1e"
+        },
+        {
+          "path": "iter_015/iteration_015/multi_view_ridge_head_ensemble/preflight_workers/multi_view_ridge_head_ensemble_iter_015_002.json",
+          "sha256": "26ed2658dff0317e5343ea3adb17ca6cd99b4d223c29bf14376d8d9d1d9e4ad7"
+        },
+        {
+          "path": "iter_016/iteration_016/compact_four_band_matched_ridge_gate/preflight_workers/compact_four_band_matched_ridge_gate_iter_016_001.json",
+          "sha256": "82e35a724a64d095e6c18042b252c9b71092b1c090b9261518f1439500ab23db"
+        },
+        {
+          "path": "iter_016/iteration_016/compact_four_band_matched_ridge_gate/preflight_workers/compact_four_band_matched_ridge_gate_iter_016_002.json",
+          "sha256": "760bb15028371fdb06ff2c16223f6ee20bb0d333191f8925245336ea3da28656"
+        },
+        {
+          "path": "iter_017/iteration_017/replicated_compact_four_band_ridge_gate/preflight_workers/replicated_compact_four_band_ridge_gate_iter_017_001.json",
+          "sha256": "be69781e7e6e6b9bb0c0a6474b9171563f40cf45d47b90b6f61f3431b7362f72"
+        },
+        {
+          "path": "iter_017/iteration_017/replicated_compact_four_band_ridge_gate/preflight_workers/replicated_compact_four_band_ridge_gate_iter_017_002.json",
+          "sha256": "0b1870edb2b756edd814e905b1cae1d58ca4fd0c7c0433850a1d1e717964e32e"
+        },
+        {
+          "path": "iter_018/iteration_018/metric_aligned_compact_ridge_regressor/preflight_workers/metric_aligned_compact_ridge_regressor_iter_018_001.json",
+          "sha256": "fb6dcaaa17c53feb97ff0f9eb9e626f6a0c78ef894f0a4b1889d0255f4213b63"
+        },
+        {
+          "path": "iter_018/iteration_018/metric_aligned_compact_ridge_regressor/preflight_workers/metric_aligned_compact_ridge_regressor_iter_018_002.json",
+          "sha256": "1d3de6eb82db8030f381d782e1e97c608708bfd3113fc053645144f7e78d2157"
+        }
+      ],
+      "source_run_id": "ligo-no-prior-run2",
+      "source_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53"
+    },
+    {
+      "case": "project8",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/project8-dual-no-prior-run5-20260923/unit/workspace",
+      "run_output_files": 12,
+      "unique_record_count": 25,
+      "status_counts": {
+        "success": 24,
+        "skipped_time_risk": 1
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 26,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 26
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/dual_axis_crossattn_regressor/run_output_iter_001.json",
+          "sha256": "0a857f357b354663163beb7f89efac894b4d64414e5036c0c9ab9632553e4012"
+        },
+        {
+          "path": "iter_002/iteration_002/dual_latent_fusion_regressor/run_output_iter_002.json",
+          "sha256": "0417fad71bcb09b76a96ec2e4c863f3defb432390f254867beae90927280634f"
+        },
+        {
+          "path": "iter_003/iteration_003/dual_multires_opening_fusion_regressor/run_output_iter_003.json",
+          "sha256": "b3085cc0570cd6f44c0da5982266fa56d53c3be159b3a5abd40f1f0e83287155"
+        },
+        {
+          "path": "iter_004/iteration_004/dual_opening_pyramid_crossattn_regressor/run_output_iter_004.json",
+          "sha256": "b295b39e4e16ad837e93bf32c912b97070cd69e19aadb7cf302145c031530209"
+        },
+        {
+          "path": "iter_005/iteration_005/asymmetric_gated_opening_fft_regressor/run_output_iter_005.json",
+          "sha256": "80dcd9f1e5b00ed776005628a8d22fc641f43a09f3a244db5a0b21dcdda0c0c6"
+        },
+        {
+          "path": "iter_006/iteration_006/regularized_opening_crossview_regressor/run_output_iter_006.json",
+          "sha256": "ccedfbf0ffc4aa339a7d313798c1f9136e1c1e766838bcd794ddedef2766e92e"
+        },
+        {
+          "path": "iter_007/iteration_007/branch_specialized_multires_regressor/run_output_iter_007.json",
+          "sha256": "a661fe2fda7fcc0c17ce10e44fbec56df808a978f463b9668dbd80a9e45511c3"
+        },
+        {
+          "path": "iter_008/iteration_008/shared_stem_multires_crossattn_regressor/run_output_iter_008.json",
+          "sha256": "e402463b0bed8d3184a407b09acd5430e4e55109422d0ead88bebc02e0c9795d"
+        },
+        {
+          "path": "iter_009/iteration_009/phase_masked_multires_fusion_regressor/run_output_iter_009.json",
+          "sha256": "ea8ce54955f8762501531cee136ade66e3682bce7669ab0aa828bb16225f69e7"
+        },
+        {
+          "path": "iter_010/iteration_010/retrieval_compressed_multires_regressor/run_output_iter_010.json",
+          "sha256": "5ebdf78aecc45337bc6eeebf7b89a185efb6dd94445e606b8639d18763623d4a"
+        },
+        {
+          "path": "iter_011/iteration_011/single_opening_highres_crossattn_regressor/run_output_iter_011.json",
+          "sha256": "3b00d61ff2f173cb48797703fe3b378a71ef135e1e02fa7926ab90b74c636130"
+        },
+        {
+          "path": "iter_012/iteration_012/opening_conditioned_spectral_retrieval_regressor/run_output_iter_012.json",
+          "sha256": "d86ab360f0c26daa2f3fabc010efc20b5fc3e8e31d2156c911369dc36c09714d"
+        },
+        {
+          "path": "iter_001/iteration_001/dual_axis_crossattn_regressor/preflight_workers/dual_axis_crossattn_regressor_iter_001_001.json",
+          "sha256": "14b4df30bc1bdbe14b9f8f063307cdbebb95770526fdcd050afe450dee662b05"
+        },
+        {
+          "path": "iter_001/iteration_001/dual_axis_crossattn_regressor/preflight_workers/dual_axis_crossattn_regressor_iter_001_002.json",
+          "sha256": "db6c562b6df608dce9c83e7c2ce2d30c884a822af32ade988a52516cd3865503"
+        },
+        {
+          "path": "iter_002/iteration_002/dual_latent_fusion_regressor/preflight_workers/dual_latent_fusion_regressor_iter_002_001.json",
+          "sha256": "93d6f3ed97b47acae7d73afde291a2b79c86203c47354795342a6243388c07de"
+        },
+        {
+          "path": "iter_002/iteration_002/dual_latent_fusion_regressor/preflight_workers/dual_latent_fusion_regressor_iter_002_002.json",
+          "sha256": "8ee32a4572986605da5a8d88532c483c686adc3d065e06749b5a5b9c0be79163"
+        },
+        {
+          "path": "iter_002/iteration_002/dual_latent_fusion_regressor/preflight_workers/dual_latent_fusion_regressor_iter_002_003.json",
+          "sha256": "1fb84494d7c0620f700fc0fc92cf3584f729f28b3d904dc58cc26559516cf270"
+        },
+        {
+          "path": "iter_003/iteration_003/dual_multires_opening_fusion_regressor/preflight_workers/dual_multires_opening_fusion_regressor_iter_003_001.json",
+          "sha256": "a5ce3237b494c46879b5d3f320c7029554bda3b1684ef0bff07f6f4eef7517c1"
+        },
+        {
+          "path": "iter_003/iteration_003/dual_multires_opening_fusion_regressor/preflight_workers/dual_multires_opening_fusion_regressor_iter_003_002.json",
+          "sha256": "6daba940fcdfd12a8bef96edbff2d447dd1855e0c2eb23e2ee7f8f4c5159ad79"
+        },
+        {
+          "path": "iter_004/iteration_004/dual_opening_pyramid_crossattn_regressor/preflight_workers/dual_opening_pyramid_crossattn_regressor_iter_004_001.json",
+          "sha256": "4a98f00bd94fb9d1e81cb6c68abb1c5241756895792e33cd4d75aee94aa7dc49"
+        },
+        {
+          "path": "iter_004/iteration_004/dual_opening_pyramid_crossattn_regressor/preflight_workers/dual_opening_pyramid_crossattn_regressor_iter_004_002.json",
+          "sha256": "2fa13627f46a5a6d07c478d7d7cda7a955cd8df821a76df8079bbb4793c4771f"
+        },
+        {
+          "path": "iter_005/iteration_005/asymmetric_gated_opening_fft_regressor/preflight_workers/asymmetric_gated_opening_fft_regressor_iter_005_001.json",
+          "sha256": "35fa07322154e1fdfd90c010ca36ba5d2ee379e9bb5bc201d3e34eb5b5b5a1c6"
+        },
+        {
+          "path": "iter_005/iteration_005/asymmetric_gated_opening_fft_regressor/preflight_workers/asymmetric_gated_opening_fft_regressor_iter_005_002.json",
+          "sha256": "3b12d5a106817653c3ce1eb75438c8bc5c907c64091431482efb4842f35bc901"
+        },
+        {
+          "path": "iter_006/iteration_006/regularized_opening_crossview_regressor/preflight_workers/regularized_opening_crossview_regressor_iter_006_001.json",
+          "sha256": "00f2a0c1fb5532327d9d0fb797938055648cb917fee2df6e01ab013246fc9ca0"
+        },
+        {
+          "path": "iter_006/iteration_006/regularized_opening_crossview_regressor/preflight_workers/regularized_opening_crossview_regressor_iter_006_002.json",
+          "sha256": "4170fa1d297d4dd66295a060baa09a33b6cfa4a3bbedd069606608d0d66275a5"
+        },
+        {
+          "path": "iter_007/iteration_007/branch_specialized_multires_regressor/preflight_workers/branch_specialized_multires_regressor_iter_007_001.json",
+          "sha256": "212cc29ac7d8f10f04b0c7e2d66219531686f1adefbe6efc06a8771a2a57ade6"
+        },
+        {
+          "path": "iter_007/iteration_007/branch_specialized_multires_regressor/preflight_workers/branch_specialized_multires_regressor_iter_007_002.json",
+          "sha256": "a33640fc6e22b3984bb2d60857cdb20b852832d11d3aeef1a835ec92659e5f7c"
+        },
+        {
+          "path": "iter_008/iteration_008/shared_stem_multires_crossattn_regressor/preflight_workers/shared_stem_multires_crossattn_regressor_iter_008_001.json",
+          "sha256": "aacefa6d4906314ec231d306da9dec56cc2dbc1189b5b54bd53e4113a78120dc"
+        },
+        {
+          "path": "iter_008/iteration_008/shared_stem_multires_crossattn_regressor/preflight_workers/shared_stem_multires_crossattn_regressor_iter_008_002.json",
+          "sha256": "78162c2bfb313e7703842306ee45a667e429969c82f166f940b36a52fb314e25"
+        },
+        {
+          "path": "iter_009/iteration_009/phase_masked_multires_fusion_regressor/preflight_workers/phase_masked_multires_fusion_regressor_iter_009_001.json",
+          "sha256": "d1bc562eae1225866ba2b77c016b2802c95270e2cf1226b0b3769e3b168b351b"
+        },
+        {
+          "path": "iter_009/iteration_009/phase_masked_multires_fusion_regressor/preflight_workers/phase_masked_multires_fusion_regressor_iter_009_002.json",
+          "sha256": "8da38eea915b272d693100cc3da1dcead9411462547f3f12f806d0988fcc4156"
+        },
+        {
+          "path": "iter_010/iteration_010/retrieval_compressed_multires_regressor/preflight_workers/retrieval_compressed_multires_regressor_iter_010_001.json",
+          "sha256": "6bb971c40a8447e421450101395401818b12f8e17745e79dac9d4904c5055a8b"
+        },
+        {
+          "path": "iter_010/iteration_010/retrieval_compressed_multires_regressor/preflight_workers/retrieval_compressed_multires_regressor_iter_010_002.json",
+          "sha256": "a93f5681989d0e13e048ff05410b9a3200bc7258f9e010c517ced14416a12f2a"
+        },
+        {
+          "path": "iter_011/iteration_011/single_opening_highres_crossattn_regressor/preflight_workers/single_opening_highres_crossattn_regressor_iter_011_001.json",
+          "sha256": "ef60dc293fda3d827ec984a3d9956bf3f3c90908e93dbc84de797e8963a4dcb6"
+        },
+        {
+          "path": "iter_011/iteration_011/single_opening_highres_crossattn_regressor/preflight_workers/single_opening_highres_crossattn_regressor_iter_011_002.json",
+          "sha256": "16d60161b65b69bdbd78ecad3ccfea7b1bfb900afe524c1701bbd165a6c7d3ab"
+        },
+        {
+          "path": "iter_012/iteration_012/opening_conditioned_spectral_retrieval_regressor/preflight_workers/opening_conditioned_spectral_retrieval_regressor_iter_012_001.json",
+          "sha256": "9aab748bfc91e212c492392ba81abc02d4af2882a6f0cf9cdbb2ddece0025c63"
+        },
+        {
+          "path": "iter_012/iteration_012/opening_conditioned_spectral_retrieval_regressor/preflight_workers/opening_conditioned_spectral_retrieval_regressor_iter_012_002.json",
+          "sha256": "42ea02290beb060db6433874b53e90ee9bdb51602cb68342aa10b5def147c044"
+        },
+        {
+          "path": "iter_013/iteration_013/protected_bypass_multires_fusion_regressor/preflight_workers/protected_bypass_multires_fusion_regressor_iter_013_001.json",
+          "sha256": "53bb347d3c3fdabe1640279a84b8ad05ea0b669a2f31f927e843d94f9e00aedc"
+        }
+      ],
+      "source_run_id": "project8-dual-no-prior-run5",
+      "source_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b"
+    },
+    {
+      "case": "tidmad-0-3",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-v5-20260919/band-0-3/unit/workspace",
+      "run_output_files": 9,
+      "unique_record_count": 41,
+      "status_counts": {
+        "failed_mode_collapse": 16,
+        "success": 10,
+        "skipped_time_risk": 15
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 28,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 28
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_dilated_regressor/run_output_iter_001.json",
+          "sha256": "5d899eba76217033e293eb27184bebd94fe1b774c4c1236dc994004eeb220201"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/run_output_iter_002.json",
+          "sha256": "15865443bad605433b60f8d67bcf1683e2d9a1740a8a68d7e5bec3e9f548a1be"
+        },
+        {
+          "path": "iter_003/iteration_003/direct_waveform_wavenet/run_output_iter_003.json",
+          "sha256": "b91272b0f6fd7dddd6b542fbada1b998eb8ad7db61da9033b49590dd5387d79b"
+        },
+        {
+          "path": "iter_004/iteration_004/calibrated_antialiased_unet1d/run_output_iter_004.json",
+          "sha256": "255fb2e2eb4281f9cb558e6fa6f5d9e380901d255aa32cfc3d5cd5da41ee6492"
+        },
+        {
+          "path": "iter_005/iteration_005/calibrated_multiscale_tcn/run_output_iter_005.json",
+          "sha256": "e6b7cba0131d5d37fe59342e94cb22e9eeb4919fa546c4a2a1aea751f6b4c6b8"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_waveform_wavenet/run_output_iter_006.json",
+          "sha256": "c614294bd3e29a0a3313d91008f7921f9eb35b8814808c85818195805addcb13"
+        },
+        {
+          "path": "iter_007/iteration_007/variance_calibrated_spectral_wavenet/run_output_iter_007.json",
+          "sha256": "d1e6bf4a382064fd7143eab42d1a3365e70e98cf5c25533138a41d1f859cc94e"
+        },
+        {
+          "path": "iter_008/iteration_008/local_statistics_conditioned_spectral_wavenet/run_output_iter_008.json",
+          "sha256": "bd7b489c8f8744a88b18366cc8eb4a7560eef976f15d4d8450a3a479a9ffd987"
+        },
+        {
+          "path": "iter_009/iteration_009/input_conditioned_adaptive_spectral_wavenet/run_output_iter_009.json",
+          "sha256": "363a2ee30b7d16c656b53fb8c2afb0c8f1874229c2880e1deab06315ee5bef96"
+        },
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_dilated_regressor/preflight_workers/wholeband_gated_dilated_regressor_iter_001_001.json",
+          "sha256": "9f2186d46eb0d32110f476732780194b5a021c54de3f74d826f92d67b8eb7bf5"
+        },
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_dilated_regressor/preflight_workers/wholeband_gated_dilated_regressor_iter_001_002.json",
+          "sha256": "fb4eb616c4fc4cdc74117c1bf29a8c204d8673b120a950cefe0a87422cd9b3fa"
+        },
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_dilated_regressor/preflight_workers/wholeband_gated_dilated_regressor_iter_001_003.json",
+          "sha256": "50dec0ee745ce010cd19eef5ad550e86a199f71d7e12a6adf089a424fd251e0c"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/preflight_workers/residual_noise_wavenet_iter_002_001.json",
+          "sha256": "25950ef60905865b67a380a5ab21021fe52822f031a5db866169c4dad05fabc8"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/preflight_workers/residual_noise_wavenet_iter_002_002.json",
+          "sha256": "25950ef60905865b67a380a5ab21021fe52822f031a5db866169c4dad05fabc8"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/preflight_workers/residual_noise_wavenet_iter_002_003.json",
+          "sha256": "c8eda49bc5addb7e5d14f7e69f6233b9d1db37c4d475fe751b6c6b642a324a58"
+        },
+        {
+          "path": "iter_003/iteration_003/direct_waveform_wavenet/preflight_workers/direct_waveform_wavenet_iter_003_001.json",
+          "sha256": "e478232c91b0a85d6e4cdbb2541ae5ec39ae1b14ec6ecb9275d6f585647866c3"
+        },
+        {
+          "path": "iter_003/iteration_003/direct_waveform_wavenet/preflight_workers/direct_waveform_wavenet_iter_003_002.json",
+          "sha256": "8d32d58780bd6d43dcf17d196fb5653e303cbed1195d8842b4638a3637ffbe0b"
+        },
+        {
+          "path": "iter_003/iteration_003/direct_waveform_wavenet/preflight_workers/direct_waveform_wavenet_iter_003_003.json",
+          "sha256": "76d9823752175a02cc96a783330f82dac510b88448b60c53332f81b108e9fcf0"
+        },
+        {
+          "path": "iter_004/iteration_004/calibrated_antialiased_unet1d/preflight_workers/calibrated_antialiased_unet1d_iter_004_001.json",
+          "sha256": "bb9d9259e3ba3c72cb8d2329beecccd793415a23a50f5f63b4ae033f75a6944f"
+        },
+        {
+          "path": "iter_004/iteration_004/calibrated_antialiased_unet1d/preflight_workers/calibrated_antialiased_unet1d_iter_004_002.json",
+          "sha256": "066c20798b2af1420e7ce3d756682683d6d75593bacf7c4fece5c1e3315ab129"
+        },
+        {
+          "path": "iter_004/iteration_004/calibrated_antialiased_unet1d/preflight_workers/calibrated_antialiased_unet1d_iter_004_003.json",
+          "sha256": "10810a02a4ed583c700a4107a0c1dcd817c85fd0884f9fde4d68a819cbf4d56d"
+        },
+        {
+          "path": "iter_005/iteration_005/calibrated_multiscale_tcn/preflight_workers/calibrated_multiscale_tcn_iter_005_001.json",
+          "sha256": "f2285cbe3135d72403cb928c632f47044b80789b084be9dfa500fee1fff56478"
+        },
+        {
+          "path": "iter_005/iteration_005/calibrated_multiscale_tcn/preflight_workers/calibrated_multiscale_tcn_iter_005_002.json",
+          "sha256": "dc96605ac5df23a235da32cab81a172b7d394bf123ce77964f4673872b77634b"
+        },
+        {
+          "path": "iter_005/iteration_005/calibrated_multiscale_tcn/preflight_workers/calibrated_multiscale_tcn_iter_005_003.json",
+          "sha256": "77ee268773a39a987f167a0779ecb5e8d324df75c357a9da33bcb8f5a1118bcb"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_waveform_wavenet/preflight_workers/direct_waveform_wavenet_iter_006_001.json",
+          "sha256": "f5b3385825c6520094275f26719af29771322bc33bfd26288f1424063c115844"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_waveform_wavenet/preflight_workers/direct_waveform_wavenet_iter_006_002.json",
+          "sha256": "f16a2e635653887355d55873bc86332c9209c3ddd8c44642e8ce6a362d006097"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_waveform_wavenet/preflight_workers/direct_waveform_wavenet_iter_006_003.json",
+          "sha256": "a733f5f444c11dbdb5f483252b5ff2bd7e844188c6b557adf4cbda4bd775285c"
+        },
+        {
+          "path": "iter_007/iteration_007/variance_calibrated_spectral_wavenet/preflight_workers/variance_calibrated_spectral_wavenet_iter_007_001.json",
+          "sha256": "7d0b2c6c4d585ebde1a6d6f65b3214147cd81a7b4d05b41baffd1d7a38a13380"
+        },
+        {
+          "path": "iter_007/iteration_007/variance_calibrated_spectral_wavenet/preflight_workers/variance_calibrated_spectral_wavenet_iter_007_002.json",
+          "sha256": "25b667c36ec0f0b78b469df7b0e1d42c844aed64ed98d0b39da64db938004909"
+        },
+        {
+          "path": "iter_008/iteration_008/local_statistics_conditioned_spectral_wavenet/preflight_workers/local_statistics_conditioned_spectral_wavenet_iter_008_001.json",
+          "sha256": "7ad2566209505819b58a1f9048b66c27281c33d30ddd7cab67e8c0b539a233ba"
+        },
+        {
+          "path": "iter_008/iteration_008/local_statistics_conditioned_spectral_wavenet/preflight_workers/local_statistics_conditioned_spectral_wavenet_iter_008_002.json",
+          "sha256": "473c12b864d0b64af4c5769ceba24a08cdcda5e47d836c2afa29fd43bd951a90"
+        },
+        {
+          "path": "iter_008/iteration_008/local_statistics_conditioned_spectral_wavenet/preflight_workers/local_statistics_conditioned_spectral_wavenet_iter_008_003.json",
+          "sha256": "8d3eb34b43948bb3a7ddb803009fb030e933d43f61d19f86c746c74d0977eb7c"
+        },
+        {
+          "path": "iter_009/iteration_009/input_conditioned_adaptive_spectral_wavenet/preflight_workers/input_conditioned_adaptive_spectral_wavenet_iter_009_001.json",
+          "sha256": "c6a7ee1a9ec784b8998260405657faee3407b986565703441a96e34e26696d0c"
+        },
+        {
+          "path": "iter_009/iteration_009/input_conditioned_adaptive_spectral_wavenet/preflight_workers/input_conditioned_adaptive_spectral_wavenet_iter_009_002.json",
+          "sha256": "9ea9940da57fdc39d197a2f24c418e0c38a97bcf6875c53d6e77b9a33dfaa1c7"
+        },
+        {
+          "path": "iter_009/iteration_009/input_conditioned_adaptive_spectral_wavenet/preflight_workers/input_conditioned_adaptive_spectral_wavenet_iter_009_003.json",
+          "sha256": "99d5ffe999c1437351822e21bc371fdb8e58d1f0ff445729b83b1d0b6262fe0a"
+        },
+        {
+          "path": "iter_010/iteration_010/fidelity_anchored_calibrated_spectral_wavenet/preflight_workers/fidelity_anchored_calibrated_spectral_wavenet_iter_010_001.json",
+          "sha256": "6b63c97a09e0995b043e25736395b5d1a7dede9abc77284ddd41546fe67c1090"
+        },
+        {
+          "path": "iter_010/iteration_010/fidelity_anchored_calibrated_spectral_wavenet/preflight_workers/fidelity_anchored_calibrated_spectral_wavenet_iter_010_002.json",
+          "sha256": "7dc4b111b9f695b6fe5f91bd7918568ab7f410bc3f34f7731b145903429fe313"
+        }
+      ],
+      "source_run_id": "workflow_noprior:0-3",
+      "source_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d"
+    },
+    {
+      "case": "tidmad-4-9",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-v5-20260919/band-4-9/unit/workspace",
+      "run_output_files": 8,
+      "unique_record_count": 24,
+      "status_counts": {
+        "failed_mode_collapse": 13,
+        "success": 11
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 27,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 27
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_denoiser/run_output_iter_001.json",
+          "sha256": "5efd6ceb53e9adaf63f8820215a81187cb5b00393a46548359665bf111789f4d"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/run_output_iter_002.json",
+          "sha256": "e723314b29da50819c740a02cf24456d2bf5424ecf8ba3a44b1f4b2e009b47c8"
+        },
+        {
+          "path": "iter_003/iteration_003/identity_bottleneck_unet/run_output_iter_003.json",
+          "sha256": "6d737ea6df3e764eb24914546d2bdc1f0d262faf85068cb9a882ed883f8661e4"
+        },
+        {
+          "path": "iter_004/iteration_004/continuous_dilated_wavenet/run_output_iter_004.json",
+          "sha256": "47aa399d636b430306c540970915a66034fac3607de54f8eac5cfe6f32d78951"
+        },
+        {
+          "path": "iter_005/iteration_005/bidirectional_scaled_dilated_tcn/run_output_iter_005.json",
+          "sha256": "bb842255bfe5b02d0432c25b300562e611da46a9c94b15800e331bb9066b8e05"
+        },
+        {
+          "path": "iter_006/iteration_006/bidirectional_stabilized_dilated_tcn/run_output_iter_006.json",
+          "sha256": "465157028fe96a2c19fae07e5c232a070bba7ea68ebb60b6e62d87ed57faf166"
+        },
+        {
+          "path": "iter_007/iteration_007/spectrally_conditioned_centered_tcn/run_output_iter_007.json",
+          "sha256": "ee330f321661d96b262f63ed2ae0248dc72c4cbcf534f5fd960e2c8fc4c349c1"
+        },
+        {
+          "path": "iter_008/iteration_008/adaptive_complex_spectral_centered_tcn/run_output_iter_008.json",
+          "sha256": "a32f203722dc5da1b315cbc39ba2061b890f9a3923425510b583e3ff882ba274"
+        },
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_denoiser/preflight_workers/scalar_gated_dilated_denoiser_iter_001_001.json",
+          "sha256": "927f14e373c3a4b0185bcb70005ed1a93e4ae9f4738d4d98b17e1d7a2f20c11c"
+        },
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_denoiser/preflight_workers/scalar_gated_dilated_denoiser_iter_001_002.json",
+          "sha256": "927f14e373c3a4b0185bcb70005ed1a93e4ae9f4738d4d98b17e1d7a2f20c11c"
+        },
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_denoiser/preflight_workers/scalar_gated_dilated_denoiser_iter_001_003.json",
+          "sha256": "57844601ad481a47b81026983a18d068f18361a31352968efafbfd3504bf66db"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/preflight_workers/residual_noise_wavenet_iter_002_001.json",
+          "sha256": "57844601ad481a47b81026983a18d068f18361a31352968efafbfd3504bf66db"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/preflight_workers/residual_noise_wavenet_iter_002_002.json",
+          "sha256": "57844601ad481a47b81026983a18d068f18361a31352968efafbfd3504bf66db"
+        },
+        {
+          "path": "iter_002/iteration_002/residual_noise_wavenet/preflight_workers/residual_noise_wavenet_iter_002_003.json",
+          "sha256": "1b549f4028a3e87e27c283d0fa2168e4adf4134c0da950d408682df96541b307"
+        },
+        {
+          "path": "iter_003/iteration_003/identity_bottleneck_unet/preflight_workers/identity_bottleneck_unet_iter_003_001.json",
+          "sha256": "5d1ebdae4b76059263dff0e00874535f29ac62ff5c1b7a8ca0e4717a20f16d3a"
+        },
+        {
+          "path": "iter_003/iteration_003/identity_bottleneck_unet/preflight_workers/identity_bottleneck_unet_iter_003_002.json",
+          "sha256": "8c740d102560bd1f558ac79d3f22e37ea8ef236e85f4ac7701d4f258281788d1"
+        },
+        {
+          "path": "iter_003/iteration_003/identity_bottleneck_unet/preflight_workers/identity_bottleneck_unet_iter_003_003.json",
+          "sha256": "e3060aceb0975383f2aa55db05363149a7453c56852e6cf6597c8221fff02044"
+        },
+        {
+          "path": "iter_004/iteration_004/continuous_dilated_wavenet/preflight_workers/continuous_dilated_wavenet_iter_004_001.json",
+          "sha256": "90c4772ad97fbeccf0559f9c6f671a7729e560c8dac02caf16f8dac8da6ca126"
+        },
+        {
+          "path": "iter_004/iteration_004/continuous_dilated_wavenet/preflight_workers/continuous_dilated_wavenet_iter_004_002.json",
+          "sha256": "e5a1e2f99a5670d8c6aa0811852127b2677228c46cea96c4b2d92fb60556c85a"
+        },
+        {
+          "path": "iter_004/iteration_004/continuous_dilated_wavenet/preflight_workers/continuous_dilated_wavenet_iter_004_003.json",
+          "sha256": "5927d3783458556f768dc5ed4cc32620edfe4d57baa3ec9431e9328bd9fefabb"
+        },
+        {
+          "path": "iter_005/iteration_005/bidirectional_scaled_dilated_tcn/preflight_workers/bidirectional_scaled_dilated_tcn_iter_005_001.json",
+          "sha256": "f136a782e9f8c16ba38ea82748f6e6d72f429aadba546d0ad4aad8132fa2602e"
+        },
+        {
+          "path": "iter_005/iteration_005/bidirectional_scaled_dilated_tcn/preflight_workers/bidirectional_scaled_dilated_tcn_iter_005_002.json",
+          "sha256": "f42c8b3daf984fcf2048f726c0bff77787ca76a0153e6ec061a972e222c78dfe"
+        },
+        {
+          "path": "iter_005/iteration_005/bidirectional_scaled_dilated_tcn/preflight_workers/bidirectional_scaled_dilated_tcn_iter_005_003.json",
+          "sha256": "87af08ead428b63c72503f1db3059c94ab3f3d1feb38bda16e2c2cec858e45c1"
+        },
+        {
+          "path": "iter_006/iteration_006/bidirectional_stabilized_dilated_tcn/preflight_workers/bidirectional_stabilized_dilated_tcn_iter_006_001.json",
+          "sha256": "f8e2c51ef04b34dd68e51f900af787e58838be5d4786ce0eb6e9dd2a4359363c"
+        },
+        {
+          "path": "iter_006/iteration_006/bidirectional_stabilized_dilated_tcn/preflight_workers/bidirectional_stabilized_dilated_tcn_iter_006_002.json",
+          "sha256": "f8e2c51ef04b34dd68e51f900af787e58838be5d4786ce0eb6e9dd2a4359363c"
+        },
+        {
+          "path": "iter_006/iteration_006/bidirectional_stabilized_dilated_tcn/preflight_workers/bidirectional_stabilized_dilated_tcn_iter_006_003.json",
+          "sha256": "f8e2c51ef04b34dd68e51f900af787e58838be5d4786ce0eb6e9dd2a4359363c"
+        },
+        {
+          "path": "iter_007/iteration_007/spectrally_conditioned_centered_tcn/preflight_workers/spectrally_conditioned_centered_tcn_iter_007_001.json",
+          "sha256": "380b96c8870291a67a7be74f4b995eb41d91dae309798735e871a75847e31a40"
+        },
+        {
+          "path": "iter_007/iteration_007/spectrally_conditioned_centered_tcn/preflight_workers/spectrally_conditioned_centered_tcn_iter_007_002.json",
+          "sha256": "dce25a2245f030b28984b512d28c4d5ad56d97930ed185fa3470fa82b2fb7703"
+        },
+        {
+          "path": "iter_007/iteration_007/spectrally_conditioned_centered_tcn/preflight_workers/spectrally_conditioned_centered_tcn_iter_007_003.json",
+          "sha256": "10cfeb03c41ce1433fef46789da2e822009a65afe85ab7d9b1acde894a0af76c"
+        },
+        {
+          "path": "iter_008/iteration_008/adaptive_complex_spectral_centered_tcn/preflight_workers/adaptive_complex_spectral_centered_tcn_iter_008_001.json",
+          "sha256": "958a39c712fd1524f62dc7b6e25a79232d2148f227599889fe4fffafda6aefd2"
+        },
+        {
+          "path": "iter_008/iteration_008/adaptive_complex_spectral_centered_tcn/preflight_workers/adaptive_complex_spectral_centered_tcn_iter_008_002.json",
+          "sha256": "958a39c712fd1524f62dc7b6e25a79232d2148f227599889fe4fffafda6aefd2"
+        },
+        {
+          "path": "iter_008/iteration_008/adaptive_complex_spectral_centered_tcn/preflight_workers/adaptive_complex_spectral_centered_tcn_iter_008_003.json",
+          "sha256": "a4236774cdfd4b373c8113d310b20a7939cbed11394dbbaa81942de07e145724"
+        },
+        {
+          "path": "iter_009/iteration_009/coverage_scaled_coarse_spectral_tcn/preflight_workers/coverage_scaled_coarse_spectral_tcn_iter_009_001.json",
+          "sha256": "85eef1618c5e91b4cadb607bacafa259a4142921408d95c5e0cd2efd471296e4"
+        },
+        {
+          "path": "iter_009/iteration_009/coverage_scaled_coarse_spectral_tcn/preflight_workers/coverage_scaled_coarse_spectral_tcn_iter_009_002.json",
+          "sha256": "8a7d1fbbbc6dcb90333ef94d00980289f2488213a00c298f1a53f3567806ead2"
+        },
+        {
+          "path": "iter_009/iteration_009/coverage_scaled_coarse_spectral_tcn/preflight_workers/coverage_scaled_coarse_spectral_tcn_iter_009_003.json",
+          "sha256": "85eef1618c5e91b4cadb607bacafa259a4142921408d95c5e0cd2efd471296e4"
+        }
+      ],
+      "source_run_id": "workflow_noprior:4-9",
+      "source_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d"
+    },
+    {
+      "case": "tidmad-10-14",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-v5-20260919/band-10-14/unit/workspace",
+      "run_output_files": 8,
+      "unique_record_count": 24,
+      "status_counts": {
+        "success": 22,
+        "failed_mode_collapse": 2
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 26,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 26
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/run_output_iter_001.json",
+          "sha256": "0a0f318e36b17a7531a432c2da1d7cfee25a91da0fd24271e2f92a68349e843b"
+        },
+        {
+          "path": "iter_002/iteration_002/fullband_centered_gated_dilated_regressor/run_output_iter_002.json",
+          "sha256": "f518fe9d084105c2ac8b70e11d48ea75bc9e6df73ba6b824911d3915fcc9071f"
+        },
+        {
+          "path": "iter_003/iteration_003/fullband_noise_conditioned_wavelet_packet_regressor/run_output_iter_003.json",
+          "sha256": "d5280224deaf13bc3f3ff554d4ef667e921dbf7f0b0ec494a6a2d38748a7f0fa"
+        },
+        {
+          "path": "iter_004/iteration_004/fullband_selective_dilation_gated_regressor/run_output_iter_004.json",
+          "sha256": "8744861fd7924b46a009a4356521eee0bf7d205fb1e189e5ed078e5ff74e9f49"
+        },
+        {
+          "path": "iter_005/iteration_005/fullband_spectral_film_gated_regressor/run_output_iter_005.json",
+          "sha256": "8be0303470775779754f04d89e5fe7f6e69c883615a2dd7e26738c460259c75f"
+        },
+        {
+          "path": "iter_006/iteration_006/fullband_coverage_scaled_metric_selected_gated_regressor/run_output_iter_006.json",
+          "sha256": "1562bf7af4760473cd40f0df4e14e577ccfd3d5d2d80c9064959b5aa1849d1e4"
+        },
+        {
+          "path": "iter_007/iteration_007/fullband_replicated_coverage_gated_regressor/run_output_iter_007.json",
+          "sha256": "88f8e8a382bf97d69764adc22c07c7b28b2df278159f2e6bf5835c730d60ead0"
+        },
+        {
+          "path": "iter_008/iteration_008/fullband_verified_coverage_replicated_gated_regressor/run_output_iter_008.json",
+          "sha256": "aa052b148e23de451aea46eb29f78366fbdaaa0a76d1e4da3f46da917cfa2975"
+        },
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/preflight_workers/fullband_gated_dilated_regressor_iter_001_001.json",
+          "sha256": "d76e864d61575a1805b45b3d8177655840ae20627d479d93730df950ffce8643"
+        },
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/preflight_workers/fullband_gated_dilated_regressor_iter_001_002.json",
+          "sha256": "d76e864d61575a1805b45b3d8177655840ae20627d479d93730df950ffce8643"
+        },
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/preflight_workers/fullband_gated_dilated_regressor_iter_001_003.json",
+          "sha256": "616904ffaeade3b38a0604fc58f676fb87bd49efadab95064373b1a72d5df42d"
+        },
+        {
+          "path": "iter_002/iteration_002/fullband_centered_gated_dilated_regressor/preflight_workers/fullband_centered_gated_dilated_regressor_iter_002_001.json",
+          "sha256": "0d31289ff27133afef86daf21cfd3ad9b98870eadb8a8581a5ee1e0f86181ae4"
+        },
+        {
+          "path": "iter_002/iteration_002/fullband_centered_gated_dilated_regressor/preflight_workers/fullband_centered_gated_dilated_regressor_iter_002_002.json",
+          "sha256": "1585fd0559df27a2ceefa6593f10ceeb606ebe1cc8d7efc8c4550ba42b774aa2"
+        },
+        {
+          "path": "iter_002/iteration_002/fullband_centered_gated_dilated_regressor/preflight_workers/fullband_centered_gated_dilated_regressor_iter_002_003.json",
+          "sha256": "1585fd0559df27a2ceefa6593f10ceeb606ebe1cc8d7efc8c4550ba42b774aa2"
+        },
+        {
+          "path": "iter_003/iteration_003/fullband_noise_conditioned_wavelet_packet_regressor/preflight_workers/fullband_noise_conditioned_wavelet_packet_regressor_iter_003_001.json",
+          "sha256": "7dfef7291d9ffd1bf80677e02e6722507a2b68e6c44e0f25579c6cdb61576b9c"
+        },
+        {
+          "path": "iter_003/iteration_003/fullband_noise_conditioned_wavelet_packet_regressor/preflight_workers/fullband_noise_conditioned_wavelet_packet_regressor_iter_003_002.json",
+          "sha256": "7dfef7291d9ffd1bf80677e02e6722507a2b68e6c44e0f25579c6cdb61576b9c"
+        },
+        {
+          "path": "iter_003/iteration_003/fullband_noise_conditioned_wavelet_packet_regressor/preflight_workers/fullband_noise_conditioned_wavelet_packet_regressor_iter_003_003.json",
+          "sha256": "7dfef7291d9ffd1bf80677e02e6722507a2b68e6c44e0f25579c6cdb61576b9c"
+        },
+        {
+          "path": "iter_004/iteration_004/fullband_selective_dilation_gated_regressor/preflight_workers/fullband_selective_dilation_gated_regressor_iter_004_001.json",
+          "sha256": "c37ba11452ab16b6fc561b07ab422a2ac669c2e248b109254990c3fc911bf485"
+        },
+        {
+          "path": "iter_004/iteration_004/fullband_selective_dilation_gated_regressor/preflight_workers/fullband_selective_dilation_gated_regressor_iter_004_002.json",
+          "sha256": "daea3069fdcd64e467d4ce4eb6753374b97af0bbd26cad1a19f91dec14668fe5"
+        },
+        {
+          "path": "iter_004/iteration_004/fullband_selective_dilation_gated_regressor/preflight_workers/fullband_selective_dilation_gated_regressor_iter_004_003.json",
+          "sha256": "361751ac349bc35c292626533a7c475dd78e578afa132b4d8f95b6b15869ddc7"
+        },
+        {
+          "path": "iter_005/iteration_005/fullband_spectral_film_gated_regressor/preflight_workers/fullband_spectral_film_gated_regressor_iter_005_001.json",
+          "sha256": "0288f21bd590d9ee41f58324d50994e4f9782298bf66677f5a7398940836572b"
+        },
+        {
+          "path": "iter_005/iteration_005/fullband_spectral_film_gated_regressor/preflight_workers/fullband_spectral_film_gated_regressor_iter_005_002.json",
+          "sha256": "0288f21bd590d9ee41f58324d50994e4f9782298bf66677f5a7398940836572b"
+        },
+        {
+          "path": "iter_005/iteration_005/fullband_spectral_film_gated_regressor/preflight_workers/fullband_spectral_film_gated_regressor_iter_005_003.json",
+          "sha256": "0288f21bd590d9ee41f58324d50994e4f9782298bf66677f5a7398940836572b"
+        },
+        {
+          "path": "iter_006/iteration_006/fullband_coverage_scaled_metric_selected_gated_regressor/preflight_workers/fullband_coverage_scaled_metric_selected_gated_regressor_iter_006_001.json",
+          "sha256": "d50feddc4f55516d31084bab4bc5002041ba79318023a52382fb1e44bc088d52"
+        },
+        {
+          "path": "iter_006/iteration_006/fullband_coverage_scaled_metric_selected_gated_regressor/preflight_workers/fullband_coverage_scaled_metric_selected_gated_regressor_iter_006_002.json",
+          "sha256": "8e9246a75880444caa9144f34dfc50da7e374faa2ef3cb371db7a46668f955e2"
+        },
+        {
+          "path": "iter_006/iteration_006/fullband_coverage_scaled_metric_selected_gated_regressor/preflight_workers/fullband_coverage_scaled_metric_selected_gated_regressor_iter_006_003.json",
+          "sha256": "d50feddc4f55516d31084bab4bc5002041ba79318023a52382fb1e44bc088d52"
+        },
+        {
+          "path": "iter_007/iteration_007/fullband_replicated_coverage_gated_regressor/preflight_workers/fullband_replicated_coverage_gated_regressor_iter_007_001.json",
+          "sha256": "52ef5095a2f514b503f96f1c282a7419671bb61de0249572a3a4d65cb85fa2d7"
+        },
+        {
+          "path": "iter_007/iteration_007/fullband_replicated_coverage_gated_regressor/preflight_workers/fullband_replicated_coverage_gated_regressor_iter_007_002.json",
+          "sha256": "a5bd9225a736a7e1e8cdf50f4fc98eea9da17de007bcf31b32a29d51aada7c7e"
+        },
+        {
+          "path": "iter_007/iteration_007/fullband_replicated_coverage_gated_regressor/preflight_workers/fullband_replicated_coverage_gated_regressor_iter_007_003.json",
+          "sha256": "5d8f503c672c6609ff2260777337d093f67db616e15ad3d66f81d1e9b8eee680"
+        },
+        {
+          "path": "iter_008/iteration_008/fullband_verified_coverage_replicated_gated_regressor/preflight_workers/fullband_verified_coverage_replicated_gated_regressor_iter_008_001.json",
+          "sha256": "411ef71012289d0d296e3861396352983446466be2db77355454f4d25e08da54"
+        },
+        {
+          "path": "iter_008/iteration_008/fullband_verified_coverage_replicated_gated_regressor/preflight_workers/fullband_verified_coverage_replicated_gated_regressor_iter_008_002.json",
+          "sha256": "6aea27be467a273bf710615d8339c253e1407659de7d7a493093b8d1c6a2e3bf"
+        },
+        {
+          "path": "iter_008/iteration_008/fullband_verified_coverage_replicated_gated_regressor/preflight_workers/fullband_verified_coverage_replicated_gated_regressor_iter_008_003.json",
+          "sha256": "a0d079d884518c7dec85563e5d6decd940a61ea82030c2e7cbac3cddf5a5ddf4"
+        },
+        {
+          "path": "iter_009/iteration_009/fullband_health_selected_checkpointed_gated_regressor/preflight_workers/fullband_health_selected_checkpointed_gated_regressor_iter_009_001.json",
+          "sha256": "d50feddc4f55516d31084bab4bc5002041ba79318023a52382fb1e44bc088d52"
+        },
+        {
+          "path": "iter_009/iteration_009/fullband_health_selected_checkpointed_gated_regressor/preflight_workers/fullband_health_selected_checkpointed_gated_regressor_iter_009_002.json",
+          "sha256": "d50feddc4f55516d31084bab4bc5002041ba79318023a52382fb1e44bc088d52"
+        }
+      ],
+      "source_run_id": "workflow_noprior:10-14",
+      "source_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d"
+    },
+    {
+      "case": "tidmad-15-19",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-v5-20260919/band-15-19/unit/workspace",
+      "run_output_files": 7,
+      "unique_record_count": 25,
+      "status_counts": {
+        "failed_mode_collapse": 11,
+        "success": 10,
+        "skipped_time_risk": 4
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 24,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 24
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/run_output_iter_001.json",
+          "sha256": "22f3ddb3c23f724a8590e5dabc05adf36cfc09cd8c9b110093e86ce1e564cb25"
+        },
+        {
+          "path": "iter_002/iteration_002/bidirectional_deepsupervised_dilated_regressor/run_output_iter_002.json",
+          "sha256": "c7395106f20480d22a68a24fd258a4fb8b1784ae369e6f9f34f84b542fc5bf8e"
+        },
+        {
+          "path": "iter_003/iteration_003/hybrid_spectral_temporal_regressor/run_output_iter_003.json",
+          "sha256": "9a6162f6d0521ffef6a4149e69cc78987a2e96bc4626cb431ad7e90feca06a73"
+        },
+        {
+          "path": "iter_004/iteration_004/progressively_supervised_noncausal_regressor/run_output_iter_004.json",
+          "sha256": "88ff2a0aa405ebb9aaacb837d1073f3cad9b27db8d0af03c181f837afcb5a97a"
+        },
+        {
+          "path": "iter_005/iteration_005/bounded_refinement_noncausal_regressor/run_output_iter_005.json",
+          "sha256": "c30f4fa9b56050acfc38f2d0ede04eb26ac7b3c04c6ea767b2db8a937173b364"
+        },
+        {
+          "path": "iter_006/iteration_006/fullcoverage_stabilized_noncausal_regressor/run_output_iter_006.json",
+          "sha256": "b2e988a655718c017d2b56d69b9f57d6a052452c2ab36fdb44400003d7cd4585"
+        },
+        {
+          "path": "iter_007/iteration_007/coverage_scaled_stabilized_noncausal_regressor/run_output_iter_007.json",
+          "sha256": "5a87f9bc6625c554936de8d912bfe429bb3b627660a4b4d80592b88349808567"
+        },
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/preflight_workers/fullband_gated_dilated_regressor_iter_001_001.json",
+          "sha256": "165655fd1280fce5c174a88517e7e7c35ffbe37d7fc5e60cf72f7392cfb7d860"
+        },
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/preflight_workers/fullband_gated_dilated_regressor_iter_001_002.json",
+          "sha256": "165655fd1280fce5c174a88517e7e7c35ffbe37d7fc5e60cf72f7392cfb7d860"
+        },
+        {
+          "path": "iter_001/iteration_001/fullband_gated_dilated_regressor/preflight_workers/fullband_gated_dilated_regressor_iter_001_003.json",
+          "sha256": "c8e744efecf4d8f537d1c4a7bea8b0d2fe095c35be86e4db4258d9544b3f5f68"
+        },
+        {
+          "path": "iter_002/iteration_002/bidirectional_deepsupervised_dilated_regressor/preflight_workers/bidirectional_deepsupervised_dilated_regressor_iter_002_001.json",
+          "sha256": "1c2eba94fe49e0e84255a1bd83af7a96fbb0efcff81ff6cb28cdee00dce9689c"
+        },
+        {
+          "path": "iter_002/iteration_002/bidirectional_deepsupervised_dilated_regressor/preflight_workers/bidirectional_deepsupervised_dilated_regressor_iter_002_002.json",
+          "sha256": "932522987f4509afd736c4a9d301e8b9587089be7e3addcebdbb69dd4d2c7ce1"
+        },
+        {
+          "path": "iter_002/iteration_002/bidirectional_deepsupervised_dilated_regressor/preflight_workers/bidirectional_deepsupervised_dilated_regressor_iter_002_003.json",
+          "sha256": "629c3c37cf6d699d4b88ee0dfd8da176a8ab3eceeb56bc58961b40c1caf78417"
+        },
+        {
+          "path": "iter_003/iteration_003/hybrid_spectral_temporal_regressor/preflight_workers/hybrid_spectral_temporal_regressor_iter_003_001.json",
+          "sha256": "95ebecb54cdf9da0739dd36f105a3eee65efaa88222151f163015d68deffe4ef"
+        },
+        {
+          "path": "iter_003/iteration_003/hybrid_spectral_temporal_regressor/preflight_workers/hybrid_spectral_temporal_regressor_iter_003_002.json",
+          "sha256": "9772fd118e17f87830454d247aa7a3bfa08c312f90b93b2ce8f26abbcb4250c3"
+        },
+        {
+          "path": "iter_003/iteration_003/hybrid_spectral_temporal_regressor/preflight_workers/hybrid_spectral_temporal_regressor_iter_003_003.json",
+          "sha256": "c990aceef3e60f3b5fc37c2f783b90934ceb88ef0ed9bc3558852333d09323e0"
+        },
+        {
+          "path": "iter_004/iteration_004/progressively_supervised_noncausal_regressor/preflight_workers/progressively_supervised_noncausal_regressor_iter_004_001.json",
+          "sha256": "6555252ab5c75387b73c4bfccab365b51d854f7e3d101ce6afa18f63755ecf42"
+        },
+        {
+          "path": "iter_004/iteration_004/progressively_supervised_noncausal_regressor/preflight_workers/progressively_supervised_noncausal_regressor_iter_004_002.json",
+          "sha256": "5dd1500c48cc6774ca61af14d94fcc77eeca41a81d16c371999e9dd51613f4f6"
+        },
+        {
+          "path": "iter_004/iteration_004/progressively_supervised_noncausal_regressor/preflight_workers/progressively_supervised_noncausal_regressor_iter_004_004.json",
+          "sha256": "885770c0dff3f2871923eb434a89426c871543faeff1b6f4b9b5908f92582c54"
+        },
+        {
+          "path": "iter_005/iteration_005/bounded_refinement_noncausal_regressor/preflight_workers/bounded_refinement_noncausal_regressor_iter_005_001.json",
+          "sha256": "cab3e45090812979bda44409d8e3347890687a3851a8643c32456e557f2fb8fb"
+        },
+        {
+          "path": "iter_005/iteration_005/bounded_refinement_noncausal_regressor/preflight_workers/bounded_refinement_noncausal_regressor_iter_005_002.json",
+          "sha256": "bc6c4aef9b66f44da872256d1af1c3832b1d976b0a7b2b23a4529f2ed8f42dd0"
+        },
+        {
+          "path": "iter_005/iteration_005/bounded_refinement_noncausal_regressor/preflight_workers/bounded_refinement_noncausal_regressor_iter_005_004.json",
+          "sha256": "8f0c9460ac0a41dd27c442472d2a9b1c1d13e16b3a818fc0ca1546877f8b5d69"
+        },
+        {
+          "path": "iter_006/iteration_006/fullcoverage_stabilized_noncausal_regressor/preflight_workers/fullcoverage_stabilized_noncausal_regressor_iter_006_001.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        },
+        {
+          "path": "iter_006/iteration_006/fullcoverage_stabilized_noncausal_regressor/preflight_workers/fullcoverage_stabilized_noncausal_regressor_iter_006_002.json",
+          "sha256": "88ddc37c2c8f10ac60e6d4be0f6b4da37a633dca565f0f197f4f491c695576ee"
+        },
+        {
+          "path": "iter_006/iteration_006/fullcoverage_stabilized_noncausal_regressor/preflight_workers/fullcoverage_stabilized_noncausal_regressor_iter_006_004.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        },
+        {
+          "path": "iter_007/iteration_007/coverage_scaled_stabilized_noncausal_regressor/preflight_workers/coverage_scaled_stabilized_noncausal_regressor_iter_007_001.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        },
+        {
+          "path": "iter_007/iteration_007/coverage_scaled_stabilized_noncausal_regressor/preflight_workers/coverage_scaled_stabilized_noncausal_regressor_iter_007_002.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        },
+        {
+          "path": "iter_007/iteration_007/coverage_scaled_stabilized_noncausal_regressor/preflight_workers/coverage_scaled_stabilized_noncausal_regressor_iter_007_004.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        },
+        {
+          "path": "iter_008/iteration_008/fullcoverage_data_scaled_noncausal_regressor/preflight_workers/fullcoverage_data_scaled_noncausal_regressor_iter_008_001.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        },
+        {
+          "path": "iter_008/iteration_008/fullcoverage_data_scaled_noncausal_regressor/preflight_workers/fullcoverage_data_scaled_noncausal_regressor_iter_008_002.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        },
+        {
+          "path": "iter_008/iteration_008/fullcoverage_data_scaled_noncausal_regressor/preflight_workers/fullcoverage_data_scaled_noncausal_regressor_iter_008_004.json",
+          "sha256": "7b8c01754bb138c155aa086805b2f2faaf24f818554af3fd09ea54c3e1ceea27"
+        }
+      ],
+      "source_run_id": "workflow_noprior:15-19",
+      "source_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d"
+    },
+    {
+      "case": "tidmad-analysis-0-3",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-da-only-run1-20260922/band-0-3/unit/workspace",
+      "run_output_files": 8,
+      "unique_record_count": 24,
+      "status_counts": {
+        "failed_mode_collapse": 23,
+        "success": 1
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 27,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 27
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_denoiser/run_output_iter_001.json",
+          "sha256": "20c33b65f5d658fd10e5b3f3dcc90972ced87a9dfbd4c5b15517d0fc0f2b2d5b"
+        },
+        {
+          "path": "iter_002/iteration_002/wholeband_gated_denoiser/run_output_iter_002.json",
+          "sha256": "2c943548ea07450ef130209680624cf890eca910a62ddcf8b04fe5a99a0a285d"
+        },
+        {
+          "path": "iter_003/iteration_003/continuous_dilated_wavenet/run_output_iter_003.json",
+          "sha256": "7b261b6873e4504d69de0f86e13585f8a9a67d96d8ea4b4ed6202ae2a8152abb"
+        },
+        {
+          "path": "iter_004/iteration_004/wholeband_fc_regression_probe/run_output_iter_004.json",
+          "sha256": "cabe8e6d7743a9a44e3d4455350ef7f8aed63ce8ee3aad2e7f58323aad9baf90"
+        },
+        {
+          "path": "iter_005/iteration_005/conditioned_residual_wavenet/run_output_iter_005.json",
+          "sha256": "32d4f5320f1e4f0dd8a975d039c5c57a8392042f769b8605452f94984cc88151"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_head_dilated_wavenet/run_output_iter_006.json",
+          "sha256": "0bc443c15c32e025a42c1f1f68a723dac0e6daef2afa8b6fba4a3b3c04757bd2"
+        },
+        {
+          "path": "iter_007/iteration_007/symmetric_direct_wavenet/run_output_iter_007.json",
+          "sha256": "6a7c1d5b37ab0b92d28dae8fc8e19e24b98316353ce3d006d805725fd820ba21"
+        },
+        {
+          "path": "iter_008/iteration_008/direct_multirate_unet/run_output_iter_008.json",
+          "sha256": "da22d08639986dba73e79c1bb6d265751aa49c7bb93dd7be03aae159ed6130fe"
+        },
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_denoiser/preflight_workers/wholeband_gated_denoiser_iter_001_001.json",
+          "sha256": "70f98eb7689108d5a19703d4da5a541aec6718dd1e0e9aaca3e0c816e7b8d414"
+        },
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_denoiser/preflight_workers/wholeband_gated_denoiser_iter_001_002.json",
+          "sha256": "70f98eb7689108d5a19703d4da5a541aec6718dd1e0e9aaca3e0c816e7b8d414"
+        },
+        {
+          "path": "iter_001/iteration_001/wholeband_gated_denoiser/preflight_workers/wholeband_gated_denoiser_iter_001_003.json",
+          "sha256": "efcf36109e2f024228530b7384a7ef61094da1e89eec84e88869912f64e900ce"
+        },
+        {
+          "path": "iter_002/iteration_002/wholeband_gated_denoiser/preflight_workers/wholeband_gated_denoiser_iter_002_001.json",
+          "sha256": "70f98eb7689108d5a19703d4da5a541aec6718dd1e0e9aaca3e0c816e7b8d414"
+        },
+        {
+          "path": "iter_002/iteration_002/wholeband_gated_denoiser/preflight_workers/wholeband_gated_denoiser_iter_002_002.json",
+          "sha256": "70f98eb7689108d5a19703d4da5a541aec6718dd1e0e9aaca3e0c816e7b8d414"
+        },
+        {
+          "path": "iter_002/iteration_002/wholeband_gated_denoiser/preflight_workers/wholeband_gated_denoiser_iter_002_003.json",
+          "sha256": "cea4ea78511c74bb033202a3de9ef5d40eccc4141a1d3d99f9a606a4f4230a47"
+        },
+        {
+          "path": "iter_003/iteration_003/continuous_dilated_wavenet/preflight_workers/continuous_dilated_wavenet_iter_003_001.json",
+          "sha256": "7f03ecf57a6783ab4eefb9cc28cc502bde621c5a2995b4758418887fc0211a78"
+        },
+        {
+          "path": "iter_003/iteration_003/continuous_dilated_wavenet/preflight_workers/continuous_dilated_wavenet_iter_003_002.json",
+          "sha256": "7f03ecf57a6783ab4eefb9cc28cc502bde621c5a2995b4758418887fc0211a78"
+        },
+        {
+          "path": "iter_003/iteration_003/continuous_dilated_wavenet/preflight_workers/continuous_dilated_wavenet_iter_003_003.json",
+          "sha256": "7f03ecf57a6783ab4eefb9cc28cc502bde621c5a2995b4758418887fc0211a78"
+        },
+        {
+          "path": "iter_004/iteration_004/wholeband_fc_regression_probe/preflight_workers/wholeband_fc_regression_probe_iter_004_001.json",
+          "sha256": "fed629ced7f7061b98cc48e07cff78386ebe8b80fb338474f04d086ceebd5349"
+        },
+        {
+          "path": "iter_004/iteration_004/wholeband_fc_regression_probe/preflight_workers/wholeband_fc_regression_probe_iter_004_002.json",
+          "sha256": "fed629ced7f7061b98cc48e07cff78386ebe8b80fb338474f04d086ceebd5349"
+        },
+        {
+          "path": "iter_004/iteration_004/wholeband_fc_regression_probe/preflight_workers/wholeband_fc_regression_probe_iter_004_003.json",
+          "sha256": "fed629ced7f7061b98cc48e07cff78386ebe8b80fb338474f04d086ceebd5349"
+        },
+        {
+          "path": "iter_005/iteration_005/conditioned_residual_wavenet/preflight_workers/conditioned_residual_wavenet_iter_005_001.json",
+          "sha256": "0bfb01cc53f70036d9602251cd6ed9af622250306498776f2a36339031c90e46"
+        },
+        {
+          "path": "iter_005/iteration_005/conditioned_residual_wavenet/preflight_workers/conditioned_residual_wavenet_iter_005_002.json",
+          "sha256": "ae41692ed3c6b1bef0e8261b0665eba13c643e29c4cb17a77f020a0ad14ada27"
+        },
+        {
+          "path": "iter_005/iteration_005/conditioned_residual_wavenet/preflight_workers/conditioned_residual_wavenet_iter_005_003.json",
+          "sha256": "1e81adc749d9a9aa90b7d7bae5b7e5fcc0e1c264b9fa7c3032fa249e2bce6be4"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_head_dilated_wavenet/preflight_workers/direct_head_dilated_wavenet_iter_006_001.json",
+          "sha256": "1e81adc749d9a9aa90b7d7bae5b7e5fcc0e1c264b9fa7c3032fa249e2bce6be4"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_head_dilated_wavenet/preflight_workers/direct_head_dilated_wavenet_iter_006_002.json",
+          "sha256": "4f38fdf11dcb15d82067fb01b482115451870febe5a97c070e3f95c316f09712"
+        },
+        {
+          "path": "iter_006/iteration_006/direct_head_dilated_wavenet/preflight_workers/direct_head_dilated_wavenet_iter_006_003.json",
+          "sha256": "1e81adc749d9a9aa90b7d7bae5b7e5fcc0e1c264b9fa7c3032fa249e2bce6be4"
+        },
+        {
+          "path": "iter_007/iteration_007/symmetric_direct_wavenet/preflight_workers/symmetric_direct_wavenet_iter_007_001.json",
+          "sha256": "721c27db549ddd0537bc61d7b79b5c1994aa710b3bacd1e15ec20950d977ac49"
+        },
+        {
+          "path": "iter_007/iteration_007/symmetric_direct_wavenet/preflight_workers/symmetric_direct_wavenet_iter_007_002.json",
+          "sha256": "b448f1eb74189127bfe7eb32b206669f03bf72599852ed87188c0a8ab1e5b37a"
+        },
+        {
+          "path": "iter_007/iteration_007/symmetric_direct_wavenet/preflight_workers/symmetric_direct_wavenet_iter_007_003.json",
+          "sha256": "5f2947fe670f88957261f1a52c96b0a9cd5dc756302d7a8ce5a7be69e29ef90c"
+        },
+        {
+          "path": "iter_008/iteration_008/direct_multirate_unet/preflight_workers/direct_multirate_unet_iter_008_001.json",
+          "sha256": "a805a8649ec58e003662f286ec30d8419da5a55da197bcecc6dcbe018d524c82"
+        },
+        {
+          "path": "iter_008/iteration_008/direct_multirate_unet/preflight_workers/direct_multirate_unet_iter_008_002.json",
+          "sha256": "f4068205699bd28a62885a8c5b312d932bfe51d678a45f6412273fd632308d39"
+        },
+        {
+          "path": "iter_008/iteration_008/direct_multirate_unet/preflight_workers/direct_multirate_unet_iter_008_003.json",
+          "sha256": "7fb25dbb58673c2328fc1a7adcfeeeccc8c7576e070719838c9866e319291696"
+        },
+        {
+          "path": "iter_009/iteration_009/adaptive_affine_residual_wavenet/preflight_workers/adaptive_affine_residual_wavenet_iter_009_001.json",
+          "sha256": "74e7e546ebeacf0557ccd2ff5a12feb3cadb6d5966ee86cb501424f845000521"
+        },
+        {
+          "path": "iter_009/iteration_009/adaptive_affine_residual_wavenet/preflight_workers/adaptive_affine_residual_wavenet_iter_009_002.json",
+          "sha256": "5cee127860a12cb532d2eae2b5c38d4d4a898dcdf9edcb8467c9edf8e32ff642"
+        },
+        {
+          "path": "iter_009/iteration_009/adaptive_affine_residual_wavenet/preflight_workers/adaptive_affine_residual_wavenet_iter_009_003.json",
+          "sha256": "3072c14fea191a272ac346fd409dc1d7fd949ad90312b19c27c280a9f532260b"
+        }
+      ],
+      "source_run_id": "workflow_analysis_on:0-3",
+      "source_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3"
+    },
+    {
+      "case": "tidmad-analysis-4-9",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-da-only-run1-20260922/band-4-9/unit/workspace",
+      "run_output_files": 8,
+      "unique_record_count": 24,
+      "status_counts": {
+        "success": 12,
+        "failed_mode_collapse": 12
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 24,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 24
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/continuous_dilated_squid/run_output_iter_001.json",
+          "sha256": "df93ab589ad54da3b1858afb31ded505be2e847d109e213d439a70c92713087b"
+        },
+        {
+          "path": "iter_002/iteration_002/guided_ungated_unet_squid/run_output_iter_002.json",
+          "sha256": "84fcf42b08bff8d13077e2edfacc6b27628544494345f52b95e83cd519fbe27e"
+        },
+        {
+          "path": "iter_003/iteration_003/moment_factored_dilated_squid/run_output_iter_003.json",
+          "sha256": "5bac4aa4442f76ba8344c25c174cc64ce210d98eb2b2619a6a791babc9977e93"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_normalized_dilated_squid/run_output_iter_004.json",
+          "sha256": "97dc753c1646f513a5204b28cf8cdc6378e4473f625f3d1c20f35f9d47bea5c8"
+        },
+        {
+          "path": "iter_005/iteration_005/spectral_residual_dilated_squid/run_output_iter_005.json",
+          "sha256": "b27731fa4026d951ff76c941bfe55fc8c3f1441172f3ccb5a4dac2df8f0d24ee"
+        },
+        {
+          "path": "iter_006/iteration_006/locally_factored_dilated_squid/run_output_iter_006.json",
+          "sha256": "0c19eb5f050b6a202b56539daf5459fc4746a1d80c54dc11fb1224b95a026f8e"
+        },
+        {
+          "path": "iter_007/iteration_007/covariance_floor_dilated_squid/run_output_iter_007.json",
+          "sha256": "873d6332c2adc73f1972918baf005e9fcd27c73989fb25278569abef9e66ef74"
+        },
+        {
+          "path": "iter_008/iteration_008/bidirectional_direct_dilated_squid/run_output_iter_008.json",
+          "sha256": "ea9f915396e48e403d3b6c71a2f25bda80b781487ba46ae51b958883befa4377"
+        },
+        {
+          "path": "iter_001/iteration_001/continuous_dilated_squid/preflight_workers/continuous_dilated_squid_iter_001_001.json",
+          "sha256": "d08bd2daf9bedd304a4414bcdb6f1acabbcc98e0282acf24c7ac34110fd985e4"
+        },
+        {
+          "path": "iter_001/iteration_001/continuous_dilated_squid/preflight_workers/continuous_dilated_squid_iter_001_002.json",
+          "sha256": "d08bd2daf9bedd304a4414bcdb6f1acabbcc98e0282acf24c7ac34110fd985e4"
+        },
+        {
+          "path": "iter_001/iteration_001/continuous_dilated_squid/preflight_workers/continuous_dilated_squid_iter_001_003.json",
+          "sha256": "616904ffaeade3b38a0604fc58f676fb87bd49efadab95064373b1a72d5df42d"
+        },
+        {
+          "path": "iter_002/iteration_002/guided_ungated_unet_squid/preflight_workers/guided_ungated_unet_squid_iter_002_001.json",
+          "sha256": "4e529cb637fbf9af5e39559d7dea4667c5e35d8a909e6953079721066d1eb74c"
+        },
+        {
+          "path": "iter_002/iteration_002/guided_ungated_unet_squid/preflight_workers/guided_ungated_unet_squid_iter_002_002.json",
+          "sha256": "06dcf114d3fc8e071a429107985e72443f85ed5700eda0d452b7b577fdc8011b"
+        },
+        {
+          "path": "iter_002/iteration_002/guided_ungated_unet_squid/preflight_workers/guided_ungated_unet_squid_iter_002_003.json",
+          "sha256": "58f4e00e6ed6811d5b8f6df3a4d27b371a4a60bfaf5ea4ac34682abcd9d37f7c"
+        },
+        {
+          "path": "iter_003/iteration_003/moment_factored_dilated_squid/preflight_workers/moment_factored_dilated_squid_iter_003_001.json",
+          "sha256": "0df975c2665401882659f4dca64e3cd764024f3edf0fd78c036e209e980b866c"
+        },
+        {
+          "path": "iter_003/iteration_003/moment_factored_dilated_squid/preflight_workers/moment_factored_dilated_squid_iter_003_002.json",
+          "sha256": "0df975c2665401882659f4dca64e3cd764024f3edf0fd78c036e209e980b866c"
+        },
+        {
+          "path": "iter_003/iteration_003/moment_factored_dilated_squid/preflight_workers/moment_factored_dilated_squid_iter_003_003.json",
+          "sha256": "273811b3d5c195c8f678229a76ef5584832c63e12d84af1bb981296a92a036a9"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_normalized_dilated_squid/preflight_workers/adc_normalized_dilated_squid_iter_004_001.json",
+          "sha256": "bf3194f4030ab9e4947088cf18173a27b0b32183587f379accfc148c476d1f58"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_normalized_dilated_squid/preflight_workers/adc_normalized_dilated_squid_iter_004_002.json",
+          "sha256": "dd2fe67e0bc11d1e9c819e50b175eb74580a1b0cebe6280298b455b82946c8f5"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_normalized_dilated_squid/preflight_workers/adc_normalized_dilated_squid_iter_004_003.json",
+          "sha256": "5354bab188959d3ac8dbdd366dae99fb3d9d7a3de05b9d5b689ac5caba3a231e"
+        },
+        {
+          "path": "iter_005/iteration_005/spectral_residual_dilated_squid/preflight_workers/spectral_residual_dilated_squid_iter_005_001.json",
+          "sha256": "a283c353aa2fcea1f9883e0234ac5813c1403092c9f2112403118ade606b0e40"
+        },
+        {
+          "path": "iter_005/iteration_005/spectral_residual_dilated_squid/preflight_workers/spectral_residual_dilated_squid_iter_005_002.json",
+          "sha256": "5d8627f10a00a049ee5cf8fc67498a3c97cd82040b49d57cd4f03b6789064d8e"
+        },
+        {
+          "path": "iter_005/iteration_005/spectral_residual_dilated_squid/preflight_workers/spectral_residual_dilated_squid_iter_005_003.json",
+          "sha256": "5d8627f10a00a049ee5cf8fc67498a3c97cd82040b49d57cd4f03b6789064d8e"
+        },
+        {
+          "path": "iter_006/iteration_006/locally_factored_dilated_squid/preflight_workers/locally_factored_dilated_squid_iter_006_001.json",
+          "sha256": "a641dec448021932d21c6f38f6e1189c8f44e58476dbf1902fe55a8566ae4f5e"
+        },
+        {
+          "path": "iter_006/iteration_006/locally_factored_dilated_squid/preflight_workers/locally_factored_dilated_squid_iter_006_002.json",
+          "sha256": "261f9fd4428d884d4a255ad000fc2b02d5f4623bf9fc67e556941103d3b8ce28"
+        },
+        {
+          "path": "iter_006/iteration_006/locally_factored_dilated_squid/preflight_workers/locally_factored_dilated_squid_iter_006_003.json",
+          "sha256": "ff7c4240186f9c2865c3d84e862cc4acae43d008d932aaafebafcf7ce32ff95d"
+        },
+        {
+          "path": "iter_007/iteration_007/covariance_floor_dilated_squid/preflight_workers/covariance_floor_dilated_squid_iter_007_001.json",
+          "sha256": "9f61377bc1164ea610dc58c059196e9c3e1d43313fc7b966d9d47314c793de56"
+        },
+        {
+          "path": "iter_007/iteration_007/covariance_floor_dilated_squid/preflight_workers/covariance_floor_dilated_squid_iter_007_002.json",
+          "sha256": "649b558c8c927bb49fb14c949aa662e93aaf5bcde09276f0c8665b2779baf0fd"
+        },
+        {
+          "path": "iter_007/iteration_007/covariance_floor_dilated_squid/preflight_workers/covariance_floor_dilated_squid_iter_007_003.json",
+          "sha256": "547b7780e672f2af15f22b754acf9dc38cb21c91354073dcbf9909f69b28dcb7"
+        },
+        {
+          "path": "iter_008/iteration_008/bidirectional_direct_dilated_squid/preflight_workers/bidirectional_direct_dilated_squid_iter_008_001.json",
+          "sha256": "3f50d6234d1c26345fade8b7717264cec831a29d81ee705b9a2e620719d9d385"
+        },
+        {
+          "path": "iter_008/iteration_008/bidirectional_direct_dilated_squid/preflight_workers/bidirectional_direct_dilated_squid_iter_008_002.json",
+          "sha256": "03255b0b8dde5bf9014109976cfc98407ef0a19727418ea2810a550b14447dba"
+        },
+        {
+          "path": "iter_008/iteration_008/bidirectional_direct_dilated_squid/preflight_workers/bidirectional_direct_dilated_squid_iter_008_003.json",
+          "sha256": "7951738017af4c4ee8aa427d37e9a2c26f7645e40e8bd9044404471c89e9eb85"
+        }
+      ],
+      "source_run_id": "workflow_analysis_on:4-9",
+      "source_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3"
+    },
+    {
+      "case": "tidmad-analysis-10-14",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-da-only-run1-20260922/band-10-14/unit/workspace",
+      "run_output_files": 8,
+      "unique_record_count": 24,
+      "status_counts": {
+        "success": 24
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 25,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 25
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/adc_dilated_gated_regressor/run_output_iter_001.json",
+          "sha256": "29bd35ce4292e9461d5abbf0cbbd450510914826f9c0e665d03abc51014c2e01"
+        },
+        {
+          "path": "iter_002/iteration_002/adc_bidirectional_gated_regressor/run_output_iter_002.json",
+          "sha256": "2a885863c6924d7b5486dc97ddd765bd4962bba86eaa1302b5bf20185a8132ad"
+        },
+        {
+          "path": "iter_003/iteration_003/adc_antialiased_dualrate_regressor/run_output_iter_003.json",
+          "sha256": "9ed4cd3738b365fcb980059f20f1aa5b248fa180ba39b0361d1ed46bd36cb99b"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_antialiased_spectral_fusion_regressor/run_output_iter_004.json",
+          "sha256": "59f06aa1901fd92e7761aefc0a586cf10b1c5479647cd7301c7f1f979d7d61f8"
+        },
+        {
+          "path": "iter_005/iteration_005/adc_adaptive_dualrate_moe_regressor/run_output_iter_005.json",
+          "sha256": "079944a77c2b3fefbfe877ea9a6ae580d5a3c3036db76a4d0959f127a97fb09c"
+        },
+        {
+          "path": "iter_006/iteration_006/adc_temporally_routed_dualrate_regressor/run_output_iter_006.json",
+          "sha256": "6ee058c5288442dc800128733de9ae7f53e4ca940016932ffcd02b255c600ae7"
+        },
+        {
+          "path": "iter_007/iteration_007/adc_shrunk_pointwise_dualrate_regressor/run_output_iter_007.json",
+          "sha256": "3bfd412de6cb28cf122c937c561d65dd4794847b39f582f41d6f74ab88b32221"
+        },
+        {
+          "path": "iter_008/iteration_008/adc_residual_context_router_dualrate_regressor/run_output_iter_008.json",
+          "sha256": "d81971dc44dbb168be0380a459eb1622a2f6b966ce2b3e9011c3ff162da51df7"
+        },
+        {
+          "path": "iter_001/iteration_001/adc_dilated_gated_regressor/preflight_workers/adc_dilated_gated_regressor_iter_001_001.json",
+          "sha256": "23b809931e853c859291e7ae0aa39f8905dc869a956a03bbd0c22c8b195055d5"
+        },
+        {
+          "path": "iter_001/iteration_001/adc_dilated_gated_regressor/preflight_workers/adc_dilated_gated_regressor_iter_001_002.json",
+          "sha256": "23b809931e853c859291e7ae0aa39f8905dc869a956a03bbd0c22c8b195055d5"
+        },
+        {
+          "path": "iter_001/iteration_001/adc_dilated_gated_regressor/preflight_workers/adc_dilated_gated_regressor_iter_001_003.json",
+          "sha256": "23b809931e853c859291e7ae0aa39f8905dc869a956a03bbd0c22c8b195055d5"
+        },
+        {
+          "path": "iter_002/iteration_002/adc_bidirectional_gated_regressor/preflight_workers/adc_bidirectional_gated_regressor_iter_002_001.json",
+          "sha256": "3c57d7009b56a68d7f70e997ba8773a20f98c814aaaca4f4f044c8ab7198c38b"
+        },
+        {
+          "path": "iter_002/iteration_002/adc_bidirectional_gated_regressor/preflight_workers/adc_bidirectional_gated_regressor_iter_002_002.json",
+          "sha256": "3c57d7009b56a68d7f70e997ba8773a20f98c814aaaca4f4f044c8ab7198c38b"
+        },
+        {
+          "path": "iter_002/iteration_002/adc_bidirectional_gated_regressor/preflight_workers/adc_bidirectional_gated_regressor_iter_002_003.json",
+          "sha256": "3c57d7009b56a68d7f70e997ba8773a20f98c814aaaca4f4f044c8ab7198c38b"
+        },
+        {
+          "path": "iter_003/iteration_003/adc_antialiased_dualrate_regressor/preflight_workers/adc_antialiased_dualrate_regressor_iter_003_001.json",
+          "sha256": "069e995b8d08c468ed3f49e209c95729a999d9f5a21acd07c9e7a15e2e5e2b28"
+        },
+        {
+          "path": "iter_003/iteration_003/adc_antialiased_dualrate_regressor/preflight_workers/adc_antialiased_dualrate_regressor_iter_003_002.json",
+          "sha256": "fd3ff51df06166d25a6235251c11234c18e9e1af82b818be0a9cd5f5832e9534"
+        },
+        {
+          "path": "iter_003/iteration_003/adc_antialiased_dualrate_regressor/preflight_workers/adc_antialiased_dualrate_regressor_iter_003_003.json",
+          "sha256": "7bd175c59be4ef2eb9e0eb87324d31301c5abce4e4771779215efe537c05857c"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_antialiased_spectral_fusion_regressor/preflight_workers/adc_antialiased_spectral_fusion_regressor_iter_004_001.json",
+          "sha256": "257025ee6a85152eabeb2223482c963127d8340805438a497c0ff3b128d9c8b9"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_antialiased_spectral_fusion_regressor/preflight_workers/adc_antialiased_spectral_fusion_regressor_iter_004_002.json",
+          "sha256": "9368f278987271f204864f9a5e3d55aa6473ee01de0e365dc16b994f256ef5c6"
+        },
+        {
+          "path": "iter_004/iteration_004/adc_antialiased_spectral_fusion_regressor/preflight_workers/adc_antialiased_spectral_fusion_regressor_iter_004_003.json",
+          "sha256": "500a0e61235cb12fd8cc598c62a44bf6fe1c6eeb9724e6562a5fe40ee97396a1"
+        },
+        {
+          "path": "iter_005/iteration_005/adc_adaptive_dualrate_moe_regressor/preflight_workers/adc_adaptive_dualrate_moe_regressor_iter_005_001.json",
+          "sha256": "cd9c350cdb2b70817587324735ff52477179fd0ee6a266fa5885c78977f1ac07"
+        },
+        {
+          "path": "iter_005/iteration_005/adc_adaptive_dualrate_moe_regressor/preflight_workers/adc_adaptive_dualrate_moe_regressor_iter_005_002.json",
+          "sha256": "665fc059fda20e17854487f061de7f868102b5935543a6eb946451605a840b4a"
+        },
+        {
+          "path": "iter_005/iteration_005/adc_adaptive_dualrate_moe_regressor/preflight_workers/adc_adaptive_dualrate_moe_regressor_iter_005_003.json",
+          "sha256": "eb37fff17b431ae6388b963620f38d99ef48c9cd095bce70c15ae6118328a2ea"
+        },
+        {
+          "path": "iter_006/iteration_006/adc_temporally_routed_dualrate_regressor/preflight_workers/adc_temporally_routed_dualrate_regressor_iter_006_001.json",
+          "sha256": "4e2a6fdfb34f07b6a63108d4c4b3859f3a24fd0c849ab6442ac1024f1e45a1e8"
+        },
+        {
+          "path": "iter_006/iteration_006/adc_temporally_routed_dualrate_regressor/preflight_workers/adc_temporally_routed_dualrate_regressor_iter_006_002.json",
+          "sha256": "2c6df5b13701e914ff4474198c0704d1ae570e6fab16a9d34f4a14ab3d12413a"
+        },
+        {
+          "path": "iter_006/iteration_006/adc_temporally_routed_dualrate_regressor/preflight_workers/adc_temporally_routed_dualrate_regressor_iter_006_003.json",
+          "sha256": "374e01de871962b92faf02a34ac4908978570018027dc220d87b34752bc37209"
+        },
+        {
+          "path": "iter_007/iteration_007/adc_shrunk_pointwise_dualrate_regressor/preflight_workers/adc_shrunk_pointwise_dualrate_regressor_iter_007_001.json",
+          "sha256": "cef4a8483e62e474c354a81a4cf602e8b86494e46347ae87dcca010e6b298785"
+        },
+        {
+          "path": "iter_007/iteration_007/adc_shrunk_pointwise_dualrate_regressor/preflight_workers/adc_shrunk_pointwise_dualrate_regressor_iter_007_002.json",
+          "sha256": "c7b978d71351689e925b22ea1b21c2daaa4f2938b472e92da853ea8e5e463ef6"
+        },
+        {
+          "path": "iter_007/iteration_007/adc_shrunk_pointwise_dualrate_regressor/preflight_workers/adc_shrunk_pointwise_dualrate_regressor_iter_007_003.json",
+          "sha256": "713507f8e240c47f00ddf42f7bdd5ca163e63b810fbf031f7a4c793dec552df6"
+        },
+        {
+          "path": "iter_008/iteration_008/adc_residual_context_router_dualrate_regressor/preflight_workers/adc_residual_context_router_dualrate_regressor_iter_008_001.json",
+          "sha256": "7cc6fb36b12a752fdbcc8aa3cd8147c89ca96024d0bd8a5aad3d1ad2c99cd92e"
+        },
+        {
+          "path": "iter_008/iteration_008/adc_residual_context_router_dualrate_regressor/preflight_workers/adc_residual_context_router_dualrate_regressor_iter_008_002.json",
+          "sha256": "f45f59fcb79b1e442a3d6e51ccb173d1e09354001ed12f0fcdb49979c1f474b5"
+        },
+        {
+          "path": "iter_008/iteration_008/adc_residual_context_router_dualrate_regressor/preflight_workers/adc_residual_context_router_dualrate_regressor_iter_008_003.json",
+          "sha256": "86e505700d0c1641307d300b210f0a44319ac57df76c41243294c741b0f951de"
+        },
+        {
+          "path": "iter_009/iteration_009/adc_signed_bypass_dualrate_moe_regressor/preflight_workers/adc_signed_bypass_dualrate_moe_regressor_iter_009_001.json",
+          "sha256": "41d25805a39e70c8a1f002e917f6404c369164a762c10249f03569a85eb9d6d6"
+        }
+      ],
+      "source_run_id": "workflow_analysis_on:10-14",
+      "source_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3"
+    },
+    {
+      "case": "tidmad-analysis-15-19",
+      "archive_root": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-da-only-run1-20260922/band-15-19/unit/workspace",
+      "run_output_files": 8,
+      "unique_record_count": 24,
+      "status_counts": {
+        "success": 24
+      },
+      "physical_rejection_binding_counts": {},
+      "worker_result_files": 25,
+      "worker_outcome_counts": {
+        "COMPLETED_MEASUREMENT": 25
+      },
+      "source_files": [
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_regressor/run_output_iter_001.json",
+          "sha256": "c8983c70e8cb93c456f9451c9b710219b1e8bb7f20c682682e6ec2262c768e22"
+        },
+        {
+          "path": "iter_002/iteration_002/symmetric_gated_dilated_regressor/run_output_iter_002.json",
+          "sha256": "6a5ffa3ff13e31edf40af336f0657c1c8d0e2eeb4fa1a52df1380eb5b9d52e0b"
+        },
+        {
+          "path": "iter_003/iteration_003/dropout_regularized_symmetric_dilated_regressor/run_output_iter_003.json",
+          "sha256": "3da99a568661032fc1bc62b3f1f661080f064ebafaf306f8856f2fc0dce8399e"
+        },
+        {
+          "path": "iter_004/iteration_004/residual_path_dropout_symmetric_dilated_regressor/run_output_iter_004.json",
+          "sha256": "638bd744c15c850da4c501d7e45ba4446da0e8e0dd8195422b19492435297ef2"
+        },
+        {
+          "path": "iter_005/iteration_005/multirate_bidirectional_ssm_dilated_regressor/run_output_iter_005.json",
+          "sha256": "1dd6a2fa83906311781a36ab3c16c6b41cf408d5900e3052752b35ef6d240530"
+        },
+        {
+          "path": "iter_006/iteration_006/depth_ramped_residual_dropout_symmetric_dilated_regressor/run_output_iter_006.json",
+          "sha256": "dd42fc1fdbcee13d484ad8ac8d99b219317ce5b6141baa42a11fa4d286f5f58d"
+        },
+        {
+          "path": "iter_007/iteration_007/stochastic_depth_residual_dropout_symmetric_dilated_regressor/run_output_iter_007.json",
+          "sha256": "1a87f87031932c827a99a636cc84e03ba888423022aad30ac3d21617f9a80e55"
+        },
+        {
+          "path": "iter_008/iteration_008/strong_stochastic_depth_clean_skip_symmetric_dilated_regressor/run_output_iter_008.json",
+          "sha256": "3b83232d15cf2a5df3effa3bfe369df88411d8205eff7ecd2b4d3e131da8a2be"
+        },
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_regressor/preflight_workers/scalar_gated_dilated_regressor_iter_001_001.json",
+          "sha256": "d90409be0b4fe1e71bd32f096a4cdaf5b7c1d463676d4fad6c3c720a024c63ec"
+        },
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_regressor/preflight_workers/scalar_gated_dilated_regressor_iter_001_002.json",
+          "sha256": "76f4b18bb2b6dd915c11a10f72334318a557fd8379138a1c09812d192ef6e68b"
+        },
+        {
+          "path": "iter_001/iteration_001/scalar_gated_dilated_regressor/preflight_workers/scalar_gated_dilated_regressor_iter_001_003.json",
+          "sha256": "6d8b2f3e663e63e502db33eb9d452921fe978d718556273683f65ffd44e2a2bc"
+        },
+        {
+          "path": "iter_002/iteration_002/symmetric_gated_dilated_regressor/preflight_workers/symmetric_gated_dilated_regressor_iter_002_001.json",
+          "sha256": "d9887386c26d6c2fe109ddc4f78008fe25f2004dcafea7ef3ff9dc29c27babcb"
+        },
+        {
+          "path": "iter_002/iteration_002/symmetric_gated_dilated_regressor/preflight_workers/symmetric_gated_dilated_regressor_iter_002_002.json",
+          "sha256": "24f2edf9926a32bc7f67d9430b6131d0e84d98f031b4b542fea79fecba548108"
+        },
+        {
+          "path": "iter_002/iteration_002/symmetric_gated_dilated_regressor/preflight_workers/symmetric_gated_dilated_regressor_iter_002_003.json",
+          "sha256": "d9887386c26d6c2fe109ddc4f78008fe25f2004dcafea7ef3ff9dc29c27babcb"
+        },
+        {
+          "path": "iter_003/iteration_003/dropout_regularized_symmetric_dilated_regressor/preflight_workers/dropout_regularized_symmetric_dilated_regressor_iter_003_001.json",
+          "sha256": "de6e35f511aa471d66fae60b1337e9e9f3c503bf4f0af9cdf1025d80703417a6"
+        },
+        {
+          "path": "iter_003/iteration_003/dropout_regularized_symmetric_dilated_regressor/preflight_workers/dropout_regularized_symmetric_dilated_regressor_iter_003_002.json",
+          "sha256": "d9887386c26d6c2fe109ddc4f78008fe25f2004dcafea7ef3ff9dc29c27babcb"
+        },
+        {
+          "path": "iter_003/iteration_003/dropout_regularized_symmetric_dilated_regressor/preflight_workers/dropout_regularized_symmetric_dilated_regressor_iter_003_003.json",
+          "sha256": "de6e35f511aa471d66fae60b1337e9e9f3c503bf4f0af9cdf1025d80703417a6"
+        },
+        {
+          "path": "iter_004/iteration_004/residual_path_dropout_symmetric_dilated_regressor/preflight_workers/residual_path_dropout_symmetric_dilated_regressor_iter_004_001.json",
+          "sha256": "5f6d7e51b5c8fda0a9db1fc2b269b1a7836d5833c319e13fff5247b5ead898c3"
+        },
+        {
+          "path": "iter_004/iteration_004/residual_path_dropout_symmetric_dilated_regressor/preflight_workers/residual_path_dropout_symmetric_dilated_regressor_iter_004_002.json",
+          "sha256": "5f6d7e51b5c8fda0a9db1fc2b269b1a7836d5833c319e13fff5247b5ead898c3"
+        },
+        {
+          "path": "iter_004/iteration_004/residual_path_dropout_symmetric_dilated_regressor/preflight_workers/residual_path_dropout_symmetric_dilated_regressor_iter_004_003.json",
+          "sha256": "d90409be0b4fe1e71bd32f096a4cdaf5b7c1d463676d4fad6c3c720a024c63ec"
+        },
+        {
+          "path": "iter_005/iteration_005/multirate_bidirectional_ssm_dilated_regressor/preflight_workers/multirate_bidirectional_ssm_dilated_regressor_iter_005_001.json",
+          "sha256": "76d3eb9e85e73b589b47d0084c9e42ba8ab5b0db0ae2954d23a1abf6641c7ae0"
+        },
+        {
+          "path": "iter_005/iteration_005/multirate_bidirectional_ssm_dilated_regressor/preflight_workers/multirate_bidirectional_ssm_dilated_regressor_iter_005_002.json",
+          "sha256": "61cb8af64a665c30cadd6146c5df93991a9745144efdae115ce9ba64adec78bf"
+        },
+        {
+          "path": "iter_005/iteration_005/multirate_bidirectional_ssm_dilated_regressor/preflight_workers/multirate_bidirectional_ssm_dilated_regressor_iter_005_003.json",
+          "sha256": "035c4bd3b11c1964486d72a62f4093969eccf2314c6b2e43fb567bbdf14301f6"
+        },
+        {
+          "path": "iter_006/iteration_006/depth_ramped_residual_dropout_symmetric_dilated_regressor/preflight_workers/depth_ramped_residual_dropout_symmetric_dilated_regressor_iter_006_001.json",
+          "sha256": "d90409be0b4fe1e71bd32f096a4cdaf5b7c1d463676d4fad6c3c720a024c63ec"
+        },
+        {
+          "path": "iter_006/iteration_006/depth_ramped_residual_dropout_symmetric_dilated_regressor/preflight_workers/depth_ramped_residual_dropout_symmetric_dilated_regressor_iter_006_002.json",
+          "sha256": "d90409be0b4fe1e71bd32f096a4cdaf5b7c1d463676d4fad6c3c720a024c63ec"
+        },
+        {
+          "path": "iter_006/iteration_006/depth_ramped_residual_dropout_symmetric_dilated_regressor/preflight_workers/depth_ramped_residual_dropout_symmetric_dilated_regressor_iter_006_003.json",
+          "sha256": "26c907c8729ca6c86da538a18c3ed6c11477cb688cc7031e3493d31e25c20984"
+        },
+        {
+          "path": "iter_007/iteration_007/stochastic_depth_residual_dropout_symmetric_dilated_regressor/preflight_workers/stochastic_depth_residual_dropout_symmetric_dilated_regressor_iter_007_001.json",
+          "sha256": "bd362a159e0cdc83e359cb85caa8de4fb67220b90268d92a7304f727f4636604"
+        },
+        {
+          "path": "iter_007/iteration_007/stochastic_depth_residual_dropout_symmetric_dilated_regressor/preflight_workers/stochastic_depth_residual_dropout_symmetric_dilated_regressor_iter_007_002.json",
+          "sha256": "bd362a159e0cdc83e359cb85caa8de4fb67220b90268d92a7304f727f4636604"
+        },
+        {
+          "path": "iter_007/iteration_007/stochastic_depth_residual_dropout_symmetric_dilated_regressor/preflight_workers/stochastic_depth_residual_dropout_symmetric_dilated_regressor_iter_007_003.json",
+          "sha256": "bd362a159e0cdc83e359cb85caa8de4fb67220b90268d92a7304f727f4636604"
+        },
+        {
+          "path": "iter_008/iteration_008/strong_stochastic_depth_clean_skip_symmetric_dilated_regressor/preflight_workers/strong_stochastic_depth_clean_skip_symmetric_dilated_regressor_iter_008_001.json",
+          "sha256": "b7284d4c0adba1863a70b973bcaa211e4d70781739a4a40751192ad2d23135a6"
+        },
+        {
+          "path": "iter_008/iteration_008/strong_stochastic_depth_clean_skip_symmetric_dilated_regressor/preflight_workers/strong_stochastic_depth_clean_skip_symmetric_dilated_regressor_iter_008_002.json",
+          "sha256": "b7284d4c0adba1863a70b973bcaa211e4d70781739a4a40751192ad2d23135a6"
+        },
+        {
+          "path": "iter_008/iteration_008/strong_stochastic_depth_clean_skip_symmetric_dilated_regressor/preflight_workers/strong_stochastic_depth_clean_skip_symmetric_dilated_regressor_iter_008_003.json",
+          "sha256": "de6e35f511aa471d66fae60b1337e9e9f3c503bf4f0af9cdf1025d80703417a6"
+        },
+        {
+          "path": "iter_009/iteration_009/scaled_residual_clean_skip_symmetric_dilated_regressor/preflight_workers/scaled_residual_clean_skip_symmetric_dilated_regressor_iter_009_001.json",
+          "sha256": "660098b0a82ec4cf0ac3ba88d9282d22cdd873e353052d1e83a9816b86a9dbb8"
+        }
+      ],
+      "source_run_id": "workflow_analysis_on:15-19",
+      "source_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3"
+    }
+  ],
+  "api_calls": 0,
+  "training_calls": 0,
+  "archive_mapping": {
+    "source": "../paper-source-inventory.json",
+    "sha256": "eea8313ed285c261ea93ba2b51e9a36a7b468b4f0069b5abb0ccd9ebb87c9c2c",
+    "selection": "All native_workflow_units; external CLI/orchestration baselines in tidmad_paper_scopes are not native workflow replay qualification",
+    "native_workflow_unit_count": 11
+  }
+}

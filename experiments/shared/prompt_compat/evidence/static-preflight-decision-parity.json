@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-10-07T07:30:52.026537+00:00",
+  "purpose": "Compare completed inference admission decisions before and after issue 615 PR A; not estimator accuracy or paper training replay.",
+  "baseline": {
+    "checkout": "/tmp/siderius-issue615-baseline",
+    "python": "/tmp/siderius-issue615-baseline/.venv/bin/python",
+    "source_module": "/tmp/siderius-issue615-baseline/src/agent/skills/evaluate_vram_skill/batch_resolver.py",
+    "git_head": "05698b0dc4f252af825875f6a006c68b80b1ee13",
+    "source_sha256": {
+      "src/agent/skills/evaluate_vram_skill/batch_resolver.py": "165c78ba878d57efad311c34a6b35fcc935dd17e505fffc83cfce88d0d67fcdf",
+      "src/agent/skills/evaluate_vram_skill/structural_probe.py": "8b831f4353827592900fe0b91438efc2593a6f9315906a0baa573f4f0a8a3781",
+      "src/agent/skills/evaluate_vram_skill/compute_intensity.py": "ce57746807e5e0dba61bfc3c1c9d9c872fbc282012bc4dc64a2d621162835b66",
+      "src/agent/skills/evaluate_vram_skill/overhead.py": "8b94ff347e1ea321eeaca6d33bbcf5b036129be27e71721dafbb00ad870ed854",
+      "uv.lock": "a4d4d1b3fdc9749048ff1cd61f25d28cb72c5cf8853f2978a4eeac7414340cff"
+    },
+    "gpu_used": false,
+    "api_calls": 0
+  },
+  "candidate": {
+    "checkout": "/tmp/siderius-issue615-audit",
+    "python": "/tmp/siderius-issue615-audit/.venv/bin/python",
+    "source_module": "/tmp/siderius-issue615-audit/src/agent/skills/evaluate_vram_skill/batch_resolver.py",
+    "git_head": "078b23ca7d88c2e498be37621e655b1eeb3c8c9e",
+    "source_sha256": {
+      "src/agent/skills/evaluate_vram_skill/batch_resolver.py": "19a80739d3008575b02602018291cf4806eb35249c8943acadc70e784d70617a",
+      "src/agent/skills/evaluate_vram_skill/structural_probe.py": "8b831f4353827592900fe0b91438efc2593a6f9315906a0baa573f4f0a8a3781",
+      "src/agent/skills/evaluate_vram_skill/compute_intensity.py": "ce57746807e5e0dba61bfc3c1c9d9c872fbc282012bc4dc64a2d621162835b66",
+      "src/agent/skills/evaluate_vram_skill/overhead.py": "8b94ff347e1ea321eeaca6d33bbcf5b036129be27e71721dafbb00ad870ed854",
+      "uv.lock": "a4d4d1b3fdc9749048ff1cd61f25d28cb72c5cf8853f2978a4eeac7414340cff"
+    },
+    "gpu_used": false,
+    "api_calls": 0
+  },
+  "witness_sha256": "0f8315af15d1f50e2c26457a4447f70c4c5c57e65a7b79616feedf34ca18e938",
+  "case_count": 1872,
+  "mismatch_count": 0,
+  "mismatches": [],
+  "groups": {
+    "actual_cpu": {
+      "accepted": 256,
+      "refused": 32
+    },
+    "frozen_large": {
+      "accepted": 900,
+      "refused": 684
+    }
+  },
+  "accepted_batch_counts": {
+    "1": 420,
+    "3": 596,
+    "7": 60,
+    "8": 80
+  },
+  "coverage": {
+    "actual_cpu": "288 cases: repeated or distinct Linear modules, 4/32 features, sequence length 7/101, 1/8 calls; three anchor batches; cap equality and +/- one byte; max batch unrestricted or 3.",
+    "frozen_large": "1584 cases: linear/quadratic virtual activation footprints, parameters 0/1024/16 GiB, eleven temporal declarations including absent and both sides of 800000 intensity boundaries; batch lists [8,3,1]/[7,3], maximum batch unrestricted/3; caps at equality and +/- one byte.",
+    "api_calls": 0,
+    "gpu_seconds": 0
+  },
+  "raw_outputs": {
+    "baseline": "/tmp/issue615-decision-baseline.json",
+    "candidate": "/tmp/issue615-decision-candidate.json"
+  },
+  "limitations": [
+    "Real model probes use CPU only. Large cases supply frozen structural observations and never allocate those virtual shapes.",
+    "Comparison is selected batch or completed static refusal plus decision inputs, not diagnostic message equality.",
+    "No claims about real GPU peaks, estimator false-positive rate, timeout or allocation-failure behavior, stochastic LLM outputs, or training artifacts.",
+    "Shared-module parameter overcount and conservative activation summation intentionally remain unchanged for later estimator work."
+  ]
+}

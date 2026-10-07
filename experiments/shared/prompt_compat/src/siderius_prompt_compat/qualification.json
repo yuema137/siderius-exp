@@ -17,6 +17,11 @@
       "infra_revision": "44e822027101785ab4e41e5335f1df8a8adb10ed",
       "assembly_sha256": "29f65b70718cbd5ad358c2ad49ea8e15835fde331e751d41d6a34af1e93e9838",
       "scope": "Independent proposer stage routing; frozen rendering fixtures and explicit historical all-reasoning route qualification"
+    },
+    {
+      "infra_revision": "078b23ca7d88c2e498be37621e655b1eeb3c8c9e",
+      "assembly_sha256": "849a69c8363a0538bff7314c27bc820714412a6345c2df5f3b20c5061426ee2e",
+      "scope": "Typed static preflight evidence; frozen message comparisons plus explicit planner v6 passing-record projection and actual producer transport checks; no changed static admission formulas"
     }
   ]
 }

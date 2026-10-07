@@ -26,7 +26,7 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
   "$EXP_CHECKOUT/experiments/shared/prompt_compat"
 ```
 
-This installs planner compatibility 0.5.0 and prompt compatibility 0.4.0 as normal
+This installs planner compatibility 0.6.0 and prompt compatibility 0.5.0 as normal
 packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
@@ -263,3 +263,22 @@ old workspace in place.
 
 By default the checker reads the exp checkout containing the script. To inspect
 a separate copy of the repository, add `--exp-checkout /your/exp-copy`.
+
+
+## Static preflight evidence
+
+Version 0.5.0 qualifies the static-evidence infra assembly in `qualification.json`.
+For a new workspace that will generate passing structural-preflight evidence,
+select the corresponding explicit
+[v6 planner provider](../planner_compat/README.md#passing-static-preflight-evidence-v6).
+It keeps the saved record intact and removes only the new qualified fields from
+its historical prompt input copy. Installation alone does not select v6.
+
+A static refusal is now described as a static decision, including in repeated
+failure summaries. It is not reported as measured GPU excess and cannot justify
+an architectural ban. New static refusal records are deliberately rejected by
+the historical v6 projection: the package cannot reconstruct a truthful old
+presentation for them. The [compatibility report](static-preflight-parity.md)
+separates archived-input equality, current producer checks, and execution-policy
+limits. Neither package changes the public infra pin or authorizes resuming an
+old workspace in place.
