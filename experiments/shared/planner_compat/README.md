@@ -343,10 +343,21 @@ For example, preflight may accept a batch and training may subsequently fail.
 V6 removes only `memory.static_preflight_evidence` and
 `memory.preflight_outcome` after validating that the preflight passed. The
 training failure remains in the prompt. Records predating these fields pass
-through unchanged. An unknown evidence version, an incomplete pair of fields,
+through unchanged unless they carry `memory.inference_verification`. V6 and
+its v7 successor reject that key even when its value is null or malformed:
+bounded inference admission has no qualified historical prompt view.
+An unknown evidence version, an incomplete pair of fields,
 or a static refusal stops historical rendering with an error before an LLM
 request. V6 cannot truthfully reconstruct the old, potentially misleading
 refusal explanation from a new refusal.
+
+For a copied historical task on the paired #615 B2b infra revision, explicitly
+select `inference_preflight.mode: static_only` using the
+[historical configuration helper](../preflight_compat/README.md#select-it-in-your-external-task-package).
+It preserves static-refusal behavior instead of enabling the new bounded
+measurement path. The new manifest field requires that paired revision and a
+new workspace; public dependency pins and original experiment archives stay
+unchanged.
 
 The [compatibility contract and archive audit](static-preflight-compatibility.md)
 describe the covered records and the limits of this check. The check concerns

@@ -21,6 +21,11 @@ def project_record(record: dict[str, Any]) -> dict[str, Any]:
         return result
     if not isinstance(memory, dict):
         raise TypeError("Static preflight projection requires a memory mapping")
+    if "inference_verification" in memory:
+        raise ValueError(
+            "Historical preflight projection cannot accept inference_verification; "
+            "bounded inference admission has no qualified historical view"
+        )
     has_evidence = "static_preflight_evidence" in memory
     has_outcome = "preflight_outcome" in memory
     if not has_evidence and not has_outcome:

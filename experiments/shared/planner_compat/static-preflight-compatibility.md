@@ -21,7 +21,12 @@ The input is the raw recorder history consumed by the planner. Each record is
 copied recursively before projection. The following conditions apply to its
 `memory` mapping:
 
-- If neither `static_preflight_evidence` nor `preflight_outcome` exists, retain
+- Reject any `inference_verification` key before checking the static fields,
+  including null, malformed or apparently admitted values. Bounded inference
+  admission has no qualified historical projection. V7 inherits this guard
+  through its v6 renderer.
+- If neither `static_preflight_evidence` nor `preflight_outcome` exists and no
+  inference verification is present, retain
   the record unchanged for the v5 renderer.
 - If either exists, both must exist. Validate the evidence with infra's
   `StaticPreflightEvidence` schema, including its supported version, phase
@@ -48,7 +53,7 @@ through the exact qualified `siderius-preflight-compat` identity. Native or
 unknown identities and contradictory phase formulas raise before rendering.
 The estimator package owns historical arithmetic; this planner remains a
 presentation-only provider. Its identity binds the estimator package's guard,
-arithmetic, provenance and qualification sources as well as its existing v5
+arithmetic, configuration helper, provenance and qualification sources as well as its existing v5
 dependencies. An absent optional estimator package still permits archived
 version 1 input, but cannot authorize version 2 projection.
 

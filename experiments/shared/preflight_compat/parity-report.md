@@ -158,3 +158,66 @@ still requires bounded admission, complete request binding, an explicit exp
 historical policy and real synthetic GPU qualification. **#615 and public exp #1
 remain open.** These checks made zero API, GPU or scientific training calls and
 promise no identical stochastic responses, trained weights or scores.
+
+## Explicit historical inference policy (#615 B2b)
+
+Clean infra candidate `7c869e67f697d6bbc81eb554711ab77e23cb7362` is qualified
+for the explicit historical policy and compatibility packages in this checkout.
+Its estimation assembly is
+`deb366d3edf04a69892cbad7ca173014d626758bf3a93cd9f16a8c926c00e787`;
+its rendering assembly is
+`a6176390bbe94ccf116c7429fbd238f387f80a6e30b4fdf685439b571a0f2d9e`.
+The rendering fingerprint changes because the tuning schemas now transport
+typed inference-verification evidence. No rendering template changes relative
+to the B2a qualification were found.
+
+The historical configuration helper now explicitly selects `static_only`,
+using `max_batches: 3` when absent and retaining an existing valid bound.
+Conflicting or malformed policy declarations refuse without mutating the input.
+`configuration.py` joins the estimator source identity and therefore its composed
+planner identities. V6 and V7 reject the presence of
+`memory.inference_verification` before any provider request, including null and
+malformed values or records without static-evidence fields. They cannot erase
+a newly admitted bounded workload into a historical prompt.
+
+The candidate and all three compatibility packages were installed normally,
+noneditable, into the exp checkout's own initially frozen environment. The
+three packages were also installed into the candidate checkout's own frozen
+environment. No environment, editable install or `PYTHONPATH` was borrowed.
+This explicit qualification installation leaves `SIDERIUS_REVISION`,
+`pyproject.toml`, `uv.lock`, original task declarations and archives unchanged.
+Package versions remain 0.1.0 / 0.8.0 / 0.6.0; source identities record the changes.
+
+**199 scoped tests passed** in the exp environment: 186 preflight, v5/v6/v7 and
+policy checks, then 13 inherited ordering/attempt-role/paper checks. The three
+checkout-specific installation tests skipped under the exp wheel installation
+and **all three passed** in the infra checkout's own environment. The checks
+include frozen 45-case arithmetic and 32-case batch-search comparisons, actual
+CPU forwards, composed producer-to-planner requests, deep-copy policy migration,
+configuration-source mutation detection, and all four early/late v6/v7 refusal
+boundaries. These are offline compatibility checks, not GPU qualification.
+
+- [Estimator installation](evidence/inference-policy-installation.json):
+  installed/source and checkout equality, parent/child identity, unknown-assembly refusal.
+- [Prompt installation](evidence/inference-policy-prompt-installation.json):
+  frozen source inventory and unqualified-renderer refusal.
+- [Frozen message comparisons](evidence/inference-policy-prompt-comparison.json):
+  **47 MATCH**, covering TESS, LIGO, Project8 and TIDMAD NoPrior/analysis-on
+  fixture paths. Some cases are reconstructed or system-template comparisons;
+  this is not a replay of every historical conversation.
+- [Storage references](evidence/inference-policy-storage-reference.json):
+  all five historical source and setup-helper comparisons match.
+- [Archive audit](evidence/inference-policy-archive-audit.json): **442 source
+  hashes** verified and **331 records** unchanged across **11 available units**.
+
+These checks used zero API, GPU or scientific-training calls. They preserve
+the historical input/prompt contract under explicit policy selection; they do
+not promise identical future model responses, trained weights or scores.
+Native bounded-measurement admission and its real GPU qualification remain
+infra-owned evidence. No public repository synchronization is performed here.
+
+Final infra head `2366dad733ac9de7d9de272726c31a9d7f395666` changes only the
+preflight README relative to the qualified executable reference. The
+installation receipt was regenerated at that exact head and confirms the same
+qualified source assembly. The CPU, frozen-message and archive evidence above
+therefore remains applicable; these checks were not repeated for prose alone.

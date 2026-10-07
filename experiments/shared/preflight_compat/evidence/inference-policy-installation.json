@@ -1,0 +1,24 @@
+{
+  "infra_revision": "2366dad733ac9de7d9de272726c31a9d7f395666",
+  "qualified_reference_revisions": [
+    "7c869e67f697d6bbc81eb554711ab77e23cb7362"
+  ],
+  "selected_checkout_assembly_match": true,
+  "installed_source_files": 5,
+  "packages": {
+    "siderius-preflight-compat": "0.1.0",
+    "siderius-planner-compat": "0.8.0"
+  },
+  "identity": {
+    "name": "legacy-078b23ca-preflight-v1",
+    "version": "1",
+    "content_sha256": "6255af2cb340a3c66e49889067725decbba4d7f424f4503be8431681a69fe732",
+    "assembly_sha256": "deb366d3edf04a69892cbad7ca173014d626758bf3a93cd9f16a8c926c00e787"
+  },
+  "child_identity_match": true,
+  "unknown_assembly_refused": true,
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "training_calls": 0,
+  "scope": "Normal installed sources, profile discovery and subprocess identity; no data or training execution"
+}

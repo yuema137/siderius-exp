@@ -39,7 +39,7 @@ in PR A. New refusal records remain outside planner v6's qualified projection.
 
 ## Identity and failure behavior
 
-The profile's sources include implementation, reference provenance and the
+The profile's sources include implementation, `configuration.py`, reference provenance and the
 qualification manifest. Qualification lists framework assembly hashes, never
 the package's own resulting content hash, avoiding circular identity hashes.
 No listed assembly means no qualified historical execution. Unknown assemblies
@@ -55,6 +55,30 @@ this package's projection guard and qualification sources. For archived version 
 inputs, no estimator qualification is required; the existing passing-evidence
 validation remains in force. Projection always copies records before removing
 additive evidence and never changes estimates, budgets, conclusions or status.
+
+## Historical inference policy (#615 B2b)
+
+`historical_task_composition` deep-copies the supplied manifest and explicitly
+selects both the historical estimator and
+`inference_preflight: {mode: static_only, max_batches: 3}`. An existing valid
+`static_only` declaration retains its bound. The helper validates the policy
+through infra's `InferencePreflightPolicy` with strict input types; a conflicting
+mode, null declaration, invalid bound or unknown field raises without changing
+the supplied manifest. There is no experiment-owned policy schema or implicit
+selection by task or estimator name.
+
+This helper requires the paired B2b infra API. The resolved policy contributes
+to task identity, and `configuration.py` contributes to both the estimator
+identity and the composed planner identities. Use a new external task copy and
+new workspace. Public pins, historical manifests and archived locks stay
+unchanged. Older qualification entries describe their named revisions and do
+not qualify B2b until its clean source identity and offline evidence are added.
+
+Under `static_only`, no bounded verification follows a static inference refusal.
+Planner v6 rejects the presence of `memory.inference_verification` before its
+legacy-history early return, even for null or malformed values. V7 inherits
+this guard through v6. No verified admission result may be erased or rephrased
+as historical static evidence.
 
 ## Offline qualification
 

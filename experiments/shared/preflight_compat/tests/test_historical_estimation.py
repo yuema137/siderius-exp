@@ -1,7 +1,6 @@
 """Frozen arithmetic/search comparisons and explicit provider selection guards."""
 
 import json
-from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
@@ -25,7 +24,6 @@ from core.preflight_estimation import (
 from core.preflight_observations import PhaseObservations, RegisteredStateInventory
 from siderius_preflight_compat import SELECTION, historical_profile
 from siderius_preflight_compat.arithmetic import estimate_historical_phase
-from siderius_preflight_compat.configuration import historical_task_composition
 
 FIXTURE = json.loads(
     (Path(__file__).parents[1] / "fixtures/reference.json").read_text()
@@ -106,17 +104,6 @@ def test_unknown_assembly_is_not_implicitly_qualified(monkeypatch):
     monkeypatch.setattr(registry, "estimation_assembly_digest", lambda: "f" * 64)
     with pytest.raises(ValueError, match="has not qualified"):
         historical_profile().identity()
-
-
-def test_configuration_copy_is_explicit_and_does_not_mutate_source():
-    original = {"task_name": "synthetic", "nested": {"value": 1}}
-    before = deepcopy(original)
-    updated = historical_task_composition(original)
-    updated["nested"]["value"] = 2
-    assert original == before
-    assert updated["preflight_estimator"] == "legacy-078b23ca-preflight-v1"
-    with pytest.raises(ValueError, match="different preflight estimator"):
-        historical_task_composition({"preflight_estimator": "registered-state-v1"})
 
 
 def test_installed_historical_provider_controls_fresh_cpu_probe_batch():

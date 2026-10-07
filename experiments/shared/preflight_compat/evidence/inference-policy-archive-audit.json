@@ -1,0 +1,788 @@
+{
+  "scope": "Declared archive hashes and record projection; AST model structure coverage only, no model execution or decision replay",
+  "inventory_sha256": "9ec96fa18cf80c70b95907ccc7ff4c1e14931e0c44c04bd33a1af9981897947f",
+  "cases": [
+    {
+      "case": "tess",
+      "verified_source_files": 81,
+      "unchanged_records": 62,
+      "archived_model_sources": [
+        {
+          "name": "cadence_aligned_spectral_resnet.py",
+          "sha256": "6df78087f83fa46ffee1e17d319ef91cc24ee5623774e305b386b5ac51bcd799",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_crossfit_ridge_stack.py",
+          "sha256": "f704075ee868bd4425a00ae075dd535abda39fe431d55266ea7465a20720c273",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_diagnostic_prior_ensemble.py",
+          "sha256": "ebceb5dd0e3593e8409489f8f3f5464b2da42dd9b7eb02a3b49863bf3038571f",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "cadence_disagreement_calibrated_expert_resnet.py",
+          "sha256": "85c28f14e249f054851a3cb6c2184f6c1639e8bc799863681b55310642bb6c7a",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_five_seed_checkpoint_average.py",
+          "sha256": "554d871eb4f39d9813446b89220ff242827d336d1dd728d3f408e07f2c7a09f3",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_genuine_oof_ridge_stack.py",
+          "sha256": "8d96a2ff7320338db01eae02f2aa2174f463de51b117aa54450d89ea7eff5d02",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_greedy_diverse_checkpoint_ensemble.py",
+          "sha256": "f2eff11fe907e45532fb32b9b505825e4b01377d136c52aaa7a9a4d548d505a2",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_highres_metric_expert_resnet.py",
+          "sha256": "91ce1ec87754a5ebe7a8e0264b134091ab04f5c73f8b58952f78eba1752c5011",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_independent_checkpoint_ensemble.py",
+          "sha256": "0896410e62964f6733247bc89a19107ace0bb283d5cd3f0d5e3c95827e5af197",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_metric_aligned_expert_resnet.py",
+          "sha256": "76f1be3938cd730c04898d500bb4091ea6ea474ef2947e108cc48745f0655f9a",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_metric_bagged_ensemble.py",
+          "sha256": "81277354b5a5360954fca9a7b98030f36dd5a9d3a549fb3b874562802cb48790",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_metric_query_pool_resnet.py",
+          "sha256": "ddfa030e866e928cf2d2b0aa9c78926fb0c58ba8f1c8cb1023dd71e35ed5f670",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "cadence_multitaper_expert_resnet.py",
+          "sha256": "6a3ddaf40c5214686f83be0a090a3d21f8d6db80791eb0aa8df898805d9643a9",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_peak_relation_transformer.py",
+          "sha256": "fe7ac46b8109e18417a412e44e6da0ff41ac267aab785ebed30decc37e1bd5dc",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "cadence_quadratic_best_r2_ensemble.py",
+          "sha256": "d3b20b541c99eb148ce17aa6bfc62968c81e4d5f9bdde603e384b27b9ac8860c",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_spacing_pyramid.py",
+          "sha256": "df334b1668c714387e5abd6df9923705255077154a44120adb052f3ece70783c",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "cadence_temporal_checkpoint_soup.py",
+          "sha256": "7df62820818858334c306399b69ca2cbe86493bbd77483bee6ba018fdd44068c",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        }
+      ]
+    },
+    {
+      "case": "ligo",
+      "verified_source_files": 53,
+      "unchanged_records": 34,
+      "archived_model_sources": [
+        {
+          "name": "adaptive_bandwidth_ridge_gate.py",
+          "sha256": "3f1d770df0f7bfec779d6e2bee5f378d6e9a6ecdda83cd2ebb03b151a8f7492a",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "additive_global_ridge_fuser.py",
+          "sha256": "0f9bf7617fa18ab8cb8564f1cf56c3ba05469b31c8f4673fc46064c26536d44b",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "band_stratified_matched_ridge_gate.py",
+          "sha256": "2b65d8c7628d6276ab3eb5d11397b6b9bfafd194bad9729ae225edb3880d741e",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "checkpoint_aligned_band_ridge_control.py",
+          "sha256": "d1adc682543be8af14f6db3274436ceba5d33e2a1e20d9e15626bc48d521d04a",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "coherent_chirpogram_fuser.py",
+          "sha256": "0cbfc01e87ae036d0077a77d6f7aff2502100133e291d237399f0c9a6ed44806",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "compact_four_band_matched_ridge_gate.py",
+          "sha256": "d2fdcf224374b8e4993c21bad71357e7da99204243cd3aaff0c03091ac4a59d3",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "compact_metric_aligned_ridge_gate.py",
+          "sha256": "01863bb0ca7cf8cc326945b0a9592b0b1e86648563703ee9bc8bf3987fb8f0be",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "context_refined_ridge_fuser.py",
+          "sha256": "de03576d06e21e5a810979b3c70c4b452e75899beead27b193c2b70695f12706",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "cross_resolution_band_consensus_gate.py",
+          "sha256": "268394609f2f46b6e2401a94e12baf67d38e7b83c3b00dea54afad68dad30c17",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "dual_domain_chirp_fuser.py",
+          "sha256": "9df1e16d8bd36814b70148f2c1ea857102765bf3907962aac8c2143ded5220ba",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "matched_global_ridge_gate.py",
+          "sha256": "83c39ba0110dfade0f6ec37fa903513150807f6c65724cbea12131e08dd9458d",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "metric_aligned_compact_ridge_regressor.py",
+          "sha256": "d435c5268434a88f0341525cdae5f6c9689b290274c7c9e2241f357a4e720262",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "monotonic_trajectory_chirp_fuser.py",
+          "sha256": "1716a1fb1c62968e3708b693cfe7c5f1536ec6fea1a60a53bb8e00aa3a22370b",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "multi_view_ridge_head_ensemble.py",
+          "sha256": "4268455c294044c7298ccbcdcc9ff5f89fe45aab6d01902e86bb4acdfabd2083",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "replicated_compact_four_band_ridge_gate.py",
+          "sha256": "4ccf23e9858fee3c3a1c65ff75bff0b2dd8d25172d286024752dee36d2860383",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "residual_global_ridge_fuser.py",
+          "sha256": "3f9099c4c84d8372104681a4acd5aa864ca9aaa53e838b5cbc273a20f18129ee",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "ridge_attention_chirp_fuser.py",
+          "sha256": "2c69194678103c340f2299ded08c1f24384eb1622e7556348e28b9c158ac62c8",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "unbiased_eight_query_ridge_gate.py",
+          "sha256": "5df7817ec35d63b325609c0903ba858beed54d1216a9ea347ae5a9aad9865e98",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        }
+      ]
+    },
+    {
+      "case": "project8",
+      "verified_source_files": 38,
+      "unchanged_records": 25,
+      "archived_model_sources": [
+        {
+          "name": "asymmetric_gated_opening_fft_regressor.py",
+          "sha256": "e95ef875856accc92d1cd907feb7d636e05b8f9b2259f5046ba8e5da73c5c128",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "branch_specialized_multires_regressor.py",
+          "sha256": "2e3fccb238dc400a2c878e945d282391fee43289213fc9f31512a2dcf531e00a",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "dual_axis_crossattn_regressor.py",
+          "sha256": "d1459d0a704cc31c518dbeb7c31e65427d191517a8c656c5d7fb898a6f281326",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "dual_latent_fusion_regressor.py",
+          "sha256": "fb94693fbf19b92946331dfd19a902d974c9c7fa966fdd1351d42439a0c7ff7e",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "dual_multires_opening_fusion_regressor.py",
+          "sha256": "edf5cf2c4a733a75d22ca877c51194182baa569d37b904ce125ec6bc57eced26",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "dual_opening_pyramid_crossattn_regressor.py",
+          "sha256": "d5fe9f59317213f50f38d4b3c0635a96b3075762d94ec2af8c60289f65d189d8",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "opening_conditioned_spectral_retrieval_regressor.py",
+          "sha256": "de270ddbe031ed39d6195713208f14f5b8e57eba23292b0b29e35679051bb399",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "phase_masked_multires_fusion_regressor.py",
+          "sha256": "5e96627decd7a78408e18cea94bbb7307d5e4300bb19b21978a62761a1f86bba",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "protected_bypass_multires_fusion_regressor.py",
+          "sha256": "b6d1d719c80528ede4a0d0a58659773d62c45b92922f005c2b3cf0eec3d13050",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "regularized_opening_crossview_regressor.py",
+          "sha256": "de489d594459a56426f744ac0312cf2bb5ecc5e7fcd791c04461f4cb5d2222d6",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "retrieval_compressed_multires_regressor.py",
+          "sha256": "50d2c6b512b10270081781d18f5ce294326355a8656a30186f4e07509b0cfaa2",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "shared_stem_multires_crossattn_regressor.py",
+          "sha256": "73a9988677568ae0abf2bfc2c772cb40076c1eb569fa332c71e76eb2f416fd32",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "single_opening_highres_crossattn_regressor.py",
+          "sha256": "e86b58b22d69ff037ce398f3a41dc3fc84c24b2b8043100a9471ea777757fe21",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        }
+      ]
+    },
+    {
+      "case": "tidmad-0-3",
+      "verified_source_files": 37,
+      "unchanged_records": 41,
+      "archived_model_sources": [
+        {
+          "name": "calibrated_antialiased_unet1d.py",
+          "sha256": "b6a05a6e6027922d7529e964b971f6ff4752cf4f785279d368467f1bf5f4ed26",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "calibrated_multiscale_tcn.py",
+          "sha256": "b958e3dd2e6435e0ed100fc6857d6ec4840eb9a3be20862c73c975352893910c",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "direct_waveform_wavenet.py",
+          "sha256": "5731a659896c83d073c66ab56ddfdd3ac96153bf562beabfc6c39db87a1a26ce",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fidelity_anchored_calibrated_spectral_wavenet.py",
+          "sha256": "5dc21c8e6bfb02d6193cc7f9af897fb68e4eeeccfcb2b57f1d5d67b180db50bc",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "input_conditioned_adaptive_spectral_wavenet.py",
+          "sha256": "7f4d3fc47fa789eabbfcc2474da791df01c1f4a47774a7d6334031fe63c6304d",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "local_statistics_conditioned_spectral_wavenet.py",
+          "sha256": "959307903a554c4dd5f6dac1469cf5a7ca31f541be22961fcccf8c5b74d45c2d",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "residual_noise_wavenet.py",
+          "sha256": "8252acc33e4e03b9c88e91f3849de1c6253f513898fc5be9ddf20b852dd8af61",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "variance_calibrated_spectral_wavenet.py",
+          "sha256": "40566cbb30ecc99ec41ff9a7edbf4fe05a3cf44889d03d159d0f2a6eab1ecbe7",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "wholeband_gated_dilated_regressor.py",
+          "sha256": "dee04c968956def15c4e02899bd347840e812cc2a00e6db1d94f4d113984313c",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        }
+      ]
+    },
+    {
+      "case": "tidmad-4-9",
+      "verified_source_files": 35,
+      "unchanged_records": 24,
+      "archived_model_sources": [
+        {
+          "name": "adaptive_complex_spectral_centered_tcn.py",
+          "sha256": "3c9d63666e3eb4a7024dba1a79f4db22edf80a0c50908b6e083b9bca48988f45",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "bidirectional_scaled_dilated_tcn.py",
+          "sha256": "2cc63fa65c2f8fa6bc383dbd2165c4be210fdf0f207c7a2bfc27a1e65e7475c2",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "bidirectional_stabilized_dilated_tcn.py",
+          "sha256": "e7e63b2ca2aac7c680b5314751c27c297e0ab5a1605b610a3a284fb5737f7675",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "continuous_dilated_wavenet.py",
+          "sha256": "91b8aa07f7216103fdf921c5ec90792ad6ac86f401b2a5885e2b78733b21e26f",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "coverage_scaled_coarse_spectral_tcn.py",
+          "sha256": "93465eba33839dc88e1e622f21e89d0d77f7989bf2046009624f357de5c6e911",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "identity_bottleneck_unet.py",
+          "sha256": "4974c48d6b3d71b43d3ba069ab8f6b4d7ddd99b7b7ddf12b402a7429c888aeac",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "residual_noise_wavenet.py",
+          "sha256": "8a6c1af4bc0229a984bb298747e6184f1342754a9a72cfe6588f4539d982cf0e",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "scalar_gated_dilated_denoiser.py",
+          "sha256": "8b73f792faab91650c5df5a87b11b637e25d7d4feb4109ae6b94716e6e3084bd",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "spectrally_conditioned_centered_tcn.py",
+          "sha256": "28be4122263ad7cea3bb72201355931eb2e057ddeceef3e0ce0557bcb99fbf0f",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        }
+      ]
+    },
+    {
+      "case": "tidmad-10-14",
+      "verified_source_files": 34,
+      "unchanged_records": 24,
+      "archived_model_sources": [
+        {
+          "name": "fullband_centered_gated_dilated_regressor.py",
+          "sha256": "1c90f544e3a1e1f6736f9996d3d30a597c1e3e9f178c98bf4dfd181f74976ad8",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullband_coverage_scaled_metric_selected_gated_regressor.py",
+          "sha256": "ffc326738c534c8b680255eefcf1e6de068412175e93c524b226e3734d9e7d4b",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullband_gated_dilated_regressor.py",
+          "sha256": "5aa131c9c6a76f3c8fd6added8ec2da9f2219b8ec42a964e6b5fbbf8b2e8dc05",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullband_health_selected_checkpointed_gated_regressor.py",
+          "sha256": "01408dce4d1be5e9385dfa1cb8a9a4a241bd0f912035851c048229ae6b0889b6",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullband_noise_conditioned_wavelet_packet_regressor.py",
+          "sha256": "cbb7976fde16d417543387580eae1ef38067668a9fddb36263bfb28196552f4f",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "fullband_replicated_coverage_gated_regressor.py",
+          "sha256": "1bf8a00ff56271d16fd04ff540332872c13a3798b7f986d585ac29fc70ee2f58",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullband_selective_dilation_gated_regressor.py",
+          "sha256": "359d83b88a8f87cbb75398e465a24ce6f5adb012724a7faff63914ee1a946c44",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullband_spectral_film_gated_regressor.py",
+          "sha256": "f4d083933ae319aeb13b79fa5f60bf4583d3435a8a4cb475f459a293583c5f62",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullband_verified_coverage_replicated_gated_regressor.py",
+          "sha256": "ac27ac1442d44306ab546671812e9f9ab12f83f4d974c73f12686a2860a9c95b",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        }
+      ]
+    },
+    {
+      "case": "tidmad-15-19",
+      "verified_source_files": 31,
+      "unchanged_records": 25,
+      "archived_model_sources": [
+        {
+          "name": "bidirectional_deepsupervised_dilated_regressor.py",
+          "sha256": "6ffddde818be885a5e02aacbe61dba20fda04660245adb73adbde5c552245f9b",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "bounded_refinement_noncausal_regressor.py",
+          "sha256": "bbd8af93eabfaa70fcd67fa759686781824a3eb0baa0dbabc918d6a063b29152",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "coverage_scaled_stabilized_noncausal_regressor.py",
+          "sha256": "00d4e2b412062f69c4b1afd7b6a870920c3d893b55786d72b82de62255d33c8e",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "fullband_gated_dilated_regressor.py",
+          "sha256": "7ff3fa1ccd315d778ee7e627fc1465f84cecd753ec81d6a25d417e6684a4396d",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "fullcoverage_data_scaled_noncausal_regressor.py",
+          "sha256": "aecb80f45578382318024928d3bc8a7c0b4572d4c40446e4a3ce1ac39acc10da",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "fullcoverage_stabilized_noncausal_regressor.py",
+          "sha256": "569d11e0659ae6ad7382a53633b6498820403f4c092aabb8b4e5ad91fce175f5",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "hybrid_spectral_temporal_regressor.py",
+          "sha256": "0d325d97ab3f6cad52f878362aafd774d2972cfc6fe7bfc37ea5ea0afaf4d722",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "progressively_supervised_noncausal_regressor.py",
+          "sha256": "b908ef449365e88bd858a20e986b68bc5e3684dfc00021288c875c3e45df51a8",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        }
+      ]
+    },
+    {
+      "case": "tidmad-analysis-0-3",
+      "verified_source_files": 35,
+      "unchanged_records": 24,
+      "archived_model_sources": [
+        {
+          "name": "adaptive_affine_residual_wavenet.py",
+          "sha256": "b8b29085ea67e53fa382bde71899ddb00f873a685e49ebc3c79666abaff83203",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "conditioned_residual_wavenet.py",
+          "sha256": "951a610fc94d64007de386f44bfa01026b9666e64529af463fc0a22b9230fd17",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "continuous_dilated_wavenet.py",
+          "sha256": "9a3ca4d7073ec648a1f6d7ab3b6377501316e1d0215610633d12d3102feb4397",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "direct_head_dilated_wavenet.py",
+          "sha256": "dcef5d2770dd2902db3364c2a60fc9cebaed0728c6e85b83625bf2c7b25cdd5b",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "direct_multirate_unet.py",
+          "sha256": "a6e7c94bfc36a4589a3d7a2d52412e6d610739349146cb0f8e97befd43557427",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "symmetric_direct_wavenet.py",
+          "sha256": "dfa3221183de2fe3c397085f320f379d898d3e938d94414d2c64cc862b436a09",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "wholeband_fc_regression_probe.py",
+          "sha256": "31a93145d34d14f0edb9e4652f02d0376d63863640063bb3158c0bff3dabe3ff",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "wholeband_gated_denoiser.py",
+          "sha256": "272073e8ab172955c87abe84fd653c5125b0eab719bf8a7bda1c5a4f73e141c3",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        }
+      ]
+    },
+    {
+      "case": "tidmad-analysis-4-9",
+      "verified_source_files": 32,
+      "unchanged_records": 24,
+      "archived_model_sources": [
+        {
+          "name": "adc_normalized_dilated_squid.py",
+          "sha256": "b02e332ff9bc900618681545c5d694abc9409ddaf4909ef331164d526716560b",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "bidirectional_direct_dilated_squid.py",
+          "sha256": "d51418df8879cd765abcab4ed6df8796ab730f901e8bfa99b48717561777b250",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "continuous_dilated_squid.py",
+          "sha256": "50e1c825eb6d4454b970254b731420831d549229bc39cecdb329f699de40dc88",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "covariance_floor_dilated_squid.py",
+          "sha256": "c81e21dca0b0decdc0603cbb3a4cfca7ad309da37cfd7a1d1db6694c10c92c55",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "guided_ungated_unet_squid.py",
+          "sha256": "3517a179d0fb763ca7aeb9286a120de8d03618e1f4b2f980eab404a56e20157e",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "locally_factored_dilated_squid.py",
+          "sha256": "9328256ed861b641885ad49b3c3c47e5e4f3959895a7b1e56df86f1031a35684",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "moment_factored_dilated_squid.py",
+          "sha256": "2256b73a0fd20055052061bce4a5fbccf5f5bb31023f0a029a0bed90f23c432e",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "spectral_residual_dilated_squid.py",
+          "sha256": "15bcfa61ceda8e482f5a215f14d9f3d4028163fcb7b25cfeae5a22c330ad56fa",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        }
+      ]
+    },
+    {
+      "case": "tidmad-analysis-10-14",
+      "verified_source_files": 33,
+      "unchanged_records": 24,
+      "archived_model_sources": [
+        {
+          "name": "adc_adaptive_dualrate_moe_regressor.py",
+          "sha256": "ac7b32cf765348ca0d389582e6b323d378a140baee20e5700756b612a059ecc4",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "adc_antialiased_dualrate_regressor.py",
+          "sha256": "4c4fbc3f94b8a90b6d00df2f1a0c341fe14628ac0a2df50dd718ca674c12a434",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "adc_antialiased_spectral_fusion_regressor.py",
+          "sha256": "2b012cc6fbf98ec542051f7860c65e696c05d5e33f7c14fa365c0cc53c933b43",
+          "registers_buffer": true,
+          "constructs_parameter": true
+        },
+        {
+          "name": "adc_bidirectional_gated_regressor.py",
+          "sha256": "bc83c4a7d42a279c4bff87dd187bd174b06d75bf79e117c3d167aff5bf1ac2a9",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "adc_dilated_gated_regressor.py",
+          "sha256": "bf2d6bafe25947497e3c6a0095b2f212aafa64f3fd376553bafc4df5a8c3c386",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "adc_residual_context_router_dualrate_regressor.py",
+          "sha256": "48e2b7763fedce42b467bb0ee91d706f98de4d32c3640ddefffb1b0e7c492cb5",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "adc_shrunk_pointwise_dualrate_regressor.py",
+          "sha256": "54f1221eda568d24c98b263282e7495c57e35814a863dd304de3761ff20bba4b",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "adc_signed_bypass_dualrate_moe_regressor.py",
+          "sha256": "1f631e481b729084281efdf2eb6f5a6aedb0795f461a9c3ff16dcf84d143d557",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        },
+        {
+          "name": "adc_temporally_routed_dualrate_regressor.py",
+          "sha256": "2af77a85be3cd8b837de3d1a1ce5e661d3a836722965a69092e556a7e625c684",
+          "registers_buffer": true,
+          "constructs_parameter": false
+        }
+      ]
+    },
+    {
+      "case": "tidmad-analysis-15-19",
+      "verified_source_files": 33,
+      "unchanged_records": 24,
+      "archived_model_sources": [
+        {
+          "name": "depth_ramped_residual_dropout_symmetric_dilated_regressor.py",
+          "sha256": "c477747d8b23c9d53c15060a74e5e6863342748300bccc605f32380eb308b68f",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "dropout_regularized_symmetric_dilated_regressor.py",
+          "sha256": "0f8cda41293aacaaf0bfd61ecab16bd833c63ad23a1b3307be2fbbc9c89206d6",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "multirate_bidirectional_ssm_dilated_regressor.py",
+          "sha256": "bcf572a2d4931aafbd51e79c0ded3f2a30fa72eed588cab8db7520993fac5f92",
+          "registers_buffer": false,
+          "constructs_parameter": true
+        },
+        {
+          "name": "residual_path_dropout_symmetric_dilated_regressor.py",
+          "sha256": "a5013ad85b740519fd03e1614c48f5dfd55046b2f27f14415ba44c3c9d0d247c",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "scalar_gated_dilated_regressor.py",
+          "sha256": "5b17c04cf8078da73710560a6ccf86c3a0778a3341c01d79878aea4798f70359",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "scaled_residual_clean_skip_symmetric_dilated_regressor.py",
+          "sha256": "341699061b6cb52be9a81458354e138328c8e846555742b851fb71032239e49a",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "stochastic_depth_residual_dropout_symmetric_dilated_regressor.py",
+          "sha256": "5e8138f7842c51d70d5c3b6b94279958dea997d6ee27cd640313ca4f7f8f09a3",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "strong_stochastic_depth_clean_skip_symmetric_dilated_regressor.py",
+          "sha256": "ba5af98872d41513b0c7a5b54bbea3add315d8936e4cd6d1988decbbb544b71e",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        },
+        {
+          "name": "symmetric_gated_dilated_regressor.py",
+          "sha256": "f08478061609b9f71756a10b337d78396f5e06c4d3b343da87b84e62609dbd59",
+          "registers_buffer": false,
+          "constructs_parameter": false
+        }
+      ]
+    }
+  ],
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "training_calls": 0
+}

@@ -16,13 +16,19 @@ weights, or score.
 
 ## Install in the environment that runs infra
 
-For the complete storage-v7 plus historical-estimator workflow below, use
-combined infra revision `334db95a39a988565dcb182c039d866ccd94e55b`, or a merged
-successor with the identical qualified estimation and storage-source hashes.
-The inference-measurement prerequisite
-`200c428afc6ee77f3dfd4968a95e88a2fd931471` is also qualified; its checks are in
-[the qualification report](parity-report.md#phase-correct-inference-measurement-prerequisite-615-b2a).
-It does not yet add automatic measurement after a static refusal.
+This checkout's configuration helper requires paired #615 B2b infra revision
+`7c869e67f697d6bbc81eb554711ab77e23cb7362`, or a merged successor with the same
+qualified estimation, rendering and storage-source hashes. It supports the
+`inference_preflight` declaration shown below. The
+[qualification report](parity-report.md#explicit-historical-inference-policy-615-b2b)
+records the exact offline checks; earlier entries qualify only their named
+revisions.
+
+Combined infra `334db95a39a988565dcb182c039d866ccd94e55b` and the B2a prerequisite
+`200c428afc6ee77f3dfd4968a95e88a2fd931471` remain historical qualification
+evidence. They do not support this new declaration. This change leaves
+`SIDERIUS_REVISION`, the public dependency pin, the lock file and archived
+experiment declarations unchanged.
 
 The standalone `5aa404263c8dfb40662a8ab2f55225d801786984` entry in
 [qualification.json](src/siderius_preflight_compat/qualification.json) qualifies
@@ -73,12 +79,23 @@ unchanged. Edit the **copied** composition manifest:
 
 ```yaml
 preflight_estimator: legacy-078b23ca-preflight-v1
+inference_preflight:
+  mode: static_only
+  max_batches: 3
 ```
 
 Code that already builds external task packages can call
 `siderius_preflight_compat.configuration.historical_task_composition(manifest)`.
-It returns a deep copy with this declaration. It does not copy files, launch
-anything, or import an old workspace.
+It returns a deep copy with both declarations. If the manifest already selects
+`static_only`, it preserves its valid `max_batches` value. A conflicting or
+malformed explicit policy raises instead of being overwritten. The helper
+does not copy files, launch anything, or import an old workspace.
+
+`static_only` keeps a static inference refusal as a refusal. For example, if
+static inspection rejects inference batch 1, a historical run stops there;
+it does not launch the new bounded measurement that could admit that batch.
+`max_batches` remains part of the declared policy identity, but launches no
+measurement while `static_only` is selected.
 
 In your copied LLM configuration, explicitly select the matching historical
 planner under `tune.planner_strategy`:
@@ -99,7 +116,10 @@ output workspace; do not resume an old lock in place.
 The new evidence includes the estimator's source and framework identities.
 The historical planner accepts only a qualified historical estimator identity.
 It rejects native corrected numbers instead of silently presenting them as
-historical numbers. Archived version 1 inputs remain readable.
+historical numbers. V6 and v7 also reject any record carrying
+`memory.inference_verification`, including a null or malformed value: the new
+admission path has no qualified historical prompt view. Archived version 1
+inputs without that field remain readable.
 
 ## Check the scope of the evidence
 

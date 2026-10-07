@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -13,7 +14,10 @@ from core.preflight_estimation import (
     resolve_preflight_estimator,
 )
 from siderius_planner_compat.self_check import _CaptureBridge
-from siderius_planner_compat.static_preflight_v6 import project_record
+from siderius_planner_compat.static_preflight_v6 import (
+    historical_preflight_v6,
+    project_record,
+)
 
 from experiments.shared.planner_compat.tests.test_static_preflight_v6 import (
     passing_record,
@@ -109,3 +113,28 @@ def test_historical_identity_does_not_authorize_a_different_formula(profile):
 def test_v1_remains_usable_without_estimator_qualification():
     record = passing_record()
     assert "static_preflight_evidence" not in project_record(record)["memory"]
+
+
+def test_configuration_source_change_invalidates_estimator_and_planner_identity(
+    profile, monkeypatch
+):
+    """Policy migration is executable compatibility behavior, so its bytes must be pinned."""
+    configuration = Path(compatibility.__file__).parent / "configuration.py"
+    estimator_before = profile.identity()
+    planner_before = historical_preflight_v6().identity
+    read_bytes = Path.read_bytes
+
+    def changed_source(path):
+        source = read_bytes(path)
+        return (
+            source + b"\n# changed historical policy\n"
+            if path == configuration
+            else source
+        )
+
+    monkeypatch.setattr(Path, "read_bytes", changed_source)
+    assert profile.identity().content_sha256 != estimator_before.content_sha256
+    assert (
+        historical_preflight_v6().identity.content_sha256
+        != planner_before.content_sha256
+    )

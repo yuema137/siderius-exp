@@ -14,6 +14,7 @@ def source_files() -> dict[str, Path]:
         for name in (
             "__init__.py",
             "arithmetic.py",
+            "configuration.py",
             "provenance.json",
             "qualification.json",
         )

@@ -32,6 +32,11 @@
       "infra_revision": "334db95a39a988565dcb182c039d866ccd94e55b",
       "assembly_sha256": "19f75b7bb07c8a9414071580f33bf16ee68b336b4e17390ad268aa789ea6220d",
       "scope": "Combined #419 and #615: unchanged rendering assembly, composed storage/preflight planner providers separately qualified"
+    },
+    {
+      "infra_revision": "7c869e67f697d6bbc81eb554711ab77e23cb7362",
+      "assembly_sha256": "a6176390bbe94ccf116c7429fbd238f387f80a6e30b4fdf685439b571a0f2d9e",
+      "scope": "Additive typed inference verification record fields; explicit historical static_only task policy and v6/v7 rejection guard; bounded frozen rendering corpus, not complete conversation replay"
     }
   ]
 }
