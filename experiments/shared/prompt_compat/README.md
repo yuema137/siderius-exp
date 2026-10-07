@@ -26,7 +26,7 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
   "$EXP_CHECKOUT/experiments/shared/prompt_compat"
 ```
 
-This installs planner compatibility 0.4.0 and prompt compatibility 0.1.0 as normal
+This installs planner compatibility 0.5.0 and prompt compatibility 0.2.0 as normal
 packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
@@ -36,6 +36,14 @@ consumer packages; reinstall them before using a historical profile.
 Copy the intended experiment's task package and experiment configuration into
 your external workspace, preserving relative paths. Keep archived files and old
 workspace locks unchanged. There are two separate choices:
+
+The v4 choices below reproduce the archived inputs used by the offline
+comparisons. If a new run will produce factual runtime-refusal records, use
+the corresponding v5 planner choice from
+[the paper runtime overlay](../planner_compat/profiles/paper-runtime-v5.json)
+instead; keep the task's `prompt_renderer` unchanged. The
+[v5 setup instructions](../planner_compat/README.md#historical-runtime-refusal-wording-v5)
+explain which copied configuration to update.
 
 | Experiment | Task manifest: `prompt_renderer` | LLM JSON: `tune.planner_strategy` |
 | --- | --- | --- |
@@ -145,3 +153,18 @@ It never executes their generated programs.
 without `--profile` or `--recovery-policy` for the reference. Omit both on the
 current revision to observe its preserved default: a third generation request,
 where replay stops because no saved reply exists.
+
+## Runtime-feedback candidate qualification
+
+Version 0.2.0 also declares the candidate infra assembly listed under
+`additional_assemblies` in `qualification.json`. This covers the added runtime
+feedback schema field; unknown assemblies still fail before rendering. The
+original qualified assembly remains supported. The package identity changes
+because its qualification source changes: use a new workspace and retain
+version 0.1.0 with its original exp revision for old workspace locks.
+
+For historical planner input produced by the new factual runtime feedback,
+select the explicit [runtime v5 planner provider](../planner_compat/README.md#historical-runtime-refusal-wording-v5)
+in addition to the task's prompt profile above. The raw record retains the
+new facts. This qualification does not change the repository's published infra
+pin or authorize public release.

@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "siderius @ git+https://github.com/yuema137/SIDERIUS.git@e800fc1f08b0e067fc21076a200f3f70d04b38b8",
     "torch==2.10.0",
-    "siderius-planner-compat==0.4.0",
+    "siderius-planner-compat==0.5.0",
 ]
 
 [dependency-groups]

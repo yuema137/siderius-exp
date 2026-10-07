@@ -1,0 +1,36 @@
+{
+  "provenance": {
+    "infra_revision": "d0f5b5bc0a2c1421f08353231f59aed4bbf6d6c1",
+    "producer": "ml_hyperparameter_tune_agent in-subprocess refusal",
+    "scope": "Synthetic admission input through the actual producer; not a historical scientific record"
+  },
+  "record": {
+    "exp_id": "synthetic_001",
+    "status": "skipped_time_risk",
+    "model_type": "synthetic",
+    "timestamp": "2026-10-06 21:28:38",
+    "file_index": 0,
+    "params": {},
+    "denoising_score": null,
+    "memory": {
+      "expert_advice_followed": "",
+      "hypothesis": "Bounded input",
+      "conclusion": "Rejected by IN-SUBPROCESS runtime verification after real setup: Insufficient observations",
+      "discovery": "admission stage=post_setup_runtime_verification; setup_cost_s=None; verification_cost_s=None; avoided_predicted_s=None",
+      "memory_update": "Runtime admission rejected this attempt (reason_code=verification_failed). A reliable runtime prediction was not established; this does not prove a budget overrun. Reported reason: Insufficient observations This rejection consumed an attempt after real setup, unlike pre-flight skips.",
+      "runtime_feedback_version": "facts-v1",
+      "time_mode": "trial",
+      "verification_stage": "in_subprocess",
+      "round_index": 1,
+      "attempt_in_round": 1
+    },
+    "runtime_verification": {
+      "admission": {
+        "decision": "rejected",
+        "stage": "post_setup_runtime_verification",
+        "reason_code": "verification_failed",
+        "reason": "Insufficient observations"
+      }
+    }
+  }
+}

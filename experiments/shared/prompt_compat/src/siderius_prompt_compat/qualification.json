@@ -1,5 +1,12 @@
 {
   "infra_revision": "2458cb2214d5857570c65bc043be9602be4bafc3",
   "assembly_sha256": "12f200f9c5dff5e4bbaea244669d3b697ff3ab2d6b4a7a4359a38a930cb4b277",
-  "scope": "Declared rendering and producer fixtures; no complete historical conversation claim"
+  "scope": "Declared rendering and producer fixtures; no complete historical conversation claim",
+  "additional_assemblies": [
+    {
+      "infra_revision": "d0f5b5bc0a2c1421f08353231f59aed4bbf6d6c1",
+      "assembly_sha256": "16695743626a4053ac32c0ce2edcafd75f5224947395e05747e7131eadd38706",
+      "scope": "Runtime feedback schema addition; frozen rendering fixtures must still match"
+    }
+  ]
 }

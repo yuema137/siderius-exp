@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "scope": "Explicit overlays for new historical-replay workspaces; retain each archived experiment configuration and source identity.",
+  "infra_assembly_sha256": "16695743626a4053ac32c0ce2edcafd75f5224947395e05747e7131eadd38706",
+  "required_packages": {
+    "siderius-planner-compat": "0.5.0",
+    "siderius-prompt-compat": "0.2.0"
+  },
+  "cases": {
+    "tess": {
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-early-v1"
+      },
+      "llm_config_overlay": {
+        "tune": {
+          "planner_strategy": "legacy-9b78d505cb11-paper-runtime-v5"
+        }
+      }
+    },
+    "ligo": {
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-early-v1"
+      },
+      "llm_config_overlay": {
+        "tune": {
+          "planner_strategy": "legacy-9b78d505cb11-paper-runtime-v5"
+        }
+      }
+    },
+    "project8": {
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-late-v1"
+      },
+      "llm_config_overlay": {
+        "tune": {
+          "planner_strategy": "legacy-9b78d505cb11-paper-late-runtime-v5"
+        }
+      }
+    },
+    "tidmad": {
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-tidmad-noprior-v1"
+      },
+      "llm_config_overlay": {
+        "tune": {
+          "planner_strategy": "legacy-9b78d505cb11-paper-runtime-v5"
+        }
+      }
+    },
+    "tidmad-analysis": {
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-analysis-c0467447-v1"
+      },
+      "llm_config_overlay": {
+        "tune": {
+          "planner_strategy": "legacy-9b78d505cb11-paper-late-runtime-v5"
+        }
+      },
+      "analysis_policy_overlay": {
+        "recovery_policy": {
+          "schema_version": 1,
+          "generated_program_retries": 0,
+          "plan_retries": 1
+        }
+      }
+    }
+  }
+}

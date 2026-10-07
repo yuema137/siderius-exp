@@ -259,3 +259,57 @@ message ends the capture; no model response or training follows.
 This verifies planner startup, supplemented by the existing later-round branch
 and history-format checks. Full interpret/propose/implement/analyze/reflect
 conversation replay is a separate follow-up; these checks do not claim it.
+
+## Historical runtime-refusal wording (v5)
+
+New infra runtime-refusal feedback distinguishes insufficient timing evidence
+from a measured budget excess. New experiments should retain those facts.
+For an explicit historical paper replay, the following providers restore the
+old refusal wording in the planner input only:
+
+- `legacy-9b78d505cb11-paper-runtime-v5`: the early paper configuration manual.
+- `legacy-9b78d505cb11-paper-late-runtime-v5`: the later paper configuration manual.
+
+These compose the existing v4 manual and v3/v2 record views. Set the chosen name
+as `tune.planner_strategy` in your **external project's** LLM configuration,
+and install this package in both the exp and selected infra environments using
+the installation procedure above. Preflight must resolve the same provider
+identity in both environments. Existing defaults and v1–v4 providers are
+unchanged; v5 is never selected automatically.
+
+Only records explicitly marked `memory.runtime_feedback_version="facts-v1"`
+and identified as in-subprocess runtime refusals are converted. Unknown
+versions or inconsistent admission/status fields fail visibly. Saved records
+retain the corrected facts, and historical records without the marker remain
+unchanged. This preserves presentation for supplied history; it does not
+restore incorrect execution decisions or promise identical new training runs.
+
+Select a new workspace when changing providers. Do not rewrite an old lock or
+resume an old workspace under the new identity. The repository's default infra
+pin remains the published qualified revision; candidate-infra checks use a
+separate explicit checkout until its release is selected. This package update
+does not publish or select a new infra revision.
+
+The exact per-task configuration overlays are saved in
+[paper-runtime-v5.json](profiles/paper-runtime-v5.json), including the separate
+TIDMAD NoPrior and analysis-on variants. Start from the verified archived
+experiment in a **new** workspace. Merge `task_composition_overlay` into its
+copied task YAML and `llm_config_overlay` into its copied LLM JSON, retaining
+the model, provider, budgets and other settings. Do not replace the entire
+`tune` object with the small overlay. For the analysis-on variant only, merge
+`analysis_policy_overlay` into the analysis-policy file referenced by that
+task. These overlays select presentation/retry compatibility; they do not
+import an archived workspace or reconstruct missing artifacts.
+
+To check the explicit new planner selection against a captured paper startup:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" -m siderius_planner_compat.startup_check \
+  --case ligo --model-plugin "$MODEL_PLUGIN" \
+  --planner-strategy legacy-9b78d505cb11-paper-runtime-v5
+```
+
+Use the matching `cases` entry for TESS, Project8 or TIDMAD. The check compares
+the resulting system/user hashes with the original capture and makes no API
+request. The `tidmad-analysis` entry has separate rendering and archived retry
+checks; it is not a fifth `startup_check --case` value.

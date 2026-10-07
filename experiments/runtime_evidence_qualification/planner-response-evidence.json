@@ -1,0 +1,160 @@
+{
+  "scope": "Two controlled current-planner response observations; not paper reproduction, training qualification, or a statistical efficacy test.",
+  "infra_revision": "d0f5b5bc0a2c1421f08353231f59aed4bbf6d6c1",
+  "exp_revision_at_probe": "183d7c8ff4b85aec8b5443d01279a76b89d657df",
+  "endpoint": "https://api.openai.com/v1",
+  "model": "gpt-5.6-sol",
+  "authorization": {
+    "max_requests_including_failures": 2,
+    "api_usd_cap": 2,
+    "wall_seconds_cap": 600,
+    "gpu_seconds_cap": 0,
+    "additional_retries": 0
+  },
+  "elapsed_seconds": 37.08404931798577,
+  "gpu_seconds": 0,
+  "conservative_debit_usd": "0.151720",
+  "pricing": {
+    "input_usd_per_million": 5,
+    "output_usd_per_million": 20,
+    "source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+    "method": "Conservative accounting including cache-write allowance; not an invoice. No cache discounts applied."
+  },
+  "cases": [
+    {
+      "case": "verification_failed",
+      "request_sha256": "7d3dfa91fc1d165e3c46f7384e419c98f5edc4c98847b0487ee7648bafebddbf",
+      "status": "settled",
+      "debit_usd": "0.070375",
+      "input_tokens": 10255,
+      "output_tokens": 955,
+      "plan_validation": "passed",
+      "response_sha256": "b10c534d9598643494c8783d9f25dad7cbcfe4eb30d9847af29ec6572fa796a5",
+      "plan_file_sha256": "4105cb5d75a6c397d84e39ceb5a837e88aa7dfb77f56f21b6987567c1c4db8e2",
+      "returned_model": "gpt-5.6-sol",
+      "service_tier": "default",
+      "plan": {
+        "model_type": "cadence_aligned_spectral_resnet",
+        "hypothesis": "If terminal-tail extraction and the learned cadence posterior are informative, physical-frequency alignment should outperform mean-like regression and produce a finite formal validation R-squared above the 0.35 refutation threshold; a result at or below 0.35 would indicate that cadence inference or the power-only representation is the dominant limitation rather than encoder capacity.",
+        "reasoning": "This final round uses mandatory formal evaluation and the approximately 119k-parameter baseline configuration recommended by the expert. The prior attempt produced no score and was rejected only because runtime prediction could not be stabilized, so it provides no evidence for changing the architecture or hyperparameters. The baseline directly tests valid-tail masking, dual-cadence physical-frequency alignment, and the shared spectral encoder while remaining well below the 500000-parameter ceiling. Batch size 32 is retained, and cooperative execution may use the available epoch budget while reserving time for full-scope scoring.",
+        "model_cfg": {
+          "segmentation_size": 1024,
+          "batch_size": 32,
+          "frequency_grid_bins": 512,
+          "frequency_grid_max_cpd": 24.0,
+          "cadence_gate_hidden_dim": 16,
+          "cadence_gate_temperature": 1.0,
+          "spectral_channels": 64,
+          "residual_blocks": 4,
+          "kernel_size": 5,
+          "dropout": 0.1,
+          "mlp_hidden_dim": 128
+        },
+        "train_cfg": {
+          "lr": 0.0003,
+          "epochs": 40,
+          "batch_size": 32,
+          "optimizer_type": "adamw",
+          "weight_decay": 1e-05,
+          "device": "cuda",
+          "checkpoint_selection": "last_completed_epoch",
+          "target_standardization": "none",
+          "drop_last": true
+        },
+        "loss_cfg": {
+          "loss_type": "smooth_l1",
+          "beta": 0.5,
+          "reduction": "mean"
+        },
+        "is_trial": false,
+        "trial_strategy": "snapshot",
+        "trial_portion": 1.0,
+        "target_files": [],
+        "train_portion": 1.0,
+        "eval_strategy": "snapshot",
+        "eval_portion": 1.0,
+        "train_validation_align": true,
+        "order_strategy": null,
+        "file_order": null
+      },
+      "declared_constraint_checks": {
+        "final_round_formal": "passed",
+        "role_epoch_cap_100": "passed",
+        "full_training_and_evaluation_scope": "passed"
+      },
+      "interpretation_review": "Correctly distinguishes insufficient timing evidence from a measured budget excess.",
+      "interpretation_review_method": "Implementing-agent inspection of the returned public hypothesis and reasoning fields; no independent judge or additional model call."
+    },
+    {
+      "case": "budget_exceeded",
+      "request_sha256": "2e73410266b9c45e3241fc70b1e0f81e70164e2c81719262a3674cce351d7253",
+      "status": "settled",
+      "debit_usd": "0.081345",
+      "input_tokens": 10205,
+      "output_tokens": 1516,
+      "plan_validation": "passed",
+      "response_sha256": "f425edb9a18f7ba3daed320f02f7e3b14d3b607738c58c35695b11957af0c365",
+      "plan_file_sha256": "ca40eaf0acde0d0ed6b72d889328bc093c8cdbbf2a609b15b1a56b42da3821e1",
+      "returned_model": "gpt-5.6-sol",
+      "service_tier": "default",
+      "plan": {
+        "model_type": "cadence_aligned_spectral_resnet",
+        "hypothesis": "The unchanged cadence-aligned representation with standardized targets will train without collapse and achieve a finite formal validation R-squared above the 0.35 refutation threshold. Halving the proposed epoch count should bring the initial workload below the prior 420-second forecast while cooperative execution can use remaining budget for additional complete epochs.",
+        "reasoning": "This final-round formal run preserves the expert-recommended approximately 119k-parameter baseline architecture and its full 512-bin physical-frequency representation, since no completed experiment justifies changing padding logic, cadence gating, or encoder capacity. The previous baseline-like attempt was rejected because its predicted 420-second runtime exceeded the 300-second budget, so the proposed horizon is reduced from 40 to 20 epochs while retaining batch size 32. Global target standardization should stabilize regression against the concentrated target distribution and rare extremes, while Smooth L1 with beta 0.5 limits their influence. Best-validation-loss checkpoint selection protects against degradation if validation loss turns upward.",
+        "model_cfg": {
+          "segmentation_size": 1024,
+          "batch_size": 32,
+          "frequency_grid_bins": 512,
+          "frequency_grid_max_cpd": 24.0,
+          "cadence_gate_hidden_dim": 16,
+          "cadence_gate_temperature": 1.0,
+          "spectral_channels": 64,
+          "residual_blocks": 4,
+          "kernel_size": 5,
+          "dropout": 0.1,
+          "mlp_hidden_dim": 128
+        },
+        "train_cfg": {
+          "lr": 0.0003,
+          "epochs": 20,
+          "batch_size": 32,
+          "optimizer_type": "adamw",
+          "weight_decay": 1e-05,
+          "device": "cuda",
+          "checkpoint_selection": "best_validation_loss",
+          "target_standardization": "training_pool_global",
+          "drop_last": true
+        },
+        "loss_cfg": {
+          "loss_type": "smooth_l1",
+          "beta": 0.5,
+          "reduction": "mean"
+        },
+        "is_trial": false,
+        "trial_strategy": "snapshot",
+        "trial_portion": 1.0,
+        "target_files": [],
+        "train_portion": 1.0,
+        "eval_strategy": "snapshot",
+        "eval_portion": 1.0,
+        "train_validation_align": true,
+        "order_strategy": null,
+        "file_order": null
+      },
+      "declared_constraint_checks": {
+        "final_round_formal": "passed",
+        "role_epoch_cap_100": "passed",
+        "full_training_and_evaluation_scope": "passed"
+      },
+      "interpretation_review": "Correctly distinguishes insufficient timing evidence from a measured budget excess.",
+      "interpretation_review_method": "Implementing-agent inspection of the returned public hypothesis and reasoning fields; no independent judge or additional model call."
+    }
+  ],
+  "limitations": [
+    "One response per cause cannot establish reliability or a causal improvement over the previous prompt.",
+    "No returned plan was trained. Runtime, VRAM, scientific score, and downstream admission were not evaluated.",
+    "Cooperative execution can exceed proposed epochs within its role cap and budget. Reducing proposed epochs does not guarantee a shorter executed workload.",
+    "The budget-excess response also changes checkpoint selection and target standardization; this is not a controlled single-parameter training comparison.",
+    "The supplied refusal histories are synthetic, while the TESS task and model context come from the captured startup fixture."
+  ]
+}

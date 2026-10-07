@@ -1,0 +1,275 @@
+{
+  "baseline_revision": "e800fc1f08b0e067fc21076a200f3f70d04b38b8",
+  "candidate_revision": "7c3b4031a6930f5fe753a88dfccc07e6abc1b727",
+  "scope": "Same archived paper rates and physical durations on pre-PR versus candidate verifier; not original execution replay",
+  "rows": 929,
+  "tasks": {
+    "TESS": 134,
+    "LIGO": 107,
+    "Project 8": 75,
+    "TIDMAD": 613
+  },
+  "baseline_verified": 860,
+  "candidate_verified": 868,
+  "changes": [
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_001/iteration_001/cadence_aligned_spectral_resnet/configs/iter_001/runtime_verification_cadence_aligned_spectral_resnet_iter_001_002.json",
+        "phase": "training",
+        "source_sha256": "abe701d3be4da1516699895d7d06d8adfab796a2bc714a357579c3a8788684ad",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 235,
+        "retained_observations": 51,
+        "median": 3.720296546816826
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 118,
+        "retained_observations": 100,
+        "median": 4.926925990730524,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_001/iteration_001/cadence_aligned_spectral_resnet/configs/iter_001/runtime_verification_cadence_aligned_spectral_resnet_iter_001_004.json",
+        "phase": "training",
+        "source_sha256": "bb6534b944fdddb36d5bbcd064ab1f6300969eb0a03d5090212adf363751e898",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 215,
+        "retained_observations": 215,
+        "median": 6.317898631095886
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 124,
+        "retained_observations": 100,
+        "median": 6.418051198124886,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_004/iteration_004/cadence_multitaper_expert_resnet/configs/iter_004/runtime_verification_cadence_multitaper_expert_resnet_iter_004_002.json",
+        "phase": "training",
+        "source_sha256": "ea80e873c27f71a9858017fba91794a7c6fefb7f38beb0e3f5d6211663fca594",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 200,
+        "retained_observations": 200,
+        "median": 8.651765994727612
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 161,
+        "retained_observations": 100,
+        "median": 8.611530531197786,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_005/iteration_005/cadence_metric_aligned_expert_resnet/configs/iter_005/runtime_verification_cadence_metric_aligned_expert_resnet_iter_005_003.json",
+        "phase": "training",
+        "source_sha256": "350cdf6aaad51bfdebecb9be7f4648830c00c3aab4d1de64c84ffe9ff5c1250d",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 208,
+        "retained_observations": 57,
+        "median": 7.0929136127233505
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 161,
+        "retained_observations": 100,
+        "median": 7.072840817272663,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_005/iteration_005/cadence_metric_aligned_expert_resnet/configs/iter_005/runtime_verification_cadence_metric_aligned_expert_resnet_iter_005_004.json",
+        "phase": "training",
+        "source_sha256": "6eaee3d6800dff83fb67821cf403c9990a853be75623a64993f5e9a9ae2862fe",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 242,
+        "retained_observations": 242,
+        "median": 5.649505648761988
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 142,
+        "retained_observations": 100,
+        "median": 6.129596848040819,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_005/iteration_005/cadence_metric_aligned_expert_resnet/configs/iter_005/runtime_verification_cadence_metric_aligned_expert_resnet_iter_005_005.json",
+        "phase": "training",
+        "source_sha256": "80b31a22c95826db2572df0cebda1adf792211c7db9bc9444ea7dd6532ff430b",
+        "archived_state": "verified"
+      },
+      "before": {
+        "state": "verified",
+        "used_observations": 234,
+        "retained_observations": 79,
+        "median": 6.147010251879692
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 146,
+        "retained_observations": 100,
+        "median": 6.892498582601547,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_007/iteration_007/cadence_metric_query_pool_resnet/configs/iter_007/runtime_verification_cadence_metric_query_pool_resnet_iter_007_002.json",
+        "phase": "training",
+        "source_sha256": "b3b176ef32d36b2578850ad71ba180cde6b097126b4a53cae8a13bb3819bab6c",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 200,
+        "retained_observations": 200,
+        "median": 5.128549411892891
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 109,
+        "retained_observations": 100,
+        "median": 5.228089168667793,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/configs/iter_008/runtime_verification_cadence_disagreement_calibrated_expert_resnet_iter_008_004.json",
+        "phase": "training",
+        "source_sha256": "e0cbcf432492fe1ccd133f1e197f5a999cbc0b4ad6003cc9b9616ab95c54273e",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 240,
+        "retained_observations": 240,
+        "median": 3.966021817177534
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 100,
+        "retained_observations": 100,
+        "median": 4.038289654999971,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TESS",
+        "run_id": "nop_004",
+        "file": "workspace/iter_008/iteration_008/cadence_disagreement_calibrated_expert_resnet/configs/iter_008/runtime_verification_cadence_disagreement_calibrated_expert_resnet_iter_008_005.json",
+        "phase": "training",
+        "source_sha256": "5c111c508ae15017f9f0bc75dd8bd24dbf9e7ac7171c14e276e094f4a8810ffe",
+        "archived_state": "failed_no_steady_state"
+      },
+      "before": {
+        "state": "failed_no_steady_state",
+        "used_observations": 169,
+        "retained_observations": 26,
+        "median": 4.008662886917591
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 118,
+        "retained_observations": 100,
+        "median": 4.055592697113752,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TIDMAD",
+        "run_id": "workflow_noprior:4-9",
+        "file": "workspace/iter_006/iteration_006/bidirectional_stabilized_dilated_tcn/configs/iter_006/runtime_verification_bidirectional_stabilized_dilated_tcn_iter_006_002.json",
+        "phase": "validation",
+        "source_sha256": "c1df4ede0a64ba8913498365d7cf781bf7a8de2a46dcb798330e37611e9ab50f",
+        "archived_state": "verified"
+      },
+      "before": {
+        "state": "verified",
+        "used_observations": 196,
+        "retained_observations": 103,
+        "median": 1.8833120120689273
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 103,
+        "retained_observations": 100,
+        "median": 1.8822042475221679,
+        "reason": null
+      }
+    },
+    {
+      "source": {
+        "task": "TIDMAD",
+        "run_id": "workflow_analysis_on:0-3",
+        "file": "workspace/iter_004/iteration_004/wholeband_fc_regression_probe/configs/iter_004/runtime_verification_wholeband_fc_regression_probe_iter_004_002.json",
+        "phase": "training",
+        "source_sha256": "f7c0d32d664b943fc59c324033d7ce786f6a3101ebbad6dd7ac69ec385804b21",
+        "archived_state": "verified"
+      },
+      "before": {
+        "state": "verified",
+        "used_observations": 224,
+        "retained_observations": 115,
+        "median": 4.3244789994787425
+      },
+      "after": {
+        "state": "verified",
+        "used_observations": 119,
+        "retained_observations": 100,
+        "median": 4.289248012355529,
+        "reason": null
+      }
+    }
+  ],
+  "baseline_verified_candidate_refused": [],
+  "implicit_physical_duration_rows": 0,
+  "source_result_sha256": {
+    "567-paper-runtime-baseline.json": "b4b47e13910f3bd04f28812ee785653a0eb4f07ac99145685175aca19960dcde",
+    "567-paper-runtime-candidate.json": "18ebcf22b183dd847312e391eab15ee909ce1f6df44ff4401463653bffc8baae"
+  }
+}

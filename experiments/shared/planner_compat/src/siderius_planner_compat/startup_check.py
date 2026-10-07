@@ -17,9 +17,13 @@ from pathlib import Path
 from pydantic import ConfigDict
 
 
-def check(case_name: str, model_plugin: Path) -> dict:
+def check(
+    case_name: str, model_plugin: Path, *, planner_strategy: str | None = None
+) -> dict:
     def forbidden(*args, **kwargs):
-        raise AssertionError("No network or scoring is permitted in offline startup checks")
+        raise AssertionError(
+            "No network or scoring is permitted in offline startup checks"
+        )
 
     socket.socket.connect = forbidden
     socket.create_connection = forbidden
@@ -41,16 +45,25 @@ def check(case_name: str, model_plugin: Path) -> dict:
             return forbidden()
 
     fixture_bytes = (
-        files("siderius_planner_compat").joinpath("fixtures/paper_task_startups.json").read_bytes()
+        files("siderius_planner_compat")
+        .joinpath("fixtures/paper_task_startups.json")
+        .read_bytes()
     )
     case = json.loads(fixture_bytes)["cases"][case_name]
-    if hashlib.sha256(model_plugin.read_bytes()).hexdigest() != case["model_source_sha256"]:
+    if (
+        hashlib.sha256(model_plugin.read_bytes()).hexdigest()
+        != case["model_source_sha256"]
+    ):
         raise ValueError("Model source does not match the archived startup")
     if register_model_in_memory(str(model_plugin)) != case["model_type"]:
         raise ValueError("Model registered under an unexpected identity")
     arguments = case["arguments"]
+    if planner_strategy is not None:
+        arguments["planner_strategy"] = planner_strategy
     arguments["task_render"] = TunerTaskRender.model_validate(arguments["task_render"])
-    arguments["timing_context"] = PlannerTimingContext.model_validate(arguments["timing_context"])
+    arguments["timing_context"] = PlannerTimingContext.model_validate(
+        arguments["timing_context"]
+    )
     arguments["custom_loss_inventory"] = CustomLossInventory.model_validate(
         arguments["custom_loss_inventory"]
     )
@@ -74,6 +87,7 @@ def check(case_name: str, model_plugin: Path) -> dict:
         raise AssertionError(f"Historical startup prompt changed: {case_name}")
     return {
         "case": case_name,
+        "planner_strategy": arguments["planner_strategy"],
         "reference_infra_revision": case["reference_infra_revision"],
         "fixture_sha256": hashlib.sha256(fixture_bytes).hexdigest(),
         "message_sha256": actual,
@@ -85,7 +99,22 @@ def check(case_name: str, model_plugin: Path) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--case", required=True, choices=("tess", "ligo", "project8", "tidmad"))
+    parser.add_argument(
+        "--case", required=True, choices=("tess", "ligo", "project8", "tidmad")
+    )
     parser.add_argument("--model-plugin", required=True, type=Path)
+    parser.add_argument(
+        "--planner-strategy",
+        help="Explicit provider to compare with the historical messages",
+    )
     args = parser.parse_args()
-    print(json.dumps(check(args.case, args.model_plugin.resolve()), indent=2))
+    print(
+        json.dumps(
+            check(
+                args.case,
+                args.model_plugin.resolve(),
+                planner_strategy=args.planner_strategy,
+            ),
+            indent=2,
+        )
+    )

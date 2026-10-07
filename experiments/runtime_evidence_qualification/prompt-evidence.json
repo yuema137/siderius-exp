@@ -1,0 +1,712 @@
+{
+  "infra_revision": "7c3b4031a6930f5fe753a88dfccc07e6abc1b727",
+  "api_calls": 0,
+  "scope": "Declared rendering/producer boundaries; not complete conversation replay",
+  "results": [
+    {
+      "case": "analysis-plan",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "8ac787d62285bbabcb79571b475cf5b832de3ebc2009cffb96fcfa58d29e0f40",
+        "user": "be4e6be4a3ff5faeaf7043bcc5c07d424d2282d602479467b936040cd9a74f12"
+      },
+      "candidate_messages": {
+        "system": "8ac787d62285bbabcb79571b475cf5b832de3ebc2009cffb96fcfa58d29e0f40",
+        "user": "be4e6be4a3ff5faeaf7043bcc5c07d424d2282d602479467b936040cd9a74f12"
+      },
+      "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+      "reference_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "reference_request_sha256": "87eeb39f2f3a2751343325362afc7860a272aea985e3b16328e5929e8ee51eb9"
+    },
+    {
+      "case": "analysis-selection",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4afca03908af1467d3fde189f7b85b3231dd0ec64e534ef7e7d4fca16b416b6c",
+        "user": "ca4544c05047c2fb7c548319849a5efffea5475dd411f7def3d410bd9f6cf357"
+      },
+      "candidate_messages": {
+        "system": "4afca03908af1467d3fde189f7b85b3231dd0ec64e534ef7e7d4fca16b416b6c",
+        "user": "ca4544c05047c2fb7c548319849a5efffea5475dd411f7def3d410bd9f6cf357"
+      },
+      "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+      "reference_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "reference_request_sha256": "bd19d574edb0357252fbd886a2237dbce968805ad66e962e418b8807573ff4fc"
+    },
+    {
+      "case": "analysis-synthesis",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "d336ac508e1b89b70c7bd7c7fd102c0340051a21b0624efc249ccea8082021e7",
+        "user": "62e34de3de5792f7152f30681bdd682966f790d6565b07b9b4738cefb7fa0a3c"
+      },
+      "candidate_messages": {
+        "system": "d336ac508e1b89b70c7bd7c7fd102c0340051a21b0624efc249ccea8082021e7",
+        "user": "62e34de3de5792f7152f30681bdd682966f790d6565b07b9b4738cefb7fa0a3c"
+      },
+      "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+      "reference_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "reference_request_sha256": "2e3ebb9289ed3bddffac6963df44362116b0cfa08540845312b8fb93ab279845"
+    },
+    {
+      "case": "ligo-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "5be1aee9aff52c0a161651057547a40dfadd6fa93fc0434fed960ec4ef346883"
+      },
+      "candidate_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "5be1aee9aff52c0a161651057547a40dfadd6fa93fc0434fed960ec4ef346883"
+      },
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "73e3286823ac90624ae888d94432f87eea3b6bc963641b1f69236f4f9000d219"
+    },
+    {
+      "case": "ligo-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7c8f77dc8d19d521150994cfe9238dcff9358a248776d7769b316879a75d2ede",
+        "user": "95c0b5bc19d8ba0d289c207d04ec23991154f81973caa4722a89c11401cf05be"
+      },
+      "candidate_messages": {
+        "system": "7c8f77dc8d19d521150994cfe9238dcff9358a248776d7769b316879a75d2ede",
+        "user": "95c0b5bc19d8ba0d289c207d04ec23991154f81973caa4722a89c11401cf05be"
+      },
+      "scope": "reconstructed first proposal context; no claim of archived complete request",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b"
+    },
+    {
+      "case": "ligo-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ae38d41a1a65068e189027584cc522c8ee4d35d8f9adabcfa78fa8759accc19f",
+        "user": "60ac960b42c941a64d9e9250158c3166438b4c55ddb46b940b6033efa8b8cef6"
+      },
+      "candidate_messages": {
+        "system": "ae38d41a1a65068e189027584cc522c8ee4d35d8f9adabcfa78fa8759accc19f",
+        "user": "60ac960b42c941a64d9e9250158c3166438b4c55ddb46b940b6033efa8b8cef6"
+      },
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "7de9e56f7b84c1560946afba6af77f949a09c6dfcfc9ea60baeca5db1a9b364a"
+    },
+    {
+      "case": "ligo-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "2db21abf58daa1ec58184768b848836e352bbd0865f0938862677501cea67319",
+        "user": "058c699ccbb91de689d88f718d0db98c1b01aed5cd684e61b4b39e99e6d5120d"
+      },
+      "candidate_messages": {
+        "system": "2db21abf58daa1ec58184768b848836e352bbd0865f0938862677501cea67319",
+        "user": "058c699ccbb91de689d88f718d0db98c1b01aed5cd684e61b4b39e99e6d5120d"
+      },
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "660d971cce88d06a709a0397b90ff0946727ed98fe1fba258e631117f0a56ce6"
+    },
+    {
+      "case": "ligo-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "6be87e4a4d3a91303bf9398f9b026746d5833f50f68e8ef3e2f05806a246bff1"
+    },
+    {
+      "case": "ligo-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "4d06f2bf66cc7929b27180f25605686321cfec299e8c924c11b06bdd11b5e77f"
+    },
+    {
+      "case": "ligo-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "b6d74b2218eeeb56f0800c120c018a763713907ef51317c42a46d86199824781"
+    },
+    {
+      "case": "ligo-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "14d517a284356566a80ed5e19137a898214b2051c7ab9bdd7ad12d22a1bc33a8"
+    },
+    {
+      "case": "ligo-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "202162ca80c8dbaf1267bb82b7746dc527e686360ed1d112266cb31b9a369990"
+    },
+    {
+      "case": "ligo-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "f838356da16da7f8fcf046c3340b20093afb418f10dcab7e9dc3d73961005bd8"
+    },
+    {
+      "case": "ligo-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "reference_request_sha256": "8e22c04466d84e9092143c51ba1b9c52c15bdd9d60c0db5670a496fdb9e6dc1d"
+    },
+    {
+      "case": "project8-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "e9b3dea28efa9d7c14580e3708cdbf994b2ed1586b41a1def3ca3f71db9449c8",
+        "user": "781a112b043197a073f7adfe8a3cf989bc78beb46d88b71b8534b54155d0f34a"
+      },
+      "candidate_messages": {
+        "system": "e9b3dea28efa9d7c14580e3708cdbf994b2ed1586b41a1def3ca3f71db9449c8",
+        "user": "781a112b043197a073f7adfe8a3cf989bc78beb46d88b71b8534b54155d0f34a"
+      },
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "3f54dd37ad8785432f906dcd81c447a3a5dcbc5e2e024fcb6c0035c55b1b411d"
+    },
+    {
+      "case": "project8-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "28ba8c052032c7ff35577116ca1072543620b07e145efc53738f196c030b7d0a",
+        "user": "44a594b7e36f26d4c5d7b0bb25a57d291e3c76242c69e7dbfd72b8e9899e6303"
+      },
+      "candidate_messages": {
+        "system": "28ba8c052032c7ff35577116ca1072543620b07e145efc53738f196c030b7d0a",
+        "user": "44a594b7e36f26d4c5d7b0bb25a57d291e3c76242c69e7dbfd72b8e9899e6303"
+      },
+      "scope": "reconstructed first proposal context; no claim of archived complete request",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78"
+    },
+    {
+      "case": "project8-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ac87c12a9432ea537a52768ecdedada3766b4eb90b445de088e6043f0f23a136",
+        "user": "649c414e9df2c2bd83e5a01c4e68d38206b7c0823aca2cd083c49e3950fbf5d2"
+      },
+      "candidate_messages": {
+        "system": "ac87c12a9432ea537a52768ecdedada3766b4eb90b445de088e6043f0f23a136",
+        "user": "649c414e9df2c2bd83e5a01c4e68d38206b7c0823aca2cd083c49e3950fbf5d2"
+      },
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "3e84a71a01235ab26f9b01478d6060e77a2bfbb1f7951205b1fa5afd47483ae4"
+    },
+    {
+      "case": "project8-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1a9b369cba5e99b5961bd756a1236da3704a0b48b2b0e3eb5e5113cbd2e37251",
+        "user": "a4578e328fc3848da0f1ee822444dd9be9109fec428c104fd80cc61c15fc660a"
+      },
+      "candidate_messages": {
+        "system": "1a9b369cba5e99b5961bd756a1236da3704a0b48b2b0e3eb5e5113cbd2e37251",
+        "user": "a4578e328fc3848da0f1ee822444dd9be9109fec428c104fd80cc61c15fc660a"
+      },
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "9512d0943ee5d35af9df987a017d1ef3b19ab79fb1670f1933628293dfac76d2"
+    },
+    {
+      "case": "project8-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "9ba90811bfeeb6ef688f0a314192f81c21c1b05479b33d0c5de40a30f313ffdf",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "9ba90811bfeeb6ef688f0a314192f81c21c1b05479b33d0c5de40a30f313ffdf",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "d6f0bb33f70e61f866489dd137f1d2d6e060918d806cb09257e35f92528f4dfb"
+    },
+    {
+      "case": "project8-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "0bfc050f1dcd20889023acdcafef8b44a77ba1a86bb032c6485e99b866c24a80",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "0bfc050f1dcd20889023acdcafef8b44a77ba1a86bb032c6485e99b866c24a80",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "7ff60fd7d03d583f7da9a260283230942f83f59da626583ceb68ba718e29c3dd"
+    },
+    {
+      "case": "project8-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1b206529f52b6d8daacf2a3efddb6eab36ad9e07d5d1d477ce095ab284f02f6a",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1b206529f52b6d8daacf2a3efddb6eab36ad9e07d5d1d477ce095ab284f02f6a",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "031692b2e0891dc71bd88a0f5f7a72fe7be82d1bb2d6d93f76fdda10ceb9fa62"
+    },
+    {
+      "case": "project8-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "b88a89a57e48ba777ec6b88ade93b80237900d3cc99c34bd588404896173ef96",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "b88a89a57e48ba777ec6b88ade93b80237900d3cc99c34bd588404896173ef96",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "d841b8019b49ce969a0fc5e58d421bc1a984391d8d4e4d37d764f447efc9af86"
+    },
+    {
+      "case": "project8-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "f5417d430eab2bbad1f0c94b12c8e5a190d96191570906cf5d8690c405f3ced8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "f5417d430eab2bbad1f0c94b12c8e5a190d96191570906cf5d8690c405f3ced8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "777f554a8818b682f81a23f716e11003837cb17fb317064fbfab9ab29e9b583e"
+    },
+    {
+      "case": "project8-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "b81d4ab38463cfc9d8ff675223829311b03081e1930d43b84470c9a8695dc957",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "b81d4ab38463cfc9d8ff675223829311b03081e1930d43b84470c9a8695dc957",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "cf44aa521ccedbac0acb0c0e6a9b6d915555b832df36832f548d91ebd2636ea9"
+    },
+    {
+      "case": "project8-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "2e96db47126d24f9fe8e1df4698b29fd7c022723502cb876eec3d7ac88ffbd52",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "2e96db47126d24f9fe8e1df4698b29fd7c022723502cb876eec3d7ac88ffbd52",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "reference_request_sha256": "6b4219a237cd02e975a128cb0a80301b2fd1f74b8ae52116d9ce6fa2c3194def"
+    },
+    {
+      "case": "tess-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "366eab1fad07bf5f9981c2908dcced8c33ceb24a01c2fac422b4ab7115fa2e02"
+      },
+      "candidate_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "366eab1fad07bf5f9981c2908dcced8c33ceb24a01c2fac422b4ab7115fa2e02"
+      },
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "d870fbe83e53443fb85fe258e371de147431440206eacee55f5bdced5007ab1d"
+    },
+    {
+      "case": "tess-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "5bc325ed430b5ff1e9e9441da1c1a06a0a70a45251b2f434f5eb68c2abf742be",
+        "user": "fc06d762857ae21e037198d54f65ed8e992a19ab9b391071b37d641ac3d7c695"
+      },
+      "candidate_messages": {
+        "system": "5bc325ed430b5ff1e9e9441da1c1a06a0a70a45251b2f434f5eb68c2abf742be",
+        "user": "fc06d762857ae21e037198d54f65ed8e992a19ab9b391071b37d641ac3d7c695"
+      },
+      "scope": "reconstructed first proposal context; no claim of archived complete request",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d"
+    },
+    {
+      "case": "tess-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "991999b7e426b570e6d4ae716b56b7132c7fab55b8d88dd29445ce3305860566",
+        "user": "2cd37bd873e577b69cf439cb3d2e52407b3553c342e2c21bb7105dea6cc3b513"
+      },
+      "candidate_messages": {
+        "system": "991999b7e426b570e6d4ae716b56b7132c7fab55b8d88dd29445ce3305860566",
+        "user": "2cd37bd873e577b69cf439cb3d2e52407b3553c342e2c21bb7105dea6cc3b513"
+      },
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "95b2c66e7c0c86ed2c63e5b448c68f02991f28ee7b7f0f5e34ef3cc3d8c1a990"
+    },
+    {
+      "case": "tess-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4aed3e6b47268d057a03d8bd38937de8c0b3e971992c5c8179f12f2a2cb0648c",
+        "user": "ec271fa01b304ee9fe376339aa57c11a4808be4b4b685a222a84f1bb0a914d89"
+      },
+      "candidate_messages": {
+        "system": "4aed3e6b47268d057a03d8bd38937de8c0b3e971992c5c8179f12f2a2cb0648c",
+        "user": "ec271fa01b304ee9fe376339aa57c11a4808be4b4b685a222a84f1bb0a914d89"
+      },
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "3dc1d29c698591e7336f64a374638a2c3561587deee914d3e9358199a504dd35"
+    },
+    {
+      "case": "tess-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "7e48d10e6ccbe4fca33566332e711b404852f64f7a0659aab0134098a5ebf31b"
+    },
+    {
+      "case": "tess-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "26a9e42bca59c5cc6c8c590dcb2a46ead42225e00cb0d994d84d405fc851e5a3"
+    },
+    {
+      "case": "tess-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "c5db70e288b6a55cf3d73755e3e9583f54d3b7c717601c1a3471f33b27eea3c8"
+    },
+    {
+      "case": "tess-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "129d44ff8bdebe52396f065f999c1701e97820e012436a9c501e803d50b926fb"
+    },
+    {
+      "case": "tess-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "2dd400ed1c4062bda953e11c89f1c22dc5f868a96ac0c72eb85649eed5acc8ab"
+    },
+    {
+      "case": "tess-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "5b624272bf8ae7de0b39c28361c781ffd7c11c7094ee81332492b008e2cecaf4"
+    },
+    {
+      "case": "tess-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "reference_request_sha256": "690d7f27dab42870d2100560622b0ea03833d16a7bd430c52d7f1b26405db951"
+    },
+    {
+      "case": "tidmad-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "9b002b60413691adeceb9dcd228c447f8e9c1106e31dcab19345917ea63b496f",
+        "user": "1b93c7d5d9137ad6f32fa6adcd6edeae8e8679a8378ef340fceae0f7051c2a0b"
+      },
+      "candidate_messages": {
+        "system": "9b002b60413691adeceb9dcd228c447f8e9c1106e31dcab19345917ea63b496f",
+        "user": "1b93c7d5d9137ad6f32fa6adcd6edeae8e8679a8378ef340fceae0f7051c2a0b"
+      },
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "4664428659bb6c327687e24fa3ce2f145f5d0e3d3608ae3e3bec640cef5ff21e"
+    },
+    {
+      "case": "tidmad-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "737311dbbffcb024cd77ed3368904094b2cfb86dc1b41bed394bc26c6cc26c1e",
+        "user": "163bff71db83231cc2055903994bdb258cbddb7fdd33ae969acba9e82d5b9aec"
+      },
+      "candidate_messages": {
+        "system": "737311dbbffcb024cd77ed3368904094b2cfb86dc1b41bed394bc26c6cc26c1e",
+        "user": "163bff71db83231cc2055903994bdb258cbddb7fdd33ae969acba9e82d5b9aec"
+      },
+      "scope": "reconstructed first proposal context; no complete archived request claim",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5"
+    },
+    {
+      "case": "tidmad-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "116becfdd7ee4ce84e8afaed00d33e944b045727fff11017a510d917f32dcfa8",
+        "user": "7c2f982dd69985986e10036693f1ac059ddb477b58e63715a93a6d1f5b0f675a"
+      },
+      "candidate_messages": {
+        "system": "116becfdd7ee4ce84e8afaed00d33e944b045727fff11017a510d917f32dcfa8",
+        "user": "7c2f982dd69985986e10036693f1ac059ddb477b58e63715a93a6d1f5b0f675a"
+      },
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "bddbe47593195f08a471ef4b5cf0cb0a6c4365d952bf355ccacb1f705eb53ec4"
+    },
+    {
+      "case": "tidmad-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "c9bf80efbbf4524ac60fc3970e041a8ad32f7ec95c0aba6b2a67f4d1733c61cb",
+        "user": "d93ed26b10bb91c80e96a65733fc13ff54eaae86cb28183f1e28842f5275801a"
+      },
+      "candidate_messages": {
+        "system": "c9bf80efbbf4524ac60fc3970e041a8ad32f7ec95c0aba6b2a67f4d1733c61cb",
+        "user": "d93ed26b10bb91c80e96a65733fc13ff54eaae86cb28183f1e28842f5275801a"
+      },
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "d6851e1cb7c6caa80a138f2d5dbb74cfbc27bdcaac611c0f78dd8e59e290265e"
+    },
+    {
+      "case": "tidmad-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "56da615f3a4f9467387bc94a626d752a36340e712c28003f8a22a3c846b36d3a"
+    },
+    {
+      "case": "tidmad-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "3bc3c9294420dee3e841a49825b4ab81da172b532e2c42a1119bd1c48876ab75"
+    },
+    {
+      "case": "tidmad-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "bc4429af454fcecb771e5f31fb348ede8aeab0b0da2ea20089af782ef1cd2ff2"
+    },
+    {
+      "case": "tidmad-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "89635a2b38782235a21a2be0ca136b504a0a2dbe4acfb14056ce12d368109a4f"
+    },
+    {
+      "case": "tidmad-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "ab48b63a76083f71aa33f2116c6e061a5ed068dec5dc0bad8740172c49e31281"
+    },
+    {
+      "case": "tidmad-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "748af5ff998cf875714f94e48652804b24a8af5deaf7330a4b61a1e706e597fd"
+    },
+    {
+      "case": "tidmad-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "reference_request_sha256": "acd8f142afae5410412257e967aaf2b6f4a42329c167607a24a1066d7f88878f"
+    }
+  ]
+}

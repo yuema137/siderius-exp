@@ -1,0 +1,38 @@
+[
+  {
+    "case": "tess",
+    "exit_code": 0,
+    "model_source_sha256": "6df78087f83fa46ffee1e17d319ef91cc24ee5623774e305b386b5ac51bcd799",
+    "expected_message_sha256": {
+      "system": "4bd6119c979afcd470013e6c3fc2db5a25d5b7bfeeffb0891b9907a48b14ced0",
+      "user": "39ca1c956e72fd37c433c5d88ad3df9d3c120f5ac5beeb7e5fb517ad47251625"
+    }
+  },
+  {
+    "case": "ligo",
+    "exit_code": 0,
+    "model_source_sha256": "9df1e16d8bd36814b70148f2c1ea857102765bf3907962aac8c2143ded5220ba",
+    "expected_message_sha256": {
+      "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+      "user": "337e6f7d697bfe0ff6803ce5144365563cde9da3c700079e573f070a2f84d646"
+    }
+  },
+  {
+    "case": "project8",
+    "exit_code": 0,
+    "model_source_sha256": "d1459d0a704cc31c518dbeb7c31e65427d191517a8c656c5d7fb898a6f281326",
+    "expected_message_sha256": {
+      "system": "b2abecd0315f2f3a0e3beebebfbb3431629123465418da550f69635910861aef",
+      "user": "516f520d1b2f181ef3e35478a91aa0e6748d5f5761416256f504840c3afbc9cd"
+    }
+  },
+  {
+    "case": "tidmad",
+    "exit_code": 0,
+    "model_source_sha256": "dee04c968956def15c4e02899bd347840e812cc2a00e6db1d94f4d113984313c",
+    "expected_message_sha256": {
+      "system": "d59f2d173ad44f205083d5414acbcb3ea1f0e29bbf1767b4ba24aa94f76c73fd",
+      "user": "3ed12413a37d9546ec36f13ce198bc22336dd54be6eac55f27d2e9b496603bbd"
+    }
+  }
+]

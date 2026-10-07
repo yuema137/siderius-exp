@@ -1,0 +1,57 @@
+{
+  "infra_revision": "7c3b4031a6930f5fe753a88dfccc07e6abc1b727",
+  "old_provider_count": 6,
+  "existing_equal": true,
+  "historical_providers": {
+    "legacy-691617f04b42-v1": {
+      "name": "legacy-691617f04b42-v1",
+      "version": "1",
+      "content_sha256": "b6b4877e55d4a6b53e047b15e2d29d0f32fc3c0757cf8d06bc352dd5a292b1f1",
+      "assembly_sha256": null
+    },
+    "legacy-9b78d505cb11-attempt-role-v3": {
+      "name": "legacy-9b78d505cb11-attempt-role-v3",
+      "version": "3",
+      "content_sha256": "c2813bc4d74f393ff4fc03c749bd2eb34df0f9a0abeb709bcd55a45b53c8c3c0",
+      "assembly_sha256": null
+    },
+    "legacy-9b78d505cb11-ordering-v2": {
+      "name": "legacy-9b78d505cb11-ordering-v2",
+      "version": "2",
+      "content_sha256": "b1d785f0fa344f6638f63d40345675e717140d37763066d83432e3ddd5731141",
+      "assembly_sha256": null
+    },
+    "legacy-9b78d505cb11-paper-late-v4": {
+      "name": "legacy-9b78d505cb11-paper-late-v4",
+      "version": "4",
+      "content_sha256": "0f1572c2d80e952989a89ce237614396f9159fef5dde213ba9e53e6c77ffefdf",
+      "assembly_sha256": null
+    },
+    "legacy-9b78d505cb11-paper-v4": {
+      "name": "legacy-9b78d505cb11-paper-v4",
+      "version": "4",
+      "content_sha256": "9eec68681e7547249a8b398fec008016fae08e65a38b0377fead3e12c06bb101",
+      "assembly_sha256": null
+    },
+    "legacy-9b78d505cb11-v1": {
+      "name": "legacy-9b78d505cb11-v1",
+      "version": "1",
+      "content_sha256": "0c36e016618dbc3d2d16000cdf4eedc1e49f8759e5bf886129866be760d4acde",
+      "assembly_sha256": null
+    }
+  },
+  "new_providers": {
+    "legacy-9b78d505cb11-paper-runtime-v5": {
+      "name": "legacy-9b78d505cb11-paper-runtime-v5",
+      "version": "5",
+      "content_sha256": "5e063a2c8e44ee34e2f5c40baeccfdc91db6fefa514e8c4e62a0baaeaa45350b",
+      "assembly_sha256": "1de01783f3838b0d72148f192e01673d45002b4e2dd20299a9a35e3594868a47"
+    },
+    "legacy-9b78d505cb11-paper-late-runtime-v5": {
+      "name": "legacy-9b78d505cb11-paper-late-runtime-v5",
+      "version": "5",
+      "content_sha256": "3a833702aac5ea3c700811cee3bdb77b93a96f9cdb03e3374df111ae9eef13b1",
+      "assembly_sha256": "1de01783f3838b0d72148f192e01673d45002b4e2dd20299a9a35e3594868a47"
+    }
+  }
+}

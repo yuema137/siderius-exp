@@ -41,7 +41,9 @@ def _profile(
     with_analysis: bool = False,
 ) -> PromptRenderingProfile:
     qualification = json.loads((_ROOT / "qualification.json").read_text())
-    if rendering_assembly_digest() != qualification["assembly_sha256"]:
+    qualified = {qualification["assembly_sha256"]}
+    qualified.update(row["assembly_sha256"] for row in qualification.get("additional_assemblies", []))
+    if rendering_assembly_digest() not in qualified:
         raise ValueError(
             "This historical profile has not been qualified for the installed infra "
             "renderers. Use the documented infra revision or rerun offline qualification."
