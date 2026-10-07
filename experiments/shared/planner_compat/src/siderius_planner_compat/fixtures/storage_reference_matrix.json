@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "reference_source": "src/core/runtime_control/provenance.py",
+  "reference_source_sha256": "4e46ced5fb654dcfcf22d3c9f36111ffb9809ba4d3d1f0b5d8c3b466f0f3f38c",
+  "classifier_source_sha256": "9bcf4ef173e7517bfe29a6222ab31dbeb9e11565b5ebf35ca0331da779836a26",
+  "frozen_module_sha256": "74f1840c5d6015094bec70e20324c1f20fd0f533ae3ee972aa5840ac098a8456",
+  "reference_revisions": {
+    "project8": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+    "ligo": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "tess": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+    "tidmad": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+    "analysis": "c046744712fabfbd09c5c5a51a84fb30073d59e3"
+  },
+  "scope": "Identical setup storage byte basis and cache classifier; no historical timing, RSS or physical counter values are fabricated.",
+  "setup_helper_ast_sha256": "0d471aa99d9902e099c8cb80ff943af0a528b69439e1a04af24ce593910c0252",
+  "current_provenance_sha256": "6c3a90db2906529e7d4d8ec97346e66ba5d4d0cc5513fa0a2d59cd6b1ca22fc8",
+  "current_infra_revision": "bf42f26cdaf8fdd4ac567a1c561097c6ef994472"
+}

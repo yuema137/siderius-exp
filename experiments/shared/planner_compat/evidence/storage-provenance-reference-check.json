@@ -1,0 +1,36 @@
+{
+  "references": [
+    {
+      "name": "project8",
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "source_match": true,
+      "setup_helper_match": true
+    },
+    {
+      "name": "ligo",
+      "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "source_match": true,
+      "setup_helper_match": true
+    },
+    {
+      "name": "tess",
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "source_match": true,
+      "setup_helper_match": true
+    },
+    {
+      "name": "tidmad",
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "source_match": true,
+      "setup_helper_match": true
+    },
+    {
+      "name": "analysis",
+      "revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "source_match": true,
+      "setup_helper_match": true
+    }
+  ],
+  "reference_code_imported": false,
+  "api_calls": 0
+}

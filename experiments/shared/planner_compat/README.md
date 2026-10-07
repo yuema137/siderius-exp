@@ -352,3 +352,44 @@ The [compatibility contract and archive audit](static-preflight-compatibility.md
 describe the covered records and the limits of this check. The check concerns
 prompt inputs; it does not promise identical future LLM responses or retraining
 results, and it does not fix the estimator's remaining conservative refusals.
+
+## Scoped storage evidence (v7)
+
+Use package 0.7.0 with the [#419 infra repair](https://github.com/Galileo-Sandbox/SIDERIUS/pull/617)
+when a new historical-reproduction workspace needs the old planner view of
+storage evidence. Infra now records whether its process counter actually
+covers the setup reads. For example, zero reads reported by the calling
+process no longer mean warm cache when another service performed the reads.
+Those corrected facts remain in the saved record.
+
+After the normal installation above, select one of these values in your
+external project's `tune.planner_strategy`:
+
+| Historical configuration | Provider |
+| --- | --- |
+| TESS, LIGO, TIDMAD NoPrior | `legacy-9b78d505cb11-paper-storage-v7` |
+| Project8, TIDMAD analysis-on | `legacy-9b78d505cb11-paper-late-storage-v7` |
+
+Keep the other experiment settings and compatibility overlays. Start a **new
+workspace**: v7 has a new identity, and installation does not select it for you.
+Before an LLM call, v7 makes a temporary copy of each recent record, validates
+the storage evidence, and reconstructs the historical cache label and field
+layout from the preserved counter and byte values. It also includes v6's
+passing-preflight handling. Invalid or unfamiliar evidence stops rendering
+with an error; the saved record is never rewritten.
+
+Run the offline pairing check with the selected infra environment:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" -m pytest \
+  "$EXP_CHECKOUT/experiments/shared/planner_compat/tests/test_storage_provenance_v7.py" -q
+```
+
+Success reports 42 passing checks without API calls, GPU work, or training.
+This covers complete planner request comparisons for the archived four-task
+record shapes and controlled counter cases. It does not promise identical
+future LLM responses or scientific results. Use the paired #419 infra revision: the package refuses an
+unqualified storage producer, and the published exp pin skips these new-producer
+cases. The
+[storage compatibility contract](storage-provenance-compatibility.md) lists
+qualified sources, failure conditions and the narrower analysis-on evidence.
