@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pytest
 
-
 EXP_ROOT = Path(__file__).resolve().parents[2]
 CAMPAIGN = EXP_ROOT / "campaigns" / "tidmad_gold"
 LAUNCHER = CAMPAIGN / "scripts" / "run_gold_campaign.sh"
@@ -159,3 +158,36 @@ def test_missing_campaign_llm_routing_refuses_before_dispatch(tmp_path: Path) ->
     assert "F-LLM-WIRE-1" in completed.stderr
     assert "gemini-3.1-pro-preview" in completed.stderr
     assert "run_chain argv" not in completed.stdout
+
+
+@pytest.mark.parametrize("arm", ["with-prior-art", "without-prior-art"])
+def test_preflight_refuses_retired_x9_before_environment_checks(
+    tmp_path: Path, arm: str
+) -> None:
+    """The retained Gold preflight must not expose the retired X9 route."""
+    completed = subprocess.run(
+        ["bash", str(CAMPAIGN / "scripts" / "campaign_preflight.sh"), "--arm", arm],
+        cwd=tmp_path,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=10,
+    )
+    assert completed.returncode != 0
+    assert "X9 is retired and no longer maintained" in completed.stderr
+    assert "[preflight]" not in completed.stdout
+
+
+def test_preflight_help_preserves_supported_usage_after_retirement() -> None:
+    """A break in the comment header must not truncate operator-facing help."""
+    completed = subprocess.run(
+        ["bash", str(CAMPAIGN / "scripts" / "campaign_preflight.sh"), "--help"],
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=10,
+    )
+    assert completed.returncode == 0
+    assert "--arm goldpod|blindpod" in completed.stdout
+    assert "--workspace-root" in completed.stdout
+    assert "--siderius-checkout" in completed.stdout

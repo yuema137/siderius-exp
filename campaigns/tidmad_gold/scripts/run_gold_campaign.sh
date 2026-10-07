@@ -17,9 +17,9 @@
 #     stage2_strict_retrain.sh               4 designs x 4 bands = 16 units
 #         run_chain.sh (--validation_fixed_candidate_plan seam)
 #
-# NOT this launcher: launch_prior_baseline_experiment.sh (X9's experiment —
-# its arms are with/without-prior-art and it refuses advice BY DESIGN; it
-# stays untouched for X9 reproducibility, operator ruling D-ARCH-1/F-LAUNCH-2).
+# The former X9 launch_prior_baseline_experiment.sh was a separate experiment
+# (D-ARCH-1/F-LAUNCH-2). X9 was retired on 2026-10-07; see
+# campaigns/tidmad_x9/README.md. Gold keeps its own entrypoint and treatment.
 #
 # Usage:
 #   bash campaigns/tidmad_gold/scripts/run_gold_campaign.sh \

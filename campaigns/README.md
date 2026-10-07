@@ -20,6 +20,13 @@ workflow's Trial/Formal semantics.
 
 The presence of a campaign does not authorize execution. Each campaign records its own operator authorization boundaries.
 
+## Retired campaigns
+
+[TIDMAD X9](tidmad_x9/README.md) is retired. Its execution scripts and dedicated
+tests have been removed; the linked notice explains the boundary and where to
+inspect historical source. Use the [paper tutorials](../tutorials/paper/README.md)
+for current workflow demos.
+
 ## Campaign package contract
 
 Each campaign package must identify:

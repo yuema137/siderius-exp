@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pytest
 
-
 EXP_ROOT = Path(__file__).resolve().parents[2]
 CAMPAIGN = EXP_ROOT / "campaigns" / "tidmad_gold"
 SCRIPTS = CAMPAIGN / "scripts"
@@ -270,16 +269,8 @@ def test_unknown_band_has_no_gpu_assignment() -> None:
     assert "unknown band '2-7'" in completed.stderr
 
 
-def test_external_gold_band_files_match_the_historical_x9_authority() -> None:
-    """Catch scoring-file drift against the experiment-owned historical X9 launcher."""
-    x9 = (
-        EXP_ROOT
-        / "campaigns"
-        / "tidmad_x9"
-        / "scripts"
-        / "launch_prior_baseline_experiment.sh"
-    ).read_text(encoding="utf-8")
-
+def test_gold_band_files_preserve_frozen_file_selection() -> None:
+    """Catch scoring-file drift without depending on the retired X9 launcher."""
     for band, files in {
         "0-3": "0,1,2,3",
         "4-9": "4,5,6,7,8,9",
@@ -296,4 +287,3 @@ def test_external_gold_band_files_match_the_historical_x9_authority() -> None:
         )
         assert completed.returncode == 0, completed.stderr
         assert completed.stdout.strip() == files
-        assert f'BAND_HEALTH_FILES="{files}"' in x9

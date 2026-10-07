@@ -1,69 +1,23 @@
-# TIDMAD X9 Campaign
+# TIDMAD X9: retired
 
-This package owns the two-arm TIDMAD X9 experiment, its four-band H100
-topology, preflight, resource posture, and campaign-specific validation.
-Every launcher requires `SIDERIUS_CHECKOUT` and delegates execution to that
-exact framework checkout.
+The old X9 campaign was retired on 2026-10-07. Its launchers, preflight,
+LLM smoke check, H100 co-residency probes and dedicated tests have been removed.
+This workflow is no longer supported or maintained.
 
-The selected framework owns `scripts/launch/` and `src/workflows/`; campaign
-posture and routing remain owned here. Exp issue #36 (default-config gap)
-remains deferred; the explicit `--llm-config` routing path is the required
-workaround. Exp issue #32 (environment/provenance), including the preflight and
-co-residency `PYTHONPATH` behavior, also remains deferred.
+The environment/provenance problem in
+[issue #32](https://github.com/Galileo-Sandbox/siderius-exp/issues/32) and the
+missing default LLM configuration in
+[issue #36](https://github.com/Galileo-Sandbox/siderius-exp/issues/36) were not
+repaired. Those issues are closed as not planned because the affected workflow
+has been retired.
 
-## H100 posture
+For the current four-experiment demos, start with the
+[paper tutorials](../../tutorials/paper/README.md). They do not use X9 and are
+workflow demos, not full paper reproduction artifacts. TIDMAD Gold is a
+[separate campaign](../tidmad_gold/README.md) with its own status and entrypoint.
 
-The posture runs four co-resident band chains per card. One card runs the
-`with-prior-art` arm and one runs the `without-prior-art` arm. The values below
-are machine-checked against `scripts/h100_posture.env`.
-
-<!-- h100-posture-table:begin -->
-| surface | H100 value | class | reason |
-|---|---|---|---|
-| `H100_POSTURE_VERSION` | `3` | policy | Version of the complete resource posture. |
-| `H100_MAX_ACTIVE_PER_CARD` | `4` | policy | Four band chains share each H100. |
-| `SIDERIUS_PAIR_VRAM_CEILING_GIB` | `72` | hardware-derived | Four 18-GiB chain slices under the card envelope. |
-| `SIDERIUS_PREFLIGHT_WORKER_MEM_GIB` | `24` | policy | Host-memory ceiling for one preflight worker. |
-| `SIDERIUS_SUBPROCESS_RSS_GB` | `unset` | deployment-owned | No campaign-wide subprocess RSS override. |
-| `SIDERIUS_GPU_VRAM_QUOTA_MIB` | `unset` | deployment-owned | A fleet-wide user quota must be measured and declared separately. |
-| `SIDERIUS_GPU_VRAM_QUOTA_GB` | `18` | policy | Per-chain capacity-attribution slice. |
-| `--trial_vram_budget_gb` | `18` | hardware-derived | Trial attempt ceiling for one chain. |
-| `--formal_vram_budget_gb` | `18` | hardware-derived | Formal attempt ceiling for one chain. |
-| `--gpu_pair_ceiling_gib` | `72` | hardware-derived | Aggregate admission ceiling recorded on the run input. |
-| `--gpu_admission_enforcement` | `enforce_resource_limits` | policy | Resource refusal remains blocking. |
-| `--execution_regime` | `four_way_coresident` | policy | Runtime-profile topology key. |
-| `--runtime_safety_factor` | `1.5` | policy | Base admission multiplier. |
-| `--runtime_trial_safety_factor` | `3.0` | policy | Trial admission multiplier. |
-| `--runtime_formal_safety_factor` | `2.25` | policy | Formal admission multiplier. |
-<!-- h100-posture-table:end -->
-
-No H100 watchdog values are borrowed from another device. Until this exact
-device and execution regime have a measured runtime profile, the outer Trial
-and Formal time budgets are the runaway bound.
-
-## Validation
-
-Run the campaign-owned checks against an explicit framework checkout:
-
-```bash
-uv sync --group dev --frozen
-export SIDERIUS_CHECKOUT=/absolute/path/to/pinned/SIDERIUS
-test "$(git -C "$SIDERIUS_CHECKOUT" rev-parse HEAD)" = "$(tr -d '\n' < SIDERIUS_REVISION)"
-(cd "$SIDERIUS_CHECKOUT" && uv sync --group dev --frozen)
-env -u PYTHONPATH .venv/bin/python -m pytest tests/campaigns/tidmad_x9
-```
-
-Run this from the exp root. The real prompt-capture child uses the framework
-checkout's own interpreter and template resources; the installed exp dependency
-alone is not a substitute for those checkout assets. The arm launcher likewise
-rejects a conflicting explicit `SIDERIUS_PYTHON`, ignores an ambient exp
-`VIRTUAL_ENV`, and clears `PYTHONPATH` before selecting
-`$SIDERIUS_CHECKOUT/.venv/bin/python`.
-
-R7 captures the task declared in each arm's real resolved-launch output, using
-`--resolved-launch`. A manual `campaign_arm_surface.py` call must instead supply
-an absolute `--task-composition` manifest (the two inputs are mutually exclusive).
-Missing, empty or relative task declarations refuse before a surface is written.
-Capture reads task declarations and plugin visibility, not scientific datasets;
-it does not start a run or require a fabricated data directory. Arm isolation,
-comparison rules and scientific treatment are unchanged.
+Historical source remains available at
+[the last pre-retirement revision](https://github.com/yuema137/siderius-exp/tree/57be005c133071b548b700af3378d55ce2648f92/campaigns/tidmad_x9).
+That source is for historical inspection, not a supported launch route.
+Existing provenance records remain unchanged; references to X9 in those records
+describe the version in which the work was performed.

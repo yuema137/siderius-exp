@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BASELINES = (
     REPO_ROOT / "tasks" / "tidmad" / "reference_data" / "legacy_baseline_configs.json"
@@ -22,7 +21,6 @@ def test_baseline_consumers_use_the_task_owned_artifact() -> None:
     """Task tools must not reach back into the framework for scientific config."""
     consumers = (
         REPO_ROOT / "tasks" / "tidmad" / "tools" / "run_comparison.py",
-        REPO_ROOT / "campaigns" / "tidmad_x9" / "scripts" / "gpu_c_probe_train_leg.py",
     )
     for consumer in consumers:
         source = consumer.read_text(encoding="utf-8")

@@ -1,5 +1,8 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
+# Current support: goldpod and blindpod only. X9 was retired on 2026-10-07;
+# historical X9 descriptions below do not describe a supported launch route.
+#
 # SIDERIUS campaign preflight (arXiv launch topology, H100 band fleet)
 # ---------------------------------------------------------------------------
 # Role   : ONE launch-blocking gate for a band-fleet campaign launch. Every
@@ -174,7 +177,7 @@
 # Usage (campaign host):
 #   bash campaigns/tidmad_gold/scripts/campaign_preflight.sh \
 #       --workspace-root /persist/siderius_campaign \
-#       --arm with-prior-art|without-prior-art|goldpod|blindpod \
+#       --arm goldpod|blindpod \
 #       --revision <expected exp sha> \
 #       --siderius-checkout /path/to/SIDERIUS \
 #       --siderius-revision <expected framework sha> \
@@ -568,6 +571,12 @@ pf_main() {
         esac
     done
 
+    case "$ARM" in
+        with-prior-art|without-prior-art)
+            echo "ERROR: X9 is retired and no longer maintained; see campaigns/tidmad_x9/README.md" >&2
+            return 1 ;;
+    esac
+
     if [ -z "$WORKSPACE_ROOT" ] || [ -z "$ARM" ] || [ -z "$REVISION" ] \
         || [ -z "$SIDERIUS_REVISION" ] || [ -z "$SIDERIUS_CHECKOUT_ARG" ]; then
         echo "Required: --workspace-root DIR --arm ARM --revision EXP_SHA --siderius-checkout DIR --siderius-revision SHA (see --help)" >&2
@@ -593,7 +602,7 @@ pf_main() {
         with-prior-art|without-prior-art) ARM_KIND="x9" ;;
         goldpod|blindpod)                 ARM_KIND="gold" ;;
         *)
-            echo "ERROR: unknown --arm '$ARM' (accepted: with-prior-art, without-prior-art, goldpod, blindpod)" >&2
+            echo "ERROR: unknown --arm '$ARM' (accepted: goldpod, blindpod)" >&2
             return 1 ;;
     esac
     if [ "$ARM_KIND" = "gold" ]; then

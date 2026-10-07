@@ -53,6 +53,5 @@ def test_default_collection_keeps_live_tasks_and_excludes_archive(
         "tests/tasks/oxford_iiit_pet/test_package_contract.py",
         "tests/tasks/supernemo_signal_background/test_package_contract.py",
         "tests/campaigns/tidmad_gold/stage3/test_strict_best.py",
-        "tests/campaigns/tidmad_x9/test_fscang4_arm_surface_symmetry.py",
     ):
         assert any(path + "::" in node for node in node_ids), path

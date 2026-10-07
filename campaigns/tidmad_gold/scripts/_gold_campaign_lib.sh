@@ -858,9 +858,8 @@ gold_frozen_chain_args() {
 }
 
 # gold_band_files BAND — echo the DS8 health-file list for BAND, or refuse.
-# Same literals as launch_prior_baseline_experiment.sh's authority table
-# (that launcher stays the X9 authority; the pinned unit test cross-checks
-# the two tables so they cannot drift apart silently).
+# Frozen Gold file selection, historically shared with the retired X9 launcher.
+# The Gold band-selection test pins all four lists independently.
 gold_band_files() {
     case "$1" in
         0-3)   echo "0,1,2,3" ;;
