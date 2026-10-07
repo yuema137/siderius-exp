@@ -1,0 +1,13 @@
+{
+  "case_id": "tess-proposal-causal_reasoning_stage-explore",
+  "boundary": "proposal.system",
+  "arguments": {
+    "stage_name": "causal_reasoning_stage",
+    "exploration_mode": "explore",
+    "baseline_isolation": true
+  },
+  "provenance": {
+    "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+    "scope": "system-template branch witness; historical intermediate replies unavailable"
+  }
+}

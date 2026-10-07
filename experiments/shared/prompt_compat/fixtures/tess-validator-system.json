@@ -1,0 +1,11 @@
+{
+  "case_id": "tess-validator-system",
+  "boundary": "validator.system",
+  "arguments": {
+    "model_io_contract": null
+  },
+  "provenance": {
+    "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+    "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation"
+  }
+}

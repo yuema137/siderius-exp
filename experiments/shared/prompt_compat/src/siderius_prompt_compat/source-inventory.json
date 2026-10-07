@@ -1,0 +1,93 @@
+[
+  {
+    "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+    "source": "src/agent/prompt_templates/interpretation/rendering.py",
+    "source_sha256": "a14e7e8f28dd58e54ed2bae862fd3305c042cd6db106a48ce5c25b77ca8aef58",
+    "packaged_file": "interpretation_345c802d.py",
+    "selection": [
+      "_build_per_model_prompt",
+      "_build_per_model_system_prompt"
+    ],
+    "packaged_sha256": "73e3b9adc3fa0e23ca407a744f4c97b6fe9c8627b15f778888c1c974a34e1dfa"
+  },
+  {
+    "revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+    "source": "src/agent/prompt_templates/data_analysis.py",
+    "source_sha256": "55f9fe8654cafb2b0481f45f2661317e247fa14e21a026d0630b56219ffecd47",
+    "packaged_file": "analysis_c0467447.py",
+    "selection": "pure rendering module",
+    "packaged_sha256": "55f9fe8654cafb2b0481f45f2661317e247fa14e21a026d0630b56219ffecd47"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/causal_reasoning_stage.md",
+    "source_sha256": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55",
+    "packaged_file": "templates/causal_reasoning_stage.md",
+    "selection": "complete template",
+    "packaged_sha256": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/causal_reasoning_stage_exploit.md",
+    "source_sha256": "cbf18435eb5970f142d0bf89b9ac32c8dec2822edbc4d3a6da9a19d720a6f15b",
+    "packaged_file": "templates/causal_reasoning_stage_exploit.md",
+    "selection": "complete template",
+    "packaged_sha256": "cbf18435eb5970f142d0bf89b9ac32c8dec2822edbc4d3a6da9a19d720a6f15b"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/causal_reasoning_stage_explore.md",
+    "source_sha256": "654961f557aa98b1e22197f2403fabdcdf4b9cb413b5aa1671b6c951fcedcffa",
+    "packaged_file": "templates/causal_reasoning_stage_explore.md",
+    "selection": "complete template",
+    "packaged_sha256": "654961f557aa98b1e22197f2403fabdcdf4b9cb413b5aa1671b6c951fcedcffa"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/comparison_stage.md",
+    "source_sha256": "6099820a60c90cae41dba61f328eef17951657da9c83b47b5e67e444ce98ba25",
+    "packaged_file": "templates/comparison_stage.md",
+    "selection": "complete template",
+    "packaged_sha256": "6099820a60c90cae41dba61f328eef17951657da9c83b47b5e67e444ce98ba25"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/comparison_stage_exploit.md",
+    "source_sha256": "4bd0e8106ec9225e5fa2a294d2055e52f26b59c2740089191557041b8e6d3d7c",
+    "packaged_file": "templates/comparison_stage_exploit.md",
+    "selection": "complete template",
+    "packaged_sha256": "4bd0e8106ec9225e5fa2a294d2055e52f26b59c2740089191557041b8e6d3d7c"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/comparison_stage_explore.md",
+    "source_sha256": "fe0b6212c1dd88981052d4d9fe32429f4fbea4ab6351fdffadcc65db91872ed5",
+    "packaged_file": "templates/comparison_stage_explore.md",
+    "selection": "complete template",
+    "packaged_sha256": "fe0b6212c1dd88981052d4d9fe32429f4fbea4ab6351fdffadcc65db91872ed5"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/proposing_stage.md",
+    "source_sha256": "75932e347b87a4bbfabf0b207701acae7e0cb6d213ab188a4f6cd3005121ca39",
+    "packaged_file": "templates/proposing_stage.md",
+    "selection": "complete template",
+    "packaged_sha256": "75932e347b87a4bbfabf0b207701acae7e0cb6d213ab188a4f6cd3005121ca39"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/proposing_stage_exploit.md",
+    "source_sha256": "44dbc4223db1a4634e1c465a4416f7664c45353c05599dc57be0112644cd75ec",
+    "packaged_file": "templates/proposing_stage_exploit.md",
+    "selection": "complete template",
+    "packaged_sha256": "44dbc4223db1a4634e1c465a4416f7664c45353c05599dc57be0112644cd75ec"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/proposal/proposing_stage_explore.md",
+    "source_sha256": "7d6a53af9b44d0922bada12dec4f733741e180e43621965e824539ff59ca05a1",
+    "packaged_file": "templates/proposing_stage_explore.md",
+    "selection": "complete template",
+    "packaged_sha256": "7d6a53af9b44d0922bada12dec4f733741e180e43621965e824539ff59ca05a1"
+  }
+]

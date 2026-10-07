@@ -1,65 +1,147 @@
-# Historical information-flow checks
+# Historical prompt compatibility
 
-This directory is being developed to compare paper-era messages with explicit
-historical profiles. It is not yet a complete full-workflow compatibility package.
-The existing planner-only checks remain in [planner_compat](../planner_compat/README.md).
+Use this package when you want current infra to assemble the historical prompt
+text for the paper experiments. It contains explicit rendering profiles, frozen
+inputs, and offline comparison tools. Infra keeps its current default behavior;
+installing this package alone changes nothing.
 
-## Explicit recovery policy
+The checks compare messages and, for one archived failure, the request sequence.
+They do not call an LLM, train a model, download data, or reproduce a paper score.
+Some intermediate replies were not archived. The [coverage report](parity-report.md)
+separates recovered inputs from supplementary branch tests and missing evidence.
 
-The profile [analysis-c0467447-recovery-v1.json](profiles/analysis-c0467447-recovery-v1.json)
-preserves the recovery allowances in infra revision
-`c046744712fabfbd09c5c5a51a84fb30073d59e3`, used by the archived native
-TIDMAD analysis-on run:
+## 1. Install into the infra environment
 
-- After generated-program validation and one representation repair fail,
-  stop that preparation attempt: `generated_program_retries: 0`.
-- Analysis-plan preparation retains its existing shared fresh-attempt
-  allowance: `plan_retries: 1`.
+Set `INFRA_CHECKOUT` and `EXP_CHECKOUT` to your own absolute checkout paths.
+Use the infra revision recorded in
+[qualification.json](src/siderius_prompt_compat/qualification.json); the package
+refuses an unqualified rendering assembly. Both repositories need the companion
+changes described in the coverage report.
 
-Do not apply this profile to every historical experiment. It is qualified for
-that source revision, and it does not restore historical prompt text by itself.
+```bash
+cd "$INFRA_CHECKOUT"
+uv sync --group dev --frozen
+uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
+  "$EXP_CHECKOUT/experiments/shared/planner_compat" \
+  "$EXP_CHECKOUT/experiments/shared/prompt_compat"
+```
 
-With the accompanying infra changes, copy the profile object into the
-`recovery_policy` field of your external analysis-policy YAML, or supply it
-in a standalone `DataAnalysisInput`. Use a new workspace. The policy enters
-run identity; old archived policy files and workspaces must remain unchanged.
-Omitting the field retains current behavior: one additional attempt at each
-stage. Counts mean additional attempts, excluding the initial attempt and
-its representation-only repair. Validation, access checks, provider-error
-handling, and the original request deadline remain enforced.
+This installs planner compatibility 0.4.0 and prompt compatibility 0.1.0 as normal
+packages. Do not share another checkout's virtualenv or add its source through
+`PYTHONPATH`. Running `uv sync` again can remove these separately installed
+consumer packages; reinstall them before using a historical profile.
 
-## Offline failure-branch comparison
+## 2. Configure copies in a new workspace
 
-`replay_generated_failure.py` consumes a hash-verified archived receipt and
-its neighboring `input.json`. It routes the two saved replies through the
-actual preparation and validation code, and stops at any additional request
-for which no archived reply exists. It does not execute generated programs.
+Copy the intended experiment's task package and experiment configuration into
+your external workspace, preserving relative paths. Keep archived files and old
+workspace locks unchanged. There are two separate choices:
 
-Run with the selected infra checkout's own frozen environment:
+| Experiment | Task manifest: `prompt_renderer` | LLM JSON: `tune.planner_strategy` |
+| --- | --- | --- |
+| TESS, LIGO | `paper-early-v1` | `legacy-9b78d505cb11-paper-v4` |
+| Project8 dual representation | `paper-late-v1` | `legacy-9b78d505cb11-paper-late-v4` |
+| TIDMAD NoPrior | `paper-tidmad-noprior-v1` | `legacy-9b78d505cb11-paper-v4` |
+| TIDMAD analysis-on at `c0467447` | `paper-analysis-c0467447-v1` | `legacy-9b78d505cb11-paper-late-v4` |
+
+For example, add this top-level field to your **copied LIGO task composition
+YAML**, the file passed to `--task_composition`:
+
+```yaml
+prompt_renderer: paper-early-v1
+```
+
+In your copied LLM JSON, retain the other settings and set
+`tune.planner_strategy` to `legacy-9b78d505cb11-paper-v4`. The first setting
+selects implementor/proposer/validator/interpreter rendering; the second selects tuner
+planner rendering. See [planner setup](../planner_compat/README.md#match-the-papers-actual-planner-startup)
+for that separate contract.
+
+For the listed **TIDMAD analysis-on** revision only, also add the following to
+the **analysis-policy YAML referenced by the copied task composition**:
+
+```yaml
+recovery_policy:
+  schema_version: 1
+  generated_program_retries: 0
+  plan_retries: 1
+```
+
+The same object is saved in
+[analysis-c0467447-recovery-v1.json](profiles/analysis-c0467447-recovery-v1.json).
+A retry here means a fresh attempt after the first draft and its representation
+repair both fail. Thus `0` stops generated-program preparation after those two
+invalid replies. `1` retains the historical shared plan retry. Omitting this
+policy keeps current infra's one additional attempt at both stages.
+Validation, access rules and the original deadline still apply.
+
+These settings change run identity. Launch into a **new workspace** using your
+experiment's launcher and the copied configuration paths. Do not resume an old
+workspace in place. The profiles restore the qualified presentation; they do
+not authorize historical data access or disable current execution checks.
+
+## 3. Inspect the offline comparisons
+
+[parity-report.md](parity-report.md) explains what was compared. The committed
+JSON receipts in [evidence](evidence/) contain reference revisions, fixture
+hashes, provider identities, message hashes, and outcomes.
+
+To regenerate the comparisons, prepare a separate infra checkout and its own
+frozen `.venv` for each historical revision listed in the report. Create a
+`references.json` file using your local paths:
+
+```json
+{
+  "tess": "/your/checkouts/tess-reference",
+  "ligo": "/your/checkouts/ligo-reference",
+  "project8": "/your/checkouts/project8-reference",
+  "tidmad": "/your/checkouts/tidmad-reference",
+  "analysis": "/your/checkouts/analysis-reference"
+}
+```
+
+Then run:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" \
+  "$EXP_CHECKOUT/experiments/shared/prompt_compat/compare.py" \
+  --candidate "$INFRA_CHECKOUT" \
+  --references /your/references.json \
+  --output /your/new-comparison-directory
+```
+
+The command launches each checkout's own Python, refuses dirty infra source or
+a wrong reference revision, and exits nonzero for errors or differing messages.
+`comparison.json` summarizes results. Each case also has `reference/` and
+`candidate/` directories containing `system.txt`, `user.txt`, and `receipt.json`.
+The frozen fixtures supply all rendering inputs; you do not need the original
+datasets or the archive paths retained as provenance in those fixtures.
+
+To check the installed package against this source tree and its historical
+source inventory, run `check_installation.py` with the same infra Python. Its
+Git object database must contain the historical revisions. It also verifies
+that an unqualified assembly is refused.
+
+## 4. Replay the archived failure, when available
+
+This additional check needs the original analysis archive directory containing
+`input.json` and `structured_output_receipts.jsonl`. It reads the two saved
+invalid replies, validates their hashes, and feeds them through preparation.
+It never executes their generated programs.
 
 ```bash
 "$INFRA_CHECKOUT/.venv/bin/python" \
   "$EXP_CHECKOUT/experiments/shared/prompt_compat/replay_generated_failure.py" \
   --archive "$ARCHIVED_ANALYSIS_DIRECTORY" \
-  --receipt-sha256 "$VERIFIED_RECEIPT_SHA256" \
+  --receipt-sha256 b60e19459d967a99e5887328c5721d597ab442dc86eb2bdb343d1085bdcb2144 \
+  --profile paper-analysis-c0467447-v1 \
   --recovery-policy "$EXP_CHECKOUT/experiments/shared/prompt_compat/profiles/analysis-c0467447-recovery-v1.json" \
-  --output "$NEW_OUTPUT_DIRECTORY"
+  --output /your/new-failure-replay-directory
 ```
 
-For an original checkout that predates the policy field, omit
-`--recovery-policy`. Also omit it when checking the current default. Output
-must be a new directory. Inspect `result.json` for the revision, input and
-policy hashes, request sequence, message hashes, and observed termination.
-Messages are saved separately in `messages.json` for local inspection.
-
-The archived band 4–9, iteration 9 witness produces two requests followed by
-failure under the original revision. The current default requests an
-additional generation. Explicitly selecting this profile restores the two
-request sequence and failure boundary while still rejecting both invalid
-drafts. System-message differences remain to be handled by rendering profiles;
-matching this sequence is not a claim of complete prompt parity.
-
-`capture.py` separately captures declared rendering boundaries from explicit
-reconstructed inputs. Its receipts distinguish renderer comparison from an
-archived conversation. Neither tool calls an API, trains, downloads a dataset,
-or proves equality of stochastic outputs or paper scores.
+`result.json` records request order, message hashes and termination;
+`messages.json` contains the text. The expected historical outcome is
+`failed_after_archived_repair` after two requests. Run the original revision
+without `--profile` or `--recovery-policy` for the reference. Omit both on the
+current revision to observe its preserved default: a third generation request,
+where replay stops because no saved reply exists.

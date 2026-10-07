@@ -1,0 +1,1226 @@
+{
+  "case_id": "analysis-synthesis",
+  "boundary": "analysis.synthesis",
+  "arguments": {
+    "input": {
+      "access_policy": {
+        "allow_model_inference": false,
+        "policy_id": "tidmad-orchestrator-candidate-0-3",
+        "policy_version": 1,
+        "purpose": "Candidate raw-only band analysis, pending main-run freeze.",
+        "split_rules": [
+          {
+            "data_visible": true,
+            "metadata": {
+              "fields": [],
+              "mode": "none"
+            },
+            "predictions_visible": false,
+            "residuals_visible": false,
+            "split_id": "validation",
+            "targets_visible": false
+          }
+        ]
+      },
+      "allowed_skill_packs": [
+        {
+          "environment_lock_ref": null,
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_id": "core-analysis",
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "environment_lock_ref": null,
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_id": "time-series",
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        }
+      ],
+      "analysis_brief": {
+        "brief_id": "analysis-brief-166d8d42a1f36a7c",
+        "optional_scope_note": "Cold-start characterization is limited to visible raw validation waveforms. Questions concern observable mixture properties only and do not attribute features to clean signal or noise; targets, predictions, residuals, and metadata are excluded.",
+        "questions": [
+          {
+            "completion_criterion": "Summarize the observed value ranges and distributions, quantization occupancy, repeated extrema, flat runs, abrupt discontinuities, and any non-finite or structurally invalid content across the accessible waveforms.",
+            "observations_to_verify": [
+              "Whether values accumulate at integer extrema in a manner consistent with clipping or saturation.",
+              "Whether long constant runs, missing segments, or abrupt sample-to-sample jumps occur.",
+              "Whether amplitude distributions differ substantially among waveforms."
+            ],
+            "priority": 5,
+            "question": "What amplitude-range, quantization, and boundary behaviors characterize the raw integer waveforms?",
+            "question_id": "analysis-question-01",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          },
+          {
+            "completion_criterion": "Characterize broad spectral concentration, narrow peaks or harmonic families, and cross-waveform consistency using normalized frequency only, without assigning components to clean signal or noise.",
+            "observations_to_verify": [
+              "Whether power is concentrated toward low, middle, or high normalized frequencies.",
+              "Whether narrow spectral peaks or harmonic patterns recur across waveforms.",
+              "Whether spectral shape varies enough across waveforms to indicate materially different raw regimes."
+            ],
+            "priority": 5,
+            "question": "How is raw waveform power distributed across normalized temporal frequencies, and which spectral structures are common or variable across waveforms?",
+            "question_id": "analysis-question-02",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          },
+          {
+            "completion_criterion": "Determine whether local amplitude, variance, spectral composition, and waveform morphology remain broadly stable or exhibit distinct changes over sample position.",
+            "observations_to_verify": [
+              "Whether localized bursts, steps, transients, or variance changes occur.",
+              "Whether spectral composition changes materially over time within a waveform.",
+              "Whether nonstationary events are isolated or occupy substantial portions of records."
+            ],
+            "priority": 4,
+            "question": "To what extent are the raw waveforms temporally nonstationary within each record?",
+            "question_id": "analysis-question-03",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          },
+          {
+            "completion_criterion": "Summarize the persistence scales, oscillatory recurrences, and repeated motifs evident from raw-waveform temporal dependence, while avoiding claims about the latent clean waveform.",
+            "observations_to_verify": [
+              "Whether short- or long-range sample dependence is prominent.",
+              "Whether stable oscillatory periods or repeated motifs appear within or across waveforms.",
+              "Whether temporal dependence differs substantially among accessible records."
+            ],
+            "priority": 3,
+            "question": "What recurring temporal dependence and periodic structure are directly observable in the raw mixtures?",
+            "question_id": "analysis-question-04",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          }
+        ],
+        "source": "interpreter",
+        "source_ref": "interpretation:iter_001:iteration:1"
+      },
+      "available_assets": [
+        {
+          "allowed_operations": [
+            "read",
+            "materialize"
+          ],
+          "asset_id": "tidmad-band-validation-input",
+          "asset_type": "dataset",
+          "authorized_scope": {
+            "data_scope": {
+              "file_indices": [
+                0,
+                1,
+                2,
+                3
+              ]
+            },
+            "kind": "legacy_partitions"
+          },
+          "description": "Raw validation input windows from the selected band.",
+          "location": {
+            "dataset_profile_sha256": "a7801aba3058dbca35523b5d1a0f76afcaf31709c7717087a355371f5a525e74",
+            "kind": "task_data",
+            "logical_role": "validation_input_windows",
+            "task_data_path_id": "tidmad_frozen_training_pool"
+          },
+          "metadata": {
+            "band_file_indices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "channel_semantics": "raw_detector_input",
+            "sample_rate_hz": 10000000.0,
+            "window_duration_seconds": 0.0262144,
+            "window_samples": 262144
+          },
+          "metadata_sources": {
+            "band_file_indices": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "channel_semantics": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "sample_rate_hz": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "window_duration_seconds": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "window_samples": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            }
+          },
+          "provenance": {
+            "created_at": null,
+            "iteration_id": null,
+            "producer": "tidmad-task-package",
+            "run_id": null,
+            "source_asset_ids": []
+          },
+          "split_id": "validation",
+          "time_precision_requirement": null
+        }
+      ],
+      "caller": {
+        "caller_id": "iter_001",
+        "caller_type": "workflow",
+        "request_source": "iteration:1"
+      },
+      "declared_scope": {
+        "historical_model_asset_ids": [],
+        "raw_input_asset_ids": [
+          "tidmad-band-validation-input"
+        ]
+      },
+      "human_advice": null,
+      "prior_evidence": [],
+      "request_id": "iteration-001",
+      "resource_envelope": {
+        "max_host_memory_gb": 8.0,
+        "max_vram_gb": null,
+        "per_skill_timeout_s": 12.0,
+        "preferred_device": "cpu",
+        "sampling_policy": {
+          "fraction": null,
+          "max_items": 10,
+          "mode": "fixed",
+          "seed": 20260915,
+          "strata_fields": [],
+          "strategy": "task_defined"
+        },
+        "wall_time_budget_s": 600.0
+      },
+      "retain_model_outputs": false,
+      "schema_version": 1,
+      "storage": {
+        "backend": "local",
+        "local": {
+          "run_name": "iter_001",
+          "workspace": "/mnt/tidmad-no-prior/f-full-0-3-daonly-v1-unit/workspace/iter_001/iteration_001"
+        },
+        "postgres": null
+      },
+      "task_context": {
+        "dataset_profile_ref": {
+          "byte_size": 613,
+          "logical_ref": "/mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/resolved/dataset_profile.json",
+          "media_type": "application/json",
+          "sha256": "a7801aba3058dbca35523b5d1a0f76afcaf31709c7717087a355371f5a525e74"
+        },
+        "forward_contract": {
+          "custom_loss_applicability": null,
+          "embedding_note": "Input values are integer-coded samples \u2014 nn.Embedding(256, embed_dim) to convert [B, T] int64 \u2192 [B, T, embed_dim], then transpose to [B, embed_dim, T] for Conv1d layers, remains a valid and common input stem. The input representation is unchanged; only the output is continuous.\n",
+          "input_description": "raw signal, integer-coded samples 0-255",
+          "input_shape": "[B, T] int64",
+          "model_io": {
+            "inference": {
+              "accepted_input_view_formats": [
+                "siderius.numeric-array.v1"
+              ],
+              "alignment": "one_prediction_per_input",
+              "determinism": "deterministic",
+              "prediction_decoder_protocol_id": "siderius.identity-prediction-decoder.v1",
+              "prediction_output_format": "siderius.numeric-array.v1",
+              "prediction_semantic_id": "tidmad.offset-encoded-continuous-waveform-segment.v1",
+              "required_information": [
+                {
+                  "fields": [],
+                  "information_class": "data"
+                }
+              ]
+            },
+            "input": {
+              "axes": [
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "B"
+                  },
+                  "role": "batch"
+                },
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "T"
+                  },
+                  "role": "temporal"
+                }
+              ],
+              "dtype": {
+                "admissible": [
+                  "int64",
+                  "int32"
+                ]
+              }
+            },
+            "output": {
+              "axes": [
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "B"
+                  },
+                  "role": "batch"
+                },
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "T"
+                  },
+                  "role": "temporal"
+                }
+              ],
+              "dtype": {
+                "admissible": [
+                  "float32"
+                ]
+              }
+            }
+          },
+          "num_classes": 0,
+          "output_description": "continuous denoised waveform value per timestep",
+          "output_head_note": "Output must be exactly [output_shape] \u2014 a continuous value per timestep, e.g. a final Conv1d(channels, 1, 1) followed by squeeze, or any head that emits [B, T] float32. Do NOT emit per-class logits and do NOT argmax: this task predicts waveform values directly. Residual formulations are natural here \u2014 predicting a correction to the input, or predicting the noise and subtracting it, preserves amplitude and low-frequency structure instead of regenerating the waveform from scratch.\n",
+          "output_shape": "[B, T] float32",
+          "preset": "sequence",
+          "segmentation_applicability": "temporal",
+          "supervision_target": null,
+          "task_note": "Offline denoising \u2014 output at position t may depend on all positions. Causal constraints are not required. The objective is a continuous regression loss; robust choices such as SmoothL1/Huber are strong task-grounded starting points, and the loss itself remains searchable.\n",
+          "task_type": "regression"
+        },
+        "input_description": "Integer-coded SQUID detector waveform samples at the task-declared physical cadence. The view contains one input channel and performs no interpolation, resampling, filtering, or repair.",
+        "metric_identity": [
+          "tidmad_denoising_score",
+          "higher"
+        ],
+        "metric_summary": "tidmad_denoising_score; direction=higher; aggregation=tidmad_anchor_normalised_linear_grand_mean",
+        "scientific_constraints": [
+          "Every certified selection must cover the selected files [0, 1, 2, 3] or refuse.",
+          "Findings concern sampled raw validation windows, not unseen data or hidden targets.",
+          "Use the declared physical cadence; distinguish measured findings from hypotheses."
+        ],
+        "scientific_goal": "Characterize authorized raw waveform inputs in the selected band.",
+        "target_description": "Clean injected waveform, not visible in the initial raw-data analysis.",
+        "task_description": "full-spectrum 1-D time-series denoising of SQUID dark-matter\ndetector data: map a noisy [B, T] integer signal to a clean\n[B, T] continuous waveform, trained across the whole frequency\nspectrum within the selected band at once (not split into per-file or\nper-frequency models). This is a\ncontinuous regression task \u2014 the model predicts waveform values\ndirectly, not a distribution over discrete levels.",
+        "task_id": "tidmad_frozen_training_pool"
+      }
+    },
+    "results": [
+      {
+        "artifact_refs": [
+          {
+            "byte_size": 25909,
+            "logical_ref": "artifacts/b3977c57ecca14886a2843b7f5e26cba9f942098443fd718ebd7b534c577de8e.json",
+            "media_type": "application/json",
+            "sha256": "b3977c57ecca14886a2843b7f5e26cba9f942098443fd718ebd7b534c577de8e"
+          }
+        ],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "boundary-audit-raw-waveforms"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "generated_program",
+        "failure": null,
+        "generated_program_identity": {
+          "declaration_sha256": "38bc311f729c591f83339be5d8da65695280fbf98b2ca230eeb043b837e9c91b",
+          "determinism": "deterministic",
+          "parameter_schema_sha256": "14ec3be61534e0ab8040dbfe7b7f85910858117e38a1fc1f21c4897e6b4126d6",
+          "program_id": "raw-waveform-boundary-audit-v1",
+          "runtime_environment_sha256": "d6a74adb1315f3156e65c77e4f6b28040b7b4739616750adbc483b74044bfa59",
+          "sandbox_protocol_id": "siderius.generated-analysis-sandbox.v1",
+          "seed": 20260915,
+          "source_sha256": "78bf12922a4d8d39b8ff5d263b6ba204bf02c92f90ac841c917ae730e0b9fb44"
+        },
+        "invocation_id": "raw-waveform-boundary-audit",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:16.363755+00:00",
+              "binding_id": "boundary-audit-raw-waveforms",
+              "decision": "allowed",
+              "invocation_id": "raw-waveform-boundary-audit",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "51c1cb1a32bccf5b13d20b8fd0a84bfa955c3fb4ad0671cc96419c86240f9785",
+              "slot_id": "raw_waveforms"
+            }
+          ],
+          "environment_lock_verified": true,
+          "finished_at": "2026-09-22T21:10:17.371908+00:00",
+          "host_details": {
+            "sandbox_disposition": "completed",
+            "sandbox_protocol_id": "siderius.generated-analysis-sandbox.v1",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "parameter_schema_sha256": "14ec3be61534e0ab8040dbfe7b7f85910858117e38a1fc1f21c4897e6b4126d6",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:17.085157+00:00",
+          "validated_parameters_sha256": "c0a955d5910c08deaf3848c4cfdcd8b09c81f0262de5cf07fe121001d859da8b",
+          "worker_pid": 751227
+        },
+        "quantitative_results": [
+          {
+            "description": "Number of waveforms containing at least one valid finite sample.",
+            "result_key": "effective_waveform_count",
+            "unit": "waveforms",
+            "value": 10
+          },
+          {
+            "description": "Number of valid finite channel samples included in amplitude statistics.",
+            "result_key": "usable_sample_count",
+            "unit": "samples",
+            "value": 2621440
+          },
+          {
+            "description": "Minimum valid finite encoded amplitude observed across all waveforms.",
+            "result_key": "global_minimum",
+            "unit": "encoded amplitude units",
+            "value": 0.0
+          },
+          {
+            "description": "Maximum valid finite encoded amplitude observed across all waveforms.",
+            "result_key": "global_maximum",
+            "unit": "encoded amplitude units",
+            "value": 255.0
+          },
+          {
+            "description": "Number of distinct valid finite amplitude values observed.",
+            "result_key": "unique_value_count",
+            "unit": "levels",
+            "value": 252
+          },
+          {
+            "description": "Fraction of integer levels between the observed extrema that are occupied, or null for non-integer-valued data.",
+            "result_key": "integer_span_occupancy_fraction",
+            "unit": "fraction",
+            "value": 0.984375
+          },
+          {
+            "description": "Fraction of usable samples equal to the global observed minimum.",
+            "result_key": "minimum_value_fraction",
+            "unit": "fraction",
+            "value": 9.918212890625e-06
+          },
+          {
+            "description": "Fraction of usable samples equal to the global observed maximum.",
+            "result_key": "maximum_value_fraction",
+            "unit": "fraction",
+            "value": 3.814697265625e-06
+          },
+          {
+            "description": "Longest contiguous run of equal valid samples within any waveform channel.",
+            "result_key": "longest_flat_run_samples",
+            "unit": "samples",
+            "value": 9
+          },
+          {
+            "description": "Fraction of valid adjacent sample pairs whose absolute change meets the configured abrupt-jump threshold.",
+            "result_key": "abrupt_jump_fraction",
+            "unit": "fraction",
+            "value": 0.0009475744154907817
+          },
+          {
+            "description": "Largest absolute change across valid adjacent samples.",
+            "result_key": "maximum_absolute_jump",
+            "unit": "encoded amplitude units",
+            "value": 84.0
+          },
+          {
+            "description": "Number of non-finite values in the materialized waveform array.",
+            "result_key": "nonfinite_sample_count",
+            "unit": "samples",
+            "value": 0
+          },
+          {
+            "description": "Number of waveform time positions marked invalid by the certified valid mask.",
+            "result_key": "invalid_mask_time_position_count",
+            "unit": "time positions",
+            "value": 0
+          },
+          {
+            "description": "Number of non-finite or non-increasing/non-positive entries detected in the certified time-axis encoding.",
+            "result_key": "structurally_invalid_time_value_count",
+            "unit": "entries",
+            "value": 0
+          },
+          {
+            "description": "Ratio of the largest to smallest positive per-waveform amplitude interquartile range, or null when fewer than two are positive.",
+            "result_key": "waveform_iqr_ratio",
+            "unit": "ratio",
+            "value": 1.7
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "RLIMIT_AS bounds virtual address space; peak RSS is observed separately.",
+            "RLIMIT_NPROC is host-UID-scoped and permits a fixed increment above the observed pre-launch UID task baseline."
+          ],
+          "peak_rss_bytes": 98238464,
+          "peak_vram_bytes": null,
+          "wall_time_s": 0.28639719300554134
+        },
+        "result_id": "iteration-001.raw-waveform-boundary-audit.result",
+        "skill_identity": null,
+        "status": "completed",
+        "summary": "Audited 10 of 10 sampled raw waveforms. Observed usable values ranged from 0 to 255 with 252 occupied levels. Repeated-extreme, long-flat-run, and threshold-jump flags occurred in 0, 0, and 10 waveforms, respectively. These are observed boundary diagnostics; repeated extrema alone do not establish clipping.",
+        "warnings": []
+      },
+      {
+        "artifact_refs": [
+          {
+            "byte_size": 258,
+            "logical_ref": "artifacts/245f111936f6190de711dc14a63dc4b7aec590df89eb8ea601652c60067e4094.json",
+            "media_type": "application/json",
+            "sha256": "245f111936f6190de711dc14a63dc4b7aec590df89eb8ea601652c60067e4094"
+          }
+        ],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "amplitude-summary-values"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "reference_skill",
+        "failure": null,
+        "generated_program_identity": null,
+        "invocation_id": "raw-amplitude-summary",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:17.378387+00:00",
+              "binding_id": "amplitude-summary-values",
+              "decision": "allowed",
+              "invocation_id": "raw-amplitude-summary",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "edf3bdaa777a43d5a2efc6257b2bc477f19f70346cf83c21cf308d0a7ac9c8bf",
+              "slot_id": "values"
+            }
+          ],
+          "environment_lock_verified": false,
+          "finished_at": "2026-09-22T21:10:18.628535+00:00",
+          "host_details": {
+            "supervisor_disposition": "exited"
+          },
+          "parameter_schema_sha256": "04e429a6cc163a60ba2abdfb666bd48d0c54a5428e73cb20e9347ead2878c1bb",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:18.009566+00:00",
+          "validated_parameters_sha256": "6863c7b9986b761e43f380e276eae921ef83e4bd80899e0a919a3fa99a2c052f",
+          "worker_pid": 751230
+        },
+        "quantitative_results": [
+          {
+            "description": "Number of finite values included",
+            "result_key": "finite_count",
+            "unit": null,
+            "value": 2621440
+          },
+          {
+            "description": "Finite-value mean",
+            "result_key": "mean",
+            "unit": null,
+            "value": 126.86635665893554
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "VRAM was not observed by the generic worker supervisor."
+          ],
+          "peak_rss_bytes": 135561216,
+          "peak_vram_bytes": null,
+          "wall_time_s": 0.6189491450204514
+        },
+        "result_id": "iteration-001.raw-amplitude-summary.result",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "737afee6dbba0c0c08970f2608cbc4db49d31bae12279a35db32f3f9e1b8f30a",
+          "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+          "pack_id": "core-analysis",
+          "pack_version": "1.0.0",
+          "skill_id": "summary_statistics",
+          "skill_version": "1.0.0"
+        },
+        "status": "completed",
+        "summary": "Summarized 2621440 finite numeric values.",
+        "warnings": []
+      },
+      {
+        "artifact_refs": [
+          {
+            "byte_size": 3899,
+            "logical_ref": "artifacts/456b2565fd61697d42dd6761de998cfc4dd754af576fe6e77eeda30c36e2bff1.json",
+            "media_type": "application/json",
+            "sha256": "456b2565fd61697d42dd6761de998cfc4dd754af576fe6e77eeda30c36e2bff1"
+          }
+        ],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "cadence-series"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "reference_skill",
+        "failure": null,
+        "generated_program_identity": null,
+        "invocation_id": "raw-cadence-and-gaps",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:18.633952+00:00",
+              "binding_id": "cadence-series",
+              "decision": "allowed",
+              "invocation_id": "raw-cadence-and-gaps",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "bcb2b7d1f211ccdeb17673290ccbab7940547b8f6af28081c7d07926097f0ea5",
+              "slot_id": "series"
+            }
+          ],
+          "environment_lock_verified": false,
+          "finished_at": "2026-09-22T21:10:21.272455+00:00",
+          "host_details": {
+            "supervisor_disposition": "exited"
+          },
+          "parameter_schema_sha256": "01175379416388ead56bda8406095d96da401fb5833a0281ee5544a4224df127",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:19.263204+00:00",
+          "validated_parameters_sha256": "4f442446e62c3d16e91fb5d657b51abd7b578dd4007a0ec6500b93671436bc9b",
+          "worker_pid": 751246
+        },
+        "quantitative_results": [
+          {
+            "description": "Examples with sufficient monotonic finite timestamps",
+            "result_key": "usable_example_count",
+            "unit": null,
+            "value": 10
+          },
+          {
+            "description": "Usable examples outside the requested regular-cadence tolerance",
+            "result_key": "irregular_example_count",
+            "unit": null,
+            "value": 0
+          },
+          {
+            "description": "Detected gaps across usable examples",
+            "result_key": "total_gap_count",
+            "unit": null,
+            "value": 0
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "VRAM was not observed by the generic worker supervisor."
+          ],
+          "peak_rss_bytes": 159010816,
+          "peak_vram_bytes": null,
+          "wall_time_s": 2.0092315479996614
+        },
+        "result_id": "iteration-001.raw-cadence-and-gaps.result",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "367d1fa54093757d469b04a504afd1bcb3697922add13cb94de66bab0090dd3c",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "sampling_cadence_and_gaps",
+          "skill_version": "1.0.0"
+        },
+        "status": "completed",
+        "summary": "Characterized sampling for 10/10 examples.",
+        "warnings": []
+      },
+      {
+        "artifact_refs": [
+          {
+            "byte_size": 1497445,
+            "logical_ref": "artifacts/c7bd34fd4dbb7d194e4da82e79a210adc008785d93605b14596eca7660477990.json",
+            "media_type": "application/json",
+            "sha256": "c7bd34fd4dbb7d194e4da82e79a210adc008785d93605b14596eca7660477990"
+          }
+        ],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "welch-series"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "reference_skill",
+        "failure": null,
+        "generated_program_identity": null,
+        "invocation_id": "raw-welch-psd",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:21.277612+00:00",
+              "binding_id": "welch-series",
+              "decision": "allowed",
+              "invocation_id": "raw-welch-psd",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "6e5710e8a65044e9f8f27a1b573ae51a8a0287de1f1253f976d6cd6fd3e94b01",
+              "slot_id": "series"
+            }
+          ],
+          "environment_lock_verified": false,
+          "finished_at": "2026-09-22T21:10:24.032454+00:00",
+          "host_details": {
+            "supervisor_disposition": "exited"
+          },
+          "parameter_schema_sha256": "9b74d3e4a2b2ac4034fc5f058395a07dba565b61b174222f7ed11e6aa9c2219a",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:21.898241+00:00",
+          "validated_parameters_sha256": "8a9577db0a190e4b68ebb1a72d42fbdadb68f13f7d7ec3498729ebfb3a87a7e0",
+          "worker_pid": 751277
+        },
+        "quantitative_results": [
+          {
+            "description": "Number of example-channel atomic series with usable results",
+            "result_key": "usable_series_count",
+            "unit": null,
+            "value": 10
+          },
+          {
+            "description": "Dominant Welch PSD peak frequency; median across usable examples in this channel",
+            "result_key": "channel.channel0001.dominant_frequency_hz.median",
+            "unit": "Hz",
+            "value": 12207.03125
+          },
+          {
+            "description": "Integrated one-sided PSD power; median across usable examples in this channel",
+            "result_key": "channel.channel0001.integrated_power.median",
+            "unit": "input_unit_squared",
+            "value": 179.52727233982012
+          },
+          {
+            "description": "Resolved Welch frequency spacing; median across usable examples in this channel",
+            "result_key": "channel.channel0001.frequency_resolution_hz.median",
+            "unit": "Hz",
+            "value": 1220.703125
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "VRAM was not observed by the generic worker supervisor."
+          ],
+          "peak_rss_bytes": 200142848,
+          "peak_vram_bytes": null,
+          "wall_time_s": 2.134192986995913
+        },
+        "result_id": "iteration-001.raw-welch-psd.result",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "1e4edd77dd91067a03aa3ac3977b4dda382d9303fadf85a776e72aff975e13eb",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "welch_psd",
+          "skill_version": "1.0.0"
+        },
+        "status": "completed",
+        "summary": "Estimated one-sided Welch PSD for applicable regular series.",
+        "warnings": []
+      },
+      {
+        "artifact_refs": [
+          {
+            "byte_size": 51008288,
+            "logical_ref": "artifacts/b9855945ed1a2c981182a8d1579f5e00b3eea8684c3635e21e35eea88258ad85.json",
+            "media_type": "application/json",
+            "sha256": "b9855945ed1a2c981182a8d1579f5e00b3eea8684c3635e21e35eea88258ad85"
+          }
+        ],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "fft-series"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "reference_skill",
+        "failure": null,
+        "generated_program_identity": null,
+        "invocation_id": "raw-fft-peaks",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:24.041705+00:00",
+              "binding_id": "fft-series",
+              "decision": "allowed",
+              "invocation_id": "raw-fft-peaks",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "2f75b2cbffc9e244e167664638247d587dae9054978322635c70483627b47237",
+              "slot_id": "series"
+            }
+          ],
+          "environment_lock_verified": false,
+          "finished_at": "2026-09-22T21:10:29.734907+00:00",
+          "host_details": {
+            "supervisor_disposition": "exited"
+          },
+          "parameter_schema_sha256": "bfa250a8520402f7cd77395dc0f7efc99c9af8570554e3f19a19df0669b41655",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:24.659510+00:00",
+          "validated_parameters_sha256": "6a6a03cd322a8a9cb67a83b387846fe23f41764f09cb34da61a9b83e2fb8f850",
+          "worker_pid": 751308
+        },
+        "quantitative_results": [
+          {
+            "description": "Number of example-channel atomic series with usable results",
+            "result_key": "usable_series_count",
+            "unit": null,
+            "value": 10
+          },
+          {
+            "description": "Dominant non-DC FFT peak frequency; median across usable examples in this channel",
+            "result_key": "channel.channel0001.dominant_frequency_hz.median",
+            "unit": "Hz",
+            "value": 14896.392822265625
+          },
+          {
+            "description": "Amplitude-squared spectral centroid; median across usable examples in this channel",
+            "result_key": "channel.channel0001.spectral_centroid_hz.median",
+            "unit": "Hz",
+            "value": 367613.07253907144
+          },
+          {
+            "description": "Maximum-bin power concentration; median across usable examples in this channel",
+            "result_key": "channel.channel0001.maximum_bin_power_fraction.median",
+            "unit": null,
+            "value": 0.02659588151324923
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "VRAM was not observed by the generic worker supervisor."
+          ],
+          "peak_rss_bytes": 417492992,
+          "peak_vram_bytes": null,
+          "wall_time_s": 5.0753764279943425
+        },
+        "result_id": "iteration-001.raw-fft-peaks.result",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "fb2f3331dad629d7072f1ea66f6fb34a5ca2995f953e178efb8762e62d7fd6eb",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "fft_peak_summary",
+          "skill_version": "1.0.0"
+        },
+        "status": "completed",
+        "summary": "Computed one-sided FFT peak evidence for applicable regular series.",
+        "warnings": []
+      },
+      {
+        "artifact_refs": [
+          {
+            "byte_size": 42917,
+            "logical_ref": "artifacts/88c6b643b6074bc70f92af3711ccc09f93e486727711f49a601207798643b494.json",
+            "media_type": "application/json",
+            "sha256": "88c6b643b6074bc70f92af3711ccc09f93e486727711f49a601207798643b494"
+          }
+        ],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "temporal-stability-series"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "reference_skill",
+        "failure": null,
+        "generated_program_identity": null,
+        "invocation_id": "raw-temporal-stability",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:29.842778+00:00",
+              "binding_id": "temporal-stability-series",
+              "decision": "allowed",
+              "invocation_id": "raw-temporal-stability",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "ce75d6afe73905dbd5f154a024d2f48762d5a036c7e644768b8e4d84cb1da566",
+              "slot_id": "series"
+            }
+          ],
+          "environment_lock_verified": false,
+          "finished_at": "2026-09-22T21:10:32.656387+00:00",
+          "host_details": {
+            "supervisor_disposition": "exited"
+          },
+          "parameter_schema_sha256": "119d1899c7d6797d046f79735db3e3f188599e174a255b4b6c2bb5d91f0fe069",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:30.476669+00:00",
+          "validated_parameters_sha256": "b36134c8abe6c2cd3a14cbd90696aa52257650013472cbaf481e99792bac9a07",
+          "worker_pid": 751339
+        },
+        "quantitative_results": [
+          {
+            "description": "Number of example-channel atomic series with usable results",
+            "result_key": "usable_series_count",
+            "unit": null,
+            "value": 10
+          },
+          {
+            "description": "Range of supported window means; median across usable examples in this channel",
+            "result_key": "channel.channel0001.window_mean_range.median",
+            "unit": null,
+            "value": 0.3563232421875
+          },
+          {
+            "description": "Range of supported window standard deviations; median across usable examples in this channel",
+            "result_key": "channel.channel0001.window_scale_range.median",
+            "unit": null,
+            "value": 12.82941480937675
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "VRAM was not observed by the generic worker supervisor."
+          ],
+          "peak_rss_bytes": 198684672,
+          "peak_vram_bytes": null,
+          "wall_time_s": 2.1796969670103863
+        },
+        "result_id": "iteration-001.raw-temporal-stability.result",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "303aa68d83386cc16dc0cad5f57caf0893bffafbd42b5eadeeffc5c6391aa209",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "temporal_stability_summary",
+          "skill_version": "1.0.0"
+        },
+        "status": "completed",
+        "summary": "Measured time-local statistical variation without assigning stationarity labels.",
+        "warnings": []
+      },
+      {
+        "artifact_refs": [],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "stft-series"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "reference_skill",
+        "failure": {
+          "failure_type": "artifact_certification",
+          "materialization_occurred": true,
+          "message": "skill exceeded its total artifact byte limit",
+          "refusal_code": null,
+          "retryable": false
+        },
+        "generated_program_identity": null,
+        "invocation_id": "raw-stft-energy",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:32.662065+00:00",
+              "binding_id": "stft-series",
+              "decision": "allowed",
+              "invocation_id": "raw-stft-energy",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "026d8c4b94f74e46ce19a850b1bac93737a55993672dd03c96e7c050733bc0fe",
+              "slot_id": "series"
+            }
+          ],
+          "environment_lock_verified": false,
+          "finished_at": "2026-09-22T21:10:41.836009+00:00",
+          "host_details": {
+            "supervisor_disposition": "exited"
+          },
+          "parameter_schema_sha256": "392c17ca2584ca590d4cc60db92223672726e750423f9f212bfa8a71e49b7784",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:33.282094+00:00",
+          "validated_parameters_sha256": "47c38625b5789b81392451643797f7fd4e3efb611437b9f3be72c82427f4299f",
+          "worker_pid": 751374
+        },
+        "quantitative_results": [
+          {
+            "description": "Number of example-channel atomic series with usable results",
+            "result_key": "usable_series_count",
+            "unit": null,
+            "value": 10
+          },
+          {
+            "description": "Energy fraction in top-decile cells; median across usable examples in this channel",
+            "result_key": "channel.channel0001.top_decile_energy_fraction.median",
+            "unit": null,
+            "value": 0.8852959736566519
+          },
+          {
+            "description": "Fraction of active STFT time bins; median across usable examples in this channel",
+            "result_key": "channel.channel0001.active_duration_fraction.median",
+            "unit": null,
+            "value": 1.0
+          },
+          {
+            "description": "Resolved STFT frequency spacing; median across usable examples in this channel",
+            "result_key": "channel.channel0001.frequency_resolution_hz.median",
+            "unit": "Hz",
+            "value": 2441.40625
+          },
+          {
+            "description": "Resolved STFT segment duration; median across usable examples in this channel",
+            "result_key": "channel.channel0001.segment_duration_seconds.median",
+            "unit": "s",
+            "value": 0.0004096
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "VRAM was not observed by the generic worker supervisor."
+          ],
+          "peak_rss_bytes": 654532608,
+          "peak_vram_bytes": null,
+          "wall_time_s": 8.553895476012258
+        },
+        "result_id": "iteration-001.raw-stft-energy.result",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "fa0e64b77bb038ec0e1894d89720a126c55d76b02975433e24fb7676317bd1b6",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "stft_energy_map",
+          "skill_version": "1.0.0"
+        },
+        "status": "failed",
+        "summary": "Skill artifacts failed executor certification.",
+        "warnings": []
+      },
+      {
+        "artifact_refs": [
+          {
+            "byte_size": 13805179,
+            "logical_ref": "artifacts/c32db0e9669049a6071bb8b667750eb62d9716700dfc1da004a71a871f310fbb.json",
+            "media_type": "application/json",
+            "sha256": "c32db0e9669049a6071bb8b667750eb62d9716700dfc1da004a71a871f310fbb"
+          }
+        ],
+        "coverage": {
+          "analyzed_count": 10,
+          "binding_ids": [
+            "autocorrelation-series"
+          ],
+          "filters": [],
+          "inference_count": null,
+          "model_artifact_ref": null,
+          "population_unit": "fixed-duration validation windows",
+          "sampling_seed": 20260915,
+          "sampling_strategy": "fixed:task_defined",
+          "selection_sha256": "f17810e443c04ffdd333e12b57b7aa4afca47d579e4a9a74e12018c8b32ce282",
+          "slice_descriptions": [],
+          "split_id": "validation",
+          "total_available": 30630
+        },
+        "execution_origin": "reference_skill",
+        "failure": null,
+        "generated_program_identity": null,
+        "invocation_id": "raw-autocorrelation",
+        "provenance": {
+          "authorization_receipts": [
+            {
+              "asset_digest": "e026cd3e8249146ef5b6b4618bbf7e841d35ef15ac662debbca4bfed2939cad3",
+              "authorized_at": "2026-09-22T21:10:41.911826+00:00",
+              "binding_id": "autocorrelation-series",
+              "decision": "allowed",
+              "invocation_id": "raw-autocorrelation",
+              "policy_digest": "bf754f8142c515773a8b5d48e9080915d09ea7111fe41d225fa753567257a15d",
+              "request_digest": "8e8e216ed3ec498ae42efe85107aa4d3aa3bec2947ab622806ad5f7a7bd633b8",
+              "slot_id": "series"
+            }
+          ],
+          "environment_lock_verified": false,
+          "finished_at": "2026-09-22T21:10:50.761719+00:00",
+          "host_details": {
+            "supervisor_disposition": "exited"
+          },
+          "parameter_schema_sha256": "7a07a14fa783f7a9577ea8320a9098174271a73bea915eceeb2c0b8fbe4b3a41",
+          "plan_sha256": "0d793b7f54266f9e0f2540f4dabad485b69fa66e98b9b0fa2a8296d3ce578ef2",
+          "started_at": "2026-09-22T21:10:42.534198+00:00",
+          "validated_parameters_sha256": "e1b5d05ebd7a805b19ea733ada1a63204836fa84afa8c18d2ed97f4d7c1f90f6",
+          "worker_pid": 751405
+        },
+        "quantitative_results": [
+          {
+            "description": "Number of example-channel atomic series with usable results",
+            "result_key": "usable_series_count",
+            "unit": null,
+            "value": 10
+          },
+          {
+            "description": "Strongest absolute-correlation lag; median across usable examples in this channel",
+            "result_key": "channel.channel0001.strongest_lag_seconds.median",
+            "unit": "s",
+            "value": 1e-07
+          },
+          {
+            "description": "Signed coefficient at strongest lag; median across usable examples in this channel",
+            "result_key": "channel.channel0001.strongest_coefficient.median",
+            "unit": null,
+            "value": 0.9136990050919849
+          }
+        ],
+        "resource_usage": {
+          "cpu_time_s": null,
+          "device": "cpu",
+          "measurement_limitations": [
+            "CPU time was not measured per process group.",
+            "VRAM was not observed by the generic worker supervisor."
+          ],
+          "peak_rss_bytes": 233238528,
+          "peak_vram_bytes": null,
+          "wall_time_s": 8.227500506007345
+        },
+        "result_id": "iteration-001.raw-autocorrelation.result",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "35049db03d48f698929a53cdf45904f8427ac530753a40020ea776f2ab839171",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "autocorrelation",
+          "skill_version": "1.0.0"
+        },
+        "status": "completed",
+        "summary": "Computed normalized autocorrelation for applicable regular series.",
+        "warnings": []
+      }
+    ]
+  },
+  "provenance": {
+    "reference_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+    "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+    "archive": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-da-only-run1-20260922/band-0-3/unit/workspace/iter_001/iteration_001/data_analysis/iter_001/iteration-001",
+    "input_sha256": "b6cba323abd11791c3ffbbeb150a2bdfa8f6b70f433f450a937a91c7e12f6bb6"
+  }
+}

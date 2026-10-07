@@ -1,0 +1,221 @@
+{
+  "scope": "Source audit before validator appendix integration; equal selected functions do not prove caller inputs or full-call parity",
+  "rows": [
+    {
+      "task": "tess",
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "path": "src/agent/prompts.py",
+      "symbol": "REFLECTOR_PROMPT",
+      "ast_equal": true,
+      "reference_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526",
+      "candidate_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526"
+    },
+    {
+      "task": "tess",
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "path": "src/agent/prompts.py",
+      "symbol": "get_reflector_user_prompt",
+      "ast_equal": true,
+      "reference_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6",
+      "candidate_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6"
+    },
+    {
+      "task": "tess",
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "path": "src/agent/llm_bridge.py",
+      "symbol": "reflect",
+      "ast_equal": true,
+      "reference_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96",
+      "candidate_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96"
+    },
+    {
+      "task": "tess",
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "path": "src/nodes/ml_code_validator_agent/ml_code_validator_agent.py",
+      "bytes_equal": false,
+      "reference_sha256": "d041837e6ef5f52bcdb5726aabef1769e96415e354ddbc36b1dc765ceef6faee",
+      "candidate_sha256": "2506961fdaa7f0ca0f181d7d636253031bcfe105357b7a04ddbce2a3168fed5c"
+    },
+    {
+      "task": "tess",
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "path": "src/agent/prompt_templates/literature_review/__init__.py",
+      "bytes_equal": true,
+      "reference_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a",
+      "candidate_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a"
+    },
+    {
+      "task": "ligo",
+      "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "path": "src/agent/prompts.py",
+      "symbol": "REFLECTOR_PROMPT",
+      "ast_equal": true,
+      "reference_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526",
+      "candidate_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526"
+    },
+    {
+      "task": "ligo",
+      "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "path": "src/agent/prompts.py",
+      "symbol": "get_reflector_user_prompt",
+      "ast_equal": true,
+      "reference_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6",
+      "candidate_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6"
+    },
+    {
+      "task": "ligo",
+      "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "path": "src/agent/llm_bridge.py",
+      "symbol": "reflect",
+      "ast_equal": true,
+      "reference_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96",
+      "candidate_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96"
+    },
+    {
+      "task": "ligo",
+      "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "path": "src/nodes/ml_code_validator_agent/ml_code_validator_agent.py",
+      "bytes_equal": false,
+      "reference_sha256": "2959140138fded6aa05be3476050ece40fa8b4fb24d6ce5889663145dc0bd469",
+      "candidate_sha256": "2506961fdaa7f0ca0f181d7d636253031bcfe105357b7a04ddbce2a3168fed5c"
+    },
+    {
+      "task": "ligo",
+      "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "path": "src/agent/prompt_templates/literature_review/__init__.py",
+      "bytes_equal": true,
+      "reference_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a",
+      "candidate_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a"
+    },
+    {
+      "task": "project8",
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "path": "src/agent/prompts.py",
+      "symbol": "REFLECTOR_PROMPT",
+      "ast_equal": true,
+      "reference_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526",
+      "candidate_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526"
+    },
+    {
+      "task": "project8",
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "path": "src/agent/prompts.py",
+      "symbol": "get_reflector_user_prompt",
+      "ast_equal": true,
+      "reference_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6",
+      "candidate_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6"
+    },
+    {
+      "task": "project8",
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "path": "src/agent/llm_bridge.py",
+      "symbol": "reflect",
+      "ast_equal": true,
+      "reference_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96",
+      "candidate_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96"
+    },
+    {
+      "task": "project8",
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "path": "src/nodes/ml_code_validator_agent/ml_code_validator_agent.py",
+      "bytes_equal": true,
+      "reference_sha256": "2506961fdaa7f0ca0f181d7d636253031bcfe105357b7a04ddbce2a3168fed5c",
+      "candidate_sha256": "2506961fdaa7f0ca0f181d7d636253031bcfe105357b7a04ddbce2a3168fed5c"
+    },
+    {
+      "task": "project8",
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "path": "src/agent/prompt_templates/literature_review/__init__.py",
+      "bytes_equal": true,
+      "reference_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a",
+      "candidate_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a"
+    },
+    {
+      "task": "tidmad",
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "path": "src/agent/prompts.py",
+      "symbol": "REFLECTOR_PROMPT",
+      "ast_equal": true,
+      "reference_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526",
+      "candidate_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526"
+    },
+    {
+      "task": "tidmad",
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "path": "src/agent/prompts.py",
+      "symbol": "get_reflector_user_prompt",
+      "ast_equal": true,
+      "reference_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6",
+      "candidate_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6"
+    },
+    {
+      "task": "tidmad",
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "path": "src/agent/llm_bridge.py",
+      "symbol": "reflect",
+      "ast_equal": true,
+      "reference_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96",
+      "candidate_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96"
+    },
+    {
+      "task": "tidmad",
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "path": "src/nodes/ml_code_validator_agent/ml_code_validator_agent.py",
+      "bytes_equal": false,
+      "reference_sha256": "d041837e6ef5f52bcdb5726aabef1769e96415e354ddbc36b1dc765ceef6faee",
+      "candidate_sha256": "2506961fdaa7f0ca0f181d7d636253031bcfe105357b7a04ddbce2a3168fed5c"
+    },
+    {
+      "task": "tidmad",
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "path": "src/agent/prompt_templates/literature_review/__init__.py",
+      "bytes_equal": true,
+      "reference_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a",
+      "candidate_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a"
+    },
+    {
+      "task": "analysis",
+      "revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "path": "src/agent/prompts.py",
+      "symbol": "REFLECTOR_PROMPT",
+      "ast_equal": true,
+      "reference_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526",
+      "candidate_sha256": "3467df46b1f4213103a851128c26f9c04efcce7ddf5ce96373c0fecd40254526"
+    },
+    {
+      "task": "analysis",
+      "revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "path": "src/agent/prompts.py",
+      "symbol": "get_reflector_user_prompt",
+      "ast_equal": true,
+      "reference_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6",
+      "candidate_sha256": "6b460b04c8b196b97535541e35e981cef842b73b04a98f510f2cbb3bb50c7fd6"
+    },
+    {
+      "task": "analysis",
+      "revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "path": "src/agent/llm_bridge.py",
+      "symbol": "reflect",
+      "ast_equal": true,
+      "reference_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96",
+      "candidate_sha256": "eda389831590add96a31a1c84049a361774e6993a1ae5e5165070153ce387c96"
+    },
+    {
+      "task": "analysis",
+      "revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "path": "src/nodes/ml_code_validator_agent/ml_code_validator_agent.py",
+      "bytes_equal": true,
+      "reference_sha256": "2506961fdaa7f0ca0f181d7d636253031bcfe105357b7a04ddbce2a3168fed5c",
+      "candidate_sha256": "2506961fdaa7f0ca0f181d7d636253031bcfe105357b7a04ddbce2a3168fed5c"
+    },
+    {
+      "task": "analysis",
+      "revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "path": "src/agent/prompt_templates/literature_review/__init__.py",
+      "bytes_equal": true,
+      "reference_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a",
+      "candidate_sha256": "763ebc9c860ae1be30aac5a4ea43baa97aff6e8f93e47c4412203c439b97672a"
+    }
+  ],
+  "audited_candidate_revision": "3d9f2c41ba44bd42fc89af2fcf0156af407e65d1"
+}

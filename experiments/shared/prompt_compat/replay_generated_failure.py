@@ -13,6 +13,7 @@ import os
 import socket
 import subprocess
 import sys
+from contextlib import nullcontext
 from copy import deepcopy
 from pathlib import Path
 
@@ -22,6 +23,7 @@ def replay(
     receipt_sha256: str,
     output: Path,
     recovery_policy: Path | None = None,
+    profile_name: str | None = None,
 ) -> dict:
     receipt_path = archive / "structured_output_receipts.jsonl"
     receipt_bytes = receipt_path.read_bytes()
@@ -92,29 +94,34 @@ def replay(
                 "data_analysis.generated_program.repair",
             )[index]
             if label != expected:
-                raise AssertionError(
-                    f"Reply routing changed: expected {expected}, got {label}"
-                )
+                raise AssertionError(f"Reply routing changed: expected {expected}, got {label}")
             return deepcopy(drafts[index])
 
+    profile_identity = None
+    rendering_scope = nullcontext()
+    if profile_name is not None:
+        from agent.prompt_rendering import bind_prompt_profile, resolve_prompt_profile
+
+        profile = resolve_prompt_profile(profile_name)
+        profile_identity = profile.identity().model_dump(mode="json")
+        rendering_scope = bind_prompt_profile(profile)
     try:
-        prepare_generated_program(
-            bridge=ArchivedReplies(),
-            store=store,
-            analysis_input=analysis_input,
-            question_ids=tuple(drafts[0]["question_ids"]),
-            provider="openai",
-            requested_model_id="offline-archived-replies",
-            llm_config={},
-        )
+        with rendering_scope:
+            prepare_generated_program(
+                bridge=ArchivedReplies(),
+                store=store,
+                analysis_input=analysis_input,
+                question_ids=tuple(drafts[0]["question_ids"]),
+                provider="openai",
+                requested_model_id="offline-archived-replies",
+                llm_config={},
+            )
     except MissingReply:
         outcome = "additional_request_without_archived_reply"
     except DataAnalysisStructuredOutputError:
         outcome = "failed_after_archived_repair"
     else:
-        raise AssertionError(
-            "Both archived replies are invalid; execution must not be reached"
-        )
+        raise AssertionError("Both archived replies are invalid; execution must not be reached")
 
     source_digest = hashlib.sha256()
     for source in sorted((checkout / "src").rglob("*.py")):
@@ -126,9 +133,7 @@ def replay(
             ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
         ).strip(),
         "source_diff_sha256": hashlib.sha256(
-            subprocess.check_output(
-                ["git", "-C", str(checkout), "diff", "HEAD", "--", "src"]
-            )
+            subprocess.check_output(["git", "-C", str(checkout), "diff", "HEAD", "--", "src"])
         ).hexdigest(),
         "capture_tool_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "receipt_sha256": receipt_sha256,
@@ -136,6 +141,7 @@ def replay(
         "recovery_policy_sha256": (
             None if policy_bytes is None else hashlib.sha256(policy_bytes).hexdigest()
         ),
+        "profile": profile_identity,
         "outcome": outcome,
         "requests": [
             {
@@ -164,6 +170,7 @@ if __name__ == "__main__":
     parser.add_argument("--receipt-sha256", required=True)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--recovery-policy", type=Path)
+    parser.add_argument("--profile")
     args = parser.parse_args()
     print(
         json.dumps(
@@ -172,6 +179,7 @@ if __name__ == "__main__":
                 args.receipt_sha256,
                 args.output.resolve(),
                 args.recovery_policy,
+                args.profile,
             ),
             indent=2,
         )

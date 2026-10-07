@@ -1,0 +1,53 @@
+{
+  "candidate_revision": "2458cb2214d5857570c65bc043be9602be4bafc3",
+  "results": [
+    {
+      "case": "tess",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "4bd6119c979afcd470013e6c3fc2db5a25d5b7bfeeffb0891b9907a48b14ced0",
+        "user": "39ca1c956e72fd37c433c5d88ad3df9d3c120f5ac5beeb7e5fb517ad47251625"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "ligo",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+        "user": "337e6f7d697bfe0ff6803ce5144365563cde9da3c700079e573f070a2f84d646"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "project8",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "b2abecd0315f2f3a0e3beebebfbb3431629123465418da550f69635910861aef",
+        "user": "516f520d1b2f181ef3e35478a91aa0e6748d5f5761416256f504840c3afbc9cd"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "tidmad",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "d59f2d173ad44f205083d5414acbcb3ea1f0e29bbf1767b4ba24aa94f76c73fd",
+        "user": "3ed12413a37d9546ec36f13ce198bc22336dd54be6eac55f27d2e9b496603bbd"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    }
+  ]
+}
