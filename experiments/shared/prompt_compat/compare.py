@@ -19,6 +19,9 @@ PROFILES = {
 
 def compare(candidate: Path, references: dict, output: Path) -> dict:
     root = Path(__file__).parent
+    requests = sorted((root / "fixtures").glob("*.json"))
+    if not requests:
+        raise ValueError("No prompt fixtures found; an empty comparison is not qualification")
     output.mkdir(parents=True, exist_ok=False)
     candidate_revision = subprocess.check_output(
         ["git", "-C", str(candidate), "rev-parse", "HEAD"], text=True
@@ -64,7 +67,6 @@ def compare(candidate: Path, references: dict, output: Path) -> dict:
             **results,
         }
 
-    requests = sorted((root / "fixtures").glob("*.json"))
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         rows = list(pool.map(run, requests))
     report = {
