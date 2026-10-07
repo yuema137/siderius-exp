@@ -1,0 +1,4 @@
+iteration,exp_id,model,score,metric,direction,validity,status,source
+1,multiscale_se_texture_net_iter_001_002,multiscale_se_texture_net,0.14864864864864866,accuracy,higher,pass,success,runs/pet_demo_001/iter_001/iteration_001/multiscale_se_texture_net/run_output_iter_001.json
+2,compact_pyramid_pool_net_iter_002_002,compact_pyramid_pool_net,0.21621621621621623,accuracy,higher,pass,success,runs/pet_demo_001/iter_002/iteration_002/compact_pyramid_pool_net/run_output_iter_002.json
+3,antialiased_moment_pyramid_net_iter_003_002,antialiased_moment_pyramid_net,0.1891891891891892,accuracy,higher,pass,success,runs/pet_demo_001/iter_003/iteration_003/antialiased_moment_pyramid_net/run_output_iter_003.json

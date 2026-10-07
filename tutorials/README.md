@@ -33,3 +33,7 @@ own external project. Keep datasets, API keys and run outputs out of both source
 repositories. The intended public sources are
 [yuema137/siderius-exp](https://github.com/yuema137/siderius-exp) and
 [yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS).
+
+## Supplementary tasks
+
+[Supplementary process demos](supplementary/README.md) start with Oxford-IIIT Pet image classification. These use the same notebook/edit/save/script/plot sequence and are not paper artifacts.

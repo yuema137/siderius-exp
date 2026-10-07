@@ -1,0 +1,47 @@
+{
+  "interpret": {
+    "provider": "openai",
+    "model_id": "gpt-5.6-sol",
+    "reasoning_effort": "medium"
+  },
+  "propose": {
+    "comparison": {
+      "provider": "openai",
+      "model_id": "gpt-5.6-sol",
+      "reasoning_effort": "medium"
+    },
+    "reasoning": {
+      "provider": "openai",
+      "model_id": "gpt-5.6-sol",
+      "reasoning_effort": "medium"
+    },
+    "proposing": {
+      "provider": "openai",
+      "model_id": "gpt-5.6-sol",
+      "reasoning_effort": "medium"
+    }
+  },
+  "implement": {
+    "provider": "openai",
+    "model_id": "gpt-5.6-sol",
+    "reasoning_effort": "medium"
+  },
+  "validate": {
+    "provider": "openai",
+    "model_id": "gpt-5.6-sol",
+    "reasoning_effort": "medium"
+  },
+  "tune": {
+    "planner": {
+      "provider": "openai",
+      "model_id": "gpt-5.6-sol",
+      "reasoning_effort": "medium"
+    },
+    "reflector": {
+      "provider": "openai",
+      "model_id": "gpt-5.6-sol",
+      "reasoning_effort": "medium"
+    },
+    "planner_strategy": "native-timing-v1"
+  }
+}
