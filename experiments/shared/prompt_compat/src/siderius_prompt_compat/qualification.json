@@ -22,6 +22,16 @@
       "infra_revision": "078b23ca7d88c2e498be37621e655b1eeb3c8c9e",
       "assembly_sha256": "849a69c8363a0538bff7314c27bc820714412a6345c2df5f3b20c5061426ee2e",
       "scope": "Typed static preflight evidence; frozen message comparisons plus explicit planner v6 passing-record projection and actual producer transport checks; no changed static admission formulas"
+    },
+    {
+      "infra_revision": "5aa404263c8dfb40662a8ab2f55225d801786984",
+      "assembly_sha256": "19f75b7bb07c8a9414071580f33bf16ee68b336b4e17390ad268aa789ea6220d",
+      "scope": "Registered-state estimation with explicit historical arithmetic and qualified v2 planner projection; frozen request corpus, not complete conversation replay"
+    },
+    {
+      "infra_revision": "334db95a39a988565dcb182c039d866ccd94e55b",
+      "assembly_sha256": "19f75b7bb07c8a9414071580f33bf16ee68b336b4e17390ad268aa789ea6220d",
+      "scope": "Combined #419 and #615: unchanged rendering assembly, composed storage/preflight planner providers separately qualified"
     }
   ]
 }

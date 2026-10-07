@@ -41,6 +41,21 @@ The candidate's default refusal text remains truthful. This provider does not
 restore incorrect execution decisions, alter batch search, or implement a
 measurement fallback. Those estimator changes remain separate issue #615 work.
 
+## Version 2 estimation identities (issue #615 B1)
+
+Planner package 0.8.0 additionally accepts version 2 passing evidence only
+through the exact qualified `siderius-preflight-compat` identity. Native or
+unknown identities and contradictory phase formulas raise before rendering.
+The estimator package owns historical arithmetic; this planner remains a
+presentation-only provider. Its identity binds the estimator package's guard,
+arithmetic, provenance and qualification sources as well as its existing v5
+dependencies. An absent optional estimator package still permits archived
+version 1 input, but cannot authorize version 2 projection.
+
+See the [estimator contract](../preflight_compat/contract.md) and
+[qualified candidate evidence](../preflight_compat/parity-report.md). Existing
+records, numbers and original scientific declarations remain unchanged.
+
 ## Offline verification
 
 `tests/test_static_preflight_v6.py` captures the actual final `LLMBridge.plan`

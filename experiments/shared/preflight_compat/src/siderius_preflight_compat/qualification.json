@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "qualified offline against frozen reference",
+  "assemblies": [
+    {
+      "infra_revision": "5aa404263c8dfb40662a8ab2f55225d801786984",
+      "assembly_sha256": "5fc6e8753d62ac61712c423826e4a6c5af4338aa3be4ba89fb01125001f51656",
+      "scope": "45 phase estimates and 32 batch decisions against 078b23ca; typed v2 identity and planner projection checks; no live GPU peak or stochastic training claim"
+    },
+    {
+      "infra_revision": "334db95a39a988565dcb182c039d866ccd94e55b",
+      "assembly_sha256": "840146882a60c3eebe0b02d78dac27408a9c7e1e6f60c76cdb6bfecb1a36dce8",
+      "scope": "Combined #419 storage provenance and #615 registered-state estimation; same completed arithmetic and batch comparison plus composed v7/v6 planner qualification"
+    }
+  ],
+  "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"
+}

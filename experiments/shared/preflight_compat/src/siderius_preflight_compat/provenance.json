@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "reference_infra_revision": "078b23ca7d88c2e498be37621e655b1eeb3c8c9e",
+  "source_sha256": {
+    "src/agent/skills/evaluate_vram_skill/wrapper.py": "5d574cf3365971ec2fb2a8b7846a969ccb2ca1c1ddcb454307b5523e5a994acf",
+    "src/agent/skills/evaluate_vram_skill/batch_resolver.py": "19a80739d3008575b02602018291cf4806eb35249c8943acadc70e784d70617a",
+    "src/agent/skills/evaluate_vram_skill/structural_probe.py": "8b831f4353827592900fe0b91438efc2593a6f9315906a0baa573f4f0a8a3781",
+    "src/agent/skills/evaluate_vram_skill/overhead.py": "8b94ff347e1ea321eeaca6d33bbcf5b036129be27e71721dafbb00ad870ed854"
+  },
+  "scope": "Frozen arithmetic only; framework retains probing, candidate order, caps, classification and execution. Historical saved records are not rewritten."
+}

@@ -2984,6 +2984,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "siderius" },
     { name = "siderius-planner-compat" },
+    { name = "siderius-preflight-compat" },
     { name = "torch" },
 ]
 
@@ -3002,6 +3003,7 @@ tutorial = [
 requires-dist = [
     { name = "siderius", git = "https://github.com/yuema137/SIDERIUS.git?rev=e800fc1f08b0e067fc21076a200f3f70d04b38b8" },
     { name = "siderius-planner-compat", directory = "experiments/shared/planner_compat" },
+    { name = "siderius-preflight-compat", directory = "experiments/shared/preflight_compat" },
     { name = "torch", specifier = "==2.10.0" },
 ]
 
@@ -3018,8 +3020,13 @@ tutorial = [
 
 [[package]]
 name = "siderius-planner-compat"
-version = "0.7.0"
+version = "0.8.0"
 source = { directory = "experiments/shared/planner_compat" }
+
+[[package]]
+name = "siderius-preflight-compat"
+version = "0.1.0"
+source = { directory = "experiments/shared/preflight_compat" }
 
 [[package]]
 name = "six"

@@ -1,0 +1,1787 @@
+{
+  "reference_revision": "078b23ca7d88c2e498be37621e655b1eeb3c8c9e",
+  "capture_sha256": "326ace37daa1f6400295cdf74a1ed16ca70722c8fba89227a4d787699318a2c4",
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "scope": "Bounded synthetic estimates/search plus one actual CPU forward; no live GPU peak qualification",
+  "estimates": [
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246415403,
+      "diagnostic_bytes": 246415403,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246415403,
+      "diagnostic_bytes": 246415403,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246415403,
+      "diagnostic_bytes": 246415403,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246415403,
+      "diagnostic_bytes": 246415403,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 193986560,
+      "diagnostic_bytes": 193986572,
+      "breakdown": {
+        "input_bytes": 4,
+        "max_output_bytes": 8,
+        "param_bytes": 0,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 192,
+        "leaf_output_bytes_max": 64,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246415659,
+      "diagnostic_bytes": 246415659,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 192,
+        "leaf_output_bytes_max": 64,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246415531,
+      "diagnostic_bytes": 246415531,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 64,
+        "training_overhead_bytes": 64,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 192,
+        "leaf_output_bytes_max": 64,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246415659,
+      "diagnostic_bytes": 246415659,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 192,
+        "leaf_output_bytes_max": 64,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246415659,
+      "diagnostic_bytes": 246415659,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 192,
+        "leaf_output_bytes_max": 64,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 193986816,
+      "diagnostic_bytes": 193986692,
+      "breakdown": {
+        "input_bytes": 4,
+        "max_output_bytes": 64,
+        "param_bytes": 64,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 1073741824,
+        "leaf_output_bytes_max": 357913941,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246448171,
+      "diagnostic_bytes": 246448171,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 1073741824,
+        "leaf_output_bytes_max": 357913941,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246431787,
+      "diagnostic_bytes": 246431787,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 8192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 1073741824,
+        "leaf_output_bytes_max": 357913941,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246448171,
+      "diagnostic_bytes": 246448171,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 1073741824,
+        "leaf_output_bytes_max": 357913941,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246448171,
+      "diagnostic_bytes": 246448171,
+      "breakdown": {
+        "autograd_tape_bytes": 31,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 1,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 1073741824,
+        "leaf_output_bytes_max": 357913941,
+        "input_bytes": 4,
+        "output_bytes": 8,
+        "saved_tensor_bytes": 31,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 1267736576,
+      "diagnostic_bytes": 551908697,
+      "breakdown": {
+        "input_bytes": 4,
+        "max_output_bytes": 357913941,
+        "param_bytes": 8192,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246415489,
+      "diagnostic_bytes": 246415489,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246415489,
+      "diagnostic_bytes": 246415489,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246415489,
+      "diagnostic_bytes": 246415489,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246415489,
+      "diagnostic_bytes": 246415489,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 193986560,
+      "diagnostic_bytes": 193986596,
+      "breakdown": {
+        "input_bytes": 12,
+        "max_output_bytes": 24,
+        "param_bytes": 0,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 576,
+        "leaf_output_bytes_max": 192,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246415745,
+      "diagnostic_bytes": 246415745,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 576,
+        "leaf_output_bytes_max": 192,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246415617,
+      "diagnostic_bytes": 246415617,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 64,
+        "training_overhead_bytes": 64,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 576,
+        "leaf_output_bytes_max": 192,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246415745,
+      "diagnostic_bytes": 246415745,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 576,
+        "leaf_output_bytes_max": 192,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246415745,
+      "diagnostic_bytes": 246415745,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 576,
+        "leaf_output_bytes_max": 192,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 193987200,
+      "diagnostic_bytes": 193986828,
+      "breakdown": {
+        "input_bytes": 12,
+        "max_output_bytes": 192,
+        "param_bytes": 64,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 3221225472,
+        "leaf_output_bytes_max": 1073741824,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246448257,
+      "diagnostic_bytes": 246448257,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 3221225472,
+        "leaf_output_bytes_max": 1073741824,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246431873,
+      "diagnostic_bytes": 246431873,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 8192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 3221225472,
+        "leaf_output_bytes_max": 1073741824,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246448257,
+      "diagnostic_bytes": 246448257,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 3221225472,
+        "leaf_output_bytes_max": 1073741824,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246448257,
+      "diagnostic_bytes": 246448257,
+      "breakdown": {
+        "autograd_tape_bytes": 93,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 3,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 3221225472,
+        "leaf_output_bytes_max": 1073741824,
+        "input_bytes": 12,
+        "output_bytes": 24,
+        "saved_tensor_bytes": 93,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 3415220224,
+      "diagnostic_bytes": 1267736588,
+      "breakdown": {
+        "input_bytes": 12,
+        "max_output_bytes": 1073741824,
+        "param_bytes": 8192,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246415704,
+      "diagnostic_bytes": 246415704,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246415704,
+      "diagnostic_bytes": 246415704,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246415704,
+      "diagnostic_bytes": 246415704,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246415704,
+      "diagnostic_bytes": 246415704,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 0,
+        "training_overhead_bytes": 0,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 0,
+        "leaf_output_bytes_sum": 0,
+        "leaf_output_bytes_max": 0,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 193986560,
+      "diagnostic_bytes": 193986656,
+      "breakdown": {
+        "input_bytes": 32,
+        "max_output_bytes": 64,
+        "param_bytes": 0,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 1536,
+        "leaf_output_bytes_max": 512,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246415960,
+      "diagnostic_bytes": 246415960,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 1536,
+        "leaf_output_bytes_max": 512,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246415832,
+      "diagnostic_bytes": 246415832,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 64,
+        "training_overhead_bytes": 64,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 1536,
+        "leaf_output_bytes_max": 512,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246415960,
+      "diagnostic_bytes": 246415960,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 1536,
+        "leaf_output_bytes_max": 512,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246415960,
+      "diagnostic_bytes": 246415960,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 64,
+        "training_overhead_bytes": 192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 64,
+        "leaf_output_bytes_sum": 1536,
+        "leaf_output_bytes_max": 512,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 193988160,
+      "diagnostic_bytes": 193987168,
+      "breakdown": {
+        "input_bytes": 32,
+        "max_output_bytes": 512,
+        "param_bytes": 64,
+        "cuda_context_bytes": 193986560
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 8589934592,
+        "leaf_output_bytes_max": 2863311530,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {}
+      },
+      "admission_bytes": 246448472,
+      "diagnostic_bytes": 246448472,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 8589934592,
+        "leaf_output_bytes_max": 2863311530,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "sgd"
+        }
+      },
+      "admission_bytes": 246432088,
+      "diagnostic_bytes": 246432088,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 8192,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 8589934592,
+        "leaf_output_bytes_max": 2863311530,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "adam"
+        }
+      },
+      "admission_bytes": 246448472,
+      "diagnostic_bytes": 246448472,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 8589934592,
+        "leaf_output_bytes_max": 2863311530,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "training",
+        "training_config": {
+          "optimizer": "ADAMW"
+        }
+      },
+      "admission_bytes": 246448472,
+      "diagnostic_bytes": 246448472,
+      "breakdown": {
+        "autograd_tape_bytes": 248,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "param_bytes": 8192,
+        "training_overhead_bytes": 24576,
+        "cuda_context_bytes": 193986560,
+        "cudnn_backward_bytes": 52428800
+      }
+    },
+    {
+      "observations": {
+        "batch_size": 8,
+        "leaf_parameter_bytes": 8192,
+        "leaf_output_bytes_sum": 8589934592,
+        "leaf_output_bytes_max": 2863311530,
+        "input_bytes": 32,
+        "output_bytes": 64,
+        "saved_tensor_bytes": 248,
+        "phase": "inference",
+        "training_config": {}
+      },
+      "admission_bytes": 8783929344,
+      "diagnostic_bytes": 3057306314,
+      "breakdown": {
+        "input_bytes": 32,
+        "max_output_bytes": 2863311530,
+        "param_bytes": 8192,
+        "cuda_context_bytes": 193986560
+      }
+    }
+  ],
+  "searches": [
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193986815,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 193986815,
+        "vram_estimate_bytes": 193986816,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193986816,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 193986816,
+        "vram_estimate_bytes": 193986816,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193986817,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 193986817,
+        "vram_estimate_bytes": 193986816,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 1551894528,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 8,
+        "vram_cap_bytes": 1551894528,
+        "vram_estimate_bytes": 193988160,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 1267736575,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 1267736575,
+        "vram_estimate_bytes": 1267736576,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 1267736576,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 1267736576,
+        "vram_estimate_bytes": 1267736576,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 1267736577,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 1267736577,
+        "vram_estimate_bytes": 1267736576,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 10141892608,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 8,
+        "vram_cap_bytes": 10141892608,
+        "vram_estimate_bytes": 8783929344,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193986815,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 193986815,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193986816,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 193986816,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193986817,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 193986817,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 1551894528,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 1551894528,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 1267736575,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 1267736575,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 1267736576,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 1267736576,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 1267736577,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 1267736577,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        8,
+        4,
+        1
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 10141892608,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 1,
+        "vram_cap_bytes": 10141892608,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 100000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193987199,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 193987199,
+        "vram_estimate_bytes": 193987200,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193987200,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 193987200,
+        "vram_estimate_bytes": 193987200,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193987201,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 193987201,
+        "vram_estimate_bytes": 193987200,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 64,
+      "outputs": 192,
+      "cap": 1551897600,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 7,
+        "vram_cap_bytes": 1551897600,
+        "vram_estimate_bytes": 193987968,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 3415220223,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 3415220223,
+        "vram_estimate_bytes": 3415220224,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 3415220224,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 3415220224,
+        "vram_estimate_bytes": 3415220224,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 3415220225,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 3415220225,
+        "vram_estimate_bytes": 3415220224,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": null,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 27321761792,
+      "outcome": "accepted",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 7,
+        "vram_cap_bytes": 27321761792,
+        "vram_estimate_bytes": 7710187520,
+        "estimator": "inference_leaf_sum_v1",
+        "intensity_product": null,
+        "intensity_limit": null
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193987199,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 193987199,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193987200,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 193987200,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 193987201,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 193987201,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 64,
+      "outputs": 192,
+      "cap": 1551897600,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 1551897600,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 3415220223,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 3415220223,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 3415220224,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 3415220224,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 3415220225,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 3415220225,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    },
+    {
+      "candidates": [
+        7,
+        3
+      ],
+      "segmentation": 100000000,
+      "params": 8192,
+      "outputs": 1073741824,
+      "cap": 27321761792,
+      "outcome": "refused",
+      "decision": {
+        "phase": "inference",
+        "batch_size": 3,
+        "vram_cap_bytes": 27321761792,
+        "vram_estimate_bytes": null,
+        "estimator": null,
+        "intensity_product": 300000000,
+        "intensity_limit": 800000
+      }
+    }
+  ],
+  "actual_cpu_search": {
+    "model": "one Linear(2, 2) object used four times in Sequential",
+    "decision": {
+      "phase": "inference",
+      "batch_size": 4,
+      "vram_cap_bytes": 193986816,
+      "vram_estimate_bytes": 193986784,
+      "estimator": "inference_leaf_sum_v1",
+      "intensity_product": null,
+      "intensity_limit": null
+    },
+    "scope": "Actual CPU forward observations and frozen resolver; no GPU measurement"
+  }
+}

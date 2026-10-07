@@ -35,6 +35,27 @@ def project_record(record: dict[str, Any]) -> dict[str, Any]:
     evidence = StaticPreflightEvidence.model_validate(
         memory["static_preflight_evidence"]
     )
+    if evidence.version == "static-preflight-v2":
+        try:
+            from siderius_preflight_compat import require_historical_identity
+        except ImportError as exc:
+            raise ValueError(
+                "Historical version 2 preflight projection requires the installed "
+                "siderius-preflight-compat package and its qualified estimator"
+            ) from exc
+        require_historical_identity(evidence.estimator_identity)
+        if any(
+            phase.estimator
+            != (
+                "training_saved_tensors_v1"
+                if phase.phase == "training"
+                else "inference_leaf_sum_v1"
+            )
+            for phase in evidence.phases
+        ):
+            raise ValueError(
+                "Historical estimator identity contradicts the phase formula"
+            )
     if (
         memory["preflight_outcome"] != "COMPLETED_MEASUREMENT"
         or evidence.binding_caps
@@ -57,6 +78,23 @@ def _provider(*, late: bool):
 
     original = historical_runtime_late_v5() if late else historical_runtime_v5()
     name = "legacy-9b78d505cb11-paper" + ("-late" if late else "") + "-preflight-v6"
+    sources = {
+        "v5_identity.json": original.identity.model_dump_json().encode(),
+        "static_preflight_v6.py": Path(__file__).read_bytes(),
+    }
+    try:
+        from siderius_preflight_compat import source_files
+    except ImportError:
+        sources["preflight_package.txt"] = (
+            b"not installed; only archived v1 inputs supported"
+        )
+    else:
+        sources.update(
+            {
+                f"preflight/{key}": path.read_bytes()
+                for key, path in source_files().items()
+            }
+        )
 
     def render(*, memory_history, **arguments):
         return original.user_renderer(
@@ -69,12 +107,7 @@ def _provider(*, late: bool):
         identity=PlannerStrategyIdentity(
             name=name,
             version="6",
-            content_sha256=source_fingerprint(
-                {
-                    "v5_identity.json": original.identity.model_dump_json().encode(),
-                    "static_preflight_v6.py": Path(__file__).read_bytes(),
-                }
-            ),
+            content_sha256=source_fingerprint(sources),
         ),
         user_renderer=render,
     )

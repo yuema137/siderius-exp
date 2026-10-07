@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-planner-compat"
-version = "0.7.0"
+version = "0.8.0"
 description = "Experiment-owned historical SIDERIUS planner prompt providers"
 requires-python = ">=3.12"
 

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "siderius-preflight-compat"
+version = "0.1.0"
+description = "Explicit historical SIDERIUS static preflight arithmetic"
+requires-python = ">=3.12"
+
+[project.entry-points."siderius.preflight_estimators"]
+legacy-078b23ca-preflight-v1 = "siderius_preflight_compat:historical_profile"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+siderius_preflight_compat = ["*.json"]
