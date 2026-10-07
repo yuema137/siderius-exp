@@ -12,6 +12,11 @@
       "infra_revision": "dfcb39045567076b752c4d30ac2b3a7a3bd6717c",
       "assembly_sha256": "791abc31176cb4e87fb7d10939575dd637405fc04694c973971120c72f48531b",
       "scope": "Independent formal evidence; frozen rendering fixtures plus explicit cache recovery and cached synthesis comparison"
+    },
+    {
+      "infra_revision": "44e822027101785ab4e41e5335f1df8a8adb10ed",
+      "assembly_sha256": "29f65b70718cbd5ad358c2ad49ea8e15835fde331e751d41d6a34af1e93e9838",
+      "scope": "Independent proposer stage routing; frozen rendering fixtures and explicit historical all-reasoning route qualification"
     }
   ]
 }
