@@ -8,6 +8,7 @@ import shlex
 import shutil
 from pathlib import Path
 
+from tutorials.paper.planner_setup import copy_llm_config
 from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.runner import ROOT, TutorialExperiment, disjoint
 
@@ -66,7 +67,7 @@ def create_project(project: Path, infra: Path) -> None:
         ROOT / "tutorials/paper/notebooks/01_tess_tutorial.ipynb",
         project / "notebooks/01_tess_tutorial.ipynb",
     )
-    shutil.copyfile(
+    copy_llm_config(
         ROOT / "experiments/phyts_tess/main_fixed_workflow/agents.json",
         project / "llm/agents.json",
     )

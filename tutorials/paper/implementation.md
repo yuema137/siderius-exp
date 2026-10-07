@@ -42,6 +42,26 @@ fresh external raw/data roots. Interrupted preparation may leave a partial
 directory; no recursive cleanup is automatic. Hashes come from the pinned
 Hugging Face LFS objects and are verified again locally. No test file is requested.
 
+## Planner installation and identity
+
+`planner_setup.copy_llm_config` preserves each source routing document and adds
+`legacy-9b78d505cb11-v1` only in the fresh user copy when no strategy is selected.
+This provider matches the prior tutorial pin349b6cd6's planner source SHA-256
+9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd.
+It is not the separate paper-v4 replay provider. Historical experiment assets
+are not rewritten. Exp installs the package as a non-editable uv dependency;
+infra installs the same exp-owned package normally after its own frozen sync.
+
+All three `inspect` implementations call `verify_planner_setup` before native
+execution. It parses the selected routing and resolves the public provider in
+both interpreters, using the same sanitized child environment as launch.
+`PlannerStrategyIdentity` equality includes provider content and infra assembly.
+Absence, loading failure or disagreement refuses before an LLM client is created;
+child stderr is suppressed in the repair message. Preview receipts carry the
+resolved identity. Existing user configurations remain read-only; omitted
+selectors use infra's declared installed-default contract, not an inferred
+historical version. No provider installation happens during preview or launch.
+
 ## Notebook effects
 
 Code cells are committed without execution outputs or counts. Markdown cells

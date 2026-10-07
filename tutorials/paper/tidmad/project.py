@@ -11,6 +11,7 @@ from pathlib import Path
 import yaml
 
 from tasks.tidmad.runtime.file_split import FileSplit
+from tutorials.paper.planner_setup import copy_llm_config
 from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.runner import ROOT, disjoint
 from tutorials.paper.tidmad.runner import TidmadExperiment
@@ -77,7 +78,7 @@ def create_project(project: Path, infra: Path):
         ROOT / "tutorials/paper/notebooks/02_tidmad_tutorial.ipynb",
         project / "notebooks/02_tidmad_tutorial.ipynb",
     )
-    shutil.copyfile(
+    copy_llm_config(
         ROOT / "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json",
         project / "llm/agents.json",
     )

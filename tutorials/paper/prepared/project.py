@@ -9,6 +9,7 @@ import shlex
 import shutil
 from pathlib import Path
 
+from tutorials.paper.planner_setup import copy_llm_config
 from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.prepared.data import Task
 from tutorials.paper.prepared.runner import PreparedExperiment
@@ -66,11 +67,10 @@ def create_project(project: Path, infra: Path, task: Task):
         else "main_fixed_workflow"
     )
     experiment = ROOT / f"experiments/phyts_{task}" / variant
-    for source, name in (
-        ("agents.json", "agents.json"),
-        ("literature_review.yaml", "literature_review.yaml"),
-    ):
-        shutil.copyfile(experiment / source, project / "llm" / name)
+    copy_llm_config(experiment / "agents.json", project / "llm/agents.json")
+    shutil.copyfile(
+        experiment / "literature_review.yaml", project / "llm/literature_review.yaml"
+    )
     (project / "advice/README.txt").write_text(
         "Human advice and Data Analysis are disabled. No advice file is read. Literature Review remains enabled.\n"
     )

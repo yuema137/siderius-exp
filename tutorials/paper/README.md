@@ -152,12 +152,29 @@ export INFRA_CHECKOUT="/absolute/path/to/SIDERIUS-tutorial"
 git clone https://github.com/yuema137/SIDERIUS.git "$INFRA_CHECKOUT"
 git -C "$INFRA_CHECKOUT" checkout --detach "$(cat "$EXP_CHECKOUT/SIDERIUS_REVISION")"
 (cd "$INFRA_CHECKOUT" && uv sync --python 3.12 --group dev --frozen)
+
+# Install the exp-owned planner prompts into infra's own environment.
+uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
+  "$EXP_CHECKOUT/experiments/shared/planner_compat"
 ```
 
 The exp environment runs notebooks and preparation tools; the infra
 environment executes the research loop. Neither borrows the other's
 `site-packages` or uses `PYTHONPATH`. Both source checkouts must be clean at
 preview/launch time. Do not edit the version pin to work around a refusal.
+
+New projects write `tune.planner_strategy: legacy-9b78d505cb11-v1` into your
+`llm/agents.json`. This preserves the planner strategy used by the previous
+tutorial version; it does not reproduce a paper run. Other routing fields and
+explicit strategy selections are preserved. Preview resolves the strategy in
+both environments and records `planner_strategy_identity` in its receipt.
+If a package is missing or the identities disagree, follow the reported install
+commands before retrying. Repeat the plugin install after running `uv sync` in
+infra, since sync removes packages absent from infra's own lock.
+
+Existing user projects are not rewritten. To upgrade one, create a fresh project
+and a fresh run workspace, then transfer your intended parameter edits. Do not
+resume an old workspace with the new infra pin.
 
 ## 2. Configure keys without storing them in a notebook
 

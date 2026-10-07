@@ -13,7 +13,6 @@ from typing import Literal
 
 import yaml
 from pydantic import model_validator
-from workflows.llm_config import WorkflowLLMConfig
 
 from experiments.shared.framework_pin import (
     verify_framework_pin,
@@ -22,6 +21,7 @@ from experiments.shared.framework_pin import (
 from experiments.shared.workflow_credentials import required_workflow_api_keys
 from experiments.tidmad.main_fixed_workflow.band_inputs import verify_band_inputs
 from tasks.tidmad.runtime.file_split import FileSplit
+from tutorials.paper.planner_setup import verify_planner_setup
 from tutorials.paper.runner import (
     ROOT,
     TutorialExperiment,
@@ -108,7 +108,11 @@ def inspect(settings: TidmadExperiment, *, launch: bool = False) -> dict:
     verify_installed_framework(revision, ROOT)
     if settings.llm_config is None:
         raise ValueError("select an external LLM routing file")
-    WorkflowLLMConfig.from_json(str(settings.llm_config))
+    planner_identity = verify_planner_setup(
+        settings.llm_config,
+        settings.infra_checkout,
+        environment=child_environment(settings),
+    )
     keys = credential_status(settings)
     fingerprint = composition_identity(settings, str(settings.composition))
     data = None
@@ -126,6 +130,7 @@ def inspect(settings: TidmadExperiment, *, launch: bool = False) -> dict:
     return {
         "kind": "tidmad-teaching-demo",
         "scientific_reproduction": False,
+        "planner_strategy_identity": planner_identity.model_dump(mode="json"),
         "settings": settings.model_dump(mode="json"),
         "infra_revision": revision,
         "exp_revision": subprocess.check_output(

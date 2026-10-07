@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 import yaml
 from execute_tools.task_data_path import ScopeBuildRequest
@@ -20,7 +18,7 @@ from tutorials.paper.tidmad.runner import TidmadExperiment, build_command
 @pytest.fixture
 def project(tmp_path):
     root = tmp_path / "user project"
-    create_project(root, Path("/tmp/siderius-tutorial-infra"))
+    create_project(root, tmp_path / "infra")
     return root
 
 
@@ -167,7 +165,7 @@ def test_existing_tidmad_entry_uses_links_and_never_copies_raw(
 
 def test_project_and_task_write_refuse_overwrite(project):
     with pytest.raises(ValueError, match="fresh"):
-        create_project(project, Path("/tmp/siderius-tutorial-infra"))
+        create_project(project, project.parent / "infra")
     write_file_split_task(project / "tasks/tidmad", FileSplit())
     with pytest.raises(FileExistsError):
         write_file_split_task(project / "tasks/tidmad", FileSplit())
@@ -176,6 +174,13 @@ def test_project_and_task_write_refuse_overwrite(project):
 def test_final_selection_change_refused_before_test_data(project, monkeypatch):
     from tutorials.paper.tidmad import final_test
 
+    # Resolve in this checkout's environment; this seal test has no installed
+    # external infra and must not accidentally use a developer's checkout.
+    monkeypatch.setattr(
+        final_test,
+        "composition_identity",
+        lambda _, manifest: compose_run_task_bindings(manifest).semantic_fingerprint,
+    )
     settings = TidmadExperiment.model_validate_json(
         (project / "experiments/tidmad-experiment.json").read_text()
     )
@@ -268,6 +273,10 @@ def test_launch_requires_exported_credentials_before_data(project, monkeypatch):
     )
     monkeypatch.setattr(runner, "verify_framework_pin", lambda *_: "pinned")
     monkeypatch.setattr(runner, "verify_installed_framework", lambda *_: None)
+    # This case isolates credential refusal; real cross-environment resolution
+    # is covered by planner setup checks and saved-script qualification.
+    monkeypatch.setattr(runner, "verify_planner_setup", lambda *a, **kw: None)
+    monkeypatch.setattr(runner, "composition_identity", lambda *_: "synthetic")
     monkeypatch.setattr(runner.os, "geteuid", lambda: 1000)
     monkeypatch.setattr(
         runner, "credential_status", lambda *_: {"OPENAI_API_KEY": False}

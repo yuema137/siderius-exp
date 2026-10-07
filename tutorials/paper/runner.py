@@ -15,8 +15,8 @@ import sys
 from pathlib import Path
 from typing import Literal
 
+from core.planner_strategy_identity import PlannerStrategyIdentity
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from workflows.llm_config import WorkflowLLMConfig
 
 from experiments.shared.fixed_workflow_config import render_siderius_args
 from experiments.shared.framework_pin import (
@@ -25,6 +25,7 @@ from experiments.shared.framework_pin import (
 )
 from experiments.shared.information_treatment import resolve_information_treatment
 from experiments.shared.workflow_credentials import required_workflow_api_keys
+from tutorials.paper.planner_setup import verify_planner_setup
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / "experiments/phyts_tess/main_fixed_workflow/workflow.json"
@@ -90,6 +91,7 @@ class TutorialReceipt(BaseModel):
     api_key_status: dict[str, bool]
     composition_fingerprint: str
     llm_config_sha256: str
+    planner_strategy_identity: PlannerStrategyIdentity
     data_sha256: dict[str, str] | None = None
     gpu: str | None = None
 
@@ -356,7 +358,9 @@ def inspect(settings: TutorialExperiment, *, launch: bool) -> TutorialReceipt:
     revision = verify_framework_pin(ROOT, settings.infra_checkout)
     verify_installed_framework(revision, ROOT)
     config = Path(command_value(command, "--llm_config"))
-    WorkflowLLMConfig.from_json(str(config))
+    planner_identity = verify_planner_setup(
+        config, settings.infra_checkout, environment=child_environment(settings)
+    )
     key_status = credential_status(config)
     required = tuple(key_status)
     composition = command_value(command, "--task_composition")
@@ -380,6 +384,7 @@ def inspect(settings: TutorialExperiment, *, launch: bool) -> TutorialReceipt:
         gpu = verify_gpu(settings)
     return TutorialReceipt(
         settings=settings,
+        planner_strategy_identity=planner_identity,
         infra_revision=revision,
         exp_revision=subprocess.check_output(
             ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True

@@ -13,7 +13,6 @@ from typing import Literal
 
 from agent.schemas.parameter_rules import ParameterRules
 from pydantic import Field, field_validator
-from workflows.llm_config import WorkflowLLMConfig
 
 from experiments.shared.framework_pin import (
     verify_framework_pin,
@@ -22,6 +21,7 @@ from experiments.shared.framework_pin import (
 from experiments.shared.prepared_unit_preflight import verify_prepared_arrays
 from experiments.shared.workflow_credentials import required_workflow_api_keys
 from tasks.shared.prepared_regression import PreparedDeclaration
+from tutorials.paper.planner_setup import verify_planner_setup
 from tutorials.paper.runner import (
     ROOT,
     TutorialExperiment,
@@ -99,7 +99,11 @@ def inspect(settings: PreparedExperiment, *, launch=False):
     command = build_command(settings)
     revision = verify_framework_pin(ROOT, settings.infra_checkout)
     verify_installed_framework(revision, ROOT)
-    WorkflowLLMConfig.from_json(str(settings.llm_config))
+    planner_identity = verify_planner_setup(
+        settings.llm_config,
+        settings.infra_checkout,
+        environment=child_environment(settings),
+    )
     fingerprint = composition_identity(settings, str(settings.composition))
     declaration = PreparedDeclaration.model_validate_json(
         (settings.composition.parent.parent / "declared/prepared.json").read_text()
@@ -126,6 +130,7 @@ def inspect(settings: PreparedExperiment, *, launch=False):
     return {
         "kind": f"{settings.task}-teaching-demo",
         "scientific_reproduction": False,
+        "planner_strategy_identity": planner_identity.model_dump(mode="json"),
         "settings": settings.model_dump(mode="json"),
         "command": command,
         "infra_revision": revision,
