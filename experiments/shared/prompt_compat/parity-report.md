@@ -129,3 +129,17 @@ of an unqualified assembly for each profile. Use the commands in the README to
 regenerate evidence. Future updates must keep archived fixtures immutable or
 publish a separately identified case, compare against original source, update
 qualification explicitly, and use a new workspace for any changed identity.
+
+
+## Merge review follow-up
+
+The [merge review receipt](evidence/merge-review.json) records the final review
+heads and checks. Review fixed an empty-fixture false positive in the comparison
+tool and completed the affected infra node contracts. No production behavior or
+frozen rendering implementation changed. The final 47 message pairs and provider
+identities remain equal to the original qualification. The expanded, relevant
+local set passed 321 tests, plus seven retry/error cases, four planner-package
+cases and one empty-fixture regression. Four actual planner startups, 30
+producer/history prompt pairs, the historical planner self-check and the archived
+failure replay passed. Targeted Ruff and Pyright checks passed. The missing
+evidence and unqualified surfaces above remain unchanged.
