@@ -11,6 +11,11 @@
       "infra_revision": "334db95a39a988565dcb182c039d866ccd94e55b",
       "assembly_sha256": "840146882a60c3eebe0b02d78dac27408a9c7e1e6f60c76cdb6bfecb1a36dce8",
       "scope": "Combined #419 storage provenance and #615 registered-state estimation; same completed arithmetic and batch comparison plus composed v7/v6 planner qualification"
+    },
+    {
+      "infra_revision": "200c428afc6ee77f3dfd4968a95e88a2fd931471",
+      "assembly_sha256": "436675b35b972f93bcc1d9a76436af693860516103033c2b9ac867ac9675506f",
+      "scope": "Phase-correct inference measurement prerequisite: existing historical static arithmetic and batch decisions; unchanged production constructor/stream semantics; no fallback admission or stochastic replay claim"
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"

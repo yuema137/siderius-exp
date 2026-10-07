@@ -116,3 +116,45 @@ these three checkout-specific tests explicitly skip; that skip is not their
 acceptance evidence. Both recorded installation receipts were regenerated with
 the final verifier. The provider and renderer sources were unchanged, so the
 178-case and 47-request qualification above remains applicable.
+
+## Phase-correct inference measurement prerequisite (#615 B2a)
+
+Infra PR #620 candidate `200c428afc6ee77f3dfd4968a95e88a2fd931471` is qualified
+with estimation assembly `436675b35b972f93bcc1d9a76436af693860516103033c2b9ac867ac9675506f`.
+The rendering assembly remains `19f75b7bb07c8a9414071580f33bf16ee68b336b4e17390ad268aa789ea6220d`.
+Packages retain versions 0.1.0 / 0.8.0 / 0.6.0; the additional qualification
+changes the source-pinned preflight identity and the composed v6/v7 identities.
+Existing archives, task declarations, release pins and locks are unchanged.
+
+The candidate was normally installed as a noneditable package in this exp
+checkout's own frozen environment for qualification. This is an explicit local
+qualification installation, not a tracked dependency update. **178 scoped tests
+passed, 3 checkout-only tests skipped** there. Those **3 installation tests
+passed** separately in the candidate checkout's own environment. Arithmetic,
+batch search and composed early/late v7 → v6 → v5 request tests remain covered.
+
+- [Installed estimator receipt](evidence/inference-installation.json): exact
+  source match, selected checkout match, parent/child identity match, and unknown
+  assembly refusal.
+- [Installed prompt receipt](evidence/inference-prompt-installation.json):
+  unchanged renderer identities and refusal of unqualified assemblies.
+- [Frozen messages](evidence/inference-prompt-comparison.json): **47 MATCH**,
+  covering TESS, LIGO, Project8, TIDMAD NoPrior and analysis-on fixture paths.
+- [Storage references](evidence/inference-storage-reference.json): all five
+  frozen source/setup comparisons match.
+- [Archive audit](evidence/inference-archive-audit.json): **442 source hashes**
+  verified and **331 records** unchanged across 11 available paper units.
+
+Infra extracts the existing production model-construction and prediction-stream
+owners and uses them for bounded evaluation-data measurement. Its CPU witnesses
+check constructor/cardinality, output ordering, full/tail batches, cross-batch
+output lifetimes, runtime timing boundaries and storage/input dtype. Training
+measurement retains its existing execution behavior; serialized reports gain
+nullable inference coverage, so complete report-byte equality is not claimed.
+
+This prerequisite introduces no new production measurement caller or static
+refusal override. It therefore needs no historical fallback setting yet. B2b
+still requires bounded admission, complete request binding, an explicit exp
+historical policy and real synthetic GPU qualification. **#615 and public exp #1
+remain open.** These checks made zero API, GPU or scientific training calls and
+promise no identical stochastic responses, trained weights or scores.

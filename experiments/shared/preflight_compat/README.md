@@ -19,6 +19,11 @@ weights, or score.
 For the complete storage-v7 plus historical-estimator workflow below, use
 combined infra revision `334db95a39a988565dcb182c039d866ccd94e55b`, or a merged
 successor with the identical qualified estimation and storage-source hashes.
+The inference-measurement prerequisite
+`200c428afc6ee77f3dfd4968a95e88a2fd931471` is also qualified; its checks are in
+[the qualification report](parity-report.md#phase-correct-inference-measurement-prerequisite-615-b2a).
+It does not yet add automatic measurement after a static refusal.
+
 The standalone `5aa404263c8dfb40662a8ab2f55225d801786984` entry in
 [qualification.json](src/siderius_preflight_compat/qualification.json) qualifies
 only the estimator; it lacks the storage producer required by v7 and is not a
