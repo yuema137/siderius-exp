@@ -1,0 +1,532 @@
+{
+  "schema": "paper-replay-conditions-369-v2",
+  "scope": "Archived declared launch conditions, not a complete artifact replay receipt or executable launcher config",
+  "native_planner_selector": "native-timing-v1",
+  "evidence": "Archived launch commands omit both flags; revision-bound CLI and schema defaults are None. No assertion about unrecorded external per-iteration overrides.",
+  "units": [
+    {
+      "task": "TESS",
+      "run_id": "nop_004",
+      "launch_sha256": "6113995ba7a7f734f22f9511ac2506a1d397403165b52ff5ab180509790c9270",
+      "infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "exp_revision": null,
+      "experiment_references": {
+        "--task_composition": "tasks/phyts_tess/compositions/rotation_regression.yaml",
+        "--llm_config": "experiments/phyts_tess/main_fixed_workflow/agents.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--healthgate_mode": "blocking",
+        "--result_authority": "scientific",
+        "--experiment_arm": "phyts-tess-main-fixed-no-prior-v1",
+        "--no-data_analysis_enabled": true,
+        "--no-ml_lit_review_enabled": true,
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "2",
+        "--plan_overrides": "{\"is_trial\": true}",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "5",
+        "--formal_time_budget_minutes": "15",
+        "--trial_vram_budget_gb": "8",
+        "--formal_vram_budget_gb": "8",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "1.0",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2"
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
+    },
+    {
+      "task": "LIGO",
+      "run_id": "ligo-no-prior-run2",
+      "launch_sha256": "ab7301ec45879af5ffa0841c90c7f5b1cf97da8dba523405cab1e6f3c23fc2ba",
+      "infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "exp_revision": "8513deabe042acfbb7743b5981bb790726ae0e82",
+      "experiment_references": {
+        "--ml_lit_review_config": "experiments/phyts_ligo/main_fixed_workflow/literature_review.yaml",
+        "--task_composition": "tasks/phyts_ligo/compositions/regression.yaml",
+        "--llm_config": "experiments/phyts_ligo/main_fixed_workflow/agents.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--result_authority": "scientific",
+        "--experiment_arm": "phyts-ligo-fixed-no-prior",
+        "--no-data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true,
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "2",
+        "--plan_overrides": "{\"is_trial\": true}",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "10",
+        "--formal_time_budget_minutes": "30",
+        "--trial_vram_budget_gb": "16",
+        "--formal_vram_budget_gb": "16",
+        "--formal_training_scope_source": "agent",
+        "--formal_eval_portion": "1.0",
+        "--training_validation_portion": "0.1",
+        "--training_budget_reserve_fraction": "0.2"
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "composition_fingerprint": "bb90719d145d77bbd7382a8d25814c0325262f5d686333af8e0b0930361808d3",
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
+    },
+    {
+      "task": "Project 8",
+      "run_id": "project8-dual-no-prior-run5",
+      "launch_sha256": "b01824e6b5b0e479e7dd0e47eb3b57b821f8bfefc867883dc29fa185d71a1ea5",
+      "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "exp_revision": "641de54b721f5c7e123c1ff4e5615d2bae39f644",
+      "experiment_references": {
+        "--ml_lit_review_config": "experiments/phyts_project8/main_fixed_workflow_dual_representation/literature_review.yaml",
+        "--task_composition": "tasks/phyts_project8/compositions/dual_representation.yaml",
+        "--llm_config": "experiments/phyts_project8/main_fixed_workflow_dual_representation/agents.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--result_authority": "scientific",
+        "--experiment_arm": "phyts-project8-dual-fixed-no-prior",
+        "--no-data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true,
+        "--workflow_parameter_rules": "{\"rules\":{\"train_config.checkpoint_selection\":{\"exact\":\"best_validation_loss\"},\"train_config.target_standardization\":{\"exact\":\"training_pool_global\"},\"train_config.drop_last\":{\"exact\":false}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "2",
+        "--plan_overrides": "{\"is_trial\": true}",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "1.0",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_validation_portion": "0.1",
+        "--training_budget_reserve_fraction": "0.2"
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "composition_fingerprint": "83e7d59c4d87ceb75083a3a8310cd2e6b03e87ea3d9cbab4efb062dca58424a4",
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:0-3",
+      "launch_sha256": "5e30778d84ec2f949e54477bff249b922c3fb63674835a6452bf1c001c828c67",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "exp_revision": "902711cbd10b35aa8d86e3234e2d3b64847ea1af",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--task_composition": "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "0-3",
+        "--health_gate_files": "0-3",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--experiment_arm": "tidmad-main-fixed-no-prior-v1",
+        "--no-data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:4-9",
+      "launch_sha256": "f7aaeac280bd262086ce3ea8bd8687027aa2b8fe40080f96e2e5b4c0184e26f8",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "exp_revision": "902711cbd10b35aa8d86e3234e2d3b64847ea1af",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--task_composition": "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "4-9",
+        "--health_gate_files": "4-9",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--experiment_arm": "tidmad-main-fixed-no-prior-v1",
+        "--no-data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:10-14",
+      "launch_sha256": "9b24b5c82973723be3007656db78974aeaff2bf7f0c45a523b2c18cdfcc4212d",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "exp_revision": "902711cbd10b35aa8d86e3234e2d3b64847ea1af",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--task_composition": "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "10-14",
+        "--health_gate_files": "10-14",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--experiment_arm": "tidmad-main-fixed-no-prior-v1",
+        "--no-data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:15-19",
+      "launch_sha256": "58cd36d52452a304cdf9abd26d61dad2422526828db2c0b72a56944cfadb7dcf",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "exp_revision": "902711cbd10b35aa8d86e3234e2d3b64847ea1af",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--task_composition": "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "15-19",
+        "--health_gate_files": "15-19",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--experiment_arm": "tidmad-main-fixed-no-prior-v1",
+        "--no-data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-v4"
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:0-3",
+      "launch_sha256": "e012bd15a73fc92c4649dbd7d8993f043a834106d2693461a46b9295e3b954e1",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "exp_revision": "552535dc43227baef69a79b81e038c9e09e275b9",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "0-3",
+        "--health_gate_files": "0-3",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--training_validation_portion": "0.1",
+        "--experiment_arm": "tidmad-main-fixed-da-only-v1",
+        "--data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "external_inputs": {
+        "--task_composition": {
+          "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-0-3/composition.yaml",
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
+        }
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/0-3/composition.yaml",
+          "sha256": "72e538bc3c6cc8d92b28e0d77a78442f15d4bf3c6a90d8057e62004b5e13f0f5"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/0-3/analysis-policy.yaml",
+          "sha256": "6a4109a287d93743ed68e2be254117c54d8755773c39e5be881cbaff0e60d7d7"
+        }
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:4-9",
+      "launch_sha256": "b547c9fa986c13d08fe3e7ad40942c4319fc8bdae3d071402d7b278e6e661d1c",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "exp_revision": "552535dc43227baef69a79b81e038c9e09e275b9",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "4-9",
+        "--health_gate_files": "4-9",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--training_validation_portion": "0.1",
+        "--experiment_arm": "tidmad-main-fixed-da-only-v1",
+        "--data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "external_inputs": {
+        "--task_composition": {
+          "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-4-9/composition.yaml",
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
+        }
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/4-9/composition.yaml",
+          "sha256": "ccd4ac8e8f895c1846142988729434e35dd841039f44b09b0054956f06ebed25"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/4-9/analysis-policy.yaml",
+          "sha256": "7e61c1607bf795b9ecb2a43d9d1efc5abd2f78f5e27e166095b1e36c5b9517ab"
+        }
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:10-14",
+      "launch_sha256": "35013fffb13a40434627fe62080d4b7ea302ea7993bf78ed52fa92e6a1a2bb6a",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "exp_revision": "552535dc43227baef69a79b81e038c9e09e275b9",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "10-14",
+        "--health_gate_files": "10-14",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--training_validation_portion": "0.1",
+        "--experiment_arm": "tidmad-main-fixed-da-only-v1",
+        "--data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "external_inputs": {
+        "--task_composition": {
+          "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-10-14/composition.yaml",
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
+        }
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/10-14/composition.yaml",
+          "sha256": "3c9e5cc891c38c6771798268875d065479da5bfabb1130ae5e762b3d4208ae7a"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/10-14/analysis-policy.yaml",
+          "sha256": "7094430e0cc67cb74132396f9c6f2965c670583df92aa1e3888971b68ce6966c"
+        }
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:15-19",
+      "launch_sha256": "2b5fbb83eb3f0cdf7b15d4550065c4f50585553d01caf2222257aa3a657bb10f",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "exp_revision": "552535dc43227baef69a79b81e038c9e09e275b9",
+      "experiment_references": {
+        "--ml_lit_review_config": "tasks/tidmad/framework_configs/lit_review.yaml",
+        "--llm_config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json"
+      },
+      "launch_parameters": {
+        "--mode": "lilab",
+        "--data_scope": "15-19",
+        "--health_gate_files": "15-19",
+        "--workflow_parameter_rules": "{\"rules\":{\"model_config.segmentation_size\":{\"exact\":40000}}}",
+        "--no-runtime_watchdog": true,
+        "--num_iterations": "100",
+        "--max_rounds": "3",
+        "--max_epochs": "100",
+        "--trial_max_epochs": "100",
+        "--formal_max_epochs": "100",
+        "--trial_time_budget_minutes": "30",
+        "--formal_time_budget_minutes": "120",
+        "--trial_vram_budget_gb": "40",
+        "--formal_vram_budget_gb": "40",
+        "--formal_training_scope_source": "operator",
+        "--formal_portion": "0.1",
+        "--formal_train_portion": "1.0",
+        "--formal_eval_portion": "1.0",
+        "--training_budget_reserve_fraction": "0.2",
+        "--training_validation_portion": "0.1",
+        "--experiment_arm": "tidmad-main-fixed-da-only-v1",
+        "--data_analysis_enabled": true,
+        "--ml_lit_review_enabled": true
+      },
+      "validation_limits": {
+        "validation_max_portion": null,
+        "validation_max_samples": null
+      },
+      "external_inputs": {
+        "--task_composition": {
+          "historical_path": "/mnt/tidmad-no-prior/operator-inputs/da-only-v1-15-19/composition.yaml",
+          "status": "exact historical bytes reconstructed and verified against launch receipt; remap paths before use"
+        }
+      },
+      "composition_fingerprint": null,
+      "explicit_historical_planner_selector": "legacy-9b78d505cb11-paper-late-v4",
+      "recovered_historical_inputs": {
+        "composition.yaml": {
+          "path": "paper_inputs/tidmad-analysis/15-19/composition.yaml",
+          "sha256": "e26bbe4a8646929f36e3f02704b0b0e04fcf4a7987d755c07257fba6c5f9822b"
+        },
+        "analysis-policy.yaml": {
+          "path": "paper_inputs/tidmad-analysis/15-19/analysis-policy.yaml",
+          "sha256": "e1c92373755811a5d54fd8216f21b8395b87fabd032e21599c62012622f56f8f"
+        }
+      }
+    }
+  ]
+}

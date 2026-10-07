@@ -160,3 +160,102 @@ call. The recorded reference digests came from the original infra checkout,
 not from the new renderer. All clients are blocked from network access. These
 checks use synthetic inputs; the early comparisons cover an empty registry only
 and do not establish scientific replay.
+
+## Correct new runs or inspect historical prompts (#369)
+
+New infra records the actual trial/formal role even when an attempt is skipped
+or fails. Use that corrected behavior for ordinary runs. Do not change a trial
+back to formal to reproduce a known recording bug.
+
+For an explicitly requested historical **planner text** comparison, package
+0.3.0 provides `legacy-9b78d505cb11-attempt-role-v3`. Copy the experiment's
+`agents.json` into your new workspace and set its `tune.planner_strategy` to
+that selector. Pass your copied file through `--llm_config`. This is opt-in:
+it changes neither the installed default nor old provider identities. The
+adapter changes only a copy of raw history presented to the historical planner;
+the saved records retain their correct roles. Choose `native-timing-v1` when you
+want the framework's current planner strategy instead of historical policy.
+
+After installing this package into the qualified infra environment using the
+installation instructions above, check the pair without credentials or a GPU:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" -m siderius_planner_compat.attempt_role_check
+```
+
+Success reports 15 producer cases, 30 identical final system/user prompt pairs,
+and zero API calls. This is an offline controlled boundary check, not a promise
+of identical new LLM responses, scientific trajectories or final artifacts.
+
+[paper-replay-369.json](paper-replay-369.json) records the audited launch parameters
+and source revisions for the 11 native paper workflow units, including TIDMAD's
+bands. It is an evidence inventory, not a file to pass directly to the launcher.
+Use its `launch_parameters` with the referenced experiment, remap data/config
+paths to your machine, and use a new workspace. Both validation limits are
+`null` (disabled); omit their CLI flags, rather than passing the string `null`.
+The dataset/split definitions, models and agent settings remain owned by the
+referenced experiment revisions. This inventory does not replace those assets
+or provide an automatic historical-workspace import.
+
+Archived TESS has 28 skipped trial records labeled formal; Project8 has one.
+Their saved per-attempt configurations identify the actual trial role. The
+archives remain unchanged. These skips produced no successful score, but their
+history may have influenced later planning. LIGO and the eight audited TIDMAD
+workflow units had no such mismatch in the inspected run-output records. This
+is a bounded archive audit, not proof that every attempted iteration survived.
+
+TIDMAD analysis-on used generated external composition files. The historical
+composition and analysis-policy bytes have now been reconstructed for all four
+bands and verified against the launch-receipt hashes. See the
+[startup compatibility report](paper-startup-parity.md#tidmad-analysis-input-recovery)
+for their locations and how to regenerate them with local paths. The
+[role compatibility report](attempt-role-parity.md) describes the narrower v3
+record-conversion boundary.
+
+## Match the paper's actual planner startup
+
+For paper-era planner text, install package **0.4.0** into an infra version that
+supports `PlannerStrategy.config_manual_renderer`. V4 also restores the correct
+configuration manual, which v3 does not change. Select the profile in your copied
+LLM configuration's `tune.planner_strategy`:
+
+| Experiment | Selector |
+| --- | --- |
+| TESS, LIGO, TIDMAD NoPrior | `legacy-9b78d505cb11-paper-v4` |
+| Project8 dual, TIDMAD analysis-on | `legacy-9b78d505cb11-paper-late-v4` |
+
+For example, LIGO's historical manual predates three training options. Its v4
+profile renders that manual for the planner while the current executor keeps
+its validated schema. Project8 already had those options, so its profile keeps
+them. Unknown manual changes stop with an explicit qualification error. Neither
+profile becomes an installation default. Start in a new workspace.
+
+Four checks use each task's actual archived model, task text, model description
+and advice. Supply the archived first model file, not a newly generated file
+with the same name; its SHA-256 must match the frozen reference:
+
+```bash
+MODEL_PLUGIN=/absolute/path/to/archived/dual_domain_chirp_fuser.py
+"$INFRA_CHECKOUT/.venv/bin/python" -m siderius_planner_compat.startup_check \
+  --case ligo --model-plugin "$MODEL_PLUGIN"
+```
+
+Repeat with `--case tess`, `project8` or `tidmad` and the corresponding archived
+model listed in the [verification report](paper-startup-parity.md). Success
+prints the matching system/user hashes and `api_calls: 0`. These checks need no
+dataset, API key or GPU. They render the current manual through the installed
+historical profile, rather than bypassing production manual assembly.
+
+To recapture the startup through the tuner itself, `capture_startup.py` accepts
+`--input /path/to/startup-spec.json --output /path/to/new-capture`. Unlike the
+frozen check, this requires the declared task package and local dataset metadata.
+The input declares `composition`, `composition_fingerprint`, `seed_plugin_path`,
+`seed_plugin_sha256`, `model_description_path`, `model_description_sha256`,
+`data_dir`, and `tuner_parameters` (validated `HyperparamTuningInput` fields).
+The output directory contains `tuner_input.json`, `planner_arguments.json`,
+`messages.json`, and `receipt.json`, plus startup bookkeeping. The first planner
+message ends the capture; no model response or training follows.
+
+This verifies planner startup, supplemented by the existing later-round branch
+and history-format checks. Full interpret/propose/implement/analyze/reflect
+conversation replay is a separate follow-up; these checks do not claim it.

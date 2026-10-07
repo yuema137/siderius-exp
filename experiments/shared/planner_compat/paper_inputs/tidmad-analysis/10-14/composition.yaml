@@ -1,0 +1,32 @@
+data_analysis:
+  config: /mnt/tidmad-no-prior/operator-inputs/da-only-v1-10-14/analysis-policy.yaml
+  enabled: true
+dataset_profile:
+  config: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/resolved/dataset_profile.json
+deliverable:
+  extension: .h5
+  index_width: 4
+  prefix: abra_validation_denoised
+implementor_blocks:
+  config: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/framework_configs/implementor.yaml
+interpretation_blocks:
+  config: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/framework_configs/interpretation.yaml
+metric:
+  declaration: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/resolved/metric_spec.json
+  implementation:
+    file: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/runtime/scoring.py
+    symbol: TidmadDenoisingMetric
+  scoreability_contracts:
+    tidmad_denoised_h5:
+      file: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/runtime/scoreability.py
+      symbol: TidmadScoreabilityContract
+proposal_blocks:
+  config: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/framework_configs/proposal_regression.yaml
+task_config:
+  config: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/declared/task_config_regression.yaml
+task_data_path:
+  file: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/runtime/tidmad_data_path.py
+  id: tidmad_frozen_training_pool
+  symbol: TidmadFrozenPoolDataPath
+task_health:
+  config: /mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/framework_configs/health_regression.yaml
