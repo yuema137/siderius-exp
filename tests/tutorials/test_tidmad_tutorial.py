@@ -74,6 +74,18 @@ def test_composed_scopes_hold_out_files_and_keep_original_indices(project):
         assert test.sample_set == {3: list(range(200))}
         assert sum(map(len, train.sample_set.values())) == 100
         assert len(val.sample_set[2]) == 50
+        # One PSD segment is 250 ML rows at the declared 40000-sample window.
+        capped = adapter.build_eval_scope(
+            request.model_copy(update={"max_samples": 600})
+        )
+        assert capped.sample_set == {2: val.sample_set[2][:2]}
+        assert (
+            adapter.build_training_scope(
+                request.model_copy(update={"max_samples": 600})
+            ).sample_set
+            == train.sample_set
+        )
+        assert adapter.build_final_test_scope().sample_set == test.sample_set
         assert not hasattr(adapter, "build_frozen_training_pool")
         assert (
             adapter.deserialize_scope(adapter.serialize_scope(train)).sample_set

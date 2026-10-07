@@ -39,6 +39,7 @@ from pathlib import Path
 from typing import cast
 
 from core.run_invariants import (
+    RunHealthMaterialization,
     build_run_invariants,
     ensure_run_invariants,
     load_run_invariants,
@@ -57,6 +58,7 @@ from execute_tools.deliverable_spec import default_deliverable_naming
 from execute_tools.health_checks.config import (
     default_health_policy_path,
     load_health_gates_config,
+    materialize_effective_config,
 )
 from execute_tools.health_checks.evaluation import evaluate_and_persist_health_gates
 from execute_tools.health_checks.schemas import GateAction, HealthCheckContext
@@ -70,6 +72,7 @@ from tasks.tidmad.runtime.campaign_artifacts import (
     validate_phase1_baseline,
     write_campaign_manifest,
 )
+from tasks.tidmad.runtime.comparison_health import validate_comparison_health
 
 SIDERIUS_ROOT = os.environ.get("SIDERIUS_CHECKOUT", "")
 ROOT_DATA_DIR = ""
@@ -80,6 +83,7 @@ LEGACY_CONFIGS_PATH = str(
     / "legacy_baseline_configs.json"
 )
 HEALTH_CHECKS_PATH = default_health_policy_path()
+TASK_HEALTH_BINDING = str(Path(__file__).resolve().parents[1] / "framework_configs/health.yaml")
 
 
 def _sha256(path: str) -> str:
@@ -459,6 +463,20 @@ def run_baseline_trial(
     scope = data_scope if data_scope is not None else DataScope.default()
     resolved_scope = scope.resolve(NUM_FILES)
 
+    if health_gate_enabled:
+        # Validate the production roster before paying for training. Runtime
+        # observation policy and production invalidation remain separate.
+        validate_comparison_health(health_checks_config, HEALTH_CHECKS_PATH, TASK_HEALTH_BINDING)
+        health_checks_config, effective_sha256 = materialize_effective_config(
+            health_checks_config, None, baseline_workspace,
+            resolved_scope=resolved_scope,
+            task_health_binding=TASK_HEALTH_BINDING,
+            dataset_partition_count=resolve_dataset_profile().partition_count,
+        )
+        if health_config_sha256 is not None and health_config_sha256 != effective_sha256:
+            raise ValueError("Comparison Health configuration differs from the declared run identity.")
+        health_config_sha256 = effective_sha256
+
     sandbox = TidmadSandbox(
         metadata_source="local",
         run_name=run_name,
@@ -587,6 +605,7 @@ def run_baseline_trial(
                 health_context,
                 config_path=health_checks_config,
                 production_config_path=HEALTH_CHECKS_PATH,
+                task_health_binding=TASK_HEALTH_BINDING,
             )
         )
     else:
@@ -1494,12 +1513,18 @@ def main():
     # materialized effective config is the single path both baseline gate
     # evaluation and the agent subprocess read. Existing baseline history is
     # stamp-validated before a lock-less workspace is locked (never silently).
+    if args.health_gate_enabled:
+        validate_comparison_health(args.health_checks_config, HEALTH_CHECKS_PATH, TASK_HEALTH_BINDING)
     run_invariants, _effective_health_config = build_run_invariants(
         resolved_data_scope=resolved_data_scope,
         health_gate_enabled=args.health_gate_enabled,
         health_gate_files=health_gate_files,
         health_checks_config=args.health_checks_config,
         workspace=baseline_workspace,
+        health_materialization=RunHealthMaterialization(
+            task_health_binding=TASK_HEALTH_BINDING,
+            dataset_partition_count=resolve_dataset_profile().partition_count,
+        ),
     )
     if _effective_health_config is not None:
         args.health_checks_config = _effective_health_config

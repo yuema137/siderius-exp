@@ -124,7 +124,9 @@ class FileSplitDataPath(_base().TidmadTaskDataPath):
         return self._file_scope(request, "train")
 
     def build_eval_scope(self, request: ScopeBuildRequest):
-        return self._file_scope(request, "validation")
+        return self._bound_evaluation_scope(
+            self._file_scope(request, "validation"), request.max_samples
+        )
 
     def build_final_test_scope(self):
         """Post-selection only; the workflow never requests this scope."""

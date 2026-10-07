@@ -94,7 +94,10 @@ def test_tampered_manifest_refuses_before_scope_construction(tmp_path: Path) -> 
     tampered = tmp_path / "manifest.json"
     tampered.write_text('{"sample_set": {}}')
     impl._POOL_PATH = tampered
-    with bind_dataset_profile(PROFILE), pytest.raises(ValueError, match="digest mismatch"):
+    with (
+        bind_dataset_profile(PROFILE),
+        pytest.raises(ValueError, match="digest mismatch"),
+    ):
         impl.build_frozen_training_pool(
             _request(band="0-3", portion=0.1, seed=11, kind="formal")
         )
@@ -103,8 +106,31 @@ def test_tampered_manifest_refuses_before_scope_construction(tmp_path: Path) -> 
 def test_composition_loads_opt_in_capability_from_the_public_manifest() -> None:
     with run_registration_scope():
         implementation = compose_task_data_path_from_manifest(
-            str(ROOT / "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml")
+            str(
+                ROOT
+                / "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml"
+            )
         )
     assert implementation.task_data_path_id == "tidmad_frozen_training_pool"
     assert callable(implementation.build_frozen_training_pool)
     assert callable(implementation.sample_training_pool)
+
+
+@pytest.mark.parametrize("band", BANDS)
+def test_paper_pool_adapter_bounds_eval_without_changing_frozen_training(band):
+    impl = TidmadFrozenPoolDataPath()
+    request = _request(band=band, portion=1.0, seed=42, kind="formal")
+    with bind_dataset_profile(PROFILE):
+        original = impl.build_eval_scope(request)
+        no_limit = impl.build_eval_scope(
+            request.model_copy(update={"max_samples": None})
+        )
+        assert impl.serialize_scope(original) == impl.serialize_scope(no_limit)
+        capped_request = request.model_copy(update={"max_samples": 600})
+        capped = impl.build_eval_scope(capped_request)
+        first = min(original.sample_set, key=int)
+        assert capped.sample_set == {first: original.sample_set[first][:2]}
+        assert (
+            impl.build_frozen_training_pool(request).scope.sample_set
+            == impl.build_frozen_training_pool(capped_request).scope.sample_set
+        )

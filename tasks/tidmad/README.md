@@ -60,6 +60,31 @@ owning declaration, regenerate or re-project the snapshot, update provenance,
 and pass the task tests. Editing a generated JSON alone creates an ambiguous
 task identity.
 
+## Validation sample limits
+
+The workflow option `validation_max_samples` limits **model input rows** in
+validation/evaluation. TIDMAD selects complete PSD segments: at the paper's
+40,000-sample model window, one PSD segment contains 250 rows. A limit of 600
+therefore selects at most two complete segments (500 rows). A limit below 250
+is refused with a message explaining the minimum; it never produces an empty
+validation set.
+
+Selection visits file indices in numeric order and keeps the already selected
+segment order within each file. The limit applies to ordinary, frozen-pool and
+file-split workflow evaluation scopes. It does not change training selection or
+the optional final-test split. An omitted or nonbinding limit preserves the
+original scope. If the reduced scope no longer covers a file required by Health,
+the existing coverage check refuses it; increase the limit or explicitly review
+the task's Health declaration instead of assuming checks were disabled.
+
+The historical `tools/run_comparison.py` path now requires runtime checks to
+match the selected TIDMAD production check IDs and scientific parameters.
+Observation-only actions and monitored-file overrides remain supported. A stale
+precomposed Health file is refused before training; use matching inputs in a new
+workspace. This boundary repair does not qualify that historical tool as a
+current paper/tutorial launcher; use the
+[TIDMAD experiment entrypoints](../../experiments/tidmad/main_fixed_workflow/README.md).
+
 ## File-by-file package map
 
 ### 1. Composition files: what SIDERIUS loads

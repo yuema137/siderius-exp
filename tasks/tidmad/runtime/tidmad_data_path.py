@@ -60,11 +60,6 @@ from execute_tools.analysis_materialization import (
     AuthorizedAnalysisMaterializationRequest,
     HistoricalInferenceInputDerivationRequest,
 )
-from execute_tools.hdf5_reader import HDF5ReadCache
-from execute_tools.training_pool import FrozenTrainingPool
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
 from execute_tools.array2h5 import create_abra_file
 from execute_tools.data_paths import resolve_physical_data_root
 from execute_tools.dataset_config import (
@@ -78,6 +73,7 @@ from execute_tools.deliverable_spec import (
     default_deliverable_storage,
     derive_tidmad_deliverable_spec,
 )
+from execute_tools.hdf5_reader import HDF5ReadCache
 from execute_tools.health_checks.config import load_composed_health_config
 from execute_tools.sample_set_builder import build_sample_set
 from execute_tools.task_data_path import (
@@ -93,6 +89,9 @@ from execute_tools.task_data_path import (
     TaskOutputArtifactInventory,
     ValidationScopeError,
 )
+from execute_tools.training_pool import FrozenTrainingPool
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 _TIDMAD_TASK_DATA_PATH_ID = "tidmad"
 
@@ -1111,7 +1110,44 @@ class TidmadTaskDataPath:
         (``policy.py:1169``); the CALLER resolves that and hands it here, so
         this method does not re-decide policy it does not own.
         """
-        return self._build_scope(request, strategy=request.selection_strategy, seed=request.seed)
+        scope = self._build_scope(
+            request, strategy=request.selection_strategy, seed=request.seed
+        )
+        return self._bound_evaluation_scope(scope, request.max_samples)
+
+    def _bound_evaluation_scope(
+        self, scope: TidmadScope, max_samples: int | None
+    ) -> TidmadScope:
+        """Bound ML rows using complete PSD segments before materialization.
+
+        Preserve declared segment order within numerically ordered files. A
+        nonbinding limit keeps the original scope and its serialized identity.
+        Training and final-test scopes do not use this validation-only bound.
+        """
+        if max_samples is None:
+            return scope
+        profile = scope.profile or resolve_dataset_profile()
+        rows_per_segment = (
+            tidmad_topology(profile).dataset.psd_segment_length // scope.seg_size
+        )
+        if rows_per_segment <= 0 or max_samples < rows_per_segment:
+            raise ValidationScopeError(
+                f"validation_max_samples={max_samples} cannot hold one complete PSD "
+                f"segment ({rows_per_segment} ML rows); increase the limit to at least "
+                f"{rows_per_segment} with a valid segmentation size."
+            )
+        remaining = max_samples // rows_per_segment
+        if sum(len(segments) for segments in scope.sample_set.values()) <= remaining:
+            return scope
+        selected = {}
+        for file_index in sorted(scope.sample_set, key=int):
+            kept = scope.sample_set[file_index][:remaining]
+            if kept:
+                selected[file_index] = kept
+                remaining -= len(kept)
+            if remaining == 0:
+                break
+        return scope.model_copy(update={"sample_set": selected})
 
     def validate_health_coverage(self, request: HealthCoverageRequest) -> HealthCoverageResult:
         """Confirm every effective Health-monitored file is in this scope.
@@ -1240,7 +1276,9 @@ class TidmadTaskDataPath:
         except (TypeError, ValueError, AttributeError) as exc:
             raise ValueError(f"TIDMAD scope payload is malformed ({exc}).") from exc
 
-    def validation_dataset(self, scope: object, params: EvalMaterializationParams) -> Dataset[Any]:
+    def validation_dataset(
+        self, scope: object, params: EvalMaterializationParams
+    ) -> Dataset[Any]:
         """Materialize the validation scope EXACTLY, failing closed.
 
         The exact-materialization check relocated verbatim from the engine's
@@ -1252,22 +1290,32 @@ class TidmadTaskDataPath:
         """
         s = self._scope(scope)
         profile = s.profile or resolve_dataset_profile()
+        ml_segs_per_psd = (
+            tidmad_topology(profile).dataset.psd_segment_length // s.seg_size
+        )
+        per_file_requested = {
+            int(k): len(segments) * ml_segs_per_psd
+            for k, segments in s.sample_set.items()
+        }
+        requested_rows = sum(per_file_requested.values())
+        if requested_rows <= 0:
+            raise ValidationScopeError(
+                "validation scope must contain at least one ML row."
+            )
         ds = TIDMADValidationDataset(
             data_dir=params.data_dir,
             sample_set=s.sample_set,
             seg_size=s.seg_size,
             profile=profile,
         )
-        ml_segs_per_psd = tidmad_topology(profile).dataset.psd_segment_length // s.seg_size
-        per_file_requested = {
-            int(k): len(segments) * ml_segs_per_psd for k, segments in s.sample_set.items()
-        }
-        requested_rows = sum(per_file_requested.values())
         materialized = len(ds)
         per_file_materialized = {
             idx: end - start for idx, (start, end) in ds.file_row_ranges.items()
         }
-        if materialized != requested_rows or per_file_materialized != per_file_requested:
+        if (
+            materialized != requested_rows
+            or per_file_materialized != per_file_requested
+        ):
             raise ValidationScopeError(
                 f"validation scope materialized {materialized} ML rows "
                 f"({per_file_materialized!r}) but {requested_rows} were requested "

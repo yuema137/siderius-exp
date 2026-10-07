@@ -10,10 +10,12 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pytest
-from execute_tools.dataset_config import DatasetProfile
+from execute_tools.dataset_config import DatasetProfile, bind_dataset_profile
 from execute_tools.task_data_path import (
     EpochSamplingParams,
     EvalMaterializationParams,
+    HealthCoverageRequest,
+    ScopeBuildRequest,
     ValidationScopeError,
 )
 
@@ -142,11 +144,13 @@ def test_segment_beyond_physical_file_cannot_produce_validation_rows(fixture_dat
         _materialize(root, requested)
 
 
+@pytest.mark.parametrize("selection", [{}, {"0": []}, {"0": [], "1": []}])
 def test_empty_validation_scope_is_refused_instead_of_reaching_r3_division(
     fixture_data,
+    selection,
 ):
     root, _profile, scope = fixture_data
-    requested = scope.model_copy(update={"sample_set": {"0": []}})
+    requested = scope.model_copy(update={"sample_set": selection})
     with pytest.raises(ValidationScopeError):
         _materialize(root, requested)
 
@@ -156,7 +160,8 @@ def test_data_disappearing_between_passes_cannot_shrink_the_next_pass(fixture_da
     assert len(_materialize(root, scope)) == 8
     (root / tidmad_topology(profile).dataset.validation_file_name(1)).unlink()
     with pytest.raises(
-        ValidationScopeError, match=r"materialized 4 ML rows.*8 were requested"
+        ValidationScopeError,
+        match=r"materialized 4 ML rows.*8 were requested",
     ):
         _materialize(root, scope)
 
@@ -176,7 +181,8 @@ def test_equal_total_does_not_hide_wrong_per_file_materialization(
         data_path.TIDMADValidationDataset, "__init__", wrong_file_ranges
     )
     with pytest.raises(
-        ValidationScopeError, match=r"materialized 8 ML rows.*8 were requested"
+        ValidationScopeError,
+        match=r"materialized 8 ML rows.*8 were requested",
     ):
         _materialize(root, scope)
 
@@ -273,3 +279,88 @@ def test_orchestration_row_declaration_accepts_file_loaded_task_class(
     assert not isinstance(foreign_scope, data_path.TidmadScope)
     with bind_task_data_path(module.TidmadTaskDataPath()):
         assert declared_rows(foreign_scope) == 8
+
+
+@pytest.mark.parametrize(
+    "limit, expected", [(None, 8), (99, 8), (8, 8), (6, 6), (5, 4), (2, 2)]
+)
+def test_eval_limit_bounds_materialized_rows_without_changing_training(
+    fixture_data, limit, expected
+):
+    root, profile, _scope = fixture_data
+    request = ScopeBuildRequest(
+        round_kind="formal",
+        selection_strategy="snapshot",
+        portion=1.0,
+        subset_ref="0,1",
+        max_samples=limit,
+        task_parameters={"seg_size": ROW_LENGTH},
+    )
+    adapter = data_path.TidmadTaskDataPath()
+    with bind_dataset_profile(profile):
+        training = adapter.build_training_scope(request)
+        evaluation = adapter.build_eval_scope(request)
+    assert sum(map(len, training.sample_set.values())) == 4
+    assert len(_materialize(root, evaluation)) == expected
+    restored = adapter.deserialize_scope(adapter.serialize_scope(evaluation))
+    assert restored.sample_set == evaluation.sample_set
+    if limit is None or limit >= 8:
+        assert adapter.serialize_scope(evaluation) == adapter.serialize_scope(training)
+    else:
+        assert evaluation.sample_set == (
+            {0: [0]}
+            if limit == 2
+            else {0: [0, 1]}
+            if limit == 5
+            else {0: [0, 1], 1: [0]}
+        )
+
+
+def test_limit_below_one_complete_segment_refuses_before_materialization(fixture_data):
+    _root, profile, _scope = fixture_data
+    request = ScopeBuildRequest(
+        round_kind="trial",
+        selection_strategy="snapshot",
+        portion=1.0,
+        max_samples=1,
+        task_parameters={"seg_size": ROW_LENGTH},
+    )
+    with (
+        bind_dataset_profile(profile),
+        pytest.raises(ValidationScopeError, match="complete PSD"),
+    ):
+        data_path.TidmadTaskDataPath().build_eval_scope(request)
+
+
+def test_ceiling_preserves_segment_order_and_numeric_file_order(fixture_data):
+    _root, _profile, scope = fixture_data
+    selected = scope.model_copy(update={"sample_set": {"1": [1, 0], "0": [1, 0]}})
+    bounded = data_path.TidmadTaskDataPath()._bound_evaluation_scope(selected, 6)
+    assert list(bounded.sample_set) == ["0", "1"]
+    assert bounded.sample_set == {"0": [1, 0], "1": [1]}
+
+
+def test_capped_scope_cannot_silently_drop_health_monitored_files(fixture_data):
+    _root, profile, _scope = fixture_data
+    request = ScopeBuildRequest(
+        round_kind="formal",
+        selection_strategy="snapshot",
+        portion=1.0,
+        subset_ref="0,1",
+        max_samples=4,
+        task_parameters={"seg_size": ROW_LENGTH},
+    )
+    adapter = data_path.TidmadTaskDataPath()
+    with bind_dataset_profile(profile):
+        evaluation = adapter.build_eval_scope(request)
+    coverage = adapter.validate_health_coverage(
+        HealthCoverageRequest(
+            evaluation_scope=evaluation,
+            round_kind="formal",
+            health_binding=None,
+            health_gate_files=(0, 1),
+        )
+    )
+    assert coverage.applicable and not coverage.covered
+    assert evaluation.sample_set == {0: [0, 1]}
+    assert "1" in coverage.reason
