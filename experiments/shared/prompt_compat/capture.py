@@ -33,14 +33,30 @@ class CaptureRequest(BaseModel):
 def render(request: CaptureRequest) -> tuple[str, str]:
     """Use a finite dispatch table; request files cannot name Python callables."""
     args = request.arguments
-    if request.boundary in {"analysis.selection", "analysis.plan", "analysis.synthesis"}:
+    if request.boundary == "interpretation.cached_synthesis":
+        from cache_synthesis import render_cached_synthesis
+
+        return render_cached_synthesis(args)
+    if request.boundary in {
+        "analysis.selection",
+        "analysis.plan",
+        "analysis.synthesis",
+    }:
         from agent.data_analysis.discovery import DiscoverySnapshot
         from agent.prompt_templates import data_analysis as prompts
         from agent.schemas.data_analysis.action_identity import GeneratedProgramIdentity
         from agent.schemas.data_analysis.context import DataAnalysisInput
-        from agent.schemas.data_analysis.generated_program import GeneratedAnalysisProgram
-        from agent.schemas.data_analysis.skills import ResolvedSkillInterface, SkillResult
-        from nodes.data_analysis_agent.data_analysis_agent import DataAnalysisAgent, _SkillSelection
+        from agent.schemas.data_analysis.generated_program import (
+            GeneratedAnalysisProgram,
+        )
+        from agent.schemas.data_analysis.skills import (
+            ResolvedSkillInterface,
+            SkillResult,
+        )
+        from nodes.data_analysis_agent.data_analysis_agent import (
+            DataAnalysisAgent,
+            _SkillSelection,
+        )
         from nodes.data_analysis_agent.report_synthesis import _ReportSynthesis
 
         inp = DataAnalysisInput.model_validate(args["input"])
@@ -62,7 +78,10 @@ def render(request: CaptureRequest) -> tuple[str, str]:
             inp,
             discovery,
             tuple(by_id[k] for k in args["selected"]),
-            {k: ResolvedSkillInterface.model_validate(v) for k, v in args["interfaces"].items()},
+            {
+                k: ResolvedSkillInterface.model_validate(v)
+                for k, v in args["interfaces"].items()
+            },
             generated_programs=tuple(
                 (
                     GeneratedAnalysisProgram.model_validate(p),
@@ -101,7 +120,8 @@ def render(request: CaptureRequest) -> tuple[str, str]:
         inp = InterpretationInput.model_validate(args["input"])
         order = MetricOrder(
             MetricIdentityKey(
-                id=args["metric_identity"]["id"], direction=args["metric_identity"]["direction"]
+                id=args["metric_identity"]["id"],
+                direction=args["metric_identity"]["direction"],
             )
         )
         summary = tuning_output_to_model_run_summary(
@@ -149,20 +169,17 @@ def render(request: CaptureRequest) -> tuple[str, str]:
         }
         # Historical renderers predate this keyword. Adapt the invocation,
         # never the resulting text or schema.
-        if "stage" in inspect.signature(render_structured_output_repair_prompt).parameters:
+        if (
+            "stage"
+            in inspect.signature(render_structured_output_repair_prompt).parameters
+        ):
             kwargs["stage"] = "data_analysis.generated_program"
         return render_structured_output_repair_prompt(**kwargs)
     raise ValueError(f"Unsupported capture boundary: {request.boundary}")
 
 
-def capture(
-    request_path: Path,
-    output: Path,
-    expected_revision: str,
-    profile_name: str | None = None,
-) -> None:
-    request_bytes = request_path.read_bytes()
-    request = CaptureRequest.model_validate_json(request_bytes)
+def validate_checkout(expected_revision: str) -> str:
+    """Bind qualification to the selected clean checkout and its own environment."""
     import agent
 
     checkout = Path(agent.__file__).resolve().parents[2]
@@ -177,10 +194,27 @@ def capture(
         ["git", "-C", str(checkout), "status", "--porcelain", "--", "src"], text=True
     )
     if dirty:
-        raise ValueError("Commit source changes before recording revision-qualified evidence")
+        raise ValueError(
+            "Commit source changes before recording revision-qualified evidence"
+        )
+
+    return revision
+
+
+def capture(
+    request_path: Path,
+    output: Path,
+    expected_revision: str,
+    profile_name: str | None = None,
+) -> None:
+    request_bytes = request_path.read_bytes()
+    request = CaptureRequest.model_validate_json(request_bytes)
+    revision = validate_checkout(expected_revision)
 
     def forbidden(*args, **kwargs):
-        raise AssertionError("Network/provider access is forbidden during offline capture")
+        raise AssertionError(
+            "Network/provider access is forbidden during offline capture"
+        )
 
     socket.socket.connect = forbidden
     socket.socket.connect_ex = forbidden
@@ -212,6 +246,16 @@ def capture(
         "profile": identity,
         "request_sha256": hashlib.sha256(request_bytes).hexdigest(),
         "capture_tool_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "capture_sources": {
+            name: hashlib.sha256(
+                (Path(__file__).parent / name).read_bytes()
+            ).hexdigest()
+            for name in (
+                ["capture.py", "cache_synthesis.py"]
+                if request.boundary == "interpretation.cached_synthesis"
+                else ["capture.py"]
+            )
+        },
         "messages": {
             name: hashlib.sha256(value.encode("utf-8")).hexdigest()
             for name, value in (("system", system), ("user", user))

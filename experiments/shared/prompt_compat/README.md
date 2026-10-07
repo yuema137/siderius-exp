@@ -26,7 +26,7 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
   "$EXP_CHECKOUT/experiments/shared/prompt_compat"
 ```
 
-This installs planner compatibility 0.5.0 and prompt compatibility 0.2.0 as normal
+This installs planner compatibility 0.5.0 and prompt compatibility 0.3.0 as normal
 packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
@@ -168,3 +168,63 @@ select the explicit [runtime v5 planner provider](../planner_compat/README.md#hi
 in addition to the task's prompt profile above. The raw record retains the
 new facts. This qualification does not change the repository's published infra
 pin or authorize public release.
+
+## Recover formal evidence for an old interpretation cache
+
+Current infra checks the original formal round's Health results before using
+its score in a scientific aggregate. Older interpretation caches saved the
+score and an authority verdict, but not all of that independent evidence.
+Reading an old cache still works; a missing proof is reported as an exclusion.
+
+If you have the original tuner outputs and their effective Health policy, use
+`recover_formal_evidence.py` to create a **separate replay input**. It keeps the
+old text and numbers and adds evidence recovered from the matching formal
+record. It never changes the archive or enables in-place continuation of an
+old workspace. Missing, ambiguous or contradictory sources cause an error.
+
+Create `recovery-request.json` in your external project. It names three inputs:
+
+| Field | File to select |
+| --- | --- |
+| `interpretation` | The archived `interpretation_*.json` containing the cache you want to recover |
+| `health_policy` | That run's `health_checks_effective.yaml` |
+| `run_outputs` | An array of original `run_output_*.json` files, with one unambiguous producing run for each cached formal score |
+
+Each file is an object with an absolute `path` and its SHA-256 file digest in
+`sha256`. Obtain the digest with `sha256sum /your/file`; do not use a digest from
+a different copy. For example, the request has this structure (replace every
+path and digest before running):
+
+```json
+{
+  "interpretation": {"path": "/your/archive/interpretation_iter_003.json", "sha256": "<64-character file digest>"},
+  "health_policy": {"path": "/your/archive/health_checks_effective.yaml", "sha256": "<64-character file digest>"},
+  "run_outputs": [
+    {"path": "/your/archive/model_a/run_output_iter_001.json", "sha256": "<64-character file digest>"},
+    {"path": "/your/archive/model_b/run_output_iter_002.json", "sha256": "<64-character file digest>"}
+  ]
+}
+```
+
+Select the independent-formal-evidence assembly listed in
+`qualification.json`. Earlier entries preserve older renderers but do not
+support this cache recovery. Run with that clean infra checkout's own Python:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" \
+  "$EXP_CHECKOUT/experiments/shared/prompt_compat/recover_formal_evidence.py" \
+  --expected-revision "$(git -C "$INFRA_CHECKOUT" rev-parse HEAD)" \
+  --request /your/project/recovery-request.json \
+  --output /your/project/recovered-cache
+```
+
+The output directory must be new. `interpretation.json` is the recovered copy;
+`receipt.json` records source digests, the selected formal record identities,
+the resolved gate roster, the infra revision and the output digest. The tool
+also verifies that each producing run recorded the same effective Health policy
+body. Do not replace missing policy evidence by declaring that Health was off.
+
+This is input recovery, not a training command. It calls no provider and trains
+no model. Use the recovered cache only through an explicitly configured replay
+or new-workspace workflow. The [formal-evidence qualification report](formal-evidence-parity.md)
+describes the paper archive coverage and the limits of the prompt comparisons.

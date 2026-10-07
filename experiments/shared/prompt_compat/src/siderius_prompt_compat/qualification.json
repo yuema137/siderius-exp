@@ -7,6 +7,11 @@
       "infra_revision": "d0f5b5bc0a2c1421f08353231f59aed4bbf6d6c1",
       "assembly_sha256": "16695743626a4053ac32c0ce2edcafd75f5224947395e05747e7131eadd38706",
       "scope": "Runtime feedback schema addition; frozen rendering fixtures must still match"
+    },
+    {
+      "infra_revision": "dfcb39045567076b752c4d30ac2b3a7a3bd6717c",
+      "assembly_sha256": "791abc31176cb4e87fb7d10939575dd637405fc04694c973971120c72f48531b",
+      "scope": "Independent formal evidence; frozen rendering fixtures plus explicit cache recovery and cached synthesis comparison"
     }
   ]
 }
