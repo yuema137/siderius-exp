@@ -26,7 +26,7 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
   "$EXP_CHECKOUT/experiments/shared/prompt_compat"
 ```
 
-This installs planner compatibility 0.5.0 and prompt compatibility 0.3.0 as normal
+This installs planner compatibility 0.5.0 and prompt compatibility 0.4.0 as normal
 packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
@@ -228,3 +228,38 @@ This is input recovery, not a training command. It calls no provider and trains
 no model. Use the recovered cache only through an explicitly configured replay
 or new-workspace workflow. The [formal-evidence qualification report](formal-evidence-parity.md)
 describes the paper archive coverage and the limits of the prompt comparisons.
+
+## Proposer model selection after the routing fix
+
+The proposer now honors each stage's model selection. Earlier infra releases
+used `propose.reasoning` for comparison, reasoning and proposing, even when
+the other entries selected different models. To keep an affected experiment's
+historical selection, set all three entries in **your external experiment's**
+LLM JSON to its old reasoning provider, model, reasoning effort and retry limit.
+For a new experiment, select whichever model you intend to use at each stage.
+
+The four paper configurations already select the historical model in all three
+entries, so they need no rewrite. Version 0.4.0 qualifies the repaired infra
+assembly listed in the package's `qualification.json`. The
+[routing audit](proposer-routing-audit.md) records the original evidence and the
+limits of that claim.
+
+To check your copy of those four configurations, run this command with the
+qualified infra checkout's own environment:
+
+```bash
+"$INFRA_CHECKOUT/.venv/bin/python" \
+  "$EXP_CHECKOUT/experiments/shared/prompt_compat/check_paper_proposer_routing.py" \
+  --expected-revision "$(git -C "$INFRA_CHECKOUT" rev-parse HEAD)" \
+  --output /your/project/new-routing-receipt.json
+```
+
+The parent directory must exist and the receipt filename must be new. Success
+prints four `MATCH` rows and saves the selected routes and input digests. This
+command checks model configuration without calling an API or training. Prompt
+text is checked separately by the frozen comparison command above. A changed
+plugin identity requires a new workspace; do not use this upgrade to resume an
+old workspace in place.
+
+By default the checker reads the exp checkout containing the script. To inspect
+a separate copy of the repository, add `--exp-checkout /your/exp-copy`.

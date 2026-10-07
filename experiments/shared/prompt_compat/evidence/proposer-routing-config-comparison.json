@@ -1,0 +1,157 @@
+{
+  "scope": "Node construction and public routing interface; not pipeline call dispatch",
+  "infra_revision": "44e822027101785ab4e41e5335f1df8a8adb10ed",
+  "infra_source_dirty": false,
+  "infra_source_sha256": {
+    "src/workflows/llm_config.py": "204d1dbbd9904ef7b94a169ca6278f304d04e4ec0ccacf1f08fc0656b06de786",
+    "src/nodes/ml_model_proposal_agent/ml_model_proposal_agent.py": "ae46cce71bf4c6864d9461137be0aa435c2284a1f71243a0c53d061e6efde911",
+    "src/nodes/ml_model_proposal_agent/routing.py": "54a60a6f8686b22087a938c9253d76db304cc55902e8c02ca9cd014fb8cf878d"
+  },
+  "checker_sha256": "7e733ab99032feae7c24bd6f36b188a552afb7adda1ea33c337a214cc6012d6e",
+  "historical_reasoning": {
+    "provider": "openai",
+    "model_id": "gpt-5.6-sol",
+    "reasoning_effort": "medium",
+    "max_retries": null
+  },
+  "results": [
+    {
+      "case": "tess",
+      "config": "experiments/phyts_tess/main_fixed_workflow/agents.json",
+      "config_sha256": "b37bbf6b51a0b3c40c7f58972f68858f3d4fc46309960a6708639215cf933e4f",
+      "effective_routes": {
+        "comparison": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "reasoning": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "proposing": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      },
+      "constructed_bridges": [
+        {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      ],
+      "status": "MATCH"
+    },
+    {
+      "case": "ligo",
+      "config": "experiments/phyts_ligo/main_fixed_workflow/agents.json",
+      "config_sha256": "376424b5ba31e08e1117cfcb5da2c786f7b50009c64a474a613d6456c9b2bb88",
+      "effective_routes": {
+        "comparison": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "reasoning": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "proposing": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      },
+      "constructed_bridges": [
+        {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      ],
+      "status": "MATCH"
+    },
+    {
+      "case": "project8",
+      "config": "experiments/phyts_project8/main_fixed_workflow_dual_representation/agents.json",
+      "config_sha256": "376424b5ba31e08e1117cfcb5da2c786f7b50009c64a474a613d6456c9b2bb88",
+      "effective_routes": {
+        "comparison": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "reasoning": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "proposing": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      },
+      "constructed_bridges": [
+        {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      ],
+      "status": "MATCH"
+    },
+    {
+      "case": "tidmad",
+      "config": "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json",
+      "config_sha256": "b37bbf6b51a0b3c40c7f58972f68858f3d4fc46309960a6708639215cf933e4f",
+      "effective_routes": {
+        "comparison": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "reasoning": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        },
+        "proposing": {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      },
+      "constructed_bridges": [
+        {
+          "provider": "openai",
+          "model_id": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "max_retries": null
+        }
+      ],
+      "status": "MATCH"
+    }
+  ],
+  "provider_calls": 0,
+  "training_calls": 0
+}
