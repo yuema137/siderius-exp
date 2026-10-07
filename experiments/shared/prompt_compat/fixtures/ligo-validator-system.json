@@ -1,0 +1,11 @@
+{
+  "case_id": "ligo-validator-system",
+  "boundary": "validator.system",
+  "arguments": {
+    "model_io_contract": null
+  },
+  "provenance": {
+    "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation"
+  }
+}

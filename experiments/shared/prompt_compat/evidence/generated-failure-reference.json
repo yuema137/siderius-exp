@@ -1,0 +1,27 @@
+{
+  "source_tree_sha256": "b8b111bf94e008b707839af250d5856bab9f2dd8538ea6b134e8506e5d0ddf86",
+  "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+  "source_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "capture_tool_sha256": "900c5d766d1225566604f507040f04fe9799244688b4edb8c4268996765dde2e",
+  "receipt_sha256": "b60e19459d967a99e5887328c5721d597ab442dc86eb2bdb343d1085bdcb2144",
+  "input_sha256": "83e7f447a322d4d729524cf1e319132bc287482d1ba8017800210b7b2d3111d5",
+  "recovery_policy_sha256": null,
+  "outcome": "failed_after_archived_repair",
+  "requests": [
+    {
+      "label": "data_analysis.generated_program",
+      "system_sha256": "b66607b2f186afbf605697a94685b67bb34f9e6f6886c656475f658869440326",
+      "user_sha256": "e909f18c7e5ef75b7d5a15becb3b632cecfa3744e8189d90435a43d1eb93dbd6"
+    },
+    {
+      "label": "data_analysis.generated_program.repair",
+      "system_sha256": "92a2f845bb866bae84df960bd19b77b3c19e8f485165a6a08270850fbd11e2b7",
+      "user_sha256": "02f6c4b8f997f7de4013c5488ec6f693370472864460aec59b8338039cc130d3"
+    }
+  ],
+  "archived_replies_consumed": 2,
+  "api_calls": 0,
+  "training_calls": 0,
+  "generated_program_executions": 0,
+  "scope": "archived failure branch only; not complete conversation replay"
+}

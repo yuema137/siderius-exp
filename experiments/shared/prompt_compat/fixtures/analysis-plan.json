@@ -1,0 +1,2631 @@
+{
+  "case_id": "analysis-plan",
+  "boundary": "analysis.plan",
+  "arguments": {
+    "input": {
+      "access_policy": {
+        "allow_model_inference": false,
+        "policy_id": "tidmad-orchestrator-candidate-0-3",
+        "policy_version": 1,
+        "purpose": "Candidate raw-only band analysis, pending main-run freeze.",
+        "split_rules": [
+          {
+            "data_visible": true,
+            "metadata": {
+              "fields": [],
+              "mode": "none"
+            },
+            "predictions_visible": false,
+            "residuals_visible": false,
+            "split_id": "validation",
+            "targets_visible": false
+          }
+        ]
+      },
+      "allowed_skill_packs": [
+        {
+          "environment_lock_ref": null,
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_id": "core-analysis",
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "environment_lock_ref": null,
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_id": "time-series",
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        }
+      ],
+      "analysis_brief": {
+        "brief_id": "analysis-brief-166d8d42a1f36a7c",
+        "optional_scope_note": "Cold-start characterization is limited to visible raw validation waveforms. Questions concern observable mixture properties only and do not attribute features to clean signal or noise; targets, predictions, residuals, and metadata are excluded.",
+        "questions": [
+          {
+            "completion_criterion": "Summarize the observed value ranges and distributions, quantization occupancy, repeated extrema, flat runs, abrupt discontinuities, and any non-finite or structurally invalid content across the accessible waveforms.",
+            "observations_to_verify": [
+              "Whether values accumulate at integer extrema in a manner consistent with clipping or saturation.",
+              "Whether long constant runs, missing segments, or abrupt sample-to-sample jumps occur.",
+              "Whether amplitude distributions differ substantially among waveforms."
+            ],
+            "priority": 5,
+            "question": "What amplitude-range, quantization, and boundary behaviors characterize the raw integer waveforms?",
+            "question_id": "analysis-question-01",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          },
+          {
+            "completion_criterion": "Characterize broad spectral concentration, narrow peaks or harmonic families, and cross-waveform consistency using normalized frequency only, without assigning components to clean signal or noise.",
+            "observations_to_verify": [
+              "Whether power is concentrated toward low, middle, or high normalized frequencies.",
+              "Whether narrow spectral peaks or harmonic patterns recur across waveforms.",
+              "Whether spectral shape varies enough across waveforms to indicate materially different raw regimes."
+            ],
+            "priority": 5,
+            "question": "How is raw waveform power distributed across normalized temporal frequencies, and which spectral structures are common or variable across waveforms?",
+            "question_id": "analysis-question-02",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          },
+          {
+            "completion_criterion": "Determine whether local amplitude, variance, spectral composition, and waveform morphology remain broadly stable or exhibit distinct changes over sample position.",
+            "observations_to_verify": [
+              "Whether localized bursts, steps, transients, or variance changes occur.",
+              "Whether spectral composition changes materially over time within a waveform.",
+              "Whether nonstationary events are isolated or occupy substantial portions of records."
+            ],
+            "priority": 4,
+            "question": "To what extent are the raw waveforms temporally nonstationary within each record?",
+            "question_id": "analysis-question-03",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          },
+          {
+            "completion_criterion": "Summarize the persistence scales, oscillatory recurrences, and repeated motifs evident from raw-waveform temporal dependence, while avoiding claims about the latent clean waveform.",
+            "observations_to_verify": [
+              "Whether short- or long-range sample dependence is prominent.",
+              "Whether stable oscillatory periods or repeated motifs appear within or across waveforms.",
+              "Whether temporal dependence differs substantially among accessible records."
+            ],
+            "priority": 3,
+            "question": "What recurring temporal dependence and periodic structure are directly observable in the raw mixtures?",
+            "question_id": "analysis-question-04",
+            "requested_scope": null,
+            "suspected_failure_modes": []
+          }
+        ],
+        "source": "interpreter",
+        "source_ref": "interpretation:iter_001:iteration:1"
+      },
+      "available_assets": [
+        {
+          "allowed_operations": [
+            "read",
+            "materialize"
+          ],
+          "asset_id": "tidmad-band-validation-input",
+          "asset_type": "dataset",
+          "authorized_scope": {
+            "data_scope": {
+              "file_indices": [
+                0,
+                1,
+                2,
+                3
+              ]
+            },
+            "kind": "legacy_partitions"
+          },
+          "description": "Raw validation input windows from the selected band.",
+          "location": {
+            "dataset_profile_sha256": "a7801aba3058dbca35523b5d1a0f76afcaf31709c7717087a355371f5a525e74",
+            "kind": "task_data",
+            "logical_role": "validation_input_windows",
+            "task_data_path_id": "tidmad_frozen_training_pool"
+          },
+          "metadata": {
+            "band_file_indices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "channel_semantics": "raw_detector_input",
+            "sample_rate_hz": 10000000.0,
+            "window_duration_seconds": 0.0262144,
+            "window_samples": 262144
+          },
+          "metadata_sources": {
+            "band_file_indices": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "channel_semantics": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "sample_rate_hz": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "window_duration_seconds": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            },
+            "window_samples": {
+              "information_class": "identity",
+              "source_fields": [],
+              "split_id": null
+            }
+          },
+          "provenance": {
+            "created_at": null,
+            "iteration_id": null,
+            "producer": "tidmad-task-package",
+            "run_id": null,
+            "source_asset_ids": []
+          },
+          "split_id": "validation",
+          "time_precision_requirement": null
+        }
+      ],
+      "caller": {
+        "caller_id": "iter_001",
+        "caller_type": "workflow",
+        "request_source": "iteration:1"
+      },
+      "declared_scope": {
+        "historical_model_asset_ids": [],
+        "raw_input_asset_ids": [
+          "tidmad-band-validation-input"
+        ]
+      },
+      "human_advice": null,
+      "prior_evidence": [],
+      "request_id": "iteration-001",
+      "resource_envelope": {
+        "max_host_memory_gb": 8.0,
+        "max_vram_gb": null,
+        "per_skill_timeout_s": 12.0,
+        "preferred_device": "cpu",
+        "sampling_policy": {
+          "fraction": null,
+          "max_items": 10,
+          "mode": "fixed",
+          "seed": 20260915,
+          "strata_fields": [],
+          "strategy": "task_defined"
+        },
+        "wall_time_budget_s": 600.0
+      },
+      "retain_model_outputs": false,
+      "schema_version": 1,
+      "storage": {
+        "backend": "local",
+        "local": {
+          "run_name": "iter_001",
+          "workspace": "/mnt/tidmad-no-prior/f-full-0-3-daonly-v1-unit/workspace/iter_001/iteration_001"
+        },
+        "postgres": null
+      },
+      "task_context": {
+        "dataset_profile_ref": {
+          "byte_size": 613,
+          "logical_ref": "/mnt/tidmad-no-prior/checkouts/da-only-v1/exp/tasks/tidmad/resolved/dataset_profile.json",
+          "media_type": "application/json",
+          "sha256": "a7801aba3058dbca35523b5d1a0f76afcaf31709c7717087a355371f5a525e74"
+        },
+        "forward_contract": {
+          "custom_loss_applicability": null,
+          "embedding_note": "Input values are integer-coded samples \u2014 nn.Embedding(256, embed_dim) to convert [B, T] int64 \u2192 [B, T, embed_dim], then transpose to [B, embed_dim, T] for Conv1d layers, remains a valid and common input stem. The input representation is unchanged; only the output is continuous.\n",
+          "input_description": "raw signal, integer-coded samples 0-255",
+          "input_shape": "[B, T] int64",
+          "model_io": {
+            "inference": {
+              "accepted_input_view_formats": [
+                "siderius.numeric-array.v1"
+              ],
+              "alignment": "one_prediction_per_input",
+              "determinism": "deterministic",
+              "prediction_decoder_protocol_id": "siderius.identity-prediction-decoder.v1",
+              "prediction_output_format": "siderius.numeric-array.v1",
+              "prediction_semantic_id": "tidmad.offset-encoded-continuous-waveform-segment.v1",
+              "required_information": [
+                {
+                  "fields": [],
+                  "information_class": "data"
+                }
+              ]
+            },
+            "input": {
+              "axes": [
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "B"
+                  },
+                  "role": "batch"
+                },
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "T"
+                  },
+                  "role": "temporal"
+                }
+              ],
+              "dtype": {
+                "admissible": [
+                  "int64",
+                  "int32"
+                ]
+              }
+            },
+            "output": {
+              "axes": [
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "B"
+                  },
+                  "role": "batch"
+                },
+                {
+                  "dimension": {
+                    "dynamic": false,
+                    "fixed": null,
+                    "symbolic": "T"
+                  },
+                  "role": "temporal"
+                }
+              ],
+              "dtype": {
+                "admissible": [
+                  "float32"
+                ]
+              }
+            }
+          },
+          "num_classes": 0,
+          "output_description": "continuous denoised waveform value per timestep",
+          "output_head_note": "Output must be exactly [output_shape] \u2014 a continuous value per timestep, e.g. a final Conv1d(channels, 1, 1) followed by squeeze, or any head that emits [B, T] float32. Do NOT emit per-class logits and do NOT argmax: this task predicts waveform values directly. Residual formulations are natural here \u2014 predicting a correction to the input, or predicting the noise and subtracting it, preserves amplitude and low-frequency structure instead of regenerating the waveform from scratch.\n",
+          "output_shape": "[B, T] float32",
+          "preset": "sequence",
+          "segmentation_applicability": "temporal",
+          "supervision_target": null,
+          "task_note": "Offline denoising \u2014 output at position t may depend on all positions. Causal constraints are not required. The objective is a continuous regression loss; robust choices such as SmoothL1/Huber are strong task-grounded starting points, and the loss itself remains searchable.\n",
+          "task_type": "regression"
+        },
+        "input_description": "Integer-coded SQUID detector waveform samples at the task-declared physical cadence. The view contains one input channel and performs no interpolation, resampling, filtering, or repair.",
+        "metric_identity": [
+          "tidmad_denoising_score",
+          "higher"
+        ],
+        "metric_summary": "tidmad_denoising_score; direction=higher; aggregation=tidmad_anchor_normalised_linear_grand_mean",
+        "scientific_constraints": [
+          "Every certified selection must cover the selected files [0, 1, 2, 3] or refuse.",
+          "Findings concern sampled raw validation windows, not unseen data or hidden targets.",
+          "Use the declared physical cadence; distinguish measured findings from hypotheses."
+        ],
+        "scientific_goal": "Characterize authorized raw waveform inputs in the selected band.",
+        "target_description": "Clean injected waveform, not visible in the initial raw-data analysis.",
+        "task_description": "full-spectrum 1-D time-series denoising of SQUID dark-matter\ndetector data: map a noisy [B, T] integer signal to a clean\n[B, T] continuous waveform, trained across the whole frequency\nspectrum within the selected band at once (not split into per-file or\nper-frequency models). This is a\ncontinuous regression task \u2014 the model predicts waveform values\ndirectly, not a distribution over discrete levels.",
+        "task_id": "tidmad_frozen_training_pool"
+      }
+    },
+    "discovery": {
+      "enabled_pack_ids": [
+        "core-analysis",
+        "time-series"
+      ],
+      "manifest_digests": [
+        "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7",
+        "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+      ],
+      "skills": [
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Numeric values require a bounded descriptive summary.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "predictions",
+                  "residuals",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1",
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for values.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "values"
+              }
+            ],
+            "keywords": [
+              "summary",
+              "statistics",
+              "mean",
+              "quantile",
+              "central",
+              "tendency",
+              "spread",
+              "variability",
+              "overview",
+              "measurements"
+            ],
+            "memory_cost": "low",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Finite-value descriptive statistics with explicit quantiles.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "summary_statistics",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "core-analysis"
+            ],
+            "time_cost": "cheap",
+            "title": "Summary statistics"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/summary_statistics.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "737afee6dbba0c0c08970f2608cbc4db49d31bae12279a35db32f3f9e1b8f30a",
+            "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+            "pack_id": "core-analysis",
+            "pack_version": "1.0.0",
+            "skill_id": "summary_statistics",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/summary_statistics.py",
+              "sha256": "4211026c795727d3879258cf59b9081e23f7665935b476175cb8dc1febb9c9cb"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "c18d70ca447733c6a7f60600b59c14e2950769eb234afd673766f1a13b09a4fe"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Numeric or time-series data quality must be inspected without repair.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "predictions",
+                  "residuals",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1",
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for values.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "values"
+              }
+            ],
+            "keywords": [
+              "missing",
+              "nonfinite",
+              "nan",
+              "quality"
+            ],
+            "memory_cost": "low",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Separates unavailable positions from NaN and infinite observed values.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "nonfinite_and_missingness",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "core-analysis"
+            ],
+            "time_cost": "cheap",
+            "title": "Nonfinite and missingness"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/nonfinite_and_missingness.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "3a18dda4f11e8ccfb3bde8ef0f84419ec8945a7a4034196b8611854c7f61c539",
+            "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+            "pack_id": "core-analysis",
+            "pack_version": "1.0.0",
+            "skill_id": "nonfinite_and_missingness",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/nonfinite_and_missingness.py",
+              "sha256": "e248f0912495ef54ae8849121719684f1b40b8eb7a586f870da4e51cdee2d9e6"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "c18d70ca447733c6a7f60600b59c14e2950769eb234afd673766f1a13b09a4fe"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Distribution spread, tails, or descriptive outliers are relevant.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "predictions",
+                  "residuals",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1",
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for values.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "values"
+              }
+            ],
+            "keywords": [
+              "distribution",
+              "quantile",
+              "outlier",
+              "iqr"
+            ],
+            "memory_cost": "low",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Quantiles and descriptive Tukey-fence outlier counts.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "distribution_quantiles_and_outliers",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "core-analysis"
+            ],
+            "time_cost": "cheap",
+            "title": "Distribution quantiles and outliers"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/distribution_quantiles_and_outliers.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "3493aad3dce75f1730a5a1c571dc023af13d9f23c7babe5f6d6e25f248e8855f",
+            "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+            "pack_id": "core-analysis",
+            "pack_version": "1.0.0",
+            "skill_id": "distribution_quantiles_and_outliers",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/distribution_quantiles_and_outliers.py",
+              "sha256": "edc05ef5e4bf01cbd5a2a7af4bbd2bad79c5368738a8203ce052bbdc57f82fff"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "c18d70ca447733c6a7f60600b59c14e2950769eb234afd673766f1a13b09a4fe"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Aligned numeric variables are available for linear-association inspection.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "predictions",
+                  "residuals",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for matrix.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "matrix"
+              }
+            ],
+            "keywords": [
+              "correlation",
+              "pearson",
+              "relationship",
+              "matrix"
+            ],
+            "memory_cost": "low",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Pairwise-complete Pearson correlations with support counts.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "correlation_matrix",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "core-analysis"
+            ],
+            "time_cost": "cheap",
+            "title": "Correlation matrix"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/correlation_matrix.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "d331d0ac208cbb87ef7da0925579563b6bccb05d29bfaa0e8726e93b23c0bfe4",
+            "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+            "pack_id": "core-analysis",
+            "pack_version": "1.0.0",
+            "skill_id": "correlation_matrix",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/correlation_matrix.py",
+              "sha256": "df10162922193d200ca7e770e0fe645918848ae51dbc526e924f5bddf308e1b8"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "c18d70ca447733c6a7f60600b59c14e2950769eb234afd673766f1a13b09a4fe"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Aligned predictions, targets, and an authorized scientific metadata field are available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "predictions"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized prediction values for predictions.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "prediction"
+                  }
+                ],
+                "slot_id": "predictions"
+              },
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized target values for targets.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "target"
+                  }
+                ],
+                "slot_id": "targets"
+              },
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "One invocation-selected, explicitly authorized metadata field.",
+                "invocation_metadata_selection": {
+                  "maximum_fields": 1,
+                  "minimum_fields": 1,
+                  "parameter_name": "metadata_field"
+                },
+                "optional_information": [],
+                "required": true,
+                "required_information": [],
+                "slot_id": "slice_metadata"
+              }
+            ],
+            "keywords": [
+              "performance",
+              "error",
+              "slice",
+              "metadata",
+              "bias",
+              "rmse"
+            ],
+            "memory_cost": "low",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Scalar prediction error conditioned on one authorized metadata variable.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "performance_slice_summary",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "core-analysis"
+            ],
+            "time_cost": "cheap",
+            "title": "Performance slice summary"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/performance_slice_summary.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "63f33d4509635cb535b9c873f69bcc4223b73c051b79e0a5e448f64da48e0b66",
+            "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+            "pack_id": "core-analysis",
+            "pack_version": "1.0.0",
+            "skill_id": "performance_slice_summary",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/performance_slice_summary.py",
+              "sha256": "45bb4e6d6c12680d198aad6dd6f7fb6d6ccab7bc4aed935761c49391bf7149c0"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "c18d70ca447733c6a7f60600b59c14e2950769eb234afd673766f1a13b09a4fe"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Aligned scalar regression predictions and targets are available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "predictions"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized prediction values for predictions.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "prediction"
+                  }
+                ],
+                "slot_id": "predictions"
+              },
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.numeric-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized target values for targets.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "target"
+                  }
+                ],
+                "slot_id": "targets"
+              }
+            ],
+            "keywords": [
+              "prediction",
+              "target",
+              "distribution",
+              "bias",
+              "collapse"
+            ],
+            "memory_cost": "low",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Detects scalar-regression bias, range compression, and support mismatch.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "prediction_target_distribution",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "core-analysis"
+            ],
+            "time_cost": "cheap",
+            "title": "Prediction-target distribution"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/prediction_target_distribution.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "d79350653c4d3d553913f04f22ea4112d3afc0504acba59bbdd3c245a2800461",
+            "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+            "pack_id": "core-analysis",
+            "pack_version": "1.0.0",
+            "skill_id": "prediction_target_distribution",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/prediction_target_distribution.py",
+              "sha256": "c198b408a8943b7e09e4586ef89c22f51404fb73345431c8da5109fa09a65e76"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "c18d70ca447733c6a7f60600b59c14e2950769eb234afd673766f1a13b09a4fe"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 10942,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "7d345614cdbf4ed36184778e8087294c39ceb1c8f9483ef154412718b55453c7"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/core_analysis"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Any time-series view with certified timing and masks is available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "sampling",
+              "cadence",
+              "gaps",
+              "irregular",
+              "interval",
+              "spacing",
+              "evenly",
+              "duration",
+              "measurements"
+            ],
+            "memory_cost": "low",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Measures cadence regularity, gaps, and usable duration without repair.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "sampling_cadence_and_gaps",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "cheap",
+            "title": "Sampling cadence and gaps"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/sampling_cadence_and_gaps.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "367d1fa54093757d469b04a504afd1bcb3697922add13cb94de66bab0090dd3c",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "sampling_cadence_and_gaps",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/sampling_cadence_and_gaps.py",
+              "sha256": "6cc21286f98a808002b1c718f14825f479616659da7809c785dbc6872a9533a8"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Time-local mean, scale, or energy variation is relevant.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "temporal",
+              "drift",
+              "stability",
+              "window"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Windowed local statistics characterize drift without stationarity claims.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "temporal_stability_summary",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Temporal stability summary"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/temporal_stability_summary.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "303aa68d83386cc16dc0cad5f57caf0893bffafbd42b5eadeeffc5c6391aa209",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "temporal_stability_summary",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/temporal_stability_summary.py",
+              "sha256": "27bc15b602ff401320d7fbd0c5d3f319a113139c270311d2a51c24d7cf9fc326"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "A complete finite certified-regular series is available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "autocorrelation",
+              "lag",
+              "memory",
+              "periodic",
+              "repeat",
+              "recurring",
+              "sequence",
+              "characteristic"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Normalized lag structure for complete certified-regular series.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "autocorrelation",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Autocorrelation"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/autocorrelation.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "35049db03d48f698929a53cdf45904f8427ac530753a40020ea776f2ab839171",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "autocorrelation",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/autocorrelation.py",
+              "sha256": "0b5b48c7900b74c12b8b934d6bc418a1382f3f5fb22b4dee865053fc29d1d173"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "A complete finite certified-regular series is available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "fft",
+              "spectrum",
+              "frequency",
+              "frequencies",
+              "peak",
+              "amplitude",
+              "amplitudes",
+              "sharp",
+              "periodic",
+              "components",
+              "regularly",
+              "sampled"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "One-sided amplitude peaks for complete certified-regular real series.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "fft_peak_summary",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "FFT peak summary"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/fft_peak_summary.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "fb2f3331dad629d7072f1ea66f6fb34a5ca2995f953e178efb8762e62d7fd6eb",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "fft_peak_summary",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/fft_peak_summary.py",
+              "sha256": "5928d68f4197d24c94f434d1c8dd99cf4a11984f4af103cc594d82cbc7b7293d"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Regular finite series and an explicit nperseg are available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "welch",
+              "psd",
+              "noise",
+              "power",
+              "frequency"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "One-sided power spectral density with explicit segment resolution.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "welch_psd",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Welch PSD"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/welch_psd.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "1e4edd77dd91067a03aa3ac3977b4dda382d9303fadf85a776e72aff975e13eb",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "welch_psd",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/welch_psd.py",
+              "sha256": "14e086418d3f62324b72e05a0d5e5a99f51b014adc284b527c802d6bc1383867"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Scientifically meaningful frequency bands and explicit nperseg are known.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "band",
+              "power",
+              "frequency",
+              "psd"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Welch-integrated power in explicit physical-frequency bands.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "band_power_summary",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Band power summary"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/band_power_summary.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "67695bbffdc0eb662cab3b9422c38014766c44c1c847d77921237fccac33bf51",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "band_power_summary",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/band_power_summary.py",
+              "sha256": "4387e35d18989cfda75ca9979b10de8bff14382615d8333d56b1518f08818fdb"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Time-varying frequency content is suspected and explicit nperseg is known.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "stft",
+              "time-frequency",
+              "nonstationary",
+              "spectrogram",
+              "transient",
+              "spectral",
+              "sequence",
+              "sweep",
+              "evolves",
+              "evolution",
+              "changing",
+              "dominant"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Unpadded time-frequency energy for nonstationary regular signals.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "stft_energy_map",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "expensive",
+            "title": "STFT energy map"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/stft_energy_map.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "fa0e64b77bb038ec0e1894d89720a126c55d76b02975433e24fb7676317bd1b6",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "stft_energy_map",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/stft_energy_map.py",
+              "sha256": "aaa7ba71c17f3b6a964cbe7df9a83dfc7f7982d5d867a3321ebf95ed622e9a75"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Irregular timestamps and an explicit physical-frequency search grid are available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "lomb-scargle",
+              "irregular",
+              "periodic",
+              "frequency"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Normalized periodic power for irregular samples on an explicit grid.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "lomb_scargle_periodogram",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Lomb-Scargle periodogram"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/lomb_scargle_periodogram.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "a4a9145203c4876e8031516c5ed80aba25949753602069399a400a600aca95f4",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "lomb_scargle_periodogram",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/lomb_scargle_periodogram.py",
+              "sha256": "1bc479b5f2f3fd12aa1150398e7cdc047d8e2c645cff9f63922b7e3336ff6cba"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Two complete finite channels share a certified regular axis.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "cross-correlation",
+              "lag",
+              "channels",
+              "delay"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Lag correlation for an explicit ordered channel pair.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "cross_correlation",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Cross-correlation"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/cross_correlation.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "b51732f4ae3e4d6afaaf52ba86c6a5923a8860fb44a41913a25f303f222ecfda",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "cross_correlation",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/cross_correlation.py",
+              "sha256": "9f475e36adbb0f957eb844ffdec28e31a0cfda1fc77d4bdbf5de153d3ce77343"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "Two complete regular channels and explicit nperseg are available.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "dataset",
+                  "analysis_artifact",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized data values for series.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "data"
+                  }
+                ],
+                "slot_id": "series"
+              }
+            ],
+            "keywords": [
+              "coherence",
+              "channels",
+              "frequency",
+              "frequencies",
+              "relationship",
+              "shared",
+              "common",
+              "oscillatory",
+              "sensors",
+              "localized",
+              "variation"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Frequency-localized dependence for an explicit channel pair.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "magnitude_squared_coherence",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Magnitude-squared coherence"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/magnitude_squared_coherence.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "c3ab3a92703301591c7db1334bf04f24f06cc496515e4e445b29d1bb02dac6f5",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "magnitude_squared_coherence",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/magnitude_squared_coherence.py",
+              "sha256": "0a30a83a706cb225f0674903a0566115e4a7b357e3f903303eb4e9d78b177c17"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        },
+        {
+          "card": {
+            "aliases": [],
+            "applicable_when": "A complete certified residual time-series artifact already exists.",
+            "determinism": "deterministic",
+            "determinism_notes": null,
+            "input_slots": [
+              {
+                "accepted_asset_types": [
+                  "residuals",
+                  "evaluation_artifact"
+                ],
+                "accepted_view_formats": [
+                  "siderius.timeseries-array.v1"
+                ],
+                "cardinality": "one",
+                "description": "Authorized residual values for residuals.",
+                "invocation_metadata_selection": null,
+                "optional_information": [],
+                "required": true,
+                "required_information": [
+                  {
+                    "fields": [],
+                    "information_class": "residual"
+                  }
+                ],
+                "slot_id": "residuals"
+              }
+            ],
+            "keywords": [
+              "residual",
+              "residuals",
+              "error",
+              "prediction",
+              "spectrum",
+              "spectrally",
+              "frequencies",
+              "white",
+              "structured",
+              "unexplained",
+              "psd"
+            ],
+            "memory_cost": "medium",
+            "numerical_tolerance": {
+              "atol": 0.0,
+              "rtol": 1e-07
+            },
+            "one_line_description": "Welch spectral structure in already-certified residual series.",
+            "preferred_device": "cpu",
+            "produced_artifact_types": [
+              "table"
+            ],
+            "skill_id": "residual_spectrum",
+            "skill_version": "1.0.0",
+            "supports_sampling": true,
+            "tags": [
+              "scientific-analysis",
+              "time-series"
+            ],
+            "time_cost": "moderate",
+            "title": "Residual spectrum"
+          },
+          "entrypoint": {
+            "callable_symbol": "run",
+            "instructions_symbol": "SKILL_INSTRUCTIONS",
+            "module_path": "skills/residual_spectrum.py",
+            "parameter_schema_symbol": "Parameters"
+          },
+          "environment_lock_ref": null,
+          "identity": {
+            "determinism": "deterministic",
+            "environment_lock_sha256": null,
+            "implementation_sha256": "a8d7ec27418271bf672678826247521901e9407aebd1708919a91f457fa55699",
+            "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+            "pack_id": "time-series",
+            "pack_version": "1.0.0",
+            "skill_id": "residual_spectrum",
+            "skill_version": "1.0.0"
+          },
+          "implementation_files": [
+            {
+              "relative_path": "skills/residual_spectrum.py",
+              "sha256": "72095bae3010e3e9304be47bf2d9cb3e6e605f2dc28eca1ffa90444a28c59d20"
+            },
+            {
+              "relative_path": "_shared.py",
+              "sha256": "7dd45c82ccc592dcabeae3f41a620dfef7593a86e16b3b1ece40a49bed3668c2"
+            }
+          ],
+          "manifest_ref": {
+            "byte_size": 17506,
+            "logical_ref": "manifest.json",
+            "media_type": "application/json",
+            "sha256": "47b3ee9389139dce27a4e2875d442c3e9a5abd99355355979bb66404c8902e28"
+          },
+          "pack_root": "/mnt/tidmad-no-prior/checkouts/da-only-v1/infra/src/agent/data_analysis/reference_packs/time_series"
+        }
+      ],
+      "snapshot_digest": "bac6d41525189086ec46fd72c36b78c2dbe0cd3fa188a8df66a302b0fe744e0f"
+    },
+    "selected": [
+      "autocorrelation",
+      "distribution_quantiles_and_outliers",
+      "fft_peak_summary",
+      "nonfinite_and_missingness",
+      "sampling_cadence_and_gaps",
+      "stft_energy_map",
+      "summary_statistics",
+      "temporal_stability_summary",
+      "welch_psd"
+    ],
+    "interfaces": {
+      "stft_energy_map": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "noverlap": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Overlap in samples; None means 50 percent.",
+              "title": "Noverlap"
+            },
+            "nperseg": {
+              "description": "Explicit samples per STFT segment controlling time/frequency resolution.",
+              "minimum": 8,
+              "title": "Nperseg",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "nperseg"
+          ],
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "392c17ca2584ca590d4cc60db92223672726e750423f9f212bfa8a71e49b7784",
+        "selected_skill_instructions": "Use to expose time-varying spectral structure in certified regular\nseries. It emits a standard STFT energy map; higher-level chirp or morphology interpretation\nbelongs to synthesis.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "fa0e64b77bb038ec0e1894d89720a126c55d76b02975433e24fb7676317bd1b6",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "stft_energy_map",
+          "skill_version": "1.0.0"
+        }
+      },
+      "fft_peak_summary": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "maximum_frequency_hz": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional inclusive upper peak-search frequency in Hz.",
+              "title": "Maximum Frequency Hz"
+            },
+            "maximum_peaks": {
+              "default": 8,
+              "description": "Maximum deterministic local maxima to return.",
+              "maximum": 64,
+              "minimum": 1,
+              "title": "Maximum Peaks",
+              "type": "integer"
+            },
+            "minimum_frequency_hz": {
+              "anyOf": [
+                {
+                  "minimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional inclusive lower peak-search frequency in Hz.",
+              "title": "Minimum Frequency Hz"
+            }
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "bfa250a8520402f7cd77395dc0f7efc99c9af8570554e3f19a19df0669b41655",
+        "selected_skill_instructions": "Use to find deterministic nonzero-frequency peaks and spectral\nconcentration in real-valued certified regular series. It reports amplitude, not PSD.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "fb2f3331dad629d7072f1ea66f6fb34a5ca2995f953e178efb8762e62d7fd6eb",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "fft_peak_summary",
+          "skill_version": "1.0.0"
+        }
+      },
+      "distribution_quantiles_and_outliers": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "iqr_multiplier": {
+              "default": 1.5,
+              "description": "Positive multiplier applied to IQR for descriptive Tukey fences.",
+              "exclusiveMinimum": 0.0,
+              "title": "Iqr Multiplier",
+              "type": "number"
+            },
+            "quantiles": {
+              "default": [
+                0.05,
+                0.25,
+                0.5,
+                0.75,
+                0.95
+              ],
+              "description": "Explicit probability levels for linear empirical quantiles.",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 1,
+              "title": "Quantiles",
+              "type": "array"
+            }
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "39a74d193c2fad148e6821c7c3c7354a2a5b3c5c7604913b9ba40489672096f8",
+        "selected_skill_instructions": "Use to inspect distribution shape through explicit quantiles and\nTukey-fence counts. Outlier flags are descriptive evidence, never a removal decision.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "3493aad3dce75f1730a5a1c571dc023af13d9f23c7babe5f6d6e25f248e8855f",
+          "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+          "pack_id": "core-analysis",
+          "pack_version": "1.0.0",
+          "skill_id": "distribution_quantiles_and_outliers",
+          "skill_version": "1.0.0"
+        }
+      },
+      "welch_psd": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "maximum_frequency_hz": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional inclusive upper peak-search frequency in Hz.",
+              "title": "Maximum Frequency Hz"
+            },
+            "maximum_peaks": {
+              "default": 8,
+              "description": "Maximum deterministic PSD peaks to return.",
+              "maximum": 64,
+              "minimum": 1,
+              "title": "Maximum Peaks",
+              "type": "integer"
+            },
+            "minimum_frequency_hz": {
+              "anyOf": [
+                {
+                  "minimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional inclusive lower peak-search frequency in Hz.",
+              "title": "Minimum Frequency Hz"
+            },
+            "noverlap": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Overlap in samples; None resolves to floor(nperseg/2).",
+              "title": "Noverlap"
+            },
+            "nperseg": {
+              "description": "Explicit samples per Welch segment.",
+              "minimum": 8,
+              "title": "Nperseg",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "nperseg"
+          ],
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "9b74d3e4a2b2ac4034fc5f058395a07dba565b61b174222f7ed11e6aa9c2219a",
+        "selected_skill_instructions": "Use to estimate broadband and narrowband power density for certified\nregular real-valued series. nperseg is required so physical frequency resolution is explicit.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "1e4edd77dd91067a03aa3ac3977b4dda382d9303fadf85a776e72aff975e13eb",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "welch_psd",
+          "skill_version": "1.0.0"
+        }
+      },
+      "summary_statistics": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "quantiles": {
+              "default": [
+                0.05,
+                0.25,
+                0.5,
+                0.75,
+                0.95
+              ],
+              "description": "Explicit probability levels in [0,1] for linear empirical quantiles.",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 1,
+              "title": "Quantiles",
+              "type": "array"
+            }
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "04e429a6cc163a60ba2abdfb666bd48d0c54a5428e73cb20e9347ead2878c1bb",
+        "selected_skill_instructions": "Use for bounded descriptive statistics of authorized numeric data.\nIt returns finite-value counts, location, spread, extrema, and explicit quantiles. It does not\nimpute, characterize temporal structure, or decide whether observations should be removed.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "737afee6dbba0c0c08970f2608cbc4db49d31bae12279a35db32f3f9e1b8f30a",
+          "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+          "pack_id": "core-analysis",
+          "pack_version": "1.0.0",
+          "skill_id": "summary_statistics",
+          "skill_version": "1.0.0"
+        }
+      },
+      "sampling_cadence_and_gaps": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "cadence_atol_seconds": {
+              "default": 0.0,
+              "description": "Absolute cadence tolerance in seconds.",
+              "minimum": 0.0,
+              "title": "Cadence Atol Seconds",
+              "type": "number"
+            },
+            "cadence_rtol": {
+              "default": 1e-06,
+              "description": "Relative cadence tolerance.",
+              "minimum": 0.0,
+              "title": "Cadence Rtol",
+              "type": "number"
+            },
+            "gap_factor": {
+              "default": 1.5,
+              "description": "Delta/cadence ratio strictly above which a gap is counted.",
+              "exclusiveMinimum": 1.0,
+              "title": "Gap Factor",
+              "type": "number"
+            }
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "01175379416388ead56bda8406095d96da401fb5833a0281ee5544a4224df127",
+        "selected_skill_instructions": "Use to determine whether timestamps are regular, whether observations\ncontain gaps, and how much usable duration is present. It describes sampling and never repairs it.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "367d1fa54093757d469b04a504afd1bcb3697922add13cb94de66bab0090dd3c",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "sampling_cadence_and_gaps",
+          "skill_version": "1.0.0"
+        }
+      },
+      "nonfinite_and_missingness": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {},
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "5d5fac0832b7f217b75fc7e304032223aa2bacb8e2f35f0e3a95dceeb2260983",
+        "selected_skill_instructions": "Use to count mask-false positions separately from NaN and infinities\ninside observed support. The skill reports data quality; it never imputes or repairs values.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "3a18dda4f11e8ccfb3bde8ef0f84419ec8945a7a4034196b8611854c7f61c539",
+          "pack_content_sha256": "bd1fbcac0c5b3d4098255114da9206c0150ae98dd4afa6ac8fea32d462c061bd",
+          "pack_id": "core-analysis",
+          "pack_version": "1.0.0",
+          "skill_id": "nonfinite_and_missingness",
+          "skill_version": "1.0.0"
+        }
+      },
+      "autocorrelation": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "maximum_lag_samples": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Largest lag in samples; None uses the reviewed bounded rule.",
+              "title": "Maximum Lag Samples"
+            }
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "7a07a14fa783f7a9577ea8320a9098174271a73bea915eceeb2c0b8fbe4b3a41",
+        "selected_skill_instructions": "Use to measure lag memory or repeating structure in a certified regular\nseries. It returns a normalized descriptive autocorrelation, not confidence intervals.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "35049db03d48f698929a53cdf45904f8427ac530753a40020ea776f2ab839171",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "autocorrelation",
+          "skill_version": "1.0.0"
+        }
+      },
+      "temporal_stability_summary": {
+        "parameter_json_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "include_linear_trend": {
+              "default": true,
+              "description": "Whether to include descriptive OLS drift summaries.",
+              "title": "Include Linear Trend",
+              "type": "boolean"
+            },
+            "minimum_points_per_window": {
+              "default": 8,
+              "description": "Finite support required before reporting window statistics.",
+              "minimum": 2,
+              "title": "Minimum Points Per Window",
+              "type": "integer"
+            },
+            "window_count": {
+              "default": 8,
+              "description": "Number of equal-duration analysis windows.",
+              "maximum": 64,
+              "minimum": 2,
+              "title": "Window Count",
+              "type": "integer"
+            }
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "parameter_schema_sha256": "119d1899c7d6797d046f79735db3e3f188599e174a255b4b6c2bb5d91f0fe069",
+        "selected_skill_instructions": "Use to measure whether local mean, scale, quantiles, or RMS drift over\nelapsed time. It provides bounded window evidence, not a formal stationarity or change-point test.",
+        "skill_identity": {
+          "determinism": "deterministic",
+          "environment_lock_sha256": null,
+          "implementation_sha256": "303aa68d83386cc16dc0cad5f57caf0893bffafbd42b5eadeeffc5c6391aa209",
+          "pack_content_sha256": "65fa7a7ee62cb4353f4646eca908a762a7535ae3d2cd03cfa215124ecf4ea540",
+          "pack_id": "time-series",
+          "pack_version": "1.0.0",
+          "skill_id": "temporal_stability_summary",
+          "skill_version": "1.0.0"
+        }
+      }
+    },
+    "programs": [
+      [
+        {
+          "determinism": "deterministic",
+          "expected_artifacts": [
+            {
+              "artifact_type": "waveform_boundary_audit",
+              "description": "Aggregate and per-waveform amplitude, quantization, extrema, flat-run, discontinuity, missingness, and structural diagnostics.",
+              "media_type": "application/json",
+              "required": true
+            }
+          ],
+          "expected_measurements": [
+            {
+              "description": "Number of waveforms containing at least one valid finite sample.",
+              "result_key": "effective_waveform_count",
+              "unit": "waveforms",
+              "value_type": "integer"
+            },
+            {
+              "description": "Number of valid finite channel samples included in amplitude statistics.",
+              "result_key": "usable_sample_count",
+              "unit": "samples",
+              "value_type": "integer"
+            },
+            {
+              "description": "Minimum valid finite encoded amplitude observed across all waveforms.",
+              "result_key": "global_minimum",
+              "unit": "encoded amplitude units",
+              "value_type": "nullable_number"
+            },
+            {
+              "description": "Maximum valid finite encoded amplitude observed across all waveforms.",
+              "result_key": "global_maximum",
+              "unit": "encoded amplitude units",
+              "value_type": "nullable_number"
+            },
+            {
+              "description": "Number of distinct valid finite amplitude values observed.",
+              "result_key": "unique_value_count",
+              "unit": "levels",
+              "value_type": "integer"
+            },
+            {
+              "description": "Fraction of integer levels between the observed extrema that are occupied, or null for non-integer-valued data.",
+              "result_key": "integer_span_occupancy_fraction",
+              "unit": "fraction",
+              "value_type": "nullable_number"
+            },
+            {
+              "description": "Fraction of usable samples equal to the global observed minimum.",
+              "result_key": "minimum_value_fraction",
+              "unit": "fraction",
+              "value_type": "nullable_number"
+            },
+            {
+              "description": "Fraction of usable samples equal to the global observed maximum.",
+              "result_key": "maximum_value_fraction",
+              "unit": "fraction",
+              "value_type": "nullable_number"
+            },
+            {
+              "description": "Longest contiguous run of equal valid samples within any waveform channel.",
+              "result_key": "longest_flat_run_samples",
+              "unit": "samples",
+              "value_type": "integer"
+            },
+            {
+              "description": "Fraction of valid adjacent sample pairs whose absolute change meets the configured abrupt-jump threshold.",
+              "result_key": "abrupt_jump_fraction",
+              "unit": "fraction",
+              "value_type": "nullable_number"
+            },
+            {
+              "description": "Largest absolute change across valid adjacent samples.",
+              "result_key": "maximum_absolute_jump",
+              "unit": "encoded amplitude units",
+              "value_type": "nullable_number"
+            },
+            {
+              "description": "Number of non-finite values in the materialized waveform array.",
+              "result_key": "nonfinite_sample_count",
+              "unit": "samples",
+              "value_type": "integer"
+            },
+            {
+              "description": "Number of waveform time positions marked invalid by the certified valid mask.",
+              "result_key": "invalid_mask_time_position_count",
+              "unit": "time positions",
+              "value_type": "integer"
+            },
+            {
+              "description": "Number of non-finite or non-increasing/non-positive entries detected in the certified time-axis encoding.",
+              "result_key": "structurally_invalid_time_value_count",
+              "unit": "entries",
+              "value_type": "integer"
+            },
+            {
+              "description": "Ratio of the largest to smallest positive per-waveform amplitude interquartile range, or null when fewer than two are positive.",
+              "result_key": "waveform_iqr_ratio",
+              "unit": "ratio",
+              "value_type": "nullable_number"
+            }
+          ],
+          "generation_provenance": {
+            "generation_prompt_sha256": "3b7008eef2ecc0552b8729f8f176601f0e6242121fd23b8992b54c8e47b8ad73",
+            "llm_config_sha256": "647d2551b25a97530887ea4e18de29aefa0d9eecd0d26db1cac362c3bb57d405",
+            "model_id": "gpt-5.6-sol",
+            "originating_request_id": "iteration-001",
+            "provider": "openai",
+            "question_ids": [
+              "analysis-question-01"
+            ]
+          },
+          "input_slots": [
+            {
+              "accepted_asset_types": [
+                "dataset"
+              ],
+              "accepted_view_formats": [
+                "siderius.timeseries-array.v1"
+              ],
+              "cardinality": "one",
+              "description": "Authorized raw waveform inputs with certified channel and time axes.",
+              "invocation_metadata_selection": null,
+              "optional_information": [],
+              "required": true,
+              "required_information": [
+                {
+                  "fields": [],
+                  "information_class": "data"
+                }
+              ],
+              "slot_id": "raw_waveforms"
+            }
+          ],
+          "parameters": [
+            {
+              "choices": [],
+              "default": 32.0,
+              "description": "Absolute adjacent-sample amplitude change at or above which a jump is classified as abrupt.",
+              "maximum": null,
+              "minimum": 0.0,
+              "name": "abrupt_jump_threshold",
+              "required": false,
+              "value_type": "number"
+            },
+            {
+              "choices": [],
+              "default": 32,
+              "description": "Minimum equal-sample run length used to flag a waveform as containing a long flat run.",
+              "maximum": null,
+              "minimum": 2.0,
+              "name": "flat_run_minimum",
+              "required": false,
+              "value_type": "integer"
+            },
+            {
+              "choices": [],
+              "default": 0.001,
+              "description": "Minimum per-waveform fraction at either observed extreme used to flag repeated extrema.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "name": "extreme_fraction_threshold",
+              "required": false,
+              "value_type": "number"
+            }
+          ],
+          "program_id": "raw-waveform-boundary-audit-v1",
+          "question_ids": [
+            "analysis-question-01"
+          ],
+          "resource_request": {
+            "max_artifact_bytes": 2097152,
+            "max_artifact_count": 1,
+            "max_host_memory_gb": 6.0,
+            "preferred_device": "cpu",
+            "wall_time_s": 12.0
+          },
+          "schema_version": 1,
+          "seed": 20260915,
+          "source_ref": {
+            "byte_size": 17590,
+            "logical_ref": "generated_analysis/sources/78bf12922a4d8d39b8ff5d263b6ba204bf02c92f90ac841c917ae730e0b9fb44.py",
+            "media_type": "text/x-python",
+            "sha256": "78bf12922a4d8d39b8ff5d263b6ba204bf02c92f90ac841c917ae730e0b9fb44"
+          },
+          "source_sha256": "78bf12922a4d8d39b8ff5d263b6ba204bf02c92f90ac841c917ae730e0b9fb44"
+        },
+        {
+          "declaration_sha256": "38bc311f729c591f83339be5d8da65695280fbf98b2ca230eeb043b837e9c91b",
+          "determinism": "deterministic",
+          "parameter_schema_sha256": "14ec3be61534e0ab8040dbfe7b7f85910858117e38a1fc1f21c4897e6b4126d6",
+          "program_id": "raw-waveform-boundary-audit-v1",
+          "runtime_environment_sha256": "d6a74adb1315f3156e65c77e4f6b28040b7b4739616750adbc483b74044bfa59",
+          "sandbox_protocol_id": "siderius.generated-analysis-sandbox.v1",
+          "seed": 20260915,
+          "source_sha256": "78bf12922a4d8d39b8ff5d263b6ba204bf02c92f90ac841c917ae730e0b9fb44"
+        }
+      ]
+    ]
+  },
+  "provenance": {
+    "reference_infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+    "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+    "archive": "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-da-only-run1-20260922/band-0-3/unit/workspace/iter_001/iteration_001/data_analysis/iter_001/iteration-001",
+    "input_sha256": "b6cba323abd11791c3ffbbeb150a2bdfa8f6b70f433f450a937a91c7e12f6bb6"
+  }
+}

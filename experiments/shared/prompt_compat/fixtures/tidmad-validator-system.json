@@ -1,0 +1,11 @@
+{
+  "case_id": "tidmad-validator-system",
+  "boundary": "validator.system",
+  "arguments": {
+    "model_io_contract": null
+  },
+  "provenance": {
+    "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+    "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation"
+  }
+}

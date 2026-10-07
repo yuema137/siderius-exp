@@ -1,0 +1,68 @@
+[
+  {
+    "profile": "TESS",
+    "infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+    "files": {
+      "src/agent/prompt_templates/proposal/__init__.py": "e3bce8a365b7e1ae4b92cb7275ca94ee7b89454a7cca9f64885542dc5a2f3e0c",
+      "src/agent/prompt_templates/proposal/causal_reasoning_stage.md": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55",
+      "src/nodes/ml_model_implementor/ml_model_implementor.py": "5898906a31c63b1f148e4207f054098f1d19bb646e2c9c859458ced36e13f2bc",
+      "src/agent/prompt_templates/data_analysis.py": "12238301a1fd0c1de5d001f8dbbd925ffa9623876bcd7c4fc74b7e6e16ce7fdc",
+      "src/agent/prompt_templates/interpretation/rendering.py": "eafc44cad9ca5528ceaee4120f845e2bce47503f2a9f4667726a23ff0559b708"
+    }
+  },
+  {
+    "profile": "LIGO",
+    "infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "files": {
+      "src/agent/prompt_templates/proposal/__init__.py": "e3bce8a365b7e1ae4b92cb7275ca94ee7b89454a7cca9f64885542dc5a2f3e0c",
+      "src/agent/prompt_templates/proposal/causal_reasoning_stage.md": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55",
+      "src/nodes/ml_model_implementor/ml_model_implementor.py": "5898906a31c63b1f148e4207f054098f1d19bb646e2c9c859458ced36e13f2bc",
+      "src/agent/prompt_templates/data_analysis.py": "12238301a1fd0c1de5d001f8dbbd925ffa9623876bcd7c4fc74b7e6e16ce7fdc",
+      "src/agent/prompt_templates/interpretation/rendering.py": "eafc44cad9ca5528ceaee4120f845e2bce47503f2a9f4667726a23ff0559b708"
+    }
+  },
+  {
+    "profile": "Project8",
+    "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+    "files": {
+      "src/agent/prompt_templates/proposal/__init__.py": "461ca14afc9cb0484685de189f935a943ca368c22399dce17d5c2039e63f3a73",
+      "src/agent/prompt_templates/proposal/causal_reasoning_stage.md": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55",
+      "src/nodes/ml_model_implementor/ml_model_implementor.py": "0f1c582ac41607a4afe6141bdf3609328a7133320319344fd6dec3495b18e88e",
+      "src/agent/prompt_templates/data_analysis.py": "98043eb2c35a1ee44cee3aa56c61d6daddf0ec9aada44bb58466d84ad01dc57b",
+      "src/agent/prompt_templates/interpretation/rendering.py": "eafc44cad9ca5528ceaee4120f845e2bce47503f2a9f4667726a23ff0559b708"
+    }
+  },
+  {
+    "profile": "TIDMAD-NoPrior",
+    "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+    "files": {
+      "src/agent/prompt_templates/proposal/__init__.py": "e3bce8a365b7e1ae4b92cb7275ca94ee7b89454a7cca9f64885542dc5a2f3e0c",
+      "src/agent/prompt_templates/proposal/causal_reasoning_stage.md": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55",
+      "src/nodes/ml_model_implementor/ml_model_implementor.py": "5898906a31c63b1f148e4207f054098f1d19bb646e2c9c859458ced36e13f2bc",
+      "src/agent/prompt_templates/data_analysis.py": "86ccaa30609d563bf14c6578c63cfae6d30586a298b220920278bde4397be101",
+      "src/agent/prompt_templates/interpretation/rendering.py": "a14e7e8f28dd58e54ed2bae862fd3305c042cd6db106a48ce5c25b77ca8aef58"
+    }
+  },
+  {
+    "profile": "TIDMAD-analysis-on",
+    "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+    "files": {
+      "src/agent/prompt_templates/proposal/__init__.py": "461ca14afc9cb0484685de189f935a943ca368c22399dce17d5c2039e63f3a73",
+      "src/agent/prompt_templates/proposal/causal_reasoning_stage.md": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55",
+      "src/nodes/ml_model_implementor/ml_model_implementor.py": "0f1c582ac41607a4afe6141bdf3609328a7133320319344fd6dec3495b18e88e",
+      "src/agent/prompt_templates/data_analysis.py": "55f9fe8654cafb2b0481f45f2661317e247fa14e21a026d0630b56219ffecd47",
+      "src/agent/prompt_templates/interpretation/rendering.py": "eafc44cad9ca5528ceaee4120f845e2bce47503f2a9f4667726a23ff0559b708"
+    }
+  },
+  {
+    "profile": "current",
+    "infra_revision": "a3c868554d7863289e36afae70246d839783a0ba",
+    "files": {
+      "src/agent/prompt_templates/proposal/__init__.py": "461ca14afc9cb0484685de189f935a943ca368c22399dce17d5c2039e63f3a73",
+      "src/agent/prompt_templates/proposal/causal_reasoning_stage.md": "1a521229597a4aae8635fe09b96906c5dc47780b8acb837151649b68f2b5928f",
+      "src/nodes/ml_model_implementor/ml_model_implementor.py": "0f1c582ac41607a4afe6141bdf3609328a7133320319344fd6dec3495b18e88e",
+      "src/agent/prompt_templates/data_analysis.py": "5270c1dca7e631db585defa1783637dbe0281e2567bf9409947fdcf0aa14fad9",
+      "src/agent/prompt_templates/interpretation/rendering.py": "eafc44cad9ca5528ceaee4120f845e2bce47503f2a9f4667726a23ff0559b708"
+    }
+  }
+]

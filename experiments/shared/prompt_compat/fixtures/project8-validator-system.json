@@ -1,0 +1,11 @@
+{
+  "case_id": "project8-validator-system",
+  "boundary": "validator.system",
+  "arguments": {
+    "model_io_contract": null
+  },
+  "provenance": {
+    "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+    "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation"
+  }
+}

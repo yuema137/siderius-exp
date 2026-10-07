@@ -1,0 +1,241 @@
+{
+  "case_id": "tidmad-implementor-reasoning",
+  "boundary": "implementor.reasoning",
+  "arguments": {
+    "input": {
+      "candidate_id": "cand_1eec5f304d184807973fba82a100caf8",
+      "task_composition_ref": null,
+      "model_name": "wholeband_gated_dilated_regressor",
+      "output_type": "regressor",
+      "model_description": "A single whole-band WaveNet-style continuous regressor that converts integer-coded samples to normalized scalar features, processes them through four repeated cycles of gated causal dilated residual blocks, sums multiscale skip features, and applies two pointwise convolutions to emit exactly one continuous float32 value per timestep. The exponentially increasing dilations provide a receptive field slightly larger than the complete 40,000-sample segment, while gated activations select useful multiscale features and residual/skip paths preserve alignment and gradient flow. The scalar regression head directly satisfies the waveform contract without class logits, argmax decoding, attention, spectral layers, or frequency-specific subnetworks.",
+      "mathematical_definition": "For integer input x in {0,...,255}^{B x T}, form a float32 scalar sequence h_0(t) = Conv1x1((x(t)-c)/s), where c and s are fixed input-normalization constants. For residual block l with dilation d_l, apply a left-padded causal convolution with kernel K_l and split its output into filter and gate branches: z_l(t) = tanh((K_l^f *_{d_l} h_l)(t)) elementwise-multiplied by sigmoid((K_l^g *_{d_l} h_l)(t)). Produce a residual update r_l = W_l^r z_l and a skip feature q_l = W_l^s z_l using pointwise convolutions, then set h_{l+1} = h_l + r_l. Dilations increase exponentially within each cycle and the complete schedule is repeated across cycles. Aggregate q = sum_l q_l, then compute y_hat = W_2 ReLU(W_1 ReLU(q)), where W_1 and W_2 are pointwise convolutions and W_2 has one output channel. Squeezing that channel gives y_hat in R^{B x T} and explicitly casting the head output gives float32. Training uses elementwise SmoothL1(y_hat,y) with mean reduction as the permitted robust regression surrogate; the DiscoveryMemo's inherited mean_squared_error objective is not used because MSE is absent from the legal built-in loss set for this task.",
+      "baseline_config": {
+        "model_config": {
+          "segmentation_size": 40000,
+          "input_dtype": "int64",
+          "input_value_min": 0,
+          "input_value_max": 255,
+          "input_channels": 1,
+          "output_channels": 1,
+          "output_dtype": "float32",
+          "input_representation": "normalized_scalar",
+          "normalization_offset": 127.5,
+          "normalization_scale": 127.5,
+          "whole_band_single_model_training": true,
+          "selected_files": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "hidden_channels": 64,
+          "skip_channels": 128,
+          "stem_type": "causal_conv1d",
+          "stem_kernel_size": 1,
+          "residual_blocks": 40,
+          "dilation_cycles": 4,
+          "dilations_per_cycle": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64,
+            128,
+            256,
+            512
+          ],
+          "dilated_kernel_size": 12,
+          "causal_padding": true,
+          "causal_padding_side": "left",
+          "gated_activation": "tanh_sigmoid",
+          "residual_connection": true,
+          "skip_connection": true,
+          "skip_aggregation": "sum",
+          "receptive_field_samples": 45013,
+          "regression_head": "relu_1x1_relu_1x1_linear",
+          "regression_head_channels": 128,
+          "scalar_regression_head": true,
+          "use_attention": false,
+          "use_spectral_layers": false,
+          "gradient_checkpointing": false,
+          "discovery_memo_requested_objective": "mean_squared_error",
+          "implemented_objective": "smooth_l1"
+        },
+        "train_config": {
+          "lr": 0.0001,
+          "epochs": 10,
+          "batch_size": 2,
+          "optimizer_type": "adamw",
+          "weight_decay": 1e-05,
+          "device": "cuda",
+          "precision": "bfloat16"
+        },
+        "loss_config": {
+          "loss_type": "smooth_l1",
+          "beta": 1.0,
+          "reduction": "mean"
+        }
+      },
+      "task_description": "full-spectrum 1-D time-series denoising of SQUID dark-matter\ndetector data: map a noisy [B, T] integer signal to a clean\n[B, T] continuous waveform, trained across the whole frequency\nspectrum within the selected band at once (not split into per-file or\nper-frequency models). This is a\ncontinuous regression task \u2014 the model predicts waveform values\ndirectly, not a distribution over discrete levels.",
+      "forward_contract": {
+        "input_shape": "[B, T] int64",
+        "input_description": "raw signal, integer-coded samples 0-255",
+        "output_shape": "[B, T] float32",
+        "output_description": "continuous denoised waveform value per timestep",
+        "num_classes": 0,
+        "embedding_note": "Input values are integer-coded samples \u2014 nn.Embedding(256, embed_dim) to convert [B, T] int64 \u2192 [B, T, embed_dim], then transpose to [B, embed_dim, T] for Conv1d layers, remains a valid and common input stem. The input representation is unchanged; only the output is continuous.\n",
+        "output_head_note": "Output must be exactly [output_shape] \u2014 a continuous value per timestep, e.g. a final Conv1d(channels, 1, 1) followed by squeeze, or any head that emits [B, T] float32. Do NOT emit per-class logits and do NOT argmax: this task predicts waveform values directly. Residual formulations are natural here \u2014 predicting a correction to the input, or predicting the noise and subtracting it, preserves amplitude and low-frequency structure instead of regenerating the waveform from scratch.\n",
+        "task_type": "regression",
+        "task_note": "Offline denoising \u2014 output at position t may depend on all positions. Causal constraints are not required. The objective is a continuous regression loss; robust choices such as SmoothL1/Huber are strong task-grounded starting points, and the loss itself remains searchable.\n",
+        "preset": "sequence",
+        "model_io": {
+          "input": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "T",
+                  "dynamic": false
+                },
+                "role": "temporal"
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "int64",
+                "int32"
+              ]
+            }
+          },
+          "output": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "T",
+                  "dynamic": false
+                },
+                "role": "temporal"
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "float32"
+              ]
+            }
+          },
+          "inference": {
+            "accepted_input_view_formats": [
+              "siderius.numeric-array.v1"
+            ],
+            "required_information": [
+              {
+                "information_class": "data",
+                "fields": []
+              }
+            ],
+            "prediction_output_format": "siderius.numeric-array.v1",
+            "prediction_semantic_id": "tidmad.offset-encoded-continuous-waveform-segment.v1",
+            "prediction_decoder_protocol_id": "siderius.identity-prediction-decoder.v1",
+            "alignment": "one_prediction_per_input",
+            "determinism": "deterministic"
+          }
+        },
+        "segmentation_applicability": "temporal",
+        "supervision_target": null,
+        "custom_loss_applicability": null
+      },
+      "implementor_blocks": {
+        "science_domain": "signal denoising",
+        "continuous_output_phrase": "continuous waveform regression"
+      },
+      "hardware_context": {
+        "device_name": "NVIDIA H100 80GB HBM3",
+        "total_memory_bytes": 85017493504,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "multiprocessor_count": 132,
+        "cuda_runtime_version": "12.8",
+        "torch_version": "2.10.0+cu128",
+        "hostname": "computeinstance-e00k4a9y5ja8efvyvj",
+        "device_available": true,
+        "discovered_at": "2026-09-19T20:25:18.556350Z",
+        "platform": "Linux-6.11.0-1016-nvidia-x86_64-with-glibc2.39",
+        "python_version": "3.12.3",
+        "cuda_visible_devices": null,
+        "visible_device_count": 1,
+        "devices": [
+          {
+            "logical_index": 0,
+            "name": "NVIDIA H100 80GB HBM3",
+            "total_memory_bytes": 85017493504,
+            "compute_capability": [
+              9,
+              0
+            ],
+            "uuid": "GPU-f73bcb08-1d3d-05b4-0da6-d2dee6344eaa",
+            "physical_index": 0
+          }
+        ],
+        "active_device_uuid": "GPU-f73bcb08-1d3d-05b4-0da6-d2dee6344eaa",
+        "hardware_fingerprint_version": 2,
+        "driver_version": "580.173.02",
+        "repo_commit": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+        "collection_errors": []
+      },
+      "vram_budget_gb": 40.0,
+      "plugin_dir": "/offline/reconstructed-input/generated/iter_001/models",
+      "test_dir": "/offline/reconstructed-input/generated/iter_001/tests",
+      "loss_dir": "/offline/reconstructed-input/generated/iter_001/losses",
+      "custom_loss_spec": null,
+      "max_retries": 2,
+      "reference_code": {},
+      "expert_advice": "",
+      "human_advice": null,
+      "previous_validation_failure": null,
+      "storage": {
+        "backend": "local",
+        "local": {
+          "workspace": "/offline/reconstructed-input",
+          "run_name": "iter_001"
+        },
+        "postgres": null
+      }
+    }
+  },
+  "provenance": {
+    "sources": {
+      "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-v5-20260919/band-0-3/unit/workspace/iter_001/iteration_001/attempt_001_wholeband_gated_dilated_regressor/proposal_iter_001.json": "0adec62b87e1e703357f6c8f3740c61824e9a81f6584f64470f6765295f364f7",
+      "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-v5-20260919/band-0-3/unit/workspace/iter_001/task_config_snapshot.yaml": "c8f332626d28277f2dc6809543cb0c799171ca48d52b78e17d03ea8b229fada0",
+      "/home/klz/Data/SIDERIUS-ICLR/runs/workflow-v5-20260919/band-0-3/unit/workspace/iter_001_hardware.json": "1eb611154b28947eaf9824180782c329a6e289dfb3dbaf4103f8fca207554842",
+      "/tmp/issue369-startup-specs/tidmad-reference.json": "0d6e551cafdca6b0a5f1080ddb62ed94b222a3bab24620c8e09f1321f1e4fe08"
+    },
+    "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+    "scope": "reconstructed first proposal context; no complete archived request claim",
+    "explicit_absences": [
+      "human_advice",
+      "previous_validation_failure",
+      "expert_advice"
+    ]
+  }
+}

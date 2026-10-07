@@ -1,0 +1,239 @@
+{
+  "case_id": "tess-implementor-code",
+  "boundary": "implementor.code",
+  "arguments": {
+    "input": {
+      "candidate_id": "cand_08809c174e3d47978c78bf0a575b49a8",
+      "task_composition_ref": null,
+      "model_name": "cadence_aligned_spectral_resnet",
+      "output_type": "regressor",
+      "model_description": "A compact cadence-aware spectral regressor that extracts the valid, non-padded portion of each light curve, applies a Hann window, computes log-power RFFT features, and maps them onto a common physical-frequency grid under the two possible TESS cadence hypotheses. A lightweight gate estimates the cadence from input-derived validity and variation statistics because the forward contract provides no explicit cadence metadata. The two cadence-conditioned spectra are processed by a shared residual dilated Conv1d encoder with a physical-frequency coordinate channel. Cadence-weighted spectral mean and max summaries are concatenated with inferred cadence and physical-duration scalars, passed through a small MLP, and mapped by an unsquashed Linear head to one continuous rotation-frequency prediction.",
+      "mathematical_definition": "For each input x, identify the maximal constant-valued right tail and construct a validity mask m that retains its first value as the final observation while excluding subsequent padding. Let n be the valid length, center the valid samples, and multiply them by a Hann window. Compute the one-sided Fourier transform and normalized power P=|RFFT(x_valid multiplied by Hann)|^2/E_Hann, followed by log(1+P). For each candidate cadence delta in the supported cadence set, assign every Fourier coefficient the physical frequency f_k=k/(n delta), then linearly interpolate log-power onto a shared physical-frequency grid to obtain S_delta and a spectral-support mask. Estimate a cadence posterior p_delta with a small softmax gate using input-derived features such as valid fraction, padding fraction, and normalized adjacent-difference energy. Append the normalized physical-frequency coordinate to each S_delta and process every cadence hypothesis with the same encoder. Each residual encoder block computes h_next=h+PointwiseConv(Dropout(GELU(Norm(DilatedConv(Norm(h)))))); dilation increases by block while convolution is noncausal because frequency has no causal ordering. Apply support-mask-aware mean and max pooling to each encoded spectrum and combine the summaries by the cadence posterior. Concatenate this representation with the posterior expected cadence and expected physical duration n times delta. Pass the result through a GELU MLP and a final Linear(features,1), without output activation, yielding a float32 tensor of shape [B,1].",
+      "baseline_config": {
+        "model_config": {
+          "input_channels": 1,
+          "input_length": 1024,
+          "output_dim": 1,
+          "cadence_minutes": [
+            10.0,
+            30.0
+          ],
+          "cadence_handling": "learned_two_hypothesis_gate",
+          "cadence_gate_features": [
+            "valid_fraction",
+            "padding_fraction",
+            "normalized_adjacent_difference_energy"
+          ],
+          "cadence_gate_hidden_dim": 16,
+          "cadence_gate_temperature": 1.0,
+          "mask_extraction": "terminal_constant_run",
+          "padding_tolerance": 1e-06,
+          "minimum_padding_run": 2,
+          "retain_first_tail_value_as_observed": true,
+          "window_type": "hann",
+          "remove_valid_mean": true,
+          "power_normalization": "hann_energy",
+          "spectral_transform": "log1p_rfft_power",
+          "frequency_grid_min_cpd": 0.0,
+          "frequency_grid_max_cpd": 24.0,
+          "frequency_grid_bins": 512,
+          "frequency_interpolation": "linear",
+          "frequency_coordinate_channel": true,
+          "spectral_channels": 64,
+          "residual_blocks": 4,
+          "kernel_size": 5,
+          "dilations": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "causal_convolution": false,
+          "normalization": "group_norm",
+          "activation": "gelu",
+          "dropout": 0.1,
+          "skip_connection": true,
+          "shared_encoder_across_cadence_hypotheses": true,
+          "spectral_pooling": [
+            "mask_aware_mean",
+            "mask_aware_max"
+          ],
+          "metadata_scalars": [
+            "posterior_expected_cadence",
+            "posterior_expected_physical_duration"
+          ],
+          "mlp_hidden_dim": 128,
+          "mlp_activation": "gelu",
+          "mlp_dropout": 0.1,
+          "head_type": "linear",
+          "head_output_dim": 1,
+          "head_activation": null,
+          "parameter_ceiling": 500000,
+          "peak_vram_target_gb": 6.4
+        },
+        "train_config": {
+          "lr": 0.0003,
+          "epochs": 40,
+          "batch_size": 32,
+          "optimizer_type": "adamw",
+          "weight_decay": 1e-05,
+          "device": "cuda"
+        },
+        "loss_config": {
+          "loss_type": "smooth_l1",
+          "beta": 0.5,
+          "reduction": "mean"
+        }
+      },
+      "task_description": "Regression of the near-core rotation frequency of a pulsating star from a\nsingle TESS light curve.\n\nEach sample is one star observed in one TESS sector: a univariate sequence\nof normalized brightness measurements. The target is frot, the star's\nnear-core rotation frequency in cycles per day. The population is the\nGDOR_SPB class of the PhyTS TESS benchmark \u2014 intermediate- and high-mass\ng-mode pulsators \u2014 for which a rotation frequency could be derived.\n\nThe physical signal is periodic: rotation shifts the frequencies of the\nstar's gravity-mode pulsations, so the information lives in the sequence's\nperiodic structure rather than in its amplitude. Each curve is z-scored\nindividually before the model sees it, which removes absolute brightness\nand per-star scale; what survives is the shape of the variability.\n\nWhat makes this hard. Sampling is uneven in a way the fixed-length tensor\ndoes not show: the released curves were taken at two different cadences\n(30-minute and 10-minute), so a fixed 1024-sample window covers a\ndifferent physical duration depending on which mission observed the star,\nand the frequency content is not aligned across samples. Targets span\nroughly -0.27 to 17.45 cycles per day but concentrate near 1, so a model\nthat predicts the mean is not obviously wrong and scores exactly 0.0.\n\nTwo properties of the labels are worth knowing because they bound what is\nachievable. First, frot is derived per LIGHT CURVE, not per star, so the\nsame star observed in different sectors can carry different target values;\nif a model predicted each star's mean target perfectly it would score\nR-squared 0.92 on train and 0.98 on validation, which is the label-noise\nceiling. Second, 26 of 4,183 released rows carry a negative frot, 23 of\nthem the exact repeated constant -0.271916. That value is almost certainly\na pipeline sentinel rather than 23 independent measurements; it is\nretained unfiltered because the task definition is the released data, but\na model is not expected to reproduce it.\n\nPublished reference points. These are the benchmark's own numbers, known\nto anyone who reads it, and they describe the task rather than recommend\nan approach. All were computed on a TEST split while a run here is scored\non VALIDATION, and R-squared is normalized by the evaluation set's own\nvariance, so they are not a target to beat on the same footing.\n\n  supervised baselines, all at 300K parameters:\n    S4D                 R-squared 0.665   diagonal state-space model\n    CNN                 R-squared 0.617   described only as a vanilla CNN\n    LinOSS              R-squared 0.612   oscillatory state-space model\n    mean predictor      R-squared -0.017  predicts the training mean\n\n  the same three across a capacity sweep (~10k / ~100k / ~300k / ~700k),\n  each cell the top-3 mean of a 100-iteration hyperparameter sweep:\n    LinOSS   0.536 / 0.589 / 0.612 / 0.598\n    S4D      0.581 / 0.624 / 0.665 / 0.522\n    CNN      0.573 / 0.580 / 0.617 / 0.591\n\n  six pretrained time-series foundation models, zero-shot, on the paper's\n  own re-split rather than this one: 0.074 to 0.305, with the strongest\n  being Chronos at 0.3049 and MOMENT at 0.2631. Fine-tuning raises the\n  best of them to 0.4095.\n\nBaseline architectures, read from the benchmark's code repository rather\nthan the paper, which publishes only family names:\n\n  CNN     five blocks of Conv1d(kernel 15, same padding) -> BatchNorm1d\n          -> GELU -> MaxPool1d(2) -> Dropout(0.4), channels\n          64/64/128/128/256, then a global average pool over time and one\n          Linear to the output. An optional validity mask multiplies the\n          input first.\n  S4D     Linear encoder to d_model 64, then 4 residual blocks of\n          S4D(d_state 16, dt 0.001-0.1) -> dropout 0.2 -> residual add\n          -> LayerNorm, then a mask-aware mean pool over time and one\n          Linear to the output.\n  LinOSS  4 blocks, each a BatchNorm, an oscillatory state-space layer\n          with diagonal A/B/C/D and learnable step sizes, a GLU, dropout\n          and a residual connection. ssm_size 100, H 200, IM\n          discretization.\n\nAll three pool over the whole sequence and then read a single linear head,\nand all three are mask-aware or made so, which is what lets them handle the\npadded tail.\n\nThree things about those published numbers do not line up, and are worth\nknowing before treating any of them as a target. The committed configs\nmeasure far larger than the 300K the paper reports: the CNN config counts\n926,536 parameters and the LinOSS config's own comment targets S4D near\n662K, which places them at the sweep's ~700k point rather than the ~300k\npoint the headline results come from, and at ~700k the sweep shows S4D\nfalling to 0.522. The committed configs also use a 70/15/15 split rather\nthan the released 80/10/10 one used here. And the repository commits no\nregression config for TESS at all, only a classification one.\n\nThe full record, including the foundation-model architectures, the\npublished training setup and the exact discrepancies above, is in\n`declared/reference_baselines.json`.",
+      "forward_contract": {
+        "input_shape": "[B, 1, 1024] float32",
+        "input_description": "a batch of TESS light curves as one channel of 1024 float32 samples, each curve already z-scored over its own observed samples and, when shorter than 1024, right-padded with its last observed value",
+        "output_shape": "[B, 1] float32",
+        "output_description": "one predicted near-core rotation frequency per light curve, in cycles per day, as an unbounded real number",
+        "num_classes": 0,
+        "embedding_note": "",
+        "output_head_note": "Output must be exactly [B, 1] \u2014 a final Linear(features, 1). Do NOT apply any squashing activation to the head: the target is an unbounded real quantity that includes a small number of negative values, and a ReLU or sigmoid output would make part of the target range unreachable.",
+        "task_type": "regression",
+        "task_note": "The useful signal is periodic and sequential, not positional: what matters is the frequency content of the variability, not where in the window a feature happens to fall. Padding is a real part of the input distribution rather than an edge case \u2014 most Primary-Mission curves are shorter than 1024 samples and end in a constant tail.",
+        "preset": null,
+        "model_io": {
+          "input": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": 1,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              },
+              {
+                "dimension": {
+                  "fixed": 1024,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "float32"
+              ]
+            }
+          },
+          "output": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": 1,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "float32"
+              ]
+            }
+          }
+        },
+        "segmentation_applicability": "not_applicable",
+        "supervision_target": null,
+        "custom_loss_applicability": null
+      },
+      "implementor_blocks": null,
+      "hardware_context": {
+        "device_name": "NVIDIA GeForce RTX 5090",
+        "total_memory_bytes": 33645723648,
+        "compute_capability": [
+          12,
+          0
+        ],
+        "multiprocessor_count": 170,
+        "cuda_runtime_version": "12.8",
+        "torch_version": "2.10.0+cu128",
+        "hostname": "ligroup",
+        "device_available": true,
+        "discovered_at": "2026-09-21T04:17:19.087124Z",
+        "platform": "Linux-5.15.0-139-generic-x86_64-with-glibc2.31",
+        "python_version": "3.12.13",
+        "cuda_visible_devices": null,
+        "visible_device_count": 1,
+        "devices": [
+          {
+            "logical_index": 0,
+            "name": "NVIDIA GeForce RTX 5090",
+            "total_memory_bytes": 33645723648,
+            "compute_capability": [
+              12,
+              0
+            ],
+            "uuid": "GPU-c30b6678-ff2a-f8b4-d378-af9681c6ceef",
+            "physical_index": 0
+          }
+        ],
+        "active_device_uuid": "GPU-c30b6678-ff2a-f8b4-d378-af9681c6ceef",
+        "hardware_fingerprint_version": 2,
+        "driver_version": "575.64",
+        "repo_commit": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+        "collection_errors": []
+      },
+      "vram_budget_gb": 8.0,
+      "plugin_dir": "/offline/reconstructed-input/generated/iter_001/models",
+      "test_dir": "/offline/reconstructed-input/generated/iter_001/tests",
+      "loss_dir": "/offline/reconstructed-input/generated/iter_001/losses",
+      "custom_loss_spec": null,
+      "max_retries": 2,
+      "reference_code": {},
+      "expert_advice": "",
+      "human_advice": null,
+      "previous_validation_failure": null,
+      "storage": {
+        "backend": "local",
+        "local": {
+          "workspace": "/offline/reconstructed-input",
+          "run_name": "iter_001"
+        },
+        "postgres": null
+      }
+    },
+    "reasoning": "Offline branch witness: preserve the declared forward contract."
+  },
+  "provenance": {
+    "sources": {
+      "/home/klz/Data/SIDEREIS_DATA/phyts_tess/units/nop_004/workspace/iter_001/iteration_001/attempt_001_cadence_aligned_spectral_resnet/proposal_iter_001.json": "e05c8388cf09c01b86b3cf4af2a8d139fbdee48238a14ebfbd151907bbc01155",
+      "/home/klz/Data/SIDEREIS_DATA/phyts_tess/units/nop_004/workspace/iter_001/task_config_snapshot.yaml": "ca76e6dfca488005bdc0a4ab01301677179971615757b2be0de35177312de09a",
+      "/home/klz/Data/SIDEREIS_DATA/phyts_tess/units/nop_004/workspace/iter_001_hardware.json": "dcbb40628371992152cf7936a44ce83410279ef1ce4b1037457700c5f04efd59",
+      "/tmp/issue369-startup-specs/tess-reference.json": "c2dce620eface5106a4ff210c094246db61ea02b38e0ffa21e79a467e6eb83ca"
+    },
+    "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+    "composition_fingerprint": "baeb657a4e0d0c7063e8147364393b299ddd6fe89b0631dae148aca27ccc123b",
+    "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+    "explicit_absences": [
+      "human_advice",
+      "previous_validation_failure",
+      "expert_advice"
+    ],
+    "reference_code": "no experiment-source inheritance on this first proposal"
+  }
+}

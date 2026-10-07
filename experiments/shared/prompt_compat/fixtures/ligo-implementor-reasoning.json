@@ -1,0 +1,245 @@
+{
+  "case_id": "ligo-implementor-reasoning",
+  "boundary": "implementor.reasoning",
+  "arguments": {
+    "input": {
+      "candidate_id": "cand_2423049770534cdfb16c7700056be0b3",
+      "task_composition_ref": null,
+      "model_name": "dual_domain_chirp_fuser",
+      "output_type": "regressor",
+      "model_description": "A compact dual-domain regressor processes the two whitened detector channels without per-example amplitude normalization. Its temporal branch uses a causal stem and nine exponentially dilated gated residual blocks with residual and multiscale skip paths, then concatenates the final-time, global-mean, and global-max summaries. Its spectral branch lifts both detectors to a width-32 representation and applies two residual spectral-convolution blocks whose learned complex channel mixers retain all 513 RFFT modes, followed by inverse transformation and mean/max pooling. The resulting 256-feature joint representation passes through a 256-to-64-to-1 fusion MLP. Global input statistics and target mean/standard deviation are fitted exclusively on the released training split; the final affine inverse target transform is part of the model so its output is one chirp-mass prediction in solar masses.",
+      "mathematical_definition": "Let x be the two-channel observation and let x_tilde=(x-mu_x)/(sigma_x+epsilon), where the channelwise statistics are fitted on training examples only. The temporal branch begins with a causal convolution h_0. At residual block l, a left-padded dilated convolution produces a_l and b_l, the gated activation is g_l=tanh(a_l) elementwise multiplied by sigmoid(b_l), and learned pointwise projections update h_l=h_{l-1}+R_l(g_l) and emit skip feature s_l=S_l(g_l). Aggregate the multiscale skips as s=phi(sum_l s_l), then form t by concatenating the last temporal position, temporal mean, and temporal maximum of s. For the spectral branch, lift x_tilde to features v_0 and transform them with an RFFT. In each residual spectral block, every retained frequency mode k is mixed by a learned complex channel matrix W_l(k); inverse RFFT returns the result to the temporal grid, where it is combined with a learned pointwise path and the block input: v_l=v_{l-1}+phi(IRFFT_k(W_l(k)RFFT(v_{l-1})(k))+P_l(v_{l-1})). Form f by concatenating temporal mean and maximum pooling of the final spectral features. Concatenate z=[t;f], pass z through a nonlinear fusion MLP to obtain standardized latent prediction q, and return y_hat=mu_y+sigma_y*q. The target statistics mu_y and sigma_y are fitted only on the training split and stored as non-trainable model buffers, making the exported forward output physical chirp mass with shape [B,1].",
+      "baseline_config": {
+        "model_config": {
+          "input_channels": 2,
+          "input_length": 1024,
+          "input_normalization": "training_global_channel_zscore",
+          "input_statistics_source": "training_split_only",
+          "normalization_epsilon": 1e-06,
+          "temporal_branch": {
+            "stem_channels": 64,
+            "stem_kernel_size": 3,
+            "num_blocks": 9,
+            "residual_channels": 64,
+            "skip_channels": 64,
+            "kernel_size": 3,
+            "dilations": [
+              1,
+              2,
+              4,
+              8,
+              16,
+              32,
+              64,
+              128,
+              256
+            ],
+            "dilated_causal_conv": true,
+            "gated_activation": "tanh_sigmoid",
+            "skip_connection": true,
+            "residual_connection": true,
+            "summary_pooling": [
+              "final_state",
+              "mean",
+              "max"
+            ],
+            "dropout": 0.0
+          },
+          "spectral_branch": {
+            "spectral_conv": true,
+            "width": 32,
+            "num_blocks": 2,
+            "rfft_modes": 513,
+            "retain_all_modes": true,
+            "complex_channel_mixing": true,
+            "pointwise_residual_path": true,
+            "residual_connection": true,
+            "activation": "gelu",
+            "summary_pooling": [
+              "mean",
+              "max"
+            ],
+            "dropout": 0.0
+          },
+          "fusion_input_features": 256,
+          "fusion_hidden_features": 64,
+          "fusion_output_features": 1,
+          "fusion_activation": "gelu",
+          "fusion_dropout": 0.0,
+          "target_standardization": "training_only",
+          "target_statistics_source": "training_split_only",
+          "exported_target_inverse": true,
+          "output_units": "solar_masses",
+          "output_shape": [
+            1
+          ]
+        },
+        "train_config": {
+          "lr": 0.0001,
+          "epochs": 10,
+          "batch_size": 256,
+          "optimizer_type": "adamw",
+          "weight_decay": 1e-05,
+          "device": "cuda",
+          "train_fraction": 1.0,
+          "per_epoch_validation_fraction": 0.1,
+          "final_validation_fraction": 1.0,
+          "selection_metric": "r2"
+        },
+        "loss_config": {
+          "loss_type": "smooth_l1",
+          "beta": 1.0,
+          "reduction": "mean"
+        }
+      },
+      "task_description": "Estimate binary-neutron-star chirp mass from H1/L1 whitened detector observations containing injected signals. Each prepared sample is whitened_injected[:, 15104:16128], the fixed [59, 63) second window at 256 Hz. Inputs are float32, two channels of 1024 samples. No per-example amplitude normalization is applied. The target is stored chirp_mass in solar masses. Source masses, SNR, clean signals, backgrounds, and other simulation parameters are excluded from model inputs.\nPreprocessing follows the owner-supplied PhyTS paper and is already materialized. The released training and validation splits are preserved. The full training split is the available pool; select training fractions within the experiment budget. Predict one scalar in physical units for each example. Any target standardization must use training statistics only and be inverted inside the exported model. The primary selection metric is global validation R2 (higher is better); global RMSE is also reported. Formal scoring uses all validation examples; per-epoch validation loss uses the fixed 10% subset. Test data are absent. Paper test scores and campaign validation scores describe different populations.",
+      "forward_contract": {
+        "input_shape": "[B, 2, 1024] float32",
+        "input_description": "Prepared float32 [B, 2, 1024] observations; no additional mandatory preprocessing.",
+        "output_shape": "[B, 1] float32",
+        "output_description": "Float32 [B, 1] predictions of chirp_mass in physical solar masses.",
+        "num_classes": 0,
+        "embedding_note": "",
+        "output_head_note": "Return exactly one scalar per example. Internal normalization is allowed; exported outputs must be in physical units.",
+        "task_type": "regression",
+        "task_note": "Sample identifiers align predictions and targets; they are not model features.",
+        "preset": null,
+        "model_io": {
+          "input": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": 2,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              },
+              {
+                "dimension": {
+                  "fixed": 1024,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "float32"
+              ]
+            }
+          },
+          "output": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": 1,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "float32"
+              ]
+            }
+          }
+        },
+        "segmentation_applicability": "not_applicable",
+        "supervision_target": null,
+        "custom_loss_applicability": null
+      },
+      "implementor_blocks": null,
+      "hardware_context": {
+        "device_name": "NVIDIA H100 80GB HBM3",
+        "total_memory_bytes": 85017493504,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "multiprocessor_count": 132,
+        "cuda_runtime_version": "12.8",
+        "torch_version": "2.10.0+cu128",
+        "hostname": "siderius-ligo-h100",
+        "device_available": true,
+        "discovered_at": "2026-09-22T07:24:53.701112Z",
+        "platform": "Linux-6.11.0-1016-nvidia-x86_64-with-glibc2.39",
+        "python_version": "3.12.3",
+        "cuda_visible_devices": null,
+        "visible_device_count": 1,
+        "devices": [
+          {
+            "logical_index": 0,
+            "name": "NVIDIA H100 80GB HBM3",
+            "total_memory_bytes": 85017493504,
+            "compute_capability": [
+              9,
+              0
+            ],
+            "uuid": "GPU-dff9c328-4210-6728-6ada-7a96981b114d",
+            "physical_index": 0
+          }
+        ],
+        "active_device_uuid": "GPU-dff9c328-4210-6728-6ada-7a96981b114d",
+        "hardware_fingerprint_version": 2,
+        "driver_version": "580.173.02",
+        "repo_commit": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+        "collection_errors": []
+      },
+      "vram_budget_gb": 16.0,
+      "plugin_dir": "/offline/reconstructed-input/generated/iter_001/models",
+      "test_dir": "/offline/reconstructed-input/generated/iter_001/tests",
+      "loss_dir": "/offline/reconstructed-input/generated/iter_001/losses",
+      "custom_loss_spec": null,
+      "max_retries": 2,
+      "reference_code": {},
+      "expert_advice": "",
+      "human_advice": null,
+      "previous_validation_failure": null,
+      "storage": {
+        "backend": "local",
+        "local": {
+          "workspace": "/offline/reconstructed-input",
+          "run_name": "iter_001"
+        },
+        "postgres": null
+      }
+    }
+  },
+  "provenance": {
+    "sources": {
+      "/home/klz/Data/SIDERIUS-ICLR/runs/ligo-run2-completed-20260922/unit/workspace/iter_001/iteration_001/attempt_001_dual_domain_chirp_fuser/proposal_iter_001.json": "944d4c9f5aef28e38c052a844389345d0ecf36cbf4fae3d6b9492a8cd2b61f47",
+      "/home/klz/Data/SIDERIUS-ICLR/runs/ligo-run2-completed-20260922/unit/workspace/iter_001/task_config_snapshot.yaml": "99ede60cb77fa78a22df29d0ca856a3b8ec66af228acbde16e99534fc1b4900a",
+      "/home/klz/Data/SIDERIUS-ICLR/runs/ligo-run2-completed-20260922/unit/workspace/iter_001_hardware.json": "126523b8b1dafe4475a2ff1cb294c18f629c772272c8dd1943c795df5586ad90",
+      "/tmp/issue369-startup-specs/ligo-reference.json": "2f3c566deef3e3a06294d488102813a26003e7547febf3782e4304ea4bfbe523"
+    },
+    "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "composition_fingerprint": "bb90719d145d77bbd7382a8d25814c0325262f5d686333af8e0b0930361808d3",
+    "scope": "reconstructed first proposal context; no claim of archived complete request",
+    "explicit_absences": [
+      "human_advice",
+      "previous_validation_failure",
+      "expert_advice"
+    ],
+    "reference_code": "no experiment-source inheritance on this first proposal"
+  }
+}

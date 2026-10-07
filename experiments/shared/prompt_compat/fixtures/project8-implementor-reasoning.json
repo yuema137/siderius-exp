@@ -1,0 +1,250 @@
+{
+  "case_id": "project8-implementor-reasoning",
+  "boundary": "implementor.reasoning",
+  "arguments": {
+    "input": {
+      "candidate_id": "cand_001ea911b689418a9066e2ac998b4dc1",
+      "task_composition_ref": null,
+      "model_name": "dual_axis_crossattn_regressor",
+      "output_type": "regressor",
+      "model_description": "A dual-encoder scalar regressor routes normalized time-domain I/Q and unshifted complex FFT real/imaginary channels through separate seven-stage residual Conv1d tokenizers. The time encoder uses ordinary same padding, while the FFT encoder uses circular frequency-axis padding to respect the wraparound of the unshifted discrete spectrum. Each branch produces 192 tokens of width 128 and receives its own learned positional embedding, avoiding any assumption that equal time and frequency indices are aligned. Two pre-normalized bidirectional cross-attention blocks update each stream using the other stream as context, after which learned attention pooling summarizes both updated streams. Their pooled vectors are concatenated and processed by a 256-128-1 regression head. The base model emits one standardized scalar, and the framework-owned training-pool target transform converts the exported prediction to physical eV.",
+      "mathematical_definition": "Let x_t be channels 0:2 and x_f be channels 2:4, preserving the supplied I+iQ and FFT-real+i\u00b7FFT-imag conventions. Independent residual encoders produce T = E_t(x_t) and F = E_f(x_f). Each encoder consists of repeated stride-two Conv1d stages with normalization and GELU, followed by a second convolution and an additive projected skip connection; E_t uses ordinary same padding and E_f uses circular padding along the frequency-bin axis. Add distinct learned coordinate embeddings P_t and P_f to obtain T_0 = T + P_t and F_0 = F + P_f. For each bidirectional fusion block l, compute simultaneous pre-normalized updates U_t = T_l + MHA_t(LN(T_l), LN(F_l), LN(F_l)) and U_f = F_l + MHA_f(LN(F_l), LN(T_l), LN(T_l)), where the first argument supplies queries and the latter two supply keys and values. Then apply branch-specific residual feed-forward updates T_(l+1) = U_t + FFN_t(LN(U_t)) and F_(l+1) = U_f + FFN_f(LN(U_f)). Learned-query attention pooling independently maps the final token sequences to vectors z_t and z_f. The standardized scalar is y_hat_std = MLP(concat(z_t,z_f)), with GELU and dropout between hidden affine layers, and is returned with shape [B,1]. The native framework compares y_hat_std with globally standardized training targets and incorporates its stored training-pool affine inverse into export so the externally visible [B,1] output is energy_eV. Both pooled branch vectors are mandatory inputs to the final head.",
+      "baseline_config": {
+        "model_config": {
+          "input_channels": 4,
+          "input_length": 24576,
+          "time_channel_indices": [
+            0,
+            1
+          ],
+          "fft_channel_indices": [
+            2,
+            3
+          ],
+          "time_channels": 2,
+          "fft_channels": 2,
+          "output_dim": 1,
+          "encoder_stage_channels": [
+            32,
+            48,
+            64,
+            80,
+            96,
+            112,
+            128
+          ],
+          "encoder_stage_strides": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "encoder_kernel_sizes": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5
+          ],
+          "residual_kernel_size": 3,
+          "encoder_normalization": "group_norm",
+          "activation": "gelu",
+          "time_padding_mode": "zeros",
+          "fft_padding_mode": "circular",
+          "token_count": 192,
+          "token_width": 128,
+          "positional_encoding": "independent_learned",
+          "cross_attention_blocks": 2,
+          "attention_heads": 4,
+          "attention_head_dim": 32,
+          "ffn_width": 256,
+          "attention_dropout": 0.1,
+          "ffn_dropout": 0.1,
+          "attention_norm": "pre_layer_norm",
+          "bidirectional_update": "simultaneous",
+          "pooling": "learned_query_attention",
+          "pool_each_branch": true,
+          "fusion": "concatenate",
+          "regression_head_dims": [
+            256,
+            128,
+            1
+          ],
+          "head_dropout": 0.1,
+          "base_output_space": "standardized_target",
+          "dtype": "float32"
+        },
+        "train_config": {
+          "lr": 0.0001,
+          "epochs": 10,
+          "batch_size": 16,
+          "segmentation_size": 24576,
+          "optimizer_type": "adamw",
+          "weight_decay": 1e-05,
+          "device": "cuda",
+          "checkpoint_selection": "best_validation_loss",
+          "drop_last": false,
+          "target_standardization": "training_pool_global"
+        },
+        "loss_config": {
+          "loss_type": "smooth_l1",
+          "beta": 1.0,
+          "reduction": "mean"
+        }
+      },
+      "task_description": "Estimate the starting electron kinetic energy (energy_eV, in eV) of one simulated cyclotron radiation emission spectroscopy (CRES) event. This task explicitly requires both the supplied time-domain and frequency-domain representations to contribute to the prediction during training and inference. Accepting four channels but discarding one representation does not satisfy the task. Choose the architecture and fusion mechanism yourself; describe where each representation enters the model. No named architecture is prescribed.\n\nPhysical context: An electron moving in a magnetic field emits cyclotron radiation. In an ideal uniform field, f_c = |e| B / (2*pi*m_e*gamma), with gamma = 1 + E_kin/(m_e*c^2); at fixed B, higher kinetic energy gives lower cyclotron frequency. Radiation loss can produce a frequency chirp. Starting energy is associated with the beginning of the event, not necessarily with its time-averaged frequency. Pitch angle means the angle between electron momentum and the magnetic field. Orbital motion and detector response can affect the observed spectral structure. These are physical context, not extra measured inputs or a supplied frequency-to-energy calibration. [Project 8 overview, Sec. 3: https://arxiv.org/abs/1703.02037]\n\nDataset: PhyTS provides simulated cavity CRES events generated with Kassiopeia particle tracking and Locust RF simulation. The two observations are in-phase (I) and quadrature (Q) readouts of the same event, not independent examples. The input source is output_ts_I + output_ts_I_cav_noise and output_ts_Q + output_ts_Q_cav_noise. Use the frequency-dependent cavity noise condition, not the alternative Gaussian noise fields. Each event has 24576 samples per channel at 403 MHz (about 61 microseconds). Simulated energies span about 100 eV; pitch angle and radial position vary across events. The cavity response and noise vary with frequency. Temporal/phase structure may carry information about electron motion and position that a magnitude-only spectral summary discards. [Owner-supplied PhyTS manuscript, Secs. 3.4 and 5, Appendix A/Table 7; Locust: https://arxiv.org/abs/1907.11124]\n\nPrepared input: float32 [B,4,24576], ordered as time_I, time_Q, fft_real, fft_imag. The first two channels are the full noisy I/Q traces, individually centered and divided by their per-event population standard deviation; a constant channel becomes zero. Their original amplitude scales and offsets are not available. The next two channels are the real and imaginary parts of FFT(time_I + 1j*time_Q, norm='ortho'), computed over the entire event and stored in float32. The complex spectrum is full, unshifted and not cropped or converted to magnitude-only. There is no second frequency-domain normalization. These representations contain the same observed information up to numerical precision; FFT does not introduce labels or additional measurements.\n\nAxis semantics: the last axis is sample time for channels 0:2 and frequency-bin index for channels 2:4. Equal indices across the two pairs do not denote the same physical coordinate. Time spacing is 1/403000000 seconds; the FFT frequencies are numpy.fft.fftfreq(24576, d=1/403000000), with spacing about 16.398 kHz and both positive and negative bins. Preserve the declared I + iQ convention. The sampled readout-frequency axis is not a calibrated absolute cyclotron-frequency axis; do not invent a magnetic field, receiver offset, or per-event calibration to plug into the ideal formula. The bin spacing alone is not an absolute limit on learned frequency estimation accuracy.\n\nAllowed information and evaluation: Only the prepared noisy inputs are model features. Clean signals, separate noise arrays, start/average carrier frequency, axial frequency, pitch angle, radius, track slope, and all other simulation truth fields are unavailable as input features or auxiliary labels. energy_eV is the supervised training target only; do not read validation targets or fit preprocessing on them. Identifiers and row order are not features. Predict exactly one scalar in physical eV. Target standardization must use training statistics only and be inverted in the exported model. Original train/validation split and row order are preserved; test data are absent. Global validation R2 is the primary score and RMSE is also reported. Per-epoch validation loss uses the fixed 10% snapshot; final Formal scoring uses all validation examples. Workflow configuration owns training fractions and budgets.\n\nThis is a separately versioned dual-representation task. It adds an explicit FFT view and a both-representations requirement to the earlier time-domain task; it is not a claim of exact reproduction of a published baseline protocol.",
+      "forward_contract": {
+        "input_shape": "[B, 4, 24576] float32",
+        "input_description": "Prepared float32 [B,4,24576]: normalized time_I/time_Q, then unshifted orthonormal complex FFT real/imag. Both representations must contribute to the prediction; fusion is model-defined.",
+        "output_shape": "[B, 1] float32",
+        "output_description": "Float32 [B, 1] predictions of energy_eV in physical eV.",
+        "num_classes": 0,
+        "embedding_note": "",
+        "output_head_note": "Return exactly one scalar per example. Internal normalization is allowed; exported outputs must be in physical units.",
+        "task_type": "regression",
+        "task_note": "Sample identifiers are not model features. Both time-domain channels 0:2 and frequency-domain channels 2:4 must be used; their final axes have different physical meanings.",
+        "preset": null,
+        "model_io": {
+          "input": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": 4,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              },
+              {
+                "dimension": {
+                  "fixed": 24576,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "float32"
+              ]
+            }
+          },
+          "output": {
+            "axes": [
+              {
+                "dimension": {
+                  "fixed": null,
+                  "symbolic": "B",
+                  "dynamic": false
+                },
+                "role": "batch"
+              },
+              {
+                "dimension": {
+                  "fixed": 1,
+                  "symbolic": null,
+                  "dynamic": false
+                },
+                "role": null
+              }
+            ],
+            "dtype": {
+              "admissible": [
+                "float32"
+              ]
+            }
+          }
+        },
+        "segmentation_applicability": "not_applicable",
+        "supervision_target": null,
+        "custom_loss_applicability": null
+      },
+      "implementor_blocks": null,
+      "hardware_context": {
+        "device_name": "NVIDIA H100 80GB HBM3",
+        "total_memory_bytes": 85017493504,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "multiprocessor_count": 132,
+        "cuda_runtime_version": "12.8",
+        "torch_version": "2.10.0+cu128",
+        "hostname": "siderius-project8-h100",
+        "device_available": true,
+        "discovered_at": "2026-09-23T20:55:51.727839Z",
+        "platform": "Linux-6.11.0-1016-nvidia-x86_64-with-glibc2.39",
+        "python_version": "3.12.3",
+        "cuda_visible_devices": null,
+        "visible_device_count": 1,
+        "devices": [
+          {
+            "logical_index": 0,
+            "name": "NVIDIA H100 80GB HBM3",
+            "total_memory_bytes": 85017493504,
+            "compute_capability": [
+              9,
+              0
+            ],
+            "uuid": "GPU-85a9d551-f7f0-8772-c034-18092a72534f",
+            "physical_index": 0
+          }
+        ],
+        "active_device_uuid": "GPU-85a9d551-f7f0-8772-c034-18092a72534f",
+        "hardware_fingerprint_version": 2,
+        "driver_version": "580.173.02",
+        "repo_commit": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+        "collection_errors": []
+      },
+      "vram_budget_gb": 40.0,
+      "plugin_dir": "/offline/reconstructed-input/generated/iter_001/models",
+      "test_dir": "/offline/reconstructed-input/generated/iter_001/tests",
+      "loss_dir": "/offline/reconstructed-input/generated/iter_001/losses",
+      "custom_loss_spec": null,
+      "max_retries": 2,
+      "reference_code": {},
+      "expert_advice": "",
+      "human_advice": null,
+      "previous_validation_failure": null,
+      "storage": {
+        "backend": "local",
+        "local": {
+          "workspace": "/offline/reconstructed-input",
+          "run_name": "iter_001"
+        },
+        "postgres": null
+      }
+    }
+  },
+  "provenance": {
+    "sources": {
+      "/home/klz/Data/SIDERIUS-ICLR/runs/project8-dual-no-prior-run5-20260923/unit/workspace/iter_001/iteration_001/attempt_001_dual_axis_crossattn_regressor/proposal_iter_001.json": "9e99f51ce05a85cae59c39dfb2bfb5cfadd275d20a96bf285293e90a946ebfcf",
+      "/home/klz/Data/SIDERIUS-ICLR/runs/project8-dual-no-prior-run5-20260923/unit/workspace/iter_001/task_config_snapshot.yaml": "ae2b65e5c78314132c33831d7bac1d5128b730a20858f53c658a41ce3ec986b0",
+      "/home/klz/Data/SIDERIUS-ICLR/runs/project8-dual-no-prior-run5-20260923/unit/workspace/iter_001_hardware.json": "b5c26914525629b9a973bc18671d8a73af10bed262f2009afecd51766c47635b",
+      "/tmp/issue369-startup-specs/project8-reference.json": "2dc84a562eba74a7fc6a5efbce03e99da15e5784b7dd0c2ccffe0c521b2d4b2b"
+    },
+    "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+    "composition_fingerprint": "83e7d59c4d87ceb75083a3a8310cd2e6b03e87ea3d9cbab4efb062dca58424a4",
+    "scope": "reconstructed first proposal context; no claim of archived complete request",
+    "explicit_absences": [
+      "human_advice",
+      "previous_validation_failure",
+      "expert_advice"
+    ],
+    "reference_code": "no experiment-source inheritance on this first proposal"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "source_tree_sha256": "3b17e387d25fc295b4772dac9ddbfcf77393471a3d57321e63879969b6eb241b",
+  "infra_revision": "2458cb2214d5857570c65bc043be9602be4bafc3",
+  "source_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "capture_tool_sha256": "69a30a5c2b7d46f3ee36760053ca5cc18242bfe5e78bf6a17c5e232c94bae55e",
+  "receipt_sha256": "b60e19459d967a99e5887328c5721d597ab442dc86eb2bdb343d1085bdcb2144",
+  "input_sha256": "83e7f447a322d4d729524cf1e319132bc287482d1ba8017800210b7b2d3111d5",
+  "recovery_policy_sha256": null,
+  "profile": null,
+  "outcome": "additional_request_without_archived_reply",
+  "requests": [
+    {
+      "label": "data_analysis.generated_program",
+      "system_sha256": "6e82d3c44a5b9aa4c8596c0629d1c50d9845432d8f223eea0d014a4269a2cae0",
+      "user_sha256": "e909f18c7e5ef75b7d5a15becb3b632cecfa3744e8189d90435a43d1eb93dbd6"
+    },
+    {
+      "label": "data_analysis.generated_program.repair",
+      "system_sha256": "0e395389aa823700672377e8b4060b6abdf2e98afdb176bb715098f956ddaf88",
+      "user_sha256": "02f6c4b8f997f7de4013c5488ec6f693370472864460aec59b8338039cc130d3"
+    },
+    {
+      "label": "data_analysis.generated_program.regeneration",
+      "system_sha256": "6e82d3c44a5b9aa4c8596c0629d1c50d9845432d8f223eea0d014a4269a2cae0",
+      "user_sha256": "0f6065953c68c4389a583fd11a6e4cc09ea2fbe8207eb380e5838e3dcb4939be"
+    }
+  ],
+  "archived_replies_consumed": 2,
+  "api_calls": 0,
+  "training_calls": 0,
+  "generated_program_executions": 0,
+  "scope": "archived failure branch only; not complete conversation replay"
+}
