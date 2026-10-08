@@ -9,20 +9,30 @@ Metric formulas come from the production ``HealthCheck`` classes, so a number
 here means the same thing it means inside a chain. The peek window is
 1,000,000 samples to match the reference table in
 ``tasks/tidmad/reference_data/official_paper_result/README.md``; production
-blocking gates peek 100,000. Nothing is recomputed locally — the checks are
-imported, not reimplemented.
+blocking gates historically used 100,000. The checks are imported, not
+reimplemented. The all-three-pass count is a reference conjunction, not the
+current regression blocking verdict: tasks/tidmad/framework_configs/health_regression.yaml
+records diversity/std and blocks only on amplitude collapse. The selected
+roster owns its sampling and dispositions.
 
 Model-agnostic by construction: the model name, the denoised directory, and
-the target directory are inputs. Missing per-file outputs are reported and
-skipped rather than faked, because a partial scan that hides its gaps is
-worse than no scan.
+the target directory are inputs. Missing per-file outputs require explicit
+--allow-partial; gaps are reported, never filled in. Zero matching files fails
+even with that flag.
 
-Usage::
+Usage for fresh banded-scorer outputs (replace external placeholders)::
 
-    python -m tasks.tidmad.tools.official_paper_health_scan \\
+    .venv/bin/python -m tasks.tidmad.tools.official_paper_health_scan \\
         --model punet \\
-        --denoised-dir /path/to/punet/full_20_files \\
-        --json-out reference_data/official_paper_result/punet_health.json
+        --denoised-dir /external/tidmad-reference/new-inference/denoised_punet \\
+        --target-dir /external/TIDMAD-data \\
+        --pattern 'abra_validation_denoised_{model}_tidmad_official_banded_{index:04d}.h5' \\
+        --peek-samples 1000000 \\
+        --json-out /external/tidmad-reference/new-report/punet_health.json
+
+For legacy outputs select the original filename pattern explicitly:
+``abra_validation_denoised_{model}_{index:04d}.h5``. Choose the layout from the
+actual filenames, not the model name.
 """
 
 from __future__ import annotations
@@ -43,14 +53,14 @@ from execute_tools.health_checks.pearson_dispersion import PearsonDispersionChec
 from execute_tools.health_checks.schemas import HealthCheckContext
 from execute_tools.health_checks.spectral_peak_ratio import SpectralPeakRatioCheck
 
-#: Reference-table peek window (§3). Production blocking gates use 100_000.
+#: Reference-table peek window (§3); historical production gates used 100_000.
 PEEK_SAMPLES = 1_000_000
 MV_PER_LSB = 40.0 / 128.0
 NUM_FILES = 20
 
-#: Production thresholds, from ``configs/health_checks.yaml``. Reproduced as
-#: literals so the scan reports pass/fail on the same line the chain uses;
-#: they are recorded in the output so a later threshold change is visible.
+#: Historical reference thresholds from ``configs/health_checks.yaml``.
+#: Recorded in the output so a later threshold change is visible; current
+#: blocking/recording dispositions belong to the selected Health roster.
 MIN_UNIQUE_INT8 = 25
 MIN_STD_MV = 1.0
 COLLAPSE_THRESHOLD = 0.95

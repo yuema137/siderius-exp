@@ -2,6 +2,11 @@
 
 Denoising scores for the official band-split TIDMAD paper checkpoints, evaluated with the SIDERIUS `score_vector` pipeline on the canonical anchor map.
 
+The four model pages and three Health JSON files are frozen evidence. Their
+commands and machine paths record the historical runs; use the current
+[reproduction guide](reproduction.md) for new work. Some historical experiments
+use these exact saved reports, so generate new reports separately.
+
 ## Aggregation
 
 Every headline number below is the CANONICAL `denoising_score`:
@@ -10,7 +15,11 @@ Every headline number below is the CANONICAL `denoising_score`:
 denoising_score = log_5.27( Σ_(f,i) per_segment[f,i] / Σ_f |S_f| )
 ```
 
-Grand mean over every sampled segment across every sampled file, then log. See `execute_tools/scoring_utils.py` module docstring §3 for the full contract and the three aggregation patterns that MUST NOT be substituted.
+Grand mean over every sampled segment across every sampled file, then log. The
+reference tool retains the pinned framework helper
+`execute_tools/scoring_utils.py` (§3). The current task composition instead binds
+[the task scorer](../../runtime/scoring.py); both use this aggregation. Recorded
+scores retain their original source and scope.
 
 ## Ruler
 
@@ -28,7 +37,9 @@ All scores are on the same log_5.27 scale, using the global s_max (295715680.14)
 | 10-14 | mid-high     | 10, 11, 12, 13, 14 | `{Model}_10_15.pth` |
 | 15-19 | high         | 15, 16, 17, 18, 19 | `{Model}_15_20.pth` |
 
-*Wavenet is intentionally excluded* (per the request that spawned this evaluation); the paper's official wavenet is a single generalist checkpoint scored separately by `scripts/score_tidmad_official_wavenet.py`.
+*Wavenet is intentionally excluded* (per the request that spawned this
+evaluation); the paper's official wavenet is a single generalist checkpoint
+scored separately by [the task-owned WaveNet scorer](../../tools/score_tidmad_official_wavenet.py).
 
 ## Summary
 
@@ -39,10 +50,12 @@ All scores are on the same log_5.27 scale, using the global s_max (295715680.14)
 | rnn | **1.5056** | 0.5049 | -8.6078 | *not scanned* | [`rnn.md`](rnn.md) |
 | transformer | *pending* | — | — | 0/18 healthy, 2 missing | [`transformer.md`](transformer.md) |
 
-The HealthGate column counts files passing all three blocking checks
-(diversity, std, amplitude). It is reported beside the score because the two
-can disagree: a collapsed model can score well through a PSD artifact. A high
-score with a low health count is a warning, not a result.
+The historical healthy count means all three checks passed: diversity, output
+standard deviation and amplitude. The current [regression workflow](../../framework_configs/health_regression.yaml)
+blocks only on amplitude collapse and records the other two checks for inspection.
+The reference scan uses 1,000,000 samples; the current workflow uses its own
+configured sample window. Score and health can disagree: a collapsed model can
+score well through a PSD artifact.
 
 **The score ordering and the health ordering are not the same ordering.**
 `fcnet > punet > rnn` by score; by health, fcnet is clean everywhere, punet is
@@ -51,12 +64,21 @@ denoised outputs were deleted. Collapse is band-dependent, so a single scalar
 per model hides where a model actually works.
 
 `rnn` requires a fresh inference run before it can be scanned — see
-[`rnn.md`](rnn.md).
+[reproduction guide](reproduction.md).
 
 ## Reproducibility
 
-Rebuild this whole directory (idempotent, reads the summary JSONs):
+Render saved summary JSONs into a new external report directory, from the exp
+repository root after `uv sync --group dev --frozen`:
 
 ```bash
-scripts/render_official_paper_result.py
+.venv/bin/python -m tasks.tidmad.tools.render_official_paper_result \
+  --summary-dir /external/tidmad-reference/summaries \
+  --out-dir /external/tidmad-reference/new-report
 ```
+
+This reads local evidence and writes Markdown. Optional Health JSON is read from
+**the output directory**, so copy selected saved Health files there first if
+needed. Missing summaries can produce pending entries. See the
+[guide](reproduction.md) for saved-evidence rendering, new inference and Health
+scanning with the correct filename layout.

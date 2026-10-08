@@ -21,5 +21,6 @@ TIDMAD_DATA_DIR=/absolute/path/to/TIDMAD \
 An absent `TIDMAD_DATA_DIR` produces a visible optional skip. Once the variable
 is supplied, an invalid directory or missing `abra_validation_0000.h5` is a
 test failure before scoring. This test runs the task-owned scorer against the
-reference-only five-function legacy oracle; neither the oracle nor real data is
-imported by production code or committed to the repository.
+reference-only five-function [legacy oracle](_legacy_scoring_reference.py). The
+oracle is committed test support and is not imported by production code. Real
+data stays external to the repository.

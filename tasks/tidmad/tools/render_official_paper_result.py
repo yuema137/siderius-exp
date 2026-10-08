@@ -4,8 +4,8 @@
 Reads the per-model summary JSONs produced by
 ``tasks.tidmad.tools.score_tidmad_official_banded`` and writes:
 
-    tasks/tidmad/reference_data/official_paper_result/README.md
-    tasks/tidmad/reference_data/official_paper_result/{model}.md
+    <out-dir>/README.md
+    <out-dir>/{model}.md
 
 The headline number per model is the CANONICAL denoising_score defined in
 ``execute_tools/scoring_utils.py`` module docstring §3 — the linear grand
@@ -17,7 +17,8 @@ Reference anchors on the same global-s_max ruler:
   * raw baseline (no denoising)      = 1.0007
   * ground-truth ceiling             = 10.1134
 
-Idempotent: re-run whenever a new summary JSON lands to rebuild the report.
+Use a new external output directory; committed model reports are frozen evidence.
+Optional <model>_health.json inputs are read from that output directory.
 """
 
 from __future__ import annotations
@@ -25,11 +26,11 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import shlex
 from pathlib import Path
 
 # Both locations are server-specific and deliberately have NO defaults —
-# pass them explicitly (portability audit 2026-07-24). Typical out-dir is
-# the repo's reference_data/official_paper_result/.
+# pass them explicitly (portability audit 2026-07-24). Keep new reports external.
 MODEL_ORDER = ["fcnet", "punet", "rnn", "transformer"]
 LOG_BASE = 5.27
 RAW_FLOOR = 1.0007
@@ -106,10 +107,15 @@ def render_health_section(health: dict) -> list[str]:
         "",
         "## HealthGate per-file metrics",
         "",
-        f"Peek window {health['peek_samples']:,} samples (the reference-table "
-        "window; production blocking gates peek 100,000). Metric formulas are "
-        "the production `HealthCheck` classes, imported rather than "
-        "reimplemented, so a number here means what it means inside a chain.",
+        (
+            f"Peek window {health['peek_samples']:,} samples (the reference-table "
+            "window; historical production blocking gates used 100,000). Formulas "
+            "are imported from the framework `HealthCheck` classes. The healthy "
+            "count is the conjunction of diversity, std and amplitude, not the "
+            "current regression blocking verdict. The selected Health roster owns "
+            "sampling and dispositions; `tasks/tidmad/framework_configs/health_regression.yaml` "
+            "records diversity/std and blocks only on amplitude collapse."
+        ),
         "",
         f"Thresholds: `unique_int8 > {t['min_unique_int8_values']}`, "
         f"`std_mv >= {t['min_std_mv']}`, "
@@ -157,16 +163,37 @@ def render_health_section(health: dict) -> list[str]:
         "Verdict letters: upper case passed that check (D diversity, S std, "
         "A amplitude), lower case failed.",
         "",
-        "Regenerate:",
+        (
+            "Re-scan existing outputs after checking their filename layout. The recipe "
+            "below explicitly selects the legacy layout; recorded paths may need "
+            "relocation. For fresh banded-scorer outputs use `<work-dir>/denoised_<model>` "
+            "and `abra_validation_denoised_{model}_tidmad_official_banded_{index:04d}.h5` "
+            "instead. Layout cannot be inferred from the model name."
+        ),
         "",
         "```bash",
-        "python -m tasks.tidmad.tools.official_paper_health_scan "
-        f"--model {health['model']} \\",
-        f"  --denoised-dir {health['denoised_dir']} \\",
-        "  --target-dir /path/to/TIDMAD \\",
-        "  --json-out tasks/tidmad/reference_data/official_paper_result/"
-        f"{health['model']}_health.json",
+        (
+            ".venv/bin/python -m tasks.tidmad.tools.official_paper_health_scan "
+            f"--model {shlex.quote(health['model'])} \\"
+        ),
+        f"  --denoised-dir {shlex.quote(health['denoised_dir'])} \\",
+        f"  --target-dir {shlex.quote(health.get('target_dir') or '/external/TIDMAD-data')} \\",
+        "  --pattern 'abra_validation_denoised_{model}_{index:04d}.h5' \\",
+        f"  --peek-samples {health['peek_samples']} \\",
+    ]
+    if s["files_missing"]:
+        lines.append("  --allow-partial \\")
+    lines += [
+        (
+            "  --json-out /external/tidmad-reference/new-report/"
+            f"{health['model']}_health.json"
+        ),
         "```",
+        "",
+        (
+            "Replace external placeholders with your paths. `--allow-partial` permits "
+            "missing files but does not create them; zero matching files still fails."
+        ),
     ]
     return lines
 
@@ -207,7 +234,9 @@ def render_per_model(summary: dict, out_path: Path, health: dict | None = None) 
         f"ground-truth ceiling = {GT_CEILING})"
     )
     lines.append("")
-    lines.append("Definition (from `execute_tools/scoring_utils.py` §3):")
+    lines.append(
+        "Definition (from the pinned framework `execute_tools/scoring_utils.py` §3):"
+    )
     lines.append("")
     lines.append("```")
     lines.append(
@@ -261,10 +290,13 @@ def render_per_model(summary: dict, out_path: Path, health: dict | None = None) 
     lines.append("")
     lines.append("```bash")
     lines.append(
-        f"python -m tasks.tidmad.tools.score_tidmad_official_banded --models {key} \\"
+        f".venv/bin/python -m tasks.tidmad.tools.score_tidmad_official_banded --models {key} \\"
     )
-    lines.append("  --data-dir /workspace/DATA/TIDMAD_DATA \\")
-    lines.append("  --work-dir /workspace/DATA/SIDERIUS_DATA/tidmad_official_banded")
+    lines.append("  --tidmad-repo /external/TIDMAD-source \\")
+    lines.append("  --checkpoint-dir /external/TIDMAD-checkpoints \\")
+    lines.append("  --data-dir /external/TIDMAD-data \\")
+    lines.append("  --anchor-map tasks/tidmad/reference_data/segment_anchors.json \\")
+    lines.append("  --work-dir /external/tidmad-reference/new-inference")
     lines.append("```")
     lines.append("")
     lines.append(
@@ -306,7 +338,8 @@ def render_readme(
     lines.append("")
     lines.append(
         "Grand mean over every sampled segment across every sampled file, "
-        "then log. See `execute_tools/scoring_utils.py` module docstring §3 "
+        "then log. See the pinned framework `execute_tools/scoring_utils.py` "
+        "module docstring §3 "
         "for the full contract and the three aggregation patterns that MUST "
         "NOT be substituted."
     )
@@ -365,20 +398,27 @@ def render_readme(
         )
     lines.append("")
     lines.append(
-        "The HealthGate column counts files passing all three blocking checks "
+        "The HealthGate column counts files passing all three reference checks "
         "(diversity, std, amplitude). It is reported beside the score because "
         "the two can disagree: a collapsed model can score well through a PSD "
-        "artifact. A high score with a low health count is a warning, not a result."
+        "artifact. The current regression workflow blocks only on amplitude collapse "
+        "and records diversity/std for inspection. It uses its own configured "
+        "sample window; see `tasks/tidmad/framework_configs/health_regression.yaml`."
     )
     lines.append("")
     lines.append("## Reproducibility")
     lines.append("")
-    lines.append("Rebuild this whole directory (idempotent, reads the summary JSONs):")
+    lines.append(
+        "Render saved summaries into a new external directory. Optional "
+        "`<model>_health.json` inputs must be placed in that output directory first:"
+    )
     lines.append("")
     lines.append("```bash")
-    lines.append("python -m tasks.tidmad.tools.render_official_paper_result \\")
-    lines.append("  --summary-dir /path/to/summary-jsons \\")
-    lines.append("  --out-dir tasks/tidmad/reference_data/official_paper_result")
+    lines.append(
+        ".venv/bin/python -m tasks.tidmad.tools.render_official_paper_result \\"
+    )
+    lines.append("  --summary-dir /external/tidmad-reference/summaries \\")
+    lines.append("  --out-dir /external/tidmad-reference/new-report")
     lines.append("```")
     lines.append("")
     out_path.write_text("\n".join(lines))
