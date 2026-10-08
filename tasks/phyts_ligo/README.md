@@ -5,6 +5,17 @@ The task uses the owner-supplied PhyTS paper's fixed 59–63 second window:
 `whitened_injected[:, 15104:16128]`, float32 `[2, 1024]`, without per-example
 amplitude normalization. Target: stored `chirp_mass`, in physical solar masses.
 
+## Start with the tutorial
+
+The [LIGO/Project8 setup guide](../../tutorials/paper/prepared/README.md) explains
+installation, external data and project creation. Open the
+[LIGO notebook](../../tutorials/paper/notebooks/04_ligo_tutorial.ipynb) to see the
+detector input and recorded results, then run a small three-iteration demo.
+The demo uses reduced data; the full research scopes below remain separate.
+It is not a complete paper reproduction.
+
+## Scientific task and research scopes
+
 Start with [the composition](compositions/regression.yaml) and
 [the scientific/forward contract](declared/task_config.yaml).
 [The prepared declaration](declared/prepared.json) pins a separately stored

@@ -16,7 +16,17 @@ classification (Task A) is **not** part of this package.
 | output | `[B, 1]` float32, unbounded |
 | population | 3,338 train / 442 validation curves; 403 held out |
 
-## Shortest safe route
+## Start with the tutorial
+
+Follow the [TESS setup and notebook guide](../../tutorials/paper/tess/README.md)
+to create your own external project, inspect example light curves, change search
+settings and run a three-iteration demo. It shows saved files and results; it is
+not a complete paper reproduction.
+
+For research settings, see the [fixed-workflow experiment](../../experiments/phyts_tess/main_fixed_workflow/README.md).
+For recorded paper runs, use the [artifact reference](../../experiments/paper-artifacts.md).
+
+## Inspect or integrate this task package
 
 1. Stage a run data root — [`data/README.md`](data/README.md) has the one
    command. The held-out test split is deliberately not staged.

@@ -1,5 +1,21 @@
 # PhyTS Project 8 electron-energy regression
 
+## Start with the tutorial
+
+The [Project8/LIGO setup guide](../../tutorials/paper/prepared/README.md) and
+[Project8 notebook](../../tutorials/paper/notebooks/03_project8_tutorial.ipynb)
+show how to inspect data, save parameters, run a three-iteration demo and plot
+results in your own external project. This is a simplified process demo, not a
+complete paper reproduction.
+
+The teaching demo uses **time and frequency views together**, the separately
+versioned [dual-representation task](DUAL_REPRESENTATION.md). Its four input
+channels are distinct from the original two-channel task below. Keep their
+configurations and recorded results separate.
+
+## Original time-only task
+
+
 Estimate electron energy in eV from two noisy CRES I/Q time series.
 Inputs are `I + I_cav_noise` and `Q + Q_cav_noise`, retaining all 24,576
 samples per channel. Each event/channel is centered and divided by its own
@@ -27,6 +43,6 @@ No advice or baseline recipe is supplied by this task to a NoPrior agent.
 owns budgets and information treatment. Identical preprocessing does not make
 validation scores directly comparable to published test scores.
 
-## New task variant: explicit use of both representations
+## Dual-representation task
 
 The separately versioned [time/frequency task](DUAL_REPRESENTATION.md) requires both supplied representations and includes cited physical context. It does not overwrite this original time-input contract.
