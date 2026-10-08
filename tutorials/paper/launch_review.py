@@ -154,7 +154,11 @@ def launch_review(
     ]
     fields = [
         ("run_name", settings.run_name, "New run identity"),
-        ("gpu", settings.gpu, "Must match the supported physical NVIDIA GPU"),
+        (
+            "gpu",
+            settings.gpu,
+            "Optional name expectation; null selects the visible logical GPU",
+        ),
         ("iterations", settings.iterations, "Search-cycle ceiling"),
         ("epochs", settings.epochs, "Epoch ceiling per training attempt"),
         (

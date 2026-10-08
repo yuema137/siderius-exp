@@ -42,6 +42,31 @@
       "infra_revision": "34660bed0960f3bcad60ba30aaedffaaf617ff8b",
       "assembly_sha256": "76792a754d20d6ef34be8af993dd40900b2627e9cd145823fa7b01551364947b",
       "scope": "Release configuration transport and namespace admission candidate; frozen rendering and historical proposer-route boundaries only, not full conversation or runtime qualification"
+    },
+    {
+      "infra_revision": "5afbdcb2ed9eab61c99cb14192b116fe1a479a0f",
+      "assembly_sha256": "fc99e9531aa06be76f383cc3cc0aee2480e5ba485836060d393571494e60987d",
+      "scope": "Portable aggregate GPU ceiling schema declaration; frozen rendering requests and historical proposer routes only, not runtime resource policy or complete conversation replay"
+    },
+    {
+      "infra_revision": "faff23aad38a2892160f64a4f3cefe1c9d6c3632",
+      "assembly_sha256": "e672969596e4baad66b55a29ba2768d7e43d37611ef10e189bceaf687f00adce",
+      "scope": "Optional protected execution schema/transport; frozen absent-policy rendering requests and four historical proposer routes only, not selected-policy evidence or runtime protection qualification"
+    },
+    {
+      "infra_revision": "ec92186d64622742473a421c4e9d61c5134b05e3",
+      "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d",
+      "scope": "Explicit runtime completion and verifier identity transport; existing frozen request corpus only. New session history is separately checked with the explicit planner v8 projection; not complete conversation replay."
+    },
+    {
+      "infra_revision": "7d0d32142a567c9e30443c7b6304ab943e714ac5",
+      "assembly_sha256": "855e13f04eec1e5b8080bd1e3f55651be1995640e0d41458f485100ec6165710",
+      "scope": "Explicit per-route retry policy schema/transport and clarified hardware API reference; frozen original requests and absent historical retry configuration. Late-response telemetry keeps deadline refusal; full conversation and stochastic replay remain outside scope."
+    },
+    {
+      "infra_revision": "46ee992043a1ccb0e2db57cac1afc8a73171e063",
+      "assembly_sha256": "f032911dd790843720989dbdeffa7ddfac8f58736be05d940a9065cbe9464d4e",
+      "scope": "Typed task objective and Health binding round trips; frozen historical rendering and static decision corpus. No new scientific configuration, runtime estimator or training algorithm; not full conversation replay."
     }
   ]
 }

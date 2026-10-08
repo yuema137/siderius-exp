@@ -9,6 +9,7 @@ import shutil
 from pathlib import Path
 
 from tutorials.shared.bootstrap import shell_setup_guard
+from tutorials.shared.llm_setup import write_test_llm_config
 from tutorials.shared.runtime import ROOT, disjoint
 from tutorials.supplementary.pet.settings import PetExperiment
 
@@ -71,11 +72,8 @@ def create_project(project: Path, infra: Path, images: Path) -> Path:
         project / "tasks/pet",
         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
     )
-    for source, target in (
-        ("agents.json", "llm/agents.json"),
-        ("workflow.json", "experiments/workflow.json"),
-    ):
-        shutil.copyfile(TEMPLATES / source, project / target)
+    write_test_llm_config(project / "llm/agents.json")
+    shutil.copyfile(TEMPLATES / "workflow.json", project / "experiments/workflow.json")
     # Keep the repository gallery visible, but never seed a user's notebook
     # with old scores that could survive an interrupted Run All.
     notebook_data = json.loads(notebook.read_text())

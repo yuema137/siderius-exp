@@ -11,7 +11,8 @@ checkouts/images. User inputs and execution workspaces remain external. Generate
 scripts bind the exact exp interpreter, read the saved experiment every invocation,
 and route execution to the public native chain. Preview performs no provider call
 or GPU allocation. Launch additionally decodes search images, checks exported key
-names and validates CUDA. Source/dependency pins and planner identities must match.
+names and uses the [shared GPU setup adapter](../../shared/gpu-runtime.md).
+Source/dependency pins and planner identities must match.
 
 `data` resolves explicit manifests without training-as-evaluation fallback. It
 rejects duplicate/overlapping IDs, missing classes, inconsistent role/class labels

@@ -1,0 +1,839 @@
+{
+  "schema_version": 1,
+  "infra_revision": "ec92186d64622742473a421c4e9d61c5134b05e3",
+  "runtime_assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad",
+  "previous_checkpoint": "d95413e",
+  "previous_evidence": "qualification-report.json",
+  "normal_installed_package_sources": {
+    "runtime_compat/__init__.py": "6ba41b39453b6104801625de11aa58fbec6e6e5da41a3153408ddc953336e8c3",
+    "runtime_compat/adapter.py": "241168b834eab905ff1680cca1b848742ee061f947bb3f979d5e4c55b67e3904",
+    "runtime_compat/adaptive_345c802d.py": "480b752b39541f22a99deeb8e9e6951679850f76c0fd167f0a4c8f356297f9d0",
+    "runtime_compat/adaptive_349b6cd6.py": "f4dd4caac2743236b1fd63cbde135485ee169787b0e901bc710b1a1fe0e78b18",
+    "runtime_compat/adaptive_7689fd58.py": "489c1673f4be02393afc0aa246330413c2c836a326a1b2fb874ba6e19da4ba93",
+    "runtime_compat/qualification.json": "f34c3015baf297b7959602b10561a95fd2f5e8c631c6f3585229db73f64dc958",
+    "runtime_compat/source-inventory.json": "3c9ef4a50cf2a912fd5b6e1affcc1b7f08a565866f157a3b41747e0c1687a5bc",
+    "runtime_compat/steady_state.py": "b2ee5e7c32d915684848ae772acedf7bc4c8ab6d304509089e72a8c56ab749db",
+    "planner_compat/__init__.py": "23557aa4249c0fd4aeafa5205180798a5d71e195b84f21c776212fc62005c0fb",
+    "planner_compat/attempt_role_check.py": "f554c6f29de5a31b225929096c97679ad5fdc5b7da831de6d755b7d0aadd17bf",
+    "planner_compat/attempt_role_v3.py": "f75b423ed1b653ebb028c42f0a6dba811a72f3e0e6c1ed1dac608f44afbc20ef",
+    "planner_compat/fixtures/current_legacy_boundary.json": "a6e1400a2ff2fd76df7403b061c9c39e10360e19c687b138824fd11a23aa808f",
+    "planner_compat/fixtures/early_legacy_boundary.json": "97ccb07307fda8097164f748818f73043a09193730348f748389b66fbe8e7672",
+    "planner_compat/fixtures/loss_strategy_boundary.json": "17e5155f769228ab4b79a453b713330707088ff6ca2ef16fa0c9c0c97a745249",
+    "planner_compat/fixtures/ordering_producer_boundary.json": "b3480b275444528c915f593742d8fc8e72553d0972d1b13617fb4dea87d59705",
+    "planner_compat/fixtures/paper_ligo_boundary.json": "b64e428a36fad17d031822abb14dddd431e8447a3bcf5abce3cab7145efc0aa3",
+    "planner_compat/fixtures/paper_task_startups.json": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+    "planner_compat/fixtures/runtime_feedback_producer.json": "8e0ecf6d0241a343e673c81017966e43667b2541fc2f950a9159dacaa828ddbe",
+    "planner_compat/fixtures/storage_reference_matrix.json": "bb52a55dadbb4d5b76ad5cacb4db2caa83b99eae8aee7b2e86114dde351a3829",
+    "planner_compat/legacy_691617f04b42.py": "691617f04b42f8e903188ac6aa701afedc09a54148d0fba826275b6bf794c013",
+    "planner_compat/legacy_9b78d505cb11.py": "9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd",
+    "planner_compat/legacy_loss_rendering.py": "9af47ab18d2a2e443023e12d5afc15403a9844a34e2c76459d485d25709882a4",
+    "planner_compat/legacy_storage_4e46ced5.py": "74f1840c5d6015094bec70e20324c1f20fd0f533ae3ee972aa5840ac098a8456",
+    "planner_compat/ordering_check.py": "a738f0fc8028785578920278cf3c72de3b0b8341815e4ac0e0cbf114e3b5eb30",
+    "planner_compat/ordering_v2.py": "e09d2217cf21849d81d4b1dbb00dd253f3258e82a5c6a1f79dcbf111b7623adc",
+    "planner_compat/paper_v4.py": "218b0067b254c569fe2d843b428a52e323ea245d74d24ba4bbf22a2e2d381f99",
+    "planner_compat/runtime_feedback_v5.py": "9eda600cffbc38a1118e6d791f2b24193e3b05b67053fe26d125512623319a4f",
+    "planner_compat/runtime_verifier_v8.py": "41f14f0541ac9c7da308968302b5171fc8690f901d5d9f7e1a8fb325c4c97b3c",
+    "planner_compat/self_check.py": "0a98b251be3669f42458f9b9f14c3080541a02cc51e6f3e6ffcc5cc67ce5ba38",
+    "planner_compat/startup_check.py": "b6fb07c26d45a38e4ef7a6d204cec55ef9559472e1ccab2fdc88305769237fae",
+    "planner_compat/static_preflight_v6.py": "5a42691869a96842d2ee3e93173d4287e6042ab9b003a9eeab189c1240edebb5",
+    "planner_compat/storage_provenance_v7.py": "de1b2d1b7418a549a4defa87d1bd3707e11d8a3994eae1758e0cb9004776cf7f",
+    "prompt_compat/__init__.py": "fbcb9635fd35a4ff7b5735e33ed657ba4c488de5230999fa87629e43d50cdb04",
+    "prompt_compat/analysis_c0467447.py": "55f9fe8654cafb2b0481f45f2661317e247fa14e21a026d0630b56219ffecd47",
+    "prompt_compat/interpretation_345c802d.py": "73e3b9adc3fa0e23ca407a744f4c97b6fe9c8627b15f778888c1c974a34e1dfa",
+    "prompt_compat/qualification.json": "3abbd48c52484dcdd54455d1f5e38cc9a9863431dbe5962d15a94e226df43abd",
+    "prompt_compat/source-inventory.json": "a172d7988c76dd6064c145e537019c82bf73a980e7e5b2a515e72cb36077fd6e",
+    "prompt_compat/templates/causal_reasoning_stage.md": "00d42cc4397e0745520aa376f00a911821b150997f7303866fa7cd0800975d55",
+    "prompt_compat/templates/causal_reasoning_stage_exploit.md": "cbf18435eb5970f142d0bf89b9ac32c8dec2822edbc4d3a6da9a19d720a6f15b",
+    "prompt_compat/templates/causal_reasoning_stage_explore.md": "654961f557aa98b1e22197f2403fabdcdf4b9cb413b5aa1671b6c951fcedcffa",
+    "prompt_compat/templates/comparison_stage.md": "6099820a60c90cae41dba61f328eef17951657da9c83b47b5e67e444ce98ba25",
+    "prompt_compat/templates/comparison_stage_exploit.md": "4bd0e8106ec9225e5fa2a294d2055e52f26b59c2740089191557041b8e6d3d7c",
+    "prompt_compat/templates/comparison_stage_explore.md": "fe0b6212c1dd88981052d4d9fe32429f4fbea4ab6351fdffadcc65db91872ed5",
+    "prompt_compat/templates/proposing_stage.md": "75932e347b87a4bbfabf0b207701acae7e0cb6d213ab188a4f6cd3005121ca39",
+    "prompt_compat/templates/proposing_stage_exploit.md": "44dbc4223db1a4634e1c465a4416f7664c45353c05599dc57be0112644cd75ec",
+    "prompt_compat/templates/proposing_stage_explore.md": "7d6a53af9b44d0922bada12dec4f733741e180e43621965e824539ff59ca05a1"
+  },
+  "planner_profiles": [
+    {
+      "name": "legacy-9b78d505cb11-paper-verifier-v8",
+      "version": "8",
+      "content_sha256": "40f9e5a63f44b1c52038771ae7cbf8762e788f64aefac0cef0b845f899b69e93",
+      "assembly_sha256": "db491bfa67c5c4ccdae43eec0aad9be7e88cf5e10f54db1b1f31b3b501cc9cb5"
+    },
+    {
+      "name": "legacy-9b78d505cb11-paper-late-verifier-v8",
+      "version": "8",
+      "content_sha256": "e3b59207484478449dca4898ef393e8350eaf553d2aef62483ff25792c63818d",
+      "assembly_sha256": "db491bfa67c5c4ccdae43eec0aad9be7e88cf5e10f54db1b1f31b3b501cc9cb5"
+    }
+  ],
+  "checks": {
+    "focused_pytest_passed": 132,
+    "actual_session_to_planner_requests": 23,
+    "original_session_policy_variants": 3,
+    "original_message_requests_matched": 47,
+    "message_bodies_matched": 94
+  },
+  "messages": [
+    {
+      "case": "analysis-plan",
+      "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+      "reference_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "request_sha256": "87eeb39f2f3a2751343325362afc7860a272aea985e3b16328e5929e8ee51eb9",
+      "messages": {
+        "system": "8ac787d62285bbabcb79571b475cf5b832de3ebc2009cffb96fcfa58d29e0f40",
+        "user": "be4e6be4a3ff5faeaf7043bcc5c07d424d2282d602479467b936040cd9a74f12"
+      },
+      "profile": {
+        "name": "paper-analysis-c0467447-v1",
+        "version": "1",
+        "content_sha256": "6a72a4b12a2cff45c3acbfa78e0faa554438e9094d0406dcbd0d4064b6a11b2b",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "analysis-selection",
+      "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+      "reference_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "request_sha256": "bd19d574edb0357252fbd886a2237dbce968805ad66e962e418b8807573ff4fc",
+      "messages": {
+        "system": "4afca03908af1467d3fde189f7b85b3231dd0ec64e534ef7e7d4fca16b416b6c",
+        "user": "ca4544c05047c2fb7c548319849a5efffea5475dd411f7def3d410bd9f6cf357"
+      },
+      "profile": {
+        "name": "paper-analysis-c0467447-v1",
+        "version": "1",
+        "content_sha256": "6a72a4b12a2cff45c3acbfa78e0faa554438e9094d0406dcbd0d4064b6a11b2b",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "analysis-synthesis",
+      "scope": "Archived typed inputs; plan selected skill order reconstructed in sorted order, not a full recorded conversation",
+      "reference_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "request_sha256": "2e3ebb9289ed3bddffac6963df44362116b0cfa08540845312b8fb93ab279845",
+      "messages": {
+        "system": "d336ac508e1b89b70c7bd7c7fd102c0340051a21b0624efc249ccea8082021e7",
+        "user": "62e34de3de5792f7152f30681bdd682966f790d6565b07b9b4738cefb7fa0a3c"
+      },
+      "profile": {
+        "name": "paper-analysis-c0467447-v1",
+        "version": "1",
+        "content_sha256": "6a72a4b12a2cff45c3acbfa78e0faa554438e9094d0406dcbd0d4064b6a11b2b",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-implementor-code",
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "73e3286823ac90624ae888d94432f87eea3b6bc963641b1f69236f4f9000d219",
+      "messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "5be1aee9aff52c0a161651057547a40dfadd6fa93fc0434fed960ec4ef346883"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-implementor-reasoning",
+      "scope": "reconstructed first proposal context; no claim of archived complete request",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+      "messages": {
+        "system": "7c8f77dc8d19d521150994cfe9238dcff9358a248776d7769b316879a75d2ede",
+        "user": "95c0b5bc19d8ba0d289c207d04ec23991154f81973caa4722a89c11401cf05be"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-interpretation-structured-health",
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "7de9e56f7b84c1560946afba6af77f949a09c6dfcfc9ea60baeca5db1a9b364a",
+      "messages": {
+        "system": "ae38d41a1a65068e189027584cc522c8ee4d35d8f9adabcfa78fa8759accc19f",
+        "user": "60ac960b42c941a64d9e9250158c3166438b4c55ddb46b940b6033efa8b8cef6"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-interpretation",
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "660d971cce88d06a709a0397b90ff0946727ed98fe1fba258e631117f0a56ce6",
+      "messages": {
+        "system": "2db21abf58daa1ec58184768b848836e352bbd0865f0938862677501cea67319",
+        "user": "058c699ccbb91de689d88f718d0db98c1b01aed5cd684e61b4b39e99e6d5120d"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-proposal-causal_reasoning_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "6be87e4a4d3a91303bf9398f9b026746d5833f50f68e8ef3e2f05806a246bff1",
+      "messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-proposal-causal_reasoning_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "4d06f2bf66cc7929b27180f25605686321cfec299e8c924c11b06bdd11b5e77f",
+      "messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-proposal-comparison_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "b6d74b2218eeeb56f0800c120c018a763713907ef51317c42a46d86199824781",
+      "messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-proposal-comparison_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "14d517a284356566a80ed5e19137a898214b2051c7ab9bdd7ad12d22a1bc33a8",
+      "messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-proposal-proposing_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "202162ca80c8dbaf1267bb82b7746dc527e686360ed1d112266cb31b9a369990",
+      "messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-proposal-proposing_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "f838356da16da7f8fcf046c3340b20093afb418f10dcab7e9dc3d73961005bd8",
+      "messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "ligo-validator-system",
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "request_sha256": "8e22c04466d84e9092143c51ba1b9c52c15bdd9d60c0db5670a496fdb9e6dc1d",
+      "messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-implementor-code",
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "3f54dd37ad8785432f906dcd81c447a3a5dcbc5e2e024fcb6c0035c55b1b411d",
+      "messages": {
+        "system": "e9b3dea28efa9d7c14580e3708cdbf994b2ed1586b41a1def3ca3f71db9449c8",
+        "user": "781a112b043197a073f7adfe8a3cf989bc78beb46d88b71b8534b54155d0f34a"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-implementor-reasoning",
+      "scope": "reconstructed first proposal context; no claim of archived complete request",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+      "messages": {
+        "system": "28ba8c052032c7ff35577116ca1072543620b07e145efc53738f196c030b7d0a",
+        "user": "44a594b7e36f26d4c5d7b0bb25a57d291e3c76242c69e7dbfd72b8e9899e6303"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-interpretation-structured-health",
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "3e84a71a01235ab26f9b01478d6060e77a2bfbb1f7951205b1fa5afd47483ae4",
+      "messages": {
+        "system": "ac87c12a9432ea537a52768ecdedada3766b4eb90b445de088e6043f0f23a136",
+        "user": "649c414e9df2c2bd83e5a01c4e68d38206b7c0823aca2cd083c49e3950fbf5d2"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-interpretation",
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "9512d0943ee5d35af9df987a017d1ef3b19ab79fb1670f1933628293dfac76d2",
+      "messages": {
+        "system": "1a9b369cba5e99b5961bd756a1236da3704a0b48b2b0e3eb5e5113cbd2e37251",
+        "user": "a4578e328fc3848da0f1ee822444dd9be9109fec428c104fd80cc61c15fc660a"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-proposal-causal_reasoning_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "d6f0bb33f70e61f866489dd137f1d2d6e060918d806cb09257e35f92528f4dfb",
+      "messages": {
+        "system": "9ba90811bfeeb6ef688f0a314192f81c21c1b05479b33d0c5de40a30f313ffdf",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-proposal-causal_reasoning_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "7ff60fd7d03d583f7da9a260283230942f83f59da626583ceb68ba718e29c3dd",
+      "messages": {
+        "system": "0bfc050f1dcd20889023acdcafef8b44a77ba1a86bb032c6485e99b866c24a80",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-proposal-comparison_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "031692b2e0891dc71bd88a0f5f7a72fe7be82d1bb2d6d93f76fdda10ceb9fa62",
+      "messages": {
+        "system": "1b206529f52b6d8daacf2a3efddb6eab36ad9e07d5d1d477ce095ab284f02f6a",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-proposal-comparison_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "d841b8019b49ce969a0fc5e58d421bc1a984391d8d4e4d37d764f447efc9af86",
+      "messages": {
+        "system": "b88a89a57e48ba777ec6b88ade93b80237900d3cc99c34bd588404896173ef96",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-proposal-proposing_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "777f554a8818b682f81a23f716e11003837cb17fb317064fbfab9ab29e9b583e",
+      "messages": {
+        "system": "f5417d430eab2bbad1f0c94b12c8e5a190d96191570906cf5d8690c405f3ced8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-proposal-proposing_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "cf44aa521ccedbac0acb0c0e6a9b6d915555b832df36832f548d91ebd2636ea9",
+      "messages": {
+        "system": "b81d4ab38463cfc9d8ff675223829311b03081e1930d43b84470c9a8695dc957",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "project8-validator-system",
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "request_sha256": "6b4219a237cd02e975a128cb0a80301b2fd1f74b8ae52116d9ce6fa2c3194def",
+      "messages": {
+        "system": "2e96db47126d24f9fe8e1df4698b29fd7c022723502cb876eec3d7ac88ffbd52",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-late-v1",
+        "version": "1",
+        "content_sha256": "102874a5f18d21d5e40c5dd0726c3e57872e9cf535090b674f87043a7c36e3af",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-implementor-code",
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "d870fbe83e53443fb85fe258e371de147431440206eacee55f5bdced5007ab1d",
+      "messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "366eab1fad07bf5f9981c2908dcced8c33ceb24a01c2fac422b4ab7115fa2e02"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-implementor-reasoning",
+      "scope": "reconstructed first proposal context; no claim of archived complete request",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+      "messages": {
+        "system": "5bc325ed430b5ff1e9e9441da1c1a06a0a70a45251b2f434f5eb68c2abf742be",
+        "user": "fc06d762857ae21e037198d54f65ed8e992a19ab9b391071b37d641ac3d7c695"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-interpretation-structured-health",
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "95b2c66e7c0c86ed2c63e5b448c68f02991f28ee7b7f0f5e34ef3cc3d8c1a990",
+      "messages": {
+        "system": "991999b7e426b570e6d4ae716b56b7132c7fab55b8d88dd29445ce3305860566",
+        "user": "2cd37bd873e577b69cf439cb3d2e52407b3553c342e2c21bb7105dea6cc3b513"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-interpretation",
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "3dc1d29c698591e7336f64a374638a2c3561587deee914d3e9358199a504dd35",
+      "messages": {
+        "system": "4aed3e6b47268d057a03d8bd38937de8c0b3e971992c5c8179f12f2a2cb0648c",
+        "user": "ec271fa01b304ee9fe376339aa57c11a4808be4b4b685a222a84f1bb0a914d89"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-proposal-causal_reasoning_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "7e48d10e6ccbe4fca33566332e711b404852f64f7a0659aab0134098a5ebf31b",
+      "messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-proposal-causal_reasoning_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "26a9e42bca59c5cc6c8c590dcb2a46ead42225e00cb0d994d84d405fc851e5a3",
+      "messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-proposal-comparison_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "c5db70e288b6a55cf3d73755e3e9583f54d3b7c717601c1a3471f33b27eea3c8",
+      "messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-proposal-comparison_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "129d44ff8bdebe52396f065f999c1701e97820e012436a9c501e803d50b926fb",
+      "messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-proposal-proposing_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "2dd400ed1c4062bda953e11c89f1c22dc5f868a96ac0c72eb85649eed5acc8ab",
+      "messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-proposal-proposing_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "5b624272bf8ae7de0b39c28361c781ffd7c11c7094ee81332492b008e2cecaf4",
+      "messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tess-validator-system",
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "request_sha256": "690d7f27dab42870d2100560622b0ea03833d16a7bd430c52d7f1b26405db951",
+      "messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-early-v1",
+        "version": "1",
+        "content_sha256": "bb51ab16851bc6626d0f4e64dcee422bf75493cbdfe4682f9e6c88038d4cde49",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-implementor-code",
+      "scope": "synthetic reasoning reply on archived proposal context; not an actual historical code request",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "4664428659bb6c327687e24fa3ce2f145f5d0e3d3608ae3e3bec640cef5ff21e",
+      "messages": {
+        "system": "9b002b60413691adeceb9dcd228c447f8e9c1106e31dcab19345917ea63b496f",
+        "user": "1b93c7d5d9137ad6f32fa6adcd6edeae8e8679a8378ef340fceae0f7051c2a0b"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-implementor-reasoning",
+      "scope": "reconstructed first proposal context; no complete archived request claim",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5",
+      "messages": {
+        "system": "737311dbbffcb024cd77ed3368904094b2cfb86dc1b41bed394bc26c6cc26c1e",
+        "user": "163bff71db83231cc2055903994bdb258cbddb7fdd33ae969acba9e82d5b9aec"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-interpretation-structured-health",
+      "scope": "Archived tuner output through summary producer; structured-health enabled, empty required-gate set; branch qualification, not an archived complete request",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "bddbe47593195f08a471ef4b5cf0cb0a6c4365d952bf355ccacb1f705eb53ec4",
+      "messages": {
+        "system": "116becfdd7ee4ce84e8afaed00d33e944b045727fff11017a510d917f32dcfa8",
+        "user": "7c2f982dd69985986e10036693f1ac059ddb477b58e63715a93a6d1f5b0f675a"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-interpretation",
+      "scope": "archived tuner output through actual summary producer and renderer; structured-health-disabled branch witness, not complete historical request",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "d6851e1cb7c6caa80a138f2d5dbb74cfbc27bdcaac611c0f78dd8e59e290265e",
+      "messages": {
+        "system": "c9bf80efbbf4524ac60fc3970e041a8ad32f7ec95c0aba6b2a67f4d1733c61cb",
+        "user": "d93ed26b10bb91c80e96a65733fc13ff54eaae86cb28183f1e28842f5275801a"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-proposal-causal_reasoning_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "56da615f3a4f9467387bc94a626d752a36340e712c28003f8a22a3c846b36d3a",
+      "messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-proposal-causal_reasoning_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "3bc3c9294420dee3e841a49825b4ab81da172b532e2c42a1119bd1c48876ab75",
+      "messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-proposal-comparison_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "bc4429af454fcecb771e5f31fb348ede8aeab0b0da2ea20089af782ef1cd2ff2",
+      "messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-proposal-comparison_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "89635a2b38782235a21a2be0ca136b504a0a2dbe4acfb14056ce12d368109a4f",
+      "messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-proposal-proposing_stage-exploit",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "ab48b63a76083f71aa33f2116c6e061a5ed068dec5dc0bad8740172c49e31281",
+      "messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-proposal-proposing_stage-explore",
+      "scope": "system-template branch witness; historical intermediate replies unavailable",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "748af5ff998cf875714f94e48652804b24a8af5deaf7330a4b61a1e706e597fd",
+      "messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    },
+    {
+      "case": "tidmad-validator-system",
+      "scope": "Native-training appendix boundary with absent model I/O contract; system-only branch qualification, not a historical validator conversation",
+      "reference_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "request_sha256": "acd8f142afae5410412257e967aaf2b6f4a42329c167607a24a1066d7f88878f",
+      "messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "profile": {
+        "name": "paper-tidmad-noprior-v1",
+        "version": "1",
+        "content_sha256": "74da3c8f80c764957f3033ab3dc24a9a14b3553e000185992090927948d02e4d",
+        "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d"
+      }
+    }
+  ],
+  "scope": "Current session outputs in minimal planner records versus independently captured original session policies/components; separate frozen original-reference messages. Not complete execution-produced records, conversations or training replay.",
+  "api_calls": 0,
+  "gpu_runs": 0,
+  "training_calls": 0,
+  "remaining": [
+    "Independent review of this exact source checkpoint",
+    "Final release pairing and dependency lock",
+    "Public installation verification"
+  ]
+}

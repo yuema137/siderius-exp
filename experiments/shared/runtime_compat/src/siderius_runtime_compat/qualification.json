@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "assemblies": [
+    {
+      "infra_revision": "ec92186d64622742473a421c4e9d61c5134b05e3",
+      "assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad",
+      "scope": "Frozen verifier source oracles and installed policy, child, session and standard CLI compatibility. Final paired prompt qualification is separate."
+    },
+    {
+      "infra_revision": "7d0d32142a567c9e30443c7b6304ab943e714ac5",
+      "assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad",
+      "scope": "Unchanged 17-member runtime verifier closure from ec92186d; explicit historical policy/session/child checks and separate final planner request qualification."
+    },
+    {
+      "infra_revision": "b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
+      "assembly_sha256": "57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da",
+      "scope": "Shared phase launch selection with unchanged watchdog/plain keyword and result semantics; fresh standalone generic inference starts setup measurement before model construction and records it before generic inference. Resumed inference prediction and actual retain prepatch timing boundaries, including the existing child-preparation omission deferred to issue673. Historical verifier algorithms, finite-trace decisions, explicit verified-prediction-v1 selection and child identity are checked; no full historical training or conversation replay claim."
+    }
+  ]
+}

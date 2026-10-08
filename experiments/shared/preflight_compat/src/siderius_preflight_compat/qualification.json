@@ -21,6 +21,26 @@
       "infra_revision": "7c869e67f697d6bbc81eb554711ab77e23cb7362",
       "assembly_sha256": "deb366d3edf04a69892cbad7ca173014d626758bf3a93cd9f16a8c926c00e787",
       "scope": "Bounded inference admission with explicit historical static_only policy; frozen static arithmetic/search, source-qualified v6/v7 projection and refusal of inference verification evidence; no stochastic replay claim"
+    },
+    {
+      "infra_revision": "faff23aad38a2892160f64a4f3cefe1c9d6c3632",
+      "assembly_sha256": "59107d905aa655d0eb1013979405075ac3006b0f1883eb842983a9c85f7b380c",
+      "scope": "Frozen 45 phase estimates and 32 batch decisions; static_only with gpu_execution_policy unselected; guarded historical projection and installed-source identity. No universal producer geometry, measured/protected execution, live GPU or training parity; Project8 geometry evidence remains incomplete for 1 of 26 archived False configs."
+    },
+    {
+      "infra_revision": "7d0d32142a567c9e30443c7b6304ab943e714ac5",
+      "assembly_sha256": "f2b00510c220a2b13cc0d8d3b955bdb4794ae5aaac262620983b0ae6eb11b577",
+      "scope": "Unchanged historical static arithmetic/search owners; generic completion/verifier and retry transport changes independently checked. Frozen 45 phase estimates and 32 batch decisions with static_only and protected GPU policy unselected. No universal producer geometry, live GPU or stochastic training parity."
+    },
+    {
+      "infra_revision": "46ee992043a1ccb0e2db57cac1afc8a73171e063",
+      "assembly_sha256": "594ff090d26de377453f791dbf1095514bb94c756e3faf83452828b13a17176b",
+      "scope": "Typed task objective and Health binding round trips; frozen historical rendering and static decision corpus. No new scientific configuration, runtime estimator or training algorithm; not full conversation replay."
+    },
+    {
+      "infra_revision": "b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
+      "assembly_sha256": "d299175819b0bda402e05f63161d31f57cff9dab782864c4b127f0713e38102f",
+      "scope": "Canonical closure now includes shared phase_launch; standalone inference setup measurement starts before model construction. Frozen static phase estimates and batch decisions with static_only and protected GPU policy unselected remain the qualified scope. No live GPU, protected/measured execution, universal producer geometry or stochastic training parity claim."
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"

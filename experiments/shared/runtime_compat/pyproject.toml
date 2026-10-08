@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "siderius-runtime-compat"
+version = "0.1.0"
+description = "Explicit historical runtime verifier profiles for SIDERIUS experiments"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+siderius_runtime_compat = ["*.json"]
+
+[project.entry-points."siderius.runtime_verifiers"]
+legacy-345c802d-verifier-v1 = "siderius_runtime_compat:historical_345c802d"
+legacy-7689fd58-verifier-v1 = "siderius_runtime_compat:historical_7689fd58"
+legacy-349b6cd6-verifier-v1 = "siderius_runtime_compat:historical_349b6cd6"

@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "scope": "Original session captures in each reference own interpreter, using the unchanged archived timing traces; no training or full experiment record production.",
+  "driver_sha256": "167ccd88ac283ffd94937e8e00c51b7963989ec689d91d4a8a95ce83454e21b6",
+  "captures": [
+    {
+      "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "input_sha256": "aede34a180a5bafd59c9011805a44df030684126311e2ae7563344d1b0e722a3",
+      "output_sha256": "3928c958aa5dbd2a60757453542badf2053474e87614afee9b567fb935befe2f",
+      "case_count": 1
+    },
+    {
+      "infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "input_sha256": "47e115cc1990e173f7c905357e6ded8eb769b4f6575731bb1dcc19c621af40bd",
+      "output_sha256": "e466e8e96eaf9ade641329fbf20894d684376e3ed96b5c7270bf6ee0293d282b",
+      "case_count": 22
+    }
+  ],
+  "policies": [
+    {
+      "operator_budget_seconds": 1800.0,
+      "time_admission_source": "measured",
+      "safety_factor": 1.0,
+      "trial_safety_factor": null,
+      "formal_safety_factor": null,
+      "verification": {
+        "steady": {
+          "window": 8,
+          "stable_windows": 4,
+          "rel_spread_tol": 0.1,
+          "max_steps": 200
+        },
+        "min_timed_steps": 5,
+        "min_timed_ms": 500.0,
+        "fast_phase_min_observations": 100,
+        "max_steps": 200,
+        "max_wall_ms": 60000.0,
+        "pathological_factor": 10.0,
+        "max_unit_ms": null,
+        "prior_match_tol": 0.25,
+        "drift_extra_factor": 2.0
+      },
+      "historical_phase_share_limit": 0.1,
+      "observation_store_root": null,
+      "watchdog": {
+        "enabled": false,
+        "grace_seconds": 10.0,
+        "poll_seconds": 1.0,
+        "floor_seconds": 60.0,
+        "safety_factor": null,
+        "max_phase_seconds": null
+      },
+      "validation_max_train_samples": null,
+      "validation_max_samples": null
+    },
+    {
+      "operator_budget_seconds": 300.0,
+      "time_admission_source": "measured",
+      "safety_factor": 1.0,
+      "trial_safety_factor": null,
+      "formal_safety_factor": null,
+      "verification": {
+        "steady": {
+          "window": 8,
+          "stable_windows": 4,
+          "rel_spread_tol": 0.1,
+          "max_steps": 200
+        },
+        "min_timed_steps": 5,
+        "min_timed_ms": 500.0,
+        "fast_phase_min_observations": 100,
+        "max_steps": 200,
+        "max_wall_ms": 60000.0,
+        "pathological_factor": 10.0,
+        "max_unit_ms": null,
+        "prior_match_tol": 0.25,
+        "drift_extra_factor": 2.0
+      },
+      "historical_phase_share_limit": 0.1,
+      "observation_store_root": null,
+      "watchdog": {
+        "enabled": false,
+        "grace_seconds": 10.0,
+        "poll_seconds": 1.0,
+        "floor_seconds": 60.0,
+        "safety_factor": null,
+        "max_phase_seconds": null
+      },
+      "validation_max_train_samples": null,
+      "validation_max_samples": null
+    },
+    {
+      "operator_budget_seconds": 900.0,
+      "time_admission_source": "measured",
+      "safety_factor": 1.0,
+      "trial_safety_factor": null,
+      "formal_safety_factor": null,
+      "verification": {
+        "steady": {
+          "window": 8,
+          "stable_windows": 4,
+          "rel_spread_tol": 0.1,
+          "max_steps": 200
+        },
+        "min_timed_steps": 5,
+        "min_timed_ms": 500.0,
+        "fast_phase_min_observations": 100,
+        "max_steps": 200,
+        "max_wall_ms": 60000.0,
+        "pathological_factor": 10.0,
+        "max_unit_ms": null,
+        "prior_match_tol": 0.25,
+        "drift_extra_factor": 2.0
+      },
+      "historical_phase_share_limit": 0.1,
+      "observation_store_root": null,
+      "watchdog": {
+        "enabled": false,
+        "grace_seconds": 10.0,
+        "poll_seconds": 1.0,
+        "floor_seconds": 60.0,
+        "safety_factor": null,
+        "max_phase_seconds": null
+      },
+      "validation_max_train_samples": null,
+      "validation_max_samples": null
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "project8-dual-no-prior-run5:dual_latent_fusion_regressor_iter_002_001:training",
+      "policy_index": 0,
+      "component_sha256": "274e4cdf0846f99ff3c9d67a2c5655737e5075e9f3762f2c74eefcc159a1fe92"
+    },
+    {
+      "case_id": "nop_004:cadence_aligned_spectral_resnet_iter_001_001:training",
+      "policy_index": 1,
+      "component_sha256": "e0e356892d5ca524e0056a34c3f8bb0ccfecdcba85efc634136e231ce7e75c45"
+    },
+    {
+      "case_id": "nop_004:cadence_aligned_spectral_resnet_iter_001_003:training",
+      "policy_index": 1,
+      "component_sha256": "458005bde48de44d1f3d65e66ba1e8807924a488ddc7c6955d66b20b49ddc4a2"
+    },
+    {
+      "case_id": "nop_004:cadence_spacing_pyramid_iter_002_001:training",
+      "policy_index": 1,
+      "component_sha256": "fe0b0da8fb7c364d66daf2cd6f774d7cd04ccc0245145185639cce0b2dbd1f0a"
+    },
+    {
+      "case_id": "nop_004:cadence_peak_relation_transformer_iter_003_001:training",
+      "policy_index": 1,
+      "component_sha256": "a196842a687865fa90fe7d1f11ba0f272e00d487b500bfb32300bc6b8291e5a9"
+    },
+    {
+      "case_id": "nop_004:cadence_multitaper_expert_resnet_iter_004_001:training",
+      "policy_index": 1,
+      "component_sha256": "9cbcfccc1e60c368aa72dab9e0766f5b407441ddcae8b6c7f076906c808aba60"
+    },
+    {
+      "case_id": "nop_004:cadence_metric_aligned_expert_resnet_iter_005_001:training",
+      "policy_index": 1,
+      "component_sha256": "ed95418d180d099f6fe49a5a9172c8fc0283b7caec2c172519dd71f35130eea7"
+    },
+    {
+      "case_id": "nop_004:cadence_metric_aligned_expert_resnet_iter_005_002:training",
+      "policy_index": 1,
+      "component_sha256": "6e863e4938f9b9a6cea7cb9a06fcbcadfa14dc61cf10ff584fde2dcf747e7961"
+    },
+    {
+      "case_id": "nop_004:cadence_metric_aligned_expert_resnet_iter_005_003:training",
+      "policy_index": 1,
+      "component_sha256": "b25de9863033ceb6787cf388f2953e5206056e9213c015c700b60c0e19400ff7"
+    },
+    {
+      "case_id": "nop_004:cadence_metric_bagged_ensemble_iter_006_001:training",
+      "policy_index": 1,
+      "component_sha256": "8c51f63ca30122580d109e16c17ed6c818381a2aa0bf1e143ca10982c59441d9"
+    },
+    {
+      "case_id": "nop_004:cadence_metric_query_pool_resnet_iter_007_001:training",
+      "policy_index": 1,
+      "component_sha256": "ba95b284341c9c55e32b73d2345347011840c704924b296988cd613f41eec6ac"
+    },
+    {
+      "case_id": "nop_004:cadence_disagreement_calibrated_expert_resnet_iter_008_001:training",
+      "policy_index": 1,
+      "component_sha256": "6af67350ccae74c1bd20611023093ea7551b5265ae32b4af8c4d1050d49b1384"
+    },
+    {
+      "case_id": "nop_004:cadence_disagreement_calibrated_expert_resnet_iter_008_002:training",
+      "policy_index": 1,
+      "component_sha256": "caab673a102374511fb84c830d76d2cdd6cde3150afb90e4133f7d6b7a6677c6"
+    },
+    {
+      "case_id": "nop_004:cadence_disagreement_calibrated_expert_resnet_iter_008_003:training",
+      "policy_index": 1,
+      "component_sha256": "bc4446d150a66343c0b1b2dcebf181a2755dd4ab3433cce692623c8639ad43f1"
+    },
+    {
+      "case_id": "nop_004:cadence_disagreement_calibrated_expert_resnet_iter_008_005:training",
+      "policy_index": 1,
+      "component_sha256": "1b9a22a2909c1304922e2cc8fdc5dd5e8d7bc20794368ccf600686974f0dd3ce"
+    },
+    {
+      "case_id": "nop_004:cadence_disagreement_calibrated_expert_resnet_iter_008_007:training",
+      "policy_index": 2,
+      "component_sha256": "090dc78466664fbfbb22e4444bac0f9b56fc130413ea3a6d4093fbf8efd6abf5"
+    },
+    {
+      "case_id": "nop_004:cadence_highres_metric_expert_resnet_iter_009_001:training",
+      "policy_index": 1,
+      "component_sha256": "40e1d9a8bf0b3fe7732818d7259b4fabf44a7ff8718b4065acb89c67666786c2"
+    },
+    {
+      "case_id": "nop_004:cadence_independent_checkpoint_ensemble_iter_010_001:training",
+      "policy_index": 1,
+      "component_sha256": "8b44c83018da06c155d2f16a791e6fbc5d997cd536c492b621cc1357134f668c"
+    },
+    {
+      "case_id": "nop_004:cadence_five_seed_checkpoint_average_iter_011_001:training",
+      "policy_index": 1,
+      "component_sha256": "59dc649871d420089dbfd4197fc306380da1d940de6b58aff08a8e153869d1d5"
+    },
+    {
+      "case_id": "nop_004:cadence_crossfit_ridge_stack_iter_012_001:training",
+      "policy_index": 1,
+      "component_sha256": "100800c0b2bab30a3b02a7ae8794bfaf110a5da5feee57ec5503be1cd9895261"
+    },
+    {
+      "case_id": "nop_004:cadence_genuine_oof_ridge_stack_iter_013_001:training",
+      "policy_index": 1,
+      "component_sha256": "b6b906295be0d6b7b3fa8f9b145f9d4056f04e7ea1db0dab1523d4e0c39ce335"
+    },
+    {
+      "case_id": "nop_004:cadence_temporal_checkpoint_soup_iter_014_001:training",
+      "policy_index": 1,
+      "component_sha256": "026f871ba50871acc025a916c5f4a84f208fafe97fe3e7996ecef0df496959fd"
+    },
+    {
+      "case_id": "nop_004:cadence_greedy_diverse_checkpoint_ensemble_iter_015_002:training",
+      "policy_index": 2,
+      "component_sha256": "95f3e0739192e76910c69680b6db2676e3b753e5e666c9028f7bb692e461189f"
+    }
+  ]
+}

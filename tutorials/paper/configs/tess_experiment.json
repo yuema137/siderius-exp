@@ -4,7 +4,7 @@
   "data_dir": "/absolute/path/to/tess-run-data",
   "workspace": "/absolute/path/to/new-tess-demo",
   "run_name": "tess_demo_001",
-  "gpu": "RTX 5090",
+  "gpu": null,
   "iterations": 1,
   "epochs": 1,
   "trial_minutes": 2,

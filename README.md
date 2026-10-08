@@ -4,6 +4,25 @@ Scientific tasks and their experiments for the SIDERIUS framework.
 This repository is the place where task meaning and experiment choices live;
 the generic framework lives in the separate [SIDERIUS repository](https://github.com/yuema137/SIDERIUS).
 
+## Paper
+
+[Beyond a Better Score: Long-Horizon Agentic ML Development and Evaluation Protocol for Physics Time Series](https://zenodo.org/records/23071121)
+introduces SIDERIUS and evaluates agent-driven model development on TIDMAD,
+TESS, Project8, and LIGO. It combines reusable research capabilities, scientific
+validity checks, and exploration within compute budgets, evaluating whether
+models are scientifically valid as well as how well they score.
+
+This repository provides the task packages, experiment configurations, and
+archived evidence. The tutorials below are simplified workflow demos; use the
+[paper artifact reference](experiments/paper-artifacts.md) for reproduction
+configurations and the available historical records.
+
+For a first flow check, use the inexpensive Luna test configuration. For
+production research, we recommend starting with the paper's LLM configuration;
+your own supported model choices are also welcome. See
+[LLM configuration levels](tutorials/shared/README.md) for the files to edit
+and the distinction between model selection and historical replay.
+
 ## Start here
 
 For a guided notebook plus terminal-script example, start with the
@@ -90,7 +109,7 @@ be hidden in a shell argument or an old run receipt.
 - [experiment index](experiments/README.md)
 - [campaign index](campaigns/README.md)
 - [migration evidence](provenance/MIGRATION.md)
-- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/e800fc1f08b0e067fc21076a200f3f70d04b38b8/docs/reference/task-composition.md)
+- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/52373be9a52bead36fd1f15d706385967e0a129d/docs/reference/task-composition.md)
 
 ## License
 

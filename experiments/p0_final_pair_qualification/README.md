@@ -1,8 +1,14 @@
-# Final-pair qualification
+# Historical P0 final-pair qualification
 
 This directory is an index for the four bounded consumer-pair checks. They
 exercise the real task adapters against one exact SIDERIUS revision. They are
 engineering qualification runs, not scientific campaigns.
+
+These wrappers are frozen at the historical infra revision in
+[`SIDERIUS_REVISION`](SIDERIUS_REVISION), `e5ace318`. The launcher checks that
+exact checkout and rejects the current repository-root release pin. Here,
+"final pair" names the earlier P0 milestone, not the current release.
+Use the [experiment index](../README.md) for current launch routes and demos.
 
 ## Choose a task
 

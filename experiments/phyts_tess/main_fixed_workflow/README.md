@@ -9,6 +9,12 @@ Two arms, differing **only** in what the agent is told:
 same workflow parameters — see
 [`../information_treatments/`](../information_treatments/README.md).
 
+The current supervisor reads the repository-root
+[`SIDERIUS_REVISION`](../../../SIDERIUS_REVISION). The adjacent revision file and
+archived run receipts describe earlier source pairs; they do not select the
+current launcher's framework. For historical replay, follow the
+[paper artifact reference](../../paper-artifacts.md).
+
 ## Preview the exact command
 
 ```bash

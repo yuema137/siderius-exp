@@ -2949,8 +2949,8 @@ wheels = [
 
 [[package]]
 name = "siderius"
-version = "0.2.3"
-source = { git = "https://github.com/yuema137/SIDERIUS.git?rev=e800fc1f08b0e067fc21076a200f3f70d04b38b8#e800fc1f08b0e067fc21076a200f3f70d04b38b8" }
+version = "1.0.0"
+source = { git = "https://github.com/yuema137/SIDERIUS.git?rev=52373be9a52bead36fd1f15d706385967e0a129d#52373be9a52bead36fd1f15d706385967e0a129d" }
 dependencies = [
     { name = "fastapi" },
     { name = "h5py" },
@@ -2979,7 +2979,7 @@ dependencies = [
 
 [[package]]
 name = "siderius-exp"
-version = "0.0.0"
+version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "siderius" },
@@ -3001,7 +3001,7 @@ tutorial = [
 
 [package.metadata]
 requires-dist = [
-    { name = "siderius", git = "https://github.com/yuema137/SIDERIUS.git?rev=e800fc1f08b0e067fc21076a200f3f70d04b38b8" },
+    { name = "siderius", git = "https://github.com/yuema137/SIDERIUS.git?rev=52373be9a52bead36fd1f15d706385967e0a129d" },
     { name = "siderius-planner-compat", directory = "experiments/shared/planner_compat" },
     { name = "siderius-preflight-compat", directory = "experiments/shared/preflight_compat" },
     { name = "torch", specifier = "==2.10.0" },
@@ -3020,12 +3020,16 @@ tutorial = [
 
 [[package]]
 name = "siderius-planner-compat"
-version = "0.8.0"
+version = "0.9.0"
 source = { directory = "experiments/shared/planner_compat" }
+
+[package.metadata]
+requires-dist = [{ name = "siderius-runtime-compat", marker = "extra == 'historical-runtime'", specifier = "==0.1.0" }]
+provides-extras = ["historical-runtime"]
 
 [[package]]
 name = "siderius-preflight-compat"
-version = "0.1.0"
+version = "0.2.0"
 source = { directory = "experiments/shared/preflight_compat" }
 
 [[package]]

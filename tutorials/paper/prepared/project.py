@@ -9,11 +9,11 @@ import shlex
 import shutil
 from pathlib import Path
 
-from tutorials.paper.planner_setup import copy_llm_config
 from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.prepared.data import Task
 from tutorials.paper.prepared.runner import PreparedExperiment
 from tutorials.paper.runner import ROOT, disjoint
+from tutorials.shared.llm_setup import write_test_llm_config
 
 
 def write_launcher(destination: Path, experiment: Path, infra: Path):
@@ -67,7 +67,7 @@ def create_project(project: Path, infra: Path, task: Task):
         else "main_fixed_workflow"
     )
     experiment = ROOT / f"experiments/phyts_{task}" / variant
-    copy_llm_config(experiment / "agents.json", project / "llm/agents.json")
+    write_test_llm_config(project / "llm/agents.json")
     shutil.copyfile(
         experiment / "literature_review.yaml", project / "llm/literature_review.yaml"
     )
@@ -80,7 +80,7 @@ def create_project(project: Path, infra: Path, task: Task):
         data_dir=project / "data/demo-001",
         workspace=project / "runs/initial-001",
         run_name=f"{task}_initial_001",
-        gpu="RTX 5090",
+        gpu=None,
         iterations=3,
         epochs=4,
         trial_train_fraction=0.5,

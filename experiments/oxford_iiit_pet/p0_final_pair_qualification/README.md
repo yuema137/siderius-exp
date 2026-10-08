@@ -1,4 +1,7 @@
-# Oxford-IIIT Pet final-pair qualification
+# Oxford-IIIT Pet historical P0 final-pair qualification
+
+This wrapper requires the [historical P0 infra pin](../../p0_final_pair_qualification/README.md),
+not the current repository-root release revision.
 
 This is a bounded consumer-pair qualification wrapper, not a campaign. Read
 the [task contract](../../../tasks/oxford_iiit_pet/README.md), use a fresh

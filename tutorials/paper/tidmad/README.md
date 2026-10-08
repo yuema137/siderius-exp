@@ -1,5 +1,9 @@
 # TIDMAD: one band, saved configurations, and file-range holdout
 
+New projects use the [shared GPT-6 Luna test configuration](../../shared/README.md) for all
+workflow LLM stages. It is independent of paper routing. Recorded figures below
+come from earlier runs and do not establish live Luna compatibility.
+
 The [notebook](../notebooks/02_tidmad_tutorial.ipynb) teaches a complete sequence:
 choose data, change settings, save your task/experiment, open the saved files,
 then run the script that selects them. It uses **band 0–3** only. The notebook
@@ -26,12 +30,13 @@ and export keys below before starting Jupyter.
 
 ## Choose existing data OR a download
 
-**Shared 5090 machine:** reuse the existing large files, without copying or
-re-downloading them:
+**Existing data:** set `TIDMAD_SOURCE` to your absolute external directory and
+reuse the large files, without copying or re-downloading them:
 
 ```bash
+export TIDMAD_SOURCE="/absolute/path/to/TIDMAD"
 .venv/bin/python -B -m tutorials.paper.data_entry --task tidmad \
-  --project "$TUTORIAL_HOME" --source /home/klz/Data/TIDMAD
+  --project "$TUTORIAL_HOME" --source "$TIDMAD_SOURCE"
 ```
 
 This verifies the eight source hashes and creates only symbolic links in
@@ -174,9 +179,13 @@ or mode-600 file. Never save values in notebooks, JSON, scripts or logs. The
 launcher checks names/presence only and refuses missing keys. TIDMAD NoPrior
 disables human advice and data analysis but retains literature review.
 
-Supported devices are one NVIDIA RTX 5090 or H100 with working CUDA and memory
-headroom. Another NVIDIA GPU needs GPU-check/CUDA/calibration qualification;
-AMD and Intel are unsupported. Per-stage time allowances are not total campaign
+Select one visible GPU with working kernels and required accounting, and keep
+resource budgets below its capacity. Names are not restricted to specific NVIDIA
+models; an explicit `gpu` value remains a name expectation. Follow the
+[shared hardware instructions](../README.md#6-change-settings-or-hardware-deliberately),
+including the source-pair qualification limits. AMD/ROCm is experimental and
+untested; missing driver accounting currently prevents this tutorial route.
+Intel GPU training is unsupported. Per-stage time allowances are not total campaign
 or cost caps. The fixed workflow has no separate security sandbox: raw files
 are locally readable and the holdout is procedural. Keep results and edited
 inputs in your project; leave both source repositories unchanged.

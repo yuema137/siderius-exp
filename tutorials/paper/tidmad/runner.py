@@ -21,7 +21,6 @@ from experiments.shared.framework_pin import (
 from experiments.shared.workflow_credentials import required_workflow_api_keys
 from experiments.tidmad.main_fixed_workflow.band_inputs import verify_band_inputs
 from tasks.tidmad.runtime.file_split import FileSplit
-from tutorials.paper.planner_setup import verify_planner_setup
 from tutorials.paper.runner import (
     ROOT,
     TutorialExperiment,
@@ -33,6 +32,7 @@ from tutorials.paper.runner import (
 from tutorials.paper.runner import (
     build_command as shared_command,
 )
+from tutorials.shared.planner_setup import verify_planner_setup
 
 
 class TidmadExperiment(TutorialExperiment):

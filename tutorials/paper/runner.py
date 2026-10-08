@@ -24,7 +24,8 @@ from experiments.shared.framework_pin import (
 )
 from experiments.shared.information_treatment import resolve_information_treatment
 from experiments.shared.workflow_credentials import required_workflow_api_keys
-from tutorials.paper.planner_setup import verify_planner_setup
+from tutorials.shared.gpu_check import ExpectedGpu, VramBudget
+from tutorials.shared.planner_setup import verify_planner_setup
 from tutorials.shared.runtime import (
     ROOT,
     child_environment,
@@ -53,18 +54,18 @@ class TutorialExperiment(BaseModel):
     data_dir: Path
     workspace: Path
     run_name: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$")
-    gpu: Literal["RTX 5090", "H100"]
+    gpu: ExpectedGpu | None = None
     iterations: int = Field(default=1, ge=1, le=100)
     epochs: int = Field(default=1, ge=1, le=100)
     trial_minutes: float = Field(default=2, gt=0, le=120)
     formal_minutes: float = Field(default=5, gt=0, le=120)
-    vram_gib: float = Field(default=8, gt=0, le=80)
+    vram_gib: VramBudget = 8.0
     trial_train_fraction: float | None = Field(default=None, ge=0.01, le=1)
     trial_val_fraction: float | None = Field(default=None, ge=0.01, le=1)
     formal_train_fraction: float = Field(default=1.0, ge=0.01, le=1)
     formal_val_fraction: float = Field(default=1.0, ge=0.01, le=1)
-    trial_vram_gib: float | None = Field(default=None, gt=0, le=80)
-    formal_vram_gib: float | None = Field(default=None, gt=0, le=80)
+    trial_vram_gib: VramBudget | None = None
+    formal_vram_gib: VramBudget | None = None
     composition: Path | None = None
     llm_config: Path | None = None
     # This entrypoint deliberately preserves the NoPrior treatment.

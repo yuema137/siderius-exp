@@ -11,10 +11,10 @@ from pathlib import Path
 import yaml
 
 from tasks.tidmad.runtime.file_split import FileSplit
-from tutorials.paper.planner_setup import copy_llm_config
 from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.runner import ROOT, disjoint
 from tutorials.paper.tidmad.runner import TidmadExperiment
+from tutorials.shared.llm_setup import write_test_llm_config
 
 
 def write_launcher(
@@ -78,10 +78,7 @@ def create_project(project: Path, infra: Path):
         ROOT / "tutorials/paper/notebooks/02_tidmad_tutorial.ipynb",
         project / "notebooks/02_tidmad_tutorial.ipynb",
     )
-    copy_llm_config(
-        ROOT / "experiments/tidmad/main_fixed_workflow/iclr_official_v1.json",
-        project / "llm/agents.json",
-    )
+    write_test_llm_config(project / "llm/agents.json")
     shutil.copyfile(
         ROOT / "tasks/tidmad/reference_data/segment_anchors.json",
         project / "data/band-0-3/segment_anchors.json",
@@ -94,7 +91,7 @@ def create_project(project: Path, infra: Path):
         data_dir=project / "data/band-0-3",
         workspace=project / "runs/paper-pool-001",
         run_name="tidmad_pool_001",
-        gpu="RTX 5090",
+        gpu=None,
         trial_train_fraction=0.5,
         trial_val_fraction=0.1,
         composition=project

@@ -21,16 +21,21 @@ def verify_planner_setup(
     an external config/provider could put sensitive values in its exception.
     """
     exp = Path(__file__).resolve().parents[2]
-    repair = (
-        f"In {exp}, run uv sync --group dev --group tutorial --frozen. "
-        "Then install the same exp planner package into infra: "
-        f"uv pip install --python {shlex.quote(str(infra / '.venv/bin/python'))} "
-        f"{shlex.quote(str(exp / 'experiments/shared/planner_compat'))}. "
-        "Check tune.planner_strategy in your llm/agents.json; "
-        "install your selected provider in both environments if using a custom strategy."
-    )
     routing = WorkflowLLMConfig.from_json(str(config))
     selection = routing.tune.planner_strategy if routing.tune else None
+    repair = (
+        f"In {exp}, run uv sync --group dev --group tutorial --frozen. "
+        f"In {infra}, run uv sync --group dev --frozen at the matching infra revision. "
+        "Check tune.planner_strategy in your llm/agents.json; "
+        "native-timing-v1 is built into infra and needs no historical plugin."
+    )
+    if selection != "native-timing-v1":
+        repair += (
+            " For an external strategy, install its provider package into both environments. "
+            "For an exp historical planner, use "
+            f"uv pip install --python {shlex.quote(str(infra / '.venv/bin/python'))} "
+            f"{shlex.quote(str(exp / 'experiments/shared/planner_compat'))}."
+        )
     try:
         expected = resolve_planner_strategy(selection).identity
     except (ValueError, TypeError, ImportError):

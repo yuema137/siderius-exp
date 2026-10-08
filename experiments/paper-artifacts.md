@@ -71,11 +71,15 @@ refusals. They do not restore all old runtime behavior or every conversation.
 Installing a package is separate from selecting its profile in copied task/LLM
 configuration, and a changed profile identity requires a fresh workspace.
 
-At this documentation baseline, exp installs infra `e800fc1f…`. Newer framework
-changes and their adapter-specific qualification remain separate from that
-installation. In particular, the presence of newer storage or preflight profiles
-does not establish that the root pinned installation supports their producers.
-Read the adapter's qualification contract before choosing a profile.
+The current installed framework pin is declared by
+[SIDERIUS_REVISION](../SIDERIUS_REVISION). The
+[source-pair qualification record](../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+states the checked installation and offline compatibility scope; verification
+of installation from the public source remains pending release synchronization.
+An installed storage or preflight profile does not by itself establish support
+for its producers or every historical runtime path. Read the selected adapter's
+qualification contract before choosing a profile. These current-installation
+checks do not replace the recorded historical source pairs or archived evidence.
 
 Use a frozen environment in each selected checkout, as specified by
 [CLAUDE.md](../CLAUDE.md#environment-and-launch-credentials). Remap machine paths

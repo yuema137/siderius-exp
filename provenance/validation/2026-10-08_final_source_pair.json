@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "installation": {
+    "infra_revision": "faff23aad38a2892160f64a4f3cefe1c9d6c3632",
+    "exp_revision": "390dcd75f18510c267f589636ce5c5313fca51dc",
+    "direct_url": {
+      "url": "https://github.com/yuema137/SIDERIUS.git",
+      "vcs_info": {
+        "vcs": "git",
+        "commit_id": "faff23aad38a2892160f64a4f3cefe1c9d6c3632",
+        "requested_revision": "faff23aad38a2892160f64a4f3cefe1c9d6c3632"
+      }
+    },
+    "framework_pin_check": "PASS",
+    "installed_revision_check": "PASS",
+    "transport": "Process-scoped file-only Git URL rewriting fetched identical local Git object; uv lock --no-index could not resolve absent Windows-index package metadata. Subsequent uv lock --offline and frozen sync reused normal cached index metadata; no network or manual cache changes.",
+    "public_source_availability": "Not tested before authorized public synchronization.",
+    "lock_changes": [
+      "Framework Git SHA only",
+      "Declared local preflight compatibility package0.1.0 to0.2.0"
+    ],
+    "infra_tree": "8766312d960c8933126bc418fad7ba0d35d1428c"
+  },
+  "tutorial_tests": {
+    "passed": 112,
+    "seconds": 6.83,
+    "command": "CUDA_VISIBLE_DEVICES='' .venv/bin/python <local optimizer-update denial guard> tests/tutorials experiments/shared/prompt_compat/tests/test_compare.py -q --tb=short",
+    "optimizer_updates": "denied by test-local guard"
+  },
+  "external_previews": [
+    {
+      "task": "tess",
+      "fresh_external_project": true,
+      "steps": [
+        {
+          "operation": "initialize external project",
+          "returncode": 0,
+          "seconds": 0.278,
+          "local_log_sha256": "173ca70f889c639055f00a5c6b0b37cf4c5bdd5702837bdc6ddf8790072da0c9"
+        },
+        {
+          "operation": "saved script preview",
+          "returncode": 0,
+          "seconds": 4.505,
+          "local_log_sha256": "dc0a0d4eb6c8fb79fb83161d9b22209dce3521b3d33de40ff9ed3edb62e6ef2b"
+        }
+      ],
+      "preview_only": true,
+      "data_read_scope": "No NPZ contents read"
+    },
+    {
+      "task": "tidmad",
+      "fresh_external_project": true,
+      "steps": [
+        {
+          "operation": "initialize external project",
+          "returncode": 0,
+          "seconds": 1.486,
+          "local_log_sha256": "ae197fda22bfc58e49eec58145937464bc2ae38c0cf624f42a9bc3fed02d23a7"
+        },
+        {
+          "operation": "saved script preview",
+          "returncode": 0,
+          "seconds": 4.354,
+          "local_log_sha256": "ff8678d52f2f083a363e38eaa2a683abad39a302b3644644f9ce91a78ac12311"
+        }
+      ],
+      "preview_only": true,
+      "data_read_scope": "No HDF5 contents read or hashed"
+    },
+    {
+      "task": "project8",
+      "fresh_external_project": true,
+      "steps": [
+        {
+          "operation": "initialize external project",
+          "returncode": 0,
+          "seconds": 1.743,
+          "local_log_sha256": "cabc07e63016b8453bd6a50fd36ab00240601772661c42f517e905c768ac7e95"
+        },
+        {
+          "operation": "selected data preparation",
+          "returncode": 0,
+          "seconds": 5.779,
+          "local_log_sha256": "531835154f16b6450526c0b9cfb9d1d88c92fb77a611a77769340f6bfee55220"
+        },
+        {
+          "operation": "saved script preview",
+          "returncode": 0,
+          "seconds": 4.828,
+          "local_log_sha256": "e3f4b6efbbb618b293f46a5a2a4f95babe9d39018d5d7d9bf6851d60db008ae0"
+        }
+      ],
+      "preview_only": true,
+      "data_read_scope": "512/1000 selected original prepared rows, converted to dual representation"
+    },
+    {
+      "task": "ligo",
+      "fresh_external_project": true,
+      "steps": [
+        {
+          "operation": "initialize external project",
+          "returncode": 0,
+          "seconds": 1.603,
+          "local_log_sha256": "7d1a544feaa1d08a241a133f844151c0fe0739ec4722cf69ac693e3efef601be"
+        },
+        {
+          "operation": "selected data preparation",
+          "returncode": 0,
+          "seconds": 1.315,
+          "local_log_sha256": "3a40e11e24712f4553d556d892de32948040b9600aade621f8d172306d5fef33"
+        },
+        {
+          "operation": "saved script preview",
+          "returncode": 0,
+          "seconds": 4.6,
+          "local_log_sha256": "18d188c9665bc3d73fec1643704216d93cede15eefd7838695d5f4a6bc22e371"
+        }
+      ],
+      "preview_only": true,
+      "data_read_scope": "512/1000 selected original prepared rows"
+    },
+    {
+      "task": "pet",
+      "fresh_external_project": true,
+      "steps": [
+        {
+          "operation": "initialize external project",
+          "returncode": 0,
+          "seconds": 0.098,
+          "local_log_sha256": "789b78c91013f3981cf96419b46b80cfdc037c8f47b24746d2547d97fa534579"
+        },
+        {
+          "operation": "saved script preview",
+          "returncode": 0,
+          "seconds": 3.254,
+          "local_log_sha256": "c3ddfdff80ea52399376941f1d50fc0480e3bbefc43061ab8dfc5019a6383357"
+        }
+      ],
+      "preview_only": true,
+      "data_read_scope": "814 declared image paths checked; pixels not decoded"
+    }
+  ],
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "training_calls": 0,
+  "downloads": 0,
+  "public_install_tested": false,
+  "scope": "Offline exact-source installation, compatibility and saved-command previews; not Run All, kernel readiness, real launch or public-source availability."
+}

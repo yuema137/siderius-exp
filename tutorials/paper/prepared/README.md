@@ -1,5 +1,9 @@
 # Project8 and LIGO: run a small workflow demo
 
+New projects use the [shared GPT-6 Luna test configuration](../../shared/README.md) for all
+workflow LLM stages. It is independent of paper routing. Recorded figures below
+come from earlier runs and do not establish live Luna compatibility.
+
 These notebooks teach the same three steps as TESS and TIDMAD: **save and inspect
 inputs, run the saved script, then plot real scores**. They use 512 training and
 1,000 validation events for three iterations. This is a workflow demo, **not a
@@ -25,10 +29,11 @@ first. Keep `EXP_CHECKOUT` and `INFRA_CHECKOUT` exported. Those commands clone
 [yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS), then select the locked
 infra revision. Each checkout must have its own frozen virtual environment.
 
-Use Linux, Python 3.12 and one RTX 5090 or H100 with working NVIDIA/CUDA access.
-H100 is supported by the guard but not locally tested. Other NVIDIA devices need
-the [hardware adaptation procedure](../README.md#6-change-settings-or-hardware-deliberately); AMD and
-Intel GPUs are unsupported. This fixed workflow has no separate coding-agent
+Use Linux, Python 3.12 and one visible GPU supported by the frozen installation
+and required accounting. Follow the [shared hardware instructions](../README.md#6-change-settings-or-hardware-deliberately)
+for optional name expectations, capacity checks and source-pair qualification limits.
+AMD/ROCm is experimental and untested; its missing driver accounting currently
+prevents these tutorial launches. Intel GPU training is unsupported. This fixed workflow has no separate coding-agent
 filesystem sandbox; generated models execute under your user account.
 
 ## 2. Create a separate project
@@ -52,15 +57,17 @@ never overwritten.
 
 ## 3. Choose one data entrance
 
-**A — Shared 5090 host: read the existing prepared data.** No large data is
+**A — Read existing prepared data.** Set `PREPARED_SOURCE` to the absolute external
+directory for your selected task. No large data is
 copied or downloaded. Only the selected rows are saved in your project. For
 Project8, the source is the original prepared time-input view; the helper adds
 the existing task's FFT representation to those selected rows.
 
 ```bash
+export PREPARED_SOURCE="/absolute/path/to/prepared/$DEMO_TASK"
 .venv/bin/python -B -m tutorials.paper.prepared.data \
   --task "$DEMO_TASK" --project "$TUTORIAL_HOME" \
-  --source "/home/klz/Data/SIDERIUS-ICLR/prepared/phyts-paper-v1-20260922/$DEMO_TASK"
+  --source "$PREPARED_SOURCE"
 ```
 
 **B — Your own machine: fetch only selected byte ranges from the public data.**

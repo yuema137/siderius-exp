@@ -24,8 +24,8 @@ provider requests.
 
 Preview requires the clean source pair and exact exp virtualenv, but no GPU,
 key or data. Launch checks key names only, validates staged curve keys and
-finite data, hashes both archives, probes the physical NVIDIA GPU and executes
-a CUDA allocation through infra's own Python. Root execution, unknown GPU,
+finite data, hashes both archives, and uses the [shared GPU setup adapter](../shared/gpu-runtime.md)
+through infra's own Python. Root execution, unavailable required GPU capabilities,
 insufficient headroom, existing workspace and nested source/data/output paths
 refuse before model calls. This is a trusted-user teaching tool, not a security
 sandbox or private evaluator.
@@ -44,13 +44,18 @@ Hugging Face LFS objects and are verified again locally. No test file is request
 
 ## Planner installation and identity
 
-`planner_setup.copy_llm_config` preserves each source routing document and adds
-`legacy-9b78d505cb11-v1` only in the fresh user copy when no strategy is selected.
-This provider matches the prior tutorial pin349b6cd6's planner source SHA-256
-9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd.
-It is not the separate paper-v4 replay provider. Historical experiment assets
-are not rewritten. Exp installs the package as a non-editable uv dependency;
-infra installs the same exp-owned package normally after its own frozen sync.
+`tutorials.shared.llm_setup.write_test_llm_config` validates and exclusively
+copies `tutorials/shared/openai_smoke_luna.json` into a fresh project. It does
+not read scientific experiment routing. All eleven configured workflow routes
+select OpenAI `gpt-6-luna`, reasoning `medium`; the planner explicitly selects
+`native-timing-v1`. The same helper serves TESS, TIDMAD, Project8, LIGO and Pet.
+The old paper-specific strategy-injection helper is removed. No historical
+experiment configuration or existing external project is rewritten. Native
+selection does not require installing the historical planner package.
+
+The [shared contract](../shared/llm-profile.md) owns route coverage, retry limits,
+validation scope and the distinction between workflow routing and an external
+orchestrator's model.
 
 All three `inspect` implementations call `verify_planner_setup` before native
 execution. It parses the selected routing and resolves the public provider in

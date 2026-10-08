@@ -8,9 +8,9 @@ import shlex
 import shutil
 from pathlib import Path
 
-from tutorials.paper.planner_setup import copy_llm_config
 from tutorials.paper.preflight import shell_setup_guard
 from tutorials.paper.runner import ROOT, TutorialExperiment, disjoint
+from tutorials.shared.llm_setup import write_test_llm_config
 
 
 def write_launcher(destination: Path, experiment: Path, infra: Path) -> None:
@@ -67,10 +67,7 @@ def create_project(project: Path, infra: Path) -> None:
         ROOT / "tutorials/paper/notebooks/01_tess_tutorial.ipynb",
         project / "notebooks/01_tess_tutorial.ipynb",
     )
-    copy_llm_config(
-        ROOT / "experiments/phyts_tess/main_fixed_workflow/agents.json",
-        project / "llm/agents.json",
-    )
+    write_test_llm_config(project / "llm/agents.json")
     shutil.copyfile(
         ROOT / "experiments/phyts_tess/main_fixed_workflow/advice.json",
         project / "advice/human_advice.example.json",
@@ -83,7 +80,7 @@ def create_project(project: Path, infra: Path) -> None:
         run_name="tess_demo_001",
         trial_train_fraction=1.0,
         trial_val_fraction=1.0,
-        gpu="RTX 5090",
+        gpu=None,
         composition=task / "compositions/rotation_regression.yaml",
         llm_config=project / "llm/agents.json",
     )

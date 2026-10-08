@@ -5,6 +5,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from tutorials.shared.gpu_check import ExpectedGpu, VramBudget
+
 
 class PetExperiment(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -18,7 +20,7 @@ class PetExperiment(BaseModel):
     run_name: str = Field(
         default="pet_demo_001", pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$"
     )
-    gpu: Literal["RTX 5090", "H100"] = "RTX 5090"
+    gpu: ExpectedGpu | None = None
     iterations: int = Field(default=3, ge=1, le=100)
     rounds: int = Field(default=2, ge=2, le=20)
     epochs: int = Field(default=32, ge=1, le=1000)
@@ -28,9 +30,9 @@ class PetExperiment(BaseModel):
     formal_val_fraction: float = Field(default=1, gt=0, le=1)
     trial_minutes: float = Field(default=2, gt=0, le=120)
     formal_minutes: float = Field(default=5, gt=0, le=120)
-    vram_gib: float = Field(default=8, gt=0, le=80)
-    trial_vram_gib: float | None = Field(default=None, gt=0, le=80)
-    formal_vram_gib: float | None = Field(default=None, gt=0, le=80)
+    vram_gib: VramBudget = 8.0
+    trial_vram_gib: VramBudget | None = None
+    formal_vram_gib: VramBudget | None = None
     train_portion: Literal[1.0] = 1.0
     advice_file: None = None
 
