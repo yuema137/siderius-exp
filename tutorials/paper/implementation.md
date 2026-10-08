@@ -46,9 +46,10 @@ Hugging Face LFS objects and are verified again locally. No test file is request
 
 `tutorials.shared.llm_setup.write_test_llm_config` validates and exclusively
 copies `tutorials/shared/openai_smoke_luna.json` into a fresh project. It does
-not read scientific experiment routing. All eleven configured workflow routes
+not read scientific experiment routing. The configured workflow routes
 select OpenAI `gpt-6-luna`, reasoning `medium`; the planner explicitly selects
-`native-timing-v1`. The same helper serves TESS, TIDMAD, Project8, LIGO and Pet.
+`native-timing-v1`. The same helper serves the paper and supplementary project
+initializers in the [tutorial catalog](../README.md).
 The old paper-specific strategy-injection helper is removed. No historical
 experiment configuration or existing external project is rewritten. Native
 selection does not require installing the historical planner package.
@@ -57,9 +58,11 @@ The [shared contract](../shared/llm-profile.md) owns route coverage, retry limit
 validation scope and the distinction between workflow routing and an external
 orchestrator's model.
 
-All three `inspect` implementations call `verify_planner_setup` before native
-execution. It parses the selected routing and resolves the public provider in
-both interpreters, using the same sanitized child environment as launch.
+The paper and supplementary runners' `inspect` paths call the shared
+[`verify_planner_setup`](../shared/planner_setup.py) before native execution.
+Task-specific admission checks remain with each runner. The helper parses the
+selected routing and resolves the public provider in both interpreters, using
+the same sanitized child environment as launch.
 `PlannerStrategyIdentity` equality includes provider content and infra assembly.
 Absence, loading failure or disagreement refuses before an LLM client is created;
 child stderr is suppressed in the repair message. Preview receipts carry the
@@ -77,8 +80,9 @@ recorded runs, not evidence that the reader has executed their notebook. The
 operator's
 Run All onboarding route supersedes the earlier read-only default: it writes a
 named external quick-demo JSON/script, reviews it, invokes that script with
-`--launch`, and renders real progress records. RUN_QUICK_DEMO=False suppresses
-execution. Re-running a completed unchanged demo reuses its result; edited
+`--launch`, and renders real progress records. `RUN_QUICK_DEMO=False` suppresses
+Quick B execution; Quick A still calls `prepare_demo` and reviews its saved
+inputs. Re-running a completed unchanged demo reuses its result; edited
 settings require a new name. Advanced example/split saves remain opt-in. Data
 must be prepared and keys exported before Jupyter starts. No raw data download
 occurs implicitly. The exact exp kernel owns notebook execution.
@@ -157,9 +161,14 @@ run output under `runs/`, never the project root. Receipt is its sibling.
 Generated plugins and calibration remain in that run. The CLI rejects input
 experiment/composition/routing paths inside source; config paths cannot be
 inside data or the run output. Absolute bindings must be updated if moved.
-`write_launcher` quotes paths with shell-safe quoting, requires fresh output,
-and binds the exact exp venv plus selected experiment. Notebook calls it only
-when its explicit write exercise is enabled. Run shell arguments are limited
+`write_launcher` quotes paths with shell-safe quoting, requires a fresh script
+destination, and binds the exact exp venv plus selected experiment. Project
+initialization and Quick A's `prepare_demo` call it when creating a script;
+Quick A does so even with `RUN_QUICK_DEMO=False`. `prepare_demo` creates missing
+demo files, refuses an existing JSON with different settings, and leaves an
+existing script in place; the following launch review checks its saved bindings.
+The advanced TESS save exercises call the writer only when `WRITE_DEMOS` or
+`MAKE_NEW_SPLIT` is enabled. Run shell arguments are limited
 to the runner's own flags; the normal generated-script path takes `--launch`.
 
 Advice is an inactive structured JSON example. `advice_file: None` rejects
@@ -222,12 +231,15 @@ Destination trees must be fresh and disjoint from source inputs and both repos.
 Interrupted writes remain for inspection; choose fresh destinations to retry.
 No provider call or training occurs. Test data is neither read nor moved.
 
-The notebook explains four separate demos before the task/experiment reference.
+The TESS notebook explains four separate advanced demos before the
+task/experiment reference.
 `WRITE_DEMOS` saves named experiment/script pairs; `MAKE_NEW_SPLIT` creates the
 new task/data pair and its experiment/script. Both default false. They perform
-preparation only; terminal scripts own launch. Old validation statements above
-refer to earlier notebook revisions (12 code cells); revalidate the current
-11-cell notebook, including both default and opt-in paths, after edits.
+preparation only and do not control Quick A's input writes or Quick B's launch.
+Terminal scripts own execution, including when Quick B invokes them. Validate
+the [current notebook](notebooks/01_tess_tutorial.ipynb) and its separate
+preparation, execution and opt-in save paths after edits; cell counts in dated
+validation entries describe only their recorded notebook revisions.
 
 
 ### Four-demo validation (2026-09-29)
@@ -382,7 +394,7 @@ and Health/runtime checks are unchanged.
 
 `preflight.require_ready` aggregates missing interpreter paths, task/LLM files,
 required exported key names, data files and NVIDIA utility availability, with
-repair instructions. It runs in both runner CLIs before launch and in
+repair instructions. It runs in the paper runner CLIs before launch and in
 `quick_demo.run_demo` before opening a log. The notebook additionally calls the
 selected native `inspect(launch=True)` so source/hash/CUDA failures appear in the
 cell before API work rather than only in a child log. The saved script repeats
