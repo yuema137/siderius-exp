@@ -27,7 +27,7 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
 ```
 
 This installs the package versions declared by the selected exp checkout
-(currently planner compatibility 0.8.0 and prompt compatibility 0.7.0) as normal
+(currently planner compatibility 0.8.0 and prompt compatibility 0.8.0) as normal
 packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
@@ -40,6 +40,16 @@ development candidate, not a new public installation pin or a completed
 onboarding release. Changing the package changes its recorded identity: use
 a new workspace and leave historical workspace locks intact. Retain the old
 package and infra revision when using an old workspace's recorded identities.
+
+Version 0.8.0 additionally qualifies the declared renderer assembly at infra
+`5afbdcb2ed9eab61c99cb14192b116fe1a479a0f`. The
+[new source review and receipt](qualifications/portable-ceiling/report.md) record
+47 matching frozen message cases, four historical proposer routes and retained
+unknown-assembly refusal. Only the portable GPU-ceiling schema declaration
+changed inside the rendering closure; runtime resource policies remain outside
+this message-parity claim. Root installation pins and historical configurations
+are not promoted by this qualification. The same new-workspace identity rule
+applies; preserve the old package for old recorded locks.
 
 ## 2. Configure copies in a new workspace
 
