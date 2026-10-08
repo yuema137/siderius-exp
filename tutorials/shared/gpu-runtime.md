@@ -2,7 +2,7 @@
 
 `hardware.HardwareSettings` owns a resource-only projection of saved experiment
 JSON. `runtime.gpu_report` transports the typed request and response;
-`runtime.verify_gpu` retains the seven launch adapters' existing string receipt.
+`runtime.verify_gpu` retains the saved launch adapters' existing string receipt.
 `gpu_check.check_gpu` consumes the selected framework's hardware, accounting and
 aggregate-admission owners. It does not implement model admission or monitoring.
 
@@ -16,15 +16,17 @@ From the exp checkout, run:
 
 The projection requires explicit absolute `infra_checkout`, absolute `workspace`
 and positive finite, non-Boolean `vram_gib`. Optional `gpu` is a stripped,
-nonempty name expectation; null means no name constraint. Optional
-`trial_vram_gib` and `formal_vram_gib` override the shared budget. There is no
+nonempty, case-sensitive substring of the detected device name; null means no
+name constraint. Optional `trial_vram_gib` and `formal_vram_gib` override the
+shared budget. There is no
 GPU-model whitelist, guessed budget or fixed upper budget.
 
 The projection intentionally ignores other fields. Passing validates hardware
 resource settings only, not the complete experiment schema, task composition,
 data integrity, planner identity, provider credentials or provider access. The
-saved tutorial runner remains responsible for those contracts. All seven current
-saved experiment schemas expose these common fields.
+saved tutorial runner remains responsible for those contracts. The eight saved
+experiment classes expose these common fields across nine tutorial tasks;
+Project8 and LIGO share `PreparedExperiment`.
 
 The command checks the clean exact source/dependency pair with
 `verify_framework_pin` and the exp installation with `verify_installed_framework`.
@@ -117,5 +119,7 @@ The new early occupancy/quota refusal intentionally improves current tutorial
 setup behavior. Task science, native training arithmetic, historical paper
 plugins/configuration, prompt fixtures and archived results are untouched.
 Focused tests use synthetic hardware with the actual native coherence/aggregate
-owners and cover all seven saved resource schemas. They are not real GPU or
-training qualification.
+owners. The [saved-resource projection test](../../tests/tutorials/test_hardware_command.py)
+currently covers seven task cases across six experiment classes (TESS, TIDMAD,
+Project8/LIGO, Pet, MJD and SuperNEMO); DAVIS and Cancer are not included in that
+parameterization. These tests are not real GPU or training qualification.
