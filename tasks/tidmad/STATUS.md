@@ -3,15 +3,44 @@
 This file records the external package's current qualification state. Framework
 capability remains owned by the pinned SIDERIUS revision.
 
-The projection checks named below are dated migration evidence from an earlier
-SIDERIUS checkout. They are not commands for the current package and must not
-be presented as tests executed from this repository.
-
-## Maturity: **production-backed task package; separated qualification pending**
+## Current declarations and evidence boundary
 
 The active framework revision for new work is the exact value in the repository
-[`SIDERIUS_REVISION`](../../SIDERIUS_REVISION). Older SHAs in this document are
-dated evidence labels for completed migration witnesses, not current pins.
+[`SIDERIUS_REVISION`](../../SIDERIUS_REVISION). Older SHAs below identify
+recorded witnesses; they do not qualify today's source pair.
+
+The [continuous-regression composition](compositions/continuous_regression.yaml)
+loads task-owned `resolved/dataset_profile.json`, `resolved/metric_spec.json`,
+runtime/scoring/scoreability implementations, regression task configuration,
+prompt blocks and Health declarations. The [frozen-pool composition](compositions/continuous_regression_frozen_pool.yaml)
+adds the fixed training parent. These are active declarations, not inert
+projection snapshots: edits to selected inputs affect the composed task.
+The [resolved-file guide](resolved/README.md) distinguishes these inputs from
+historical/reference snapshots. Follow the [task contract](task-contract.md)
+for reviewed changes and identity requirements.
+
+Evidence belongs to its selected task, treatment and source pair:
+
+- **Regression tutorial:** the [2026-09-29 receipt](../../tutorials/paper/examples/tidmad-example.json)
+  records three iterations on an RTX 5090, exit code 0, at exp
+  `6e26c98f9402020d441cd71e4f0dba7d166cacbb` and framework
+  `349b6cd6d9766abbf3d87515b22e1005599a694b`. All three scored Formal
+  attempts failed mode-collapse Health. This demonstrates that recorded
+  workflow's execution, not an acceptable denoiser, paper reproduction or
+  qualification of the current pin. No separate final test was run.
+- **Classification qualification:** `compositions/bounded_qualification.yaml`
+  selects the historical classification contract. The stopped chains and
+  repair witnesses below retain their original limits; their pending-iteration
+  statements do not describe the later regression tutorial.
+- **Paper experiments:** use the [paper artifact reference](../../experiments/paper-artifacts.md)
+  and the selected experiment's recorded source/configuration identity. The
+  tutorial and migration witnesses do not qualify a paper-scale campaign.
+
+Current test owners include [package/launcher contract checks](../../tests/tasks/tidmad/test_tidmad_package_contract.py)
+and [model-I/O contract checks](../../tests/tasks/tidmad/test_model_io_contract.py).
+These links identify checks, not a claim that they were run for this document.
+Task documentation also contributes to the [visible bundle identity](README.md#change-the-right-owner);
+preserve the recorded checkout or archived bundle when reviewing old runs.
 
 The task-owned validation adapter is memory-bounded: it validates the complete
 declared HDF5 scope from metadata, then reads signal rows lazily as the
@@ -19,6 +48,14 @@ framework DataLoader requests them. Full Formal validation therefore does not
 copy the whole selected validation corpus into host RAM. Training keeps its
 existing eager, shuffleable epoch dataset; this change does not alter training
 selection or ordering.
+
+## Historical projection and migration ledger
+
+The following tables record the PR0 projection and subsequent migration
+checkpoints. `GENERATED`, retired framework paths, Step numbers and pending
+capabilities describe those checkpoints, not current authoring instructions or
+unimplemented features in today's package. The historical projection test path
+is not a test command in this repository.
 
 | projected in this pack (PR0) | how | verified by |
 |---|---|---|
@@ -32,17 +69,7 @@ selection or ordering.
 | data root | explicit caller-owned `--data_dir` argument | `data/README.md` |
 | run entrypoint | experiment-owned `experiments/tidmad/two_iteration_qualification/launch.sh`, which delegates to the selected pinned checkout | experiment README and launcher dry-run |
 
-**The former `examples/tidmad/` projection is historical and is not an
-authoring surface.** The current package lives under `tasks/tidmad/`; its
-resolved snapshots are generated
-projections, and editing one changes nothing you want changed (design §3.6).
-The one nuance: this package's composition manifest
-`compositions/bounded_qualification.yaml` binds `resolved/dataset_profile.json`
-and `resolved/metric_spec.json` as declaration references, so a composed run
-does load those two — which is exactly why a hand edit is caught as a red
-test rather than being harmless.
-
-## NOT projected here (and who owns it)
+### Historical unprojected seams and checkpoint owners
 
 | seam | status | owner |
 |---|---|---|
@@ -55,7 +82,11 @@ test rather than being harmless.
 | generic health applicability declaration | `configs/health_checks.yaml` referenced only | Step 08 |
 | interpretation evidence | — | Step 09 |
 
-## Separation qualification — dated evidence
+## Historical classification separation qualification
+
+These entries describe the classification migration and its data-path repairs
+at the recorded revisions. Pending qualification statements remain attached to
+those witnesses, not the current regression workflow.
 
 - On 2026-09-15, the task-owned lazy validation adapter constructed the full
   files 15--19 Formal scope at segmentation size 40,000: 250,000 logical rows,

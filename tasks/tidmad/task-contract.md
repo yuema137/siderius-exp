@@ -48,7 +48,7 @@ the task's authority.
 | --- | --- | --- |
 | Which HDF5 root is used | The experiment command's `--data_dir` | This repository's Python code |
 | Which band is exposed | The experiment's `--band` (`0-3`, `4-9`, `10-14`, `15-19`) | A second hard-coded file list in the task |
-| Training/validation file names and topology | `resolved/dataset_profile.json` through its owning declaration/projection, plus provenance and tests | A launcher-only file pattern |
+| Training/validation file names and topology | The bound `resolved/dataset_profile.json` declaration and dependent runtime semantics, plus provenance and tests | A launcher-only file pattern |
 | The fixed 20-of-200 training parent | A new pool declaration and matching data-path implementation; the current manifest digest and 0.1 source fraction are enforced in `TidmadFrozenPoolDataPath` | Only the JSON or `--formal_portion`; neither alone changes the frozen pool |
 | Task meaning and model I/O | `declared/task_config_regression.yaml` | `workflow.json` or advice text |
 | Primary score and direction | `resolved/metric_spec.json` and `runtime/scoring.py`, in one reviewed task change | A secondary score or a dashboard ordering rule |
@@ -58,11 +58,13 @@ the task's authority.
 | Literature search rules | `framework_configs/lit_review.yaml` | The generic infra repository |
 | Reference anchors and baseline/ceiling rulers | `reference_data/segment_anchors.json`, `raw_baseline/`, `ground_truth/` | A run-local copy without a new identity |
 
-The files under `resolved/` are committed projections used by the composition.
-They are not a convenient scratch area. An intentional change must update its
-owning declaration, regenerate or re-project the snapshot, update provenance,
-and pass the task tests. Editing a generated JSON alone creates an ambiguous
-task identity.
+The imported files under `resolved/` are now task-owned frozen declarations
+and reference snapshots; [their guide](resolved/README.md) identifies which
+ones the compositions consume. No current projection generator is required to
+edit them. A reviewed change must update the declarations actually selected by
+the composition, dependent runtime semantics, provenance and task tests together.
+A change in scientific meaning requires a new task identity. Historical
+snapshots and archived runs retain their recorded identities.
 
 ## Validation sample limits
 

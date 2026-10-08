@@ -13,18 +13,19 @@
   the source for the authoritative current terms).
 - **Files SIDERIUS reads**: `abra_training_{file_index:04d}.h5` and
   `abra_validation_{file_index:04d}.h5`, `file_index` 0–19 (see
-  `resolved/identity.json`, generated from the profile's file patterns).
+  the bound `resolved/dataset_profile.json`; `resolved/identity.json` preserves
+  the imported file-family/index snapshot).
 
-Raw data is NEVER committed to this repository (roadmap §22.23.10). The
+Raw data is never committed to this repository. The
 historical `examples/tidmad/` projection did not fetch it; current task data is
 caller-staged outside this repository.
 
 ## Literature-review configuration
 
 `framework_configs/lit_review.yaml` is the current task-owned literature
-configuration. SIDERIUS `98610b8d` below is historical source provenance, not
-the active framework pin.
-That source file has SHA-256
+configuration. Its historical source was SIDERIUS
+`98610b8d:configs/lit_review_config.yaml`, not the active framework pin or the
+current task file. Those historical source bytes have SHA-256
 `004ffa44c7bfd3684c6e07c63091dabf6d059050309934fd3862577baaaae203`.
 The projection preserves every executable value while removing repository-
 internal historical commentary; task-specific root papers and confidence
@@ -49,8 +50,14 @@ framework checkout nor repository-local configuration selects a task path.
 
 ## Snapshots in `resolved/` — provenance
 
-Generated at PR0 (2026-08-15) from the production authorities named in
-`resolved/README.md` by `tools/example_packs/projection.py`; each is
-regenerated and deep-compared by `tests/unit/examples/test_tidmad_projection.py`.
-They carry no independent provenance of their own — their provenance IS the
-owning path.
+These files were generated at PR0 (2026-08-15) by the then-current
+`tools/example_packs/projection.py`. The original
+`tests/unit/examples/test_tidmad_projection.py` deep-compared them with the
+production authorities at that checkpoint. Those tool/test paths describe
+historical provenance, not a current regeneration command.
+
+Current compositions consume task-owned declarations as described in
+[the resolved-file guide](resolved/README.md) and [the task contract](task-contract.md).
+The imported source locations explain their origin; they are not competing
+framework-side scientific owners. Preserve historical snapshots and archived
+identities when defining and qualifying a changed task.

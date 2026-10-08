@@ -1,25 +1,16 @@
 # `data/` — TIDMAD data root (nothing is stored here)
 
-No dataset lives in this directory, and nothing in this pack downloads one
-(roadmap §22.23.10). The TIDMAD HDF5 files are acquired from the official
-distribution named in `../PROVENANCE.md` into a **machine-local**, read-only
-directory. Every experiment or campaign names that directory explicitly:
+No dataset lives in this directory. Prepare the official HDF5 files in an
+external data directory using the [one-band tutorial's reuse or download steps](../../../tutorials/paper/tidmad/README.md#choose-existing-data-or-a-download).
+[Provenance](../PROVENANCE.md) identifies the official distribution. Each
+experiment or campaign selects its data root explicitly with `--data_dir`.
 
-```bash
---data_dir /path/to/TIDMAD
-```
-
-The campaign preflight and chain launcher validate the directory before any
-run spends compute. Which files exist and how they are named is projected
-read-only in `../resolved/identity.json`.
-
-That is what the qualification experiment launcher requires, and it is why the
-command published in `../README.md` reproduces on any machine: the caller
-selects its own data root instead of depending on framework state.
-
-Prepared/derived data, caches and run artifacts belong to the workspace
-(`--workspace`, default `./siderius_workspace`, gitignored) — never to the
-tracked example tree.
+The bound [dataset profile](../resolved/dataset_profile.json) declares file
+patterns and topology; `resolved/identity.json` is an imported reference snapshot.
+The selected launcher owns data preflight. Use the [experiment guide](../../../experiments/tidmad/main_fixed_workflow/README.md)
+for the fixed workflow's band/checksum requirements, or the tutorial above for
+its separate file-holdout route. Prepare the anchor before making the data root
+read-only. Keep derived data, caches and run artifacts outside both repositories.
 
 ## Stage the approved anchor
 
