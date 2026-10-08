@@ -101,10 +101,9 @@ states**, not from a constant. A hardcoded exclusion would keep excluding
 Data Analysis after an arm enabled it, and the run would then start without
 the key it needs and fail after the clock had already begun.
 
-Selecting an arm also certifies its treatment manifest and, on the full arm,
-re-computes the advice digest from the same bytes it parses. An edited advice
-file refuses the launch rather than running a different treatment under an
-unchanged identity.
+The launcher verifies the selected information treatment and rejects modified
+advice before starting. Different advice requires a reviewed new treatment;
+see the [treatment guide](../information_treatments/README.md).
 
 ## Unit layout
 

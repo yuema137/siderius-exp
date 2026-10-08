@@ -8,7 +8,7 @@ the same workflow parameters. **The information is the only variable.**
 | treatment | used by | advice | Data Analysis | Literature Review |
 |---|---|---|---|---|
 | [`main-fixed-no-prior.yaml`](main-fixed-no-prior.yaml) | fixed workflow | disabled | disabled | disabled |
-| [`main-fixed-full.yaml`](main-fixed-full.yaml) | fixed workflow | enabled, sha-pinned | enabled | disabled |
+| [`main-fixed-full.yaml`](main-fixed-full.yaml) | fixed workflow | enabled, verified before launch | enabled | disabled |
 | [`main-cli-no-advice.yaml`](main-cli-no-advice.yaml) | coding-agent baseline | disabled | `not_applicable` | `not_applicable` |
 
 The CLI treatment says `not_applicable`, not `disabled`, and the distinction
@@ -17,31 +17,30 @@ data-analysis MODULE to switch off. Claiming `disabled` would assert a
 contrast against a capability the product does not have.
 
 Select one with `--arm no-prior` or `--arm full` on the fixed-workflow
-launcher. The adapter derives every flag from the declaration — module state
-becomes `--data_analysis_enabled` / `--no-data_analysis_enabled`, and an
-enabled advice block becomes `--advice` plus `--advice_sha256` — so the two
-can never disagree with each other.
+launcher. The launcher reads module settings and advice from that treatment
+and verifies the selected files before starting. The
+[technical treatment contract](../../shared/information_treatment.md) explains
+how those declarations become execution settings.
 
 Literature review is **disabled in both arms**, and what matters is that the
 two agree: it is a second information channel, so a state that differed
 between them would make the contrast a two-variable change rather than the
 single "operator prior present or absent" comparison it is meant to be.
 
-It is off rather than on because enabling it requires a task-owned
-literature-review config naming curated root papers and domain confidence
-criteria — task science, and a separate decision. The framework refuses the
-launch outright without one, which is how the first launch attempt failed.
+Disabling it is a choice of these frozen treatments. A different experiment
+can enable Literature Review with an explicit configuration. Curated root
+papers are optional: the framework also supports an empty root-paper list
+with dynamic search. Such a change needs its own treatment and review; it is
+not an edit to these recorded comparison arms.
 
 ## The advice artifact
 
-[`../main_fixed_workflow/advice.json`](../main_fixed_workflow/advice.json),
-sha256 `c3ec1514d08d392086b556c820b65cd270c8f41ffee04c2ca1c4f1bf2dcf3aae`,
-carrying per-node guidance under `interpret`, `analysis`, `propose`,
+[The advice file](../main_fixed_workflow/advice.json) carries per-node guidance under `interpret`, `analysis`, `propose`,
 `implement` and `tune`.
 
-The digest is declared in the treatment and re-certified from the same bytes
-at load, so an edited advice file refuses the launch instead of quietly
-running a different treatment under an unchanged identity.
+The launcher checks the advice against the selected treatment and refuses
+modified files. To use different advice, create and review a new treatment;
+do not bypass the check to reuse an old experiment identity.
 
 **It is a DRAFT awaiting operator review.** Every claim in it is either
 transcribed from the PhyTS benchmark paper or measured from the released

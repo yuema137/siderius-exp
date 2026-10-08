@@ -34,14 +34,14 @@ produces two deliberately non-identical views from one staged data root.
 | `agent/` | both light-curve archives · `train.csv` **with** targets · `predict.csv` with identities and **no** target column |
 | `evaluator/` | `val_truth.csv` with the validation targets |
 
-**Why this is not optional.** In a SIDERIUS chain the agent is an LLM that
-never touches the filesystem — scopes and targets travel to child processes —
-so the task package's committed identity manifest carrying validation targets
-is harmless and in fact necessary, since the metric reads truth from the
-scope. A coding agent has a shell. Any validation target under a path it can
-read is a winning strategy: copy them into the predictions and score a
-perfect R-squared, with nothing downstream reporting a problem, because the
-deliverable is well formed, scoreable and complete.
+**Why the views need access controls.** The fixed workflow controls structured
+messages passed to its LLM agents, but generated Python runs with the launch
+process's filesystem access. That message boundary is not an OS sandbox.
+A general coding agent can also read files directly. Stage the target-free
+agent view and keep evaluator truth inaccessible to its execution account:
+readable validation targets could be copied into well-formed predictions.
+The view builder separates file contents; deployment permissions must enforce
+privacy.
 
 The tool re-reads what it wrote and **refuses** to publish an agent view
 containing an evaluated target, rather than trusting the writer standing next
@@ -70,7 +70,7 @@ to be inferred:
    backup destination. TIDMAD's live under
    `deployments/tidmad_coding_agent_baseline/` with systemd units; nothing
    equivalent has been decided for TESS.
-4. **The frozen input bundle.** TIDMAD records archive hashes in Git while
+4. **The frozen input bundle.** TIDMAD records verified archive identities while
    the bytes stay in an external store. No such store is nominated for TESS.
 5. **The budget.** The fixed workflow's six hours is a SIDERIUS-chain budget;
    whether a coding agent gets the same is a comparability decision.
@@ -80,9 +80,10 @@ to be inferred:
 Against [`../main_fixed_workflow/`](../main_fixed_workflow/README.md), on the
 same task and the same metric. For that comparison to mean anything, both
 sides must be scored by the same authority against the same held-out
-population, and neither may see it. The view split is that guarantee on this
-side; on the workflow side it is the composition, which never names the test
-split.
+population. The view builder separates published contents; deployment
+permissions must keep evaluator targets private. Omitting the test split from
+the fixed-workflow composition prevents its intended use, but does not isolate
+generated code from other readable files.
 
 Note that both sides are evaluated on **validation**. The test split remains
 untouched by either, for a separate final evaluation that no agent
