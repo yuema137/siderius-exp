@@ -90,7 +90,7 @@ be hidden in a shell argument or an old run receipt.
 - [experiment index](experiments/README.md)
 - [campaign index](campaigns/README.md)
 - [migration evidence](provenance/MIGRATION.md)
-- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/e800fc1f08b0e067fc21076a200f3f70d04b38b8/docs/reference/task-composition.md)
+- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/7d0d32142a567c9e30443c7b6304ab943e714ac5/docs/reference/task-composition.md)
 
 ## License
 
