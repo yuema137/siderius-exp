@@ -16,7 +16,8 @@ this package does not update or qualify the framework.
 | Coverage and missing evidence | [Coverage and missing evidence](parity-report.md) |
 | Recovered formal evidence | [Recovered formal evidence](formal-evidence-parity.md) |
 | Routing qualification | [Routing qualification](proposer-routing-audit.md) |
-| Current development qualification | [Portable-ceiling assembly: offline comparisons and limits](qualifications/portable-ceiling/report.md) |
+| Current source-pair qualification | [Final-pair checks and limits](qualifications/final-pair/report.md) |
+| Earlier development qualification | [Preserved 0.8.0 receipt](qualifications/portable-ceiling/report.md) |
 | Earlier development qualification | [Preserved 0.7.0 receipt](release-renderer-qualification.md) |
 
 Use a new external workspace for a changed profile. Preserve historical source,

@@ -1,0 +1,644 @@
+{
+  "schema_version": 1,
+  "candidate_infra_revision": "faff23aad38a2892160f64a4f3cefe1c9d6c3632",
+  "candidate_tree": "8766312d960c8933126bc418fad7ba0d35d1428c",
+  "reference_revision": "7c869e67f697d6bbc81eb554711ab77e23cb7362",
+  "reference_digest": "deb366d3edf04a69892cbad7ca173014d626758bf3a93cd9f16a8c926c00e787",
+  "candidate_digest": "59107d905aa655d0eb1013979405075ac3006b0f1883eb842983a9c85f7b380c",
+  "reference_count": 58,
+  "candidate_count": 77,
+  "sources": [
+    {
+      "path": "src/agent/schemas/hyperparam_tuning.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "5f0aba5ec2eeb4e277e11f87c98d742a4fd336b9ff1ce40bf83a2564427c5284",
+      "candidate_sha256": "0613dae9bfac151f7fd8b5e9cd0fd2b0c37754312e1c02648b35ec73fff939d5",
+      "changed": true
+    },
+    {
+      "path": "src/agent/schemas/preflight.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "92bf0ad616dcf5b95210d9f1e14d766e5cbfda338b47910127199ee4ee11910a",
+      "candidate_sha256": "92bf0ad616dcf5b95210d9f1e14d766e5cbfda338b47910127199ee4ee11910a",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/batch_resolver.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "2eac7d7c18e9a91036cc7958561da7a81414948291c5f94f08ebcc9b90d704e6",
+      "candidate_sha256": "2eac7d7c18e9a91036cc7958561da7a81414948291c5f94f08ebcc9b90d704e6",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/compute_intensity.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "ce57746807e5e0dba61bfc3c1c9d9c872fbc282012bc4dc64a2d621162835b66",
+      "candidate_sha256": "ce57746807e5e0dba61bfc3c1c9d9c872fbc282012bc4dc64a2d621162835b66",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/estimation_inputs.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "96d0e4f7dd522b2ed35de2766644b5d843efc0d4859b40b11027e93755420c3b",
+      "candidate_sha256": "96d0e4f7dd522b2ed35de2766644b5d843efc0d4859b40b11027e93755420c3b",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/evidence.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "97c45b96bc0f0584894fc9549fd88d54667d592e4fbf2c180bab9bc337090d2b",
+      "candidate_sha256": "97c45b96bc0f0584894fc9549fd88d54667d592e4fbf2c180bab9bc337090d2b",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/isolated_probe.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "b28ebe7e7e4ac80a2ce7b50c416fe382eb8e01ea426f951456a6a19e3a15c72a",
+      "candidate_sha256": "b28ebe7e7e4ac80a2ce7b50c416fe382eb8e01ea426f951456a6a19e3a15c72a",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/killer_report.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "7e57fa426a62358c90724b966f906205f52a71e600f8c807a635d7f757b94580",
+      "candidate_sha256": "7e57fa426a62358c90724b966f906205f52a71e600f8c807a635d7f757b94580",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/native_estimation.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "3efe91e09c756312e2d6b0784eb7c8b6fc28d44d598e6873b74d4ef2af777e31",
+      "candidate_sha256": "3efe91e09c756312e2d6b0784eb7c8b6fc28d44d598e6873b74d4ef2af777e31",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/overhead.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "8b94ff347e1ea321eeaca6d33bbcf5b036129be27e71721dafbb00ad870ed854",
+      "candidate_sha256": "8b94ff347e1ea321eeaca6d33bbcf5b036129be27e71721dafbb00ad870ed854",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/preflight_adapter.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "38111929bea2c5a41893dac5191eb6d8fbcca575c867cf9a825f92a05d7b038c",
+      "candidate_sha256": "38111929bea2c5a41893dac5191eb6d8fbcca575c867cf9a825f92a05d7b038c",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/preflight_worker_main.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "d65d81198e5c4b03874dc13ddb45b495783bdf4aa7bc93ac5be65ba7734df2fa",
+      "candidate_sha256": "d37b3e22215177c07575bec2767d0442aa7001de421dacb4f8c8656448cb9a39",
+      "changed": true
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/probe_budgets.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "fed249e62a55aa8d6041d5751d85f185b2228ff78a5ba5cef8f39a38ec3a53dc",
+      "candidate_sha256": "fed249e62a55aa8d6041d5751d85f185b2228ff78a5ba5cef8f39a38ec3a53dc",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/registered_state.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "f4d82739e779655487dd6de2831d94983c9feaa0e08c4646a31ea73fd6d918e3",
+      "candidate_sha256": "f4d82739e779655487dd6de2831d94983c9feaa0e08c4646a31ea73fd6d918e3",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/structural_probe.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "8b831f4353827592900fe0b91438efc2593a6f9315906a0baa573f4f0a8a3781",
+      "candidate_sha256": "8b831f4353827592900fe0b91438efc2593a6f9315906a0baa573f4f0a8a3781",
+      "changed": false
+    },
+    {
+      "path": "src/agent/skills/evaluate_vram_skill/wrapper.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "587d5fc28ce3e884e405d0da8c2fede546b64c2711aa154a6bc62625446eeb7b",
+      "candidate_sha256": "587d5fc28ce3e884e405d0da8c2fede546b64c2711aa154a6bc62625446eeb7b",
+      "changed": false
+    },
+    {
+      "path": "src/core/file_identity.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "2835e4acdf13668a7e15eb76dbf8eba86e417dc3eedb2a503655fb70490e2bab",
+      "changed": true
+    },
+    {
+      "path": "src/core/inference_preflight_policy.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "5f76d3ad1f5a5f1ce5160aef2cb5c1bb737f3b296d1d2da3e93b78a10be3e173",
+      "candidate_sha256": "5f76d3ad1f5a5f1ce5160aef2cb5c1bb737f3b296d1d2da3e93b78a10be3e173",
+      "changed": false
+    },
+    {
+      "path": "src/core/planner_strategy_identity.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "ef4cb262110213e2471ad31dd96c56d30d5864ce431ef3aed059d2f08b3a3557",
+      "candidate_sha256": "ef4cb262110213e2471ad31dd96c56d30d5864ce431ef3aed059d2f08b3a3557",
+      "changed": false
+    },
+    {
+      "path": "src/core/preflight_estimation.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "5da82bb39bac4e54737cabf30622d1d2dd21ebb9dfc2f480eb6be4a5e51a4fe4",
+      "candidate_sha256": "4bf13539212c4f17c8fb404f068c13eec6cb7ea7c2fc65490a04f32d19013a79",
+      "changed": true
+    },
+    {
+      "path": "src/core/preflight_observations.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "64df0b3d52002ca8df1834306993875410f77d8e8603ab89ea469ad95a8657c1",
+      "candidate_sha256": "64df0b3d52002ca8df1834306993875410f77d8e8603ab89ea469ad95a8657c1",
+      "changed": false
+    },
+    {
+      "path": "src/core/runtime_control/admission.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "bf7d7a1b2b26b3275d7139a918fc91a42c2d4a4ee14748026111d95b11cdaac7",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_accounting.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "cbb1e8a52455797b434696f5f5809cb363e02589aefc3acd6cc7aa6aeea35421",
+      "candidate_sha256": "761d0576bc1a064d0aaa9d9d548766dac7976274afbde454eacfdd5e9eed756d",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_inference_components.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "29554496ab1b361a69a35da1bc7cb99369a402ef6c8922ae1b4e3be97dc4b8a4",
+      "candidate_sha256": "3964eb854a9d455024903e14ff542a65a6b49c387a900f17408c5cd36d5e2b6d",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_classifier.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "6fe8f593da96ff3d66cf5a473220861c8419b6d3bed5b085ad1eaef9b3d66daa",
+      "candidate_sha256": "2a6ef3cd878b7faf331773f0bc8412ec44891e97ab7e98d8e8cc14f1b6106b87",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_hold.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "bd6a4fa655aedce38e8025dfe44cdfdb8d886a58382ae83cf43b988049e2ccf2",
+      "candidate_sha256": "beadc311ece5831617a46f9edc5faec259aab5ca0261162f7489dadef6c7625f",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_identity.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "bf3456b51740d89a04329d022a4b4a05ec3ad4a853e71736bede88166af3dffe",
+      "candidate_sha256": "bf3456b51740d89a04329d022a4b4a05ec3ad4a853e71736bede88166af3dffe",
+      "changed": false
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_phases.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "12528ffda99753f008012c27996e46ff7b08e335c1cc910ae3d40a6960c58b69",
+      "candidate_sha256": "497111ce30c3267fef55f8e6e23f4a9eae260cf2fd34369ea27a878b2a1f359d",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_runner.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "3c3abd93cd26ce32cc00a112d33d0a93a3ffab5861036aa62dd6e24bf27e9039",
+      "candidate_sha256": "d123ac71c23bd9c4c52fd815dd49e72b2e370b099c9db41ef978eace6d2d4480",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_sampler.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "4baa910b5eded3c0c4ac5e97db4a3e2d1c76345312394c199f5a38f1905ae3c6",
+      "candidate_sha256": "4baa910b5eded3c0c4ac5e97db4a3e2d1c76345312394c199f5a38f1905ae3c6",
+      "changed": false
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_spec.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "a503b101ec233dad1f152cfddcad700df3a0aee380875b9d6a07059e7419221f",
+      "candidate_sha256": "81498e6eb74d886ef295ce25fcbfb638029e1788d2b0f4ab7536e03e052733fc",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_measurement_worker_main.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "eeed9b52be85f2a4973bea57d82e7da6cd02c24cdb988daaf335874f2515a881",
+      "candidate_sha256": "7d1edb45f4253d8b9e3e20704b7eb8b3d50b033984582de5bd915f4c6aabe948",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_requirement.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "8898f4999617ec816ebde9878c77d57ff9a1352920f11469efae0d9db60a9e90",
+      "candidate_sha256": "d7210d806030779e7c8ce30d10e44b82c6e74e84319f239e60330354cf81b52d",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_requirement_evidence.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "b9768ed89d7bf611ca91969a6a4f06dff90196c775194e25f8194b45d8215ec0",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/gpu_training_components.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "933463a70032f7bd1df97e728dc8c6d28783d4e988a242035dc67f5cd8fda88f",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/inference_checkpoint_reference.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "0fdab9683bbc58ed8729c5118088d33b968303bee19b210f2e54ae47265c2630",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/inference_measurement_assessment.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "363dcf7738db5ed859e6c87ed15efe6559a20328fd6d7b7c49a07b9880d3bb3f",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/inference_measurement_binding.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "f135ea358797da8742476d63084ed71b68472c48bae3624089d229558e9940c0",
+      "candidate_sha256": "452b8576f5888930db37dafbc20723bcdd8b90f765ba2912b1eb7db1e42ba2cd",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/inference_refusal_verification.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "37706b68d8ab28c61ebaaa2b6b70c7ea33f236634df29e3ebee35282eb16e008",
+      "candidate_sha256": "37706b68d8ab28c61ebaaa2b6b70c7ea33f236634df29e3ebee35282eb16e008",
+      "changed": false
+    },
+    {
+      "path": "src/core/runtime_control/inference_verification_evidence.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "d5ade433fc87e04c19946dd9c5389a809e01144a292cc86880be4cb54f728982",
+      "candidate_sha256": "466b0b60e188081dd2a0a14290cafda28d43abdc887725ee4b02ab203ae14ad8",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/isolated_admission.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "abe01ab0bf5fd38879083b9bb89b35a1c495d143e80e2aa4cf6b026fe9fc6b2e",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/measurement_hold_assessment.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "7134c288c4d7a67d1c6787e7f5db655fd1d8ae95a5c2a576172105759bc8c4b5",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/pair_admission.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "c7d32fbb3a02ed97518159d2fa3fccd115e6f412d4b1b67e2bccb69311779be1",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/prephase_admission.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "4f5576b98e86063b2de412bf706a380b4259f0c1bc8ed3c91952672828cd4d5f",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/process_group.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "cf597abf767393993c07ab68a7819fab456827587ac8abe3b931c492de1b2c9c",
+      "candidate_sha256": "db5157a9fd86f3724bb6c0c716438c0460ec271bea61ad7adfaa900db0bd7a9a",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/training_measurement_assessment.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "d995d1551ccdf15c5e83dc259f920a38b8a4cc33836efc929bd7f845adec4951",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/training_measurement_binding.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "530b4df81f6afa348e5fd5e08e98fecf49f8406b51ec97bc9493e9c79a724aa4",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/training_measurement_lifecycle.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "8eb33bc5209aac94acafe7572e568cb6f82511f7593f76808f33059568343cc1",
+      "changed": true
+    },
+    {
+      "path": "src/core/runtime_control/training_measurement_steps.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "5b19e6b4500da4e29a2317da0f2eb8a5babd9c481ed86bfd1b69229d26de0ee9",
+      "changed": true
+    },
+    {
+      "path": "src/core/stream_identity.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "6f60321c2a62138083f33015ccae32d18ff3300e79167108483f6a8f1bc41d3b",
+      "changed": true
+    },
+    {
+      "path": "src/core/subprocess_env.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "ab90e213b392815c88b9d4dfd69106bcb47ada48c6514a8d7ced4a8234afb289",
+      "candidate_sha256": "ab90e213b392815c88b9d4dfd69106bcb47ada48c6514a8d7ced4a8234afb289",
+      "changed": false
+    },
+    {
+      "path": "src/core/target_standardization.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "aaa72f50e7a8b81a60eb82287f20cfb6019dfe15a97a36d88e60772daca958b2",
+      "changed": true
+    },
+    {
+      "path": "src/execute_tools/generic_inference.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "fef26b05bce26ac2fe3b5370cc62f594211b2c0b43b83e061499d8c110cc6925",
+      "candidate_sha256": "fef26b05bce26ac2fe3b5370cc62f594211b2c0b43b83e061499d8c110cc6925",
+      "changed": false
+    },
+    {
+      "path": "src/execute_tools/inference_checkpoint.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "74762225e71c6440d268efa06e2f8df5afc4b6dc533a1693fff0b1353ce2fce5",
+      "changed": true
+    },
+    {
+      "path": "src/execute_tools/inference_forward.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "e2254287dad46499f0fb880f4d60c827ffad2efe6a132b3c715e22aa333cad63",
+      "candidate_sha256": "e2254287dad46499f0fb880f4d60c827ffad2efe6a132b3c715e22aa333cad63",
+      "changed": false
+    },
+    {
+      "path": "src/execute_tools/inference_model.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "d74b9dbc874bdd023104b22476880b9bf6403eabcf425035642d4672d852bdf2",
+      "candidate_sha256": "d74b9dbc874bdd023104b22476880b9bf6403eabcf425035642d4672d852bdf2",
+      "changed": false
+    },
+    {
+      "path": "src/execute_tools/inference_single.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "9eb3f8b6330b9cf5d5491b98eec155bdd457f7f97ef3803b09820b88298f259a",
+      "candidate_sha256": "f9f8d2f27448cf661ca1ba5c05934d2d900c001fc420b39d44875a4db0a22f35",
+      "changed": true
+    },
+    {
+      "path": "src/execute_tools/inference_stream.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "d75c3b7eff5e672b261e6051efe53d9a1c3368992a5a34fa2ac0bfee81408574",
+      "candidate_sha256": "d75c3b7eff5e672b261e6051efe53d9a1c3368992a5a34fa2ac0bfee81408574",
+      "changed": false
+    },
+    {
+      "path": "src/execute_tools/model_input_dtype.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "528e40295b6024c3da81fb1f52fd02e75bdcd588af19f4527de1c3f7021391af",
+      "candidate_sha256": "528e40295b6024c3da81fb1f52fd02e75bdcd588af19f4527de1c3f7021391af",
+      "changed": false
+    },
+    {
+      "path": "src/execute_tools/target_standardization.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "6f5ce816765a6656f9cec3787b3b9380a0d9f96f2985f50cabd47266c06f63d2",
+      "changed": true
+    },
+    {
+      "path": "src/execute_tools/task_probe_batch.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "898bba0ff1d75c4b16c26d3aa6af35627768b334b6134ba2932ae41d588f4097",
+      "candidate_sha256": "e34b46cd3cd615f0e2952bb13a3fdb23415a07fa0a0a1d56b1490c39e0744047",
+      "changed": true
+    },
+    {
+      "path": "src/execute_tools/train_engine_sandbox.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "ea846322979a00f079cc550a81fc9a52fa1eb49985b14242bc84c270c88fa35c",
+      "candidate_sha256": "7d32389b27ea74620a8f4ed664bc509cdd8a35dd7f526009eee648a81c8bfc77",
+      "changed": true
+    },
+    {
+      "path": "src/ml_models/loss_models_sandbox.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "3146c4ed307f277b3ad35ad9615475b6d9f2f785cc26c0e0a98d3b79cc34a3b7",
+      "candidate_sha256": "3146c4ed307f277b3ad35ad9615475b6d9f2f785cc26c0e0a98d3b79cc34a3b7",
+      "changed": false
+    },
+    {
+      "path": "src/ml_models/loss_plugin_loader.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "56dac45f1a429c3f5374587b67313be9a030417aa9a5a0e8448c7143b52d12b3",
+      "candidate_sha256": "56dac45f1a429c3f5374587b67313be9a030417aa9a5a0e8448c7143b52d12b3",
+      "changed": false
+    },
+    {
+      "path": "src/ml_models/model_descriptions.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "5e25e2936143ad8f9a76e6f2ffe52f4e7e3c1307f1c11b87b5ea6c9d495c294c",
+      "candidate_sha256": "5e25e2936143ad8f9a76e6f2ffe52f4e7e3c1307f1c11b87b5ea6c9d495c294c",
+      "changed": false
+    },
+    {
+      "path": "src/ml_models/models_format_sandbox.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "2e5b4621a3b20026f32ba531c236ca552ca9d73eb8671cf5010e999c84cafaf9",
+      "candidate_sha256": "2e5b4621a3b20026f32ba531c236ca552ca9d73eb8671cf5010e999c84cafaf9",
+      "changed": false
+    },
+    {
+      "path": "src/ml_models/models_sandbox.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "9dcedbc108f06b71a40a699aa551d7cfa930c045d93606193e89e81c931eee90",
+      "candidate_sha256": "9dcedbc108f06b71a40a699aa551d7cfa930c045d93606193e89e81c931eee90",
+      "changed": false
+    },
+    {
+      "path": "src/ml_models/plugin_binding.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "aaf59f2cd860d860bf2da2b517bd35a2eadda1b420ace8badb2be34bef6a6002",
+      "candidate_sha256": "aaf59f2cd860d860bf2da2b517bd35a2eadda1b420ace8badb2be34bef6a6002",
+      "changed": false
+    },
+    {
+      "path": "src/ml_models/plugin_loader.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "bddf07baac3b524507639ee645fe3cec454224f912dfc5f0d7270acce954fdec",
+      "candidate_sha256": "bddf07baac3b524507639ee645fe3cec454224f912dfc5f0d7270acce954fdec",
+      "changed": false
+    },
+    {
+      "path": "src/ml_models/target_standardization.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "dba7d021f008284a2f6f0f2958ca1749374feba510fc11d40b8674ea4761e71e",
+      "candidate_sha256": "dba7d021f008284a2f6f0f2958ca1749374feba510fc11d40b8674ea4761e71e",
+      "changed": false
+    },
+    {
+      "path": "src/nodes/ml_hyperparameter_tune_agent/execution.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "cc146f5dab1e10364d677fc86eca22cc20daa1fd0ff8abaccc31cd8ea2604bc8",
+      "candidate_sha256": "0490a91335abe966d06b301cf80de6f7cc08537861bf786231f2f4553ad9bebc",
+      "changed": true
+    },
+    {
+      "path": "src/nodes/ml_hyperparameter_tune_agent/feedback.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "3f9dbe1fdda2e9f7e1aa3cc4944e606dbb3adf795b0343aa226717b3564d5d30",
+      "candidate_sha256": "3f9dbe1fdda2e9f7e1aa3cc4944e606dbb3adf795b0343aa226717b3564d5d30",
+      "changed": false
+    },
+    {
+      "path": "src/nodes/ml_hyperparameter_tune_agent/ml_hyperparameter_tune_agent.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "5902c82c066a57daf56826e969eedcb0da1f30af710c00d688df24aa798f82bf",
+      "candidate_sha256": "f2c91dac7b5d772a9a5e1a41452aeadfe030e57b36591f53478d7cf5ee539266",
+      "changed": true
+    },
+    {
+      "path": "src/nodes/ml_hyperparameter_tune_agent/runtime.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "e122c5a71d4cb7eb3b45f244ab0cf202c7d8072273da4f999f7147120b37ecba",
+      "candidate_sha256": "0ec24fbf5e7b0cd51af87da7a0dc100f47f972fc3714e3f957d8cfa51dfdde6c",
+      "changed": true
+    },
+    {
+      "path": "src/workflows/model_exploration.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "2f9a360fe3c8cce1d2c713c644b1859e993273a64d53224f49cbc90235b03879",
+      "candidate_sha256": "0a43ec0755ba4dd1520156d1955e265b44977136e9895408b0f4987e6cff718c",
+      "changed": true
+    },
+    {
+      "path": "src/workflows/task_composition.py",
+      "reference_member": true,
+      "candidate_member": true,
+      "reference_sha256": "34a6dd192824a71f20d91b55119096340f3bde4321049e096abca009c5e8a772",
+      "candidate_sha256": "34a6dd192824a71f20d91b55119096340f3bde4321049e096abca009c5e8a772",
+      "changed": false
+    },
+    {
+      "path": "src/workflows/task_settings.py",
+      "reference_member": false,
+      "candidate_member": true,
+      "reference_sha256": null,
+      "candidate_sha256": "d966d7e9b22266296b0d4e0977c69c127f14966a7d3386a09a6e5215d8fc8364",
+      "changed": true
+    }
+  ],
+  "source_review": {
+    "summary": "Static arithmetic/search/observation and static_only policy owners remain unchanged. The task probe honors resolved drop_last; new bound training, target-standardization, checkpoint, complete cleanup/host evidence, retained-worker accounting, ceiling and protected dispatch owners require explicit source qualification.",
+    "boundary": "Qualifies frozen static arithmetic/search and guarded projections only, with static_only and gpu_execution_policy unselected. No universal actual producer geometry, live resource admission or training parity. Existing Project8 audit covers 25 of 26 False configs; one geometry remains unavailable."
+  },
+  "separate_owner_sha256": {
+    "src/core/runtime_control/native_gpu_execution.py": "58f2e9996def61820d10ad1dab247ebd6a97219108f5fe9d86f5201ce4789ca4",
+    "src/core/runtime_control/inference_startup.py": "9a2df68f2f7079cfc21c4dedb276e22cb085973b62ef3c81f573809a56c1f939",
+    "src/core/runtime_control/gpu_execution_policy.py": "85ac96a020598dba8dffb8cf76da3d309f892b2b799b210c6de62d25f31a9020",
+    "src/core/runtime_control/gpu_execution_evidence.py": "e459500f9dabf805aed44f4f285499cab96cc11e288d982b9c0ea68be5f8259d",
+    "src/core/runtime_control/measurement_allowance.py": "2a2534e371c78c75e72e56beb10f61afb0836bd48dbbc7d2382c0867e65487dc",
+    "src/nodes/ml_hyperparameter_tune_agent/gpu_execution.py": "c58895797cb9922b0773f64e27750e828274c434614ac1e94821fea03cc79520",
+    "src/core/hardware_context.py": "ac33fd4d6a4cb79b6ffc242cdcd7bd60c22c7b87ac34366bdf24183e44f85234",
+    "src/core/sandbox_executor.py": "14e4c36be07a240832c39e0b2f41ff582e1a6f2d5aeec4f27572667fba8d21d2",
+    "src/core/execution_calibration.py": "25def6da0b288f04d352f573db6642ebb5d9d7501b22ec29cbf67014740edd92",
+    "src/core/runtime_control/observed_subprocess.py": "124fb53ec7540f0d0579fcb2be7bb22f7f9a499bd223a413ae541f9e8f2ec1d5"
+  }
+}

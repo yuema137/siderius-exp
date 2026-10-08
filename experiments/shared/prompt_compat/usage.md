@@ -27,7 +27,7 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
 ```
 
 This installs the package versions declared by the selected exp checkout
-(currently planner compatibility 0.8.0 and prompt compatibility 0.8.0) as normal
+(currently planner compatibility 0.8.0 and prompt compatibility 0.9.0) as normal
 packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
@@ -50,6 +50,14 @@ changed inside the rendering closure; runtime resource policies remain outside
 this message-parity claim. Root installation pins and historical configurations
 are not promoted by this qualification. The same new-workspace identity rule
 applies; preserve the old package for old recorded locks.
+
+Version 0.9.0 adds the exact final-pair renderer assembly at infra
+`faff23aad38a2892160f64a4f3cefe1c9d6c3632`. See the
+[final-pair report](qualifications/final-pair/report.md) for actual offline evidence.
+Only absent-policy historical inputs are within this comparison; newly selected
+protected-execution evidence is not recast as an old message. The repository pin
+now selects this reviewed source; public-source availability is verified separately
+when the release is synchronized.
 
 ## 2. Configure copies in a new workspace
 

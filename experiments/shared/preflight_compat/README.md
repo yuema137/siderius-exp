@@ -16,19 +16,16 @@ weights, or score.
 
 ## Install in the environment that runs infra
 
-This checkout's configuration helper requires paired #615 B2b infra revision
-`7c869e67f697d6bbc81eb554711ab77e23cb7362`, or a merged successor with the same
-qualified estimation, rendering and storage-source hashes. It supports the
-`inference_preflight` declaration shown below. The
-[qualification report](parity-report.md#explicit-historical-inference-policy-615-b2b)
-records the exact offline checks; earlier entries qualify only their named
-revisions.
+The current package targets the exact framework revision in the repository's
+`SIDERIUS_REVISION`. Its [final-pair report](qualifications/final-pair/report.md)
+records the source review, executed checks and limits. Use `static_only` and leave
+`gpu_execution_policy` unselected for this historical view. Newly measured/protected
+execution evidence is outside that qualification.
 
-Combined infra `334db95a39a988565dcb182c039d866ccd94e55b` and the B2a prerequisite
-`200c428afc6ee77f3dfd4968a95e88a2fd931471` remain historical qualification
-evidence. They do not support this new declaration. This change leaves
-`SIDERIUS_REVISION`, the public dependency pin, the lock file and archived
-experiment declarations unchanged.
+Earlier entries, including `7c869e67`, remain evidence for their recorded source
+pairs. Keep the corresponding old package when reopening an old workspace; the
+new qualification changes package identity. Frozen experiment declarations and
+archived results are preserved.
 
 The standalone `5aa404263c8dfb40662a8ab2f55225d801786984` entry in
 [qualification.json](src/siderius_preflight_compat/qualification.json) qualifies

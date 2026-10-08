@@ -2,7 +2,7 @@
 
 ## Owner and boundary
 
-Exp owns `siderius-preflight-compat` 0.1.0 and the explicit
+Exp owns `siderius-preflight-compat` 0.2.0 and the explicit
 `legacy-078b23ca-preflight-v1` entry point in `siderius.preflight_estimators`.
 There is no installed-default entry point. Infra owns typed observations,
 provider identity, composition binding, worker dispatch, probing, candidate
@@ -100,3 +100,14 @@ archive hash checks, paper source coverage and scoped frozen message results.
 No API calls, GPU work, downloads, or training are required for this contract.
 Historical prompts and information-flow comparison do not imply deterministic
 future responses, weights, scores or predictions.
+
+## Final-pair qualification boundary
+
+The [final-pair source review](qualifications/final-pair/source-review.json) compares
+`faff23aad38a2892160f64a4f3cefe1c9d6c3632` against `7c869e67`.
+This entry covers static arithmetic/search and guarded historical projection under
+`static_only`, with `gpu_execution_policy` unselected. It does not qualify historical
+projection of newly measured/protected execution evidence. Correct `drop_last=False`
+producer behavior can differ from the old full-batch-only probe; one archived
+Project8 configuration still lacks recovered geometry. The [execution receipt](qualifications/final-pair/report.md)
+distinguishes source review from checks actually run.
