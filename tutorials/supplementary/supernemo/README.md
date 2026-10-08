@@ -84,7 +84,7 @@ from the [official SuperNEMO release](https://zenodo.org/records/20698789):
 
 Together they occupy about 23.1 GB. Small training fractions do not reduce this
 source download. The [task-owned manifest](../../../tasks/supernemo_signal_background/declared/source_files.json)
-records the required sizes and official checksums.
+records the required files and their verification details.
 
 Keep these three locations separate and outside the source checkouts:
 
@@ -107,7 +107,7 @@ cd "$EXP_CHECKOUT"
   --raw-data-dir "$RAW_DATA" --output-dir "$PREPARED_DATA"
 ```
 
-This checks all raw-file checksums and runs the task's existing event-index
+This verifies all four raw files and runs the task's existing event-index
 tool. It reads large columns and needs CPU time and RAM, but makes no LLM calls
 and performs no GPU training. It creates links rather than copying raw files.
 Success prints the path to `preparation.json`. An incomplete directory is not
@@ -222,7 +222,7 @@ bash "$TUTORIAL_HOME/scripts/run-supernemo.sh" --launch
 The first command inspects the saved setup; `--dry-run` also prints native
 commands. Neither launches training. For a saved variant, use its own script
 path printed by the notebook review cell. Launch checks keys, source pairing,
-GPU readiness, raw checksums and prepared-index identity before execution.
+GPU readiness, raw-file integrity and the prepared indexes before execution.
 
 **Run All reaches the live cell by default.** Set `RUN_QUICK_DEMO=False` to
 skip it. The notebook invokes that same saved script rather than training

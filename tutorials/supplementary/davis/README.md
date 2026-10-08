@@ -63,15 +63,15 @@ verify and extract the official archive:
   --dest "$DAVIS_DATA" --extract --check-layout
 ```
 
-The helper reuses a present archive and checks its SHA-256. Keep data outside
+The helper reuses and verifies a present archive. Keep data outside
 both repositories. See the [data guide](../../../tasks/davis_future_prediction/data/README.md)
 for the exact directory layout, original split and data terms. The tutorial
 never regenerates manifests or copies video files into your project.
 
 Preview verifies frozen manifest identity and required frame presence. Launch
-also verifies the archive SHA-256 and ten frozen decoded-window probes. This
-checks those named windows; it is not a cryptographic verification of every
-extracted image. Do not treat an archive hash alone as proof of extracted bytes.
+also verifies the original archive and ten fixed decoded windows. This checks
+those named windows, not every extracted image. Verifying the archive alone
+does not establish that all extracted images are unchanged.
 
 ## 3. Create an external project
 

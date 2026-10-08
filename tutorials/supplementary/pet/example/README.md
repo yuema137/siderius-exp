@@ -2,7 +2,7 @@
 
 These are measured outputs from a completed three-iteration process demo,
 not paper results. The [provenance receipt](provenance.json) records exact
-source revisions, task identity, source-record hashes, dataset counts and the
+source revisions, task identity, verification records for the original results, dataset counts and the
 conservative validation-budget accounting.
 
 ![Task-materialized training images](images.png)

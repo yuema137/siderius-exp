@@ -4,7 +4,7 @@ This three-iteration demo used real Majorana Low-AvsE data and GPT-6 Luna on an
 RTX 5090. It demonstrates the complete notebook → saved script → recorded score
 workflow. It is a supplementary example, not a paper artifact or a promised score.
 The [provenance receipt](provenance.json) records the executed source revisions,
-settings, task identity and hashes of the native score records.
+settings, task identity and verification records for the native scores.
 
 ## See the input
 

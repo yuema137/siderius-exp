@@ -54,7 +54,7 @@ Repeating Run All reused the saved result without new API requests and preserved
 the completion receipt. This demonstrates one source/data/hardware sequence,
 not every possible generated model or device.
 
-One-time CPU data preparation was separate: it verified all four raw MD5s and
+One-time CPU data preparation was separate: it verified all four raw files and
 built indexes in about 3.3 minutes on this machine. Its timing is not included
 in the live campaign figures above. See the [setup guide](../README.md) to reuse
 local files or prepare your own external directories. Initialization clears the

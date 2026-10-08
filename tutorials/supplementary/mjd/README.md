@@ -97,7 +97,7 @@ cd /absolute/path/siderius-exp
 
 Success prints `Majorana dataset verification passed: 22 file(s)`. Verification
 reads all supervised bytes. Launch repeats it; preview checks names and sizes
-only. Do not edit checksums to make a damaged download pass. The tutorial rejects
+only. Do not alter verification records to make a damaged download pass. The tutorial rejects
 a copied dataset manifest that differs from the task's official manifest.
 Smaller fractions reduce selected waveform/training work, not the required files
 or the task loader's complete-partition metadata reads.
@@ -194,8 +194,8 @@ bash /absolute/path/my-mjd-project/scripts/run-mjd.sh --launch
 ```
 
 The first two commands stay offline. `--dry-run` also asks the native launcher
-to render its command. `--launch` checks the selected setup and all official
-MD5 values before running. Notebook section 5 invokes this same saved script;
+to render its command. `--launch` checks the selected setup and the integrity of all 22 official
+files before running. Notebook section 5 invokes this same saved script;
 set `RUN_QUICK_DEMO=False` to skip it. `RUN_NATIVE_PREVIEW=False` separately
 skips native preview for a file-only walkthrough. When the selected workspace
 already exists, the notebook skips native launch preview and lets section 5

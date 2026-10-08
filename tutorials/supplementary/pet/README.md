@@ -193,7 +193,7 @@ bash /absolute/path/my-pet-project/scripts/run-pet.sh
 ```
 
 It prints the native command, exact revisions, strategy identity, split counts,
-input hashes and required key presence. It makes no API calls or CUDA allocation.
+selected input identities and required key presence. It makes no API calls or CUDA allocation.
 A missing dataset, dirty/mismatched checkout or incomplete environment produces
 an error before execution. To also check native launcher argument parsing:
 

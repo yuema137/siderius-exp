@@ -65,8 +65,8 @@ curl --fail --location --output "$CANCER_DATA/cpdb/data.h5" \
 ```
 
 Use that command only when the file is missing. The copied task's
-`declared/tutorial_source_files.json` owns its exact size and SHA-256. Preview
-checks size and mask structure; launch verifies full SHA-256. No index-building
+`declared/tutorial_source_files.json` records the required file and verification details. Preview
+checks size and mask structure; launch verifies the complete source file. No index-building
 or second prepared-data directory is needed.
 
 ## 3. Create your own project
