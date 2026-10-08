@@ -37,6 +37,11 @@
       "infra_revision": "7c869e67f697d6bbc81eb554711ab77e23cb7362",
       "assembly_sha256": "a6176390bbe94ccf116c7429fbd238f387f80a6e30b4fdf685439b571a0f2d9e",
       "scope": "Additive typed inference verification record fields; explicit historical static_only task policy and v6/v7 rejection guard; bounded frozen rendering corpus, not complete conversation replay"
+    },
+    {
+      "infra_revision": "34660bed0960f3bcad60ba30aaedffaaf617ff8b",
+      "assembly_sha256": "76792a754d20d6ef34be8af993dd40900b2627e9cd145823fa7b01551364947b",
+      "scope": "Release configuration transport and namespace admission candidate; frozen rendering and historical proposer-route boundaries only, not full conversation or runtime qualification"
     }
   ]
 }
