@@ -62,6 +62,11 @@
       "infra_revision": "7d0d32142a567c9e30443c7b6304ab943e714ac5",
       "assembly_sha256": "855e13f04eec1e5b8080bd1e3f55651be1995640e0d41458f485100ec6165710",
       "scope": "Explicit per-route retry policy schema/transport and clarified hardware API reference; frozen original requests and absent historical retry configuration. Late-response telemetry keeps deadline refusal; full conversation and stochastic replay remain outside scope."
+    },
+    {
+      "infra_revision": "46ee992043a1ccb0e2db57cac1afc8a73171e063",
+      "assembly_sha256": "f032911dd790843720989dbdeffa7ddfac8f58736be05d940a9065cbe9464d4e",
+      "scope": "Typed task objective and Health binding round trips; frozen historical rendering and static decision corpus. No new scientific configuration, runtime estimator or training algorithm; not full conversation replay."
     }
   ]
 }
