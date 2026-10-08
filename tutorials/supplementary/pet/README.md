@@ -53,7 +53,7 @@ discovery API refuses launch rather than borrowing another checkout's environmen
 
 ### Check hardware before paid execution
 
-The default demo uses a 8 GiB VRAM allowance. Available room and deployment
+The default demo uses an 8 GiB VRAM allowance. Available room and deployment
 limits must accommodate that allowance as well as current device occupancy; a
 card's advertised capacity alone is insufficient. CPU training is unsupported.
 See the [hardware guide](../../shared/hardware/README.md) for this task's data,
