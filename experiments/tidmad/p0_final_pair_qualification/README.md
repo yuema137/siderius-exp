@@ -1,4 +1,7 @@
-# TIDMAD final-pair qualification
+# TIDMAD historical P0 final-pair qualification
+
+This wrapper requires the [historical P0 infra pin](../../p0_final_pair_qualification/README.md),
+not the current repository-root release revision.
 
 This is a bounded consumer-pair qualification wrapper, not the TIDMAD Gold
 campaign. It exercises the selected task and workflow with a fresh external

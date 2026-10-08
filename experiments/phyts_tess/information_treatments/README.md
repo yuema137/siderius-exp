@@ -7,8 +7,8 @@ the same workflow parameters. **The information is the only variable.**
 
 | treatment | used by | advice | Data Analysis | Literature Review |
 |---|---|---|---|---|
-| [`main-fixed-no-prior.yaml`](main-fixed-no-prior.yaml) | fixed workflow | disabled | disabled | enabled |
-| [`main-fixed-full.yaml`](main-fixed-full.yaml) | fixed workflow | enabled, sha-pinned | enabled | enabled |
+| [`main-fixed-no-prior.yaml`](main-fixed-no-prior.yaml) | fixed workflow | disabled | disabled | disabled |
+| [`main-fixed-full.yaml`](main-fixed-full.yaml) | fixed workflow | enabled, sha-pinned | enabled | disabled |
 | [`main-cli-no-advice.yaml`](main-cli-no-advice.yaml) | coding-agent baseline | disabled | `not_applicable` | `not_applicable` |
 
 The CLI treatment says `not_applicable`, not `disabled`, and the distinction

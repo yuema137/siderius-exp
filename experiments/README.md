@@ -1,9 +1,15 @@
 # Experiments
 
-Start here when you have selected a task and need one concrete, bounded
-treatment. An experiment is a reproducibility identity, not a campaign
-authorization. Open the task-specific qualification page before preparing a
-workspace; use `--dry-run` where the launcher supports it.
+Start here when you have selected a task and need one concrete treatment.
+For a first run, choose one of the [five notebook demos](../tutorials/README.md):
+the four paper-task demos or supplementary Pet. They are simplified examples,
+not one-click paper reproductions. The table below also includes research
+launchers, which need their declared data, environments and budgets.
+
+An experiment is a reproducibility identity, not a campaign authorization.
+An available launcher does not mean that every profile has completed a real run
+on the current repository pair. Read its evidence and use `--dry-run` where
+supported before preparing an effectful launch.
 
 | Task family | Bounded qualification | Notes |
 |---|---|---|
@@ -11,9 +17,11 @@ workspace; use `--dry-run` where the launcher supports it.
 | TIDMAD coding-agent baseline | [`coding_agent_baseline/`](tidmad/coding_agent_baseline/) | four independent no-advice Codex band units; launch record, not final results |
 | TIDMAD raw Data Analysis | [`data_analysis_raw_characterization/`](tidmad/data_analysis_raw_characterization/) | full high-frequency band, raw-data smoke only; not the matched ON/OFF treatment |
 | TIDMAD Data Analysis pair | [`data_analysis_pair/`](tidmad/data_analysis_pair/) | bounded local ON/OFF qualification; Literature Review runs first |
-| Oxford-IIIT Pet | [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | consumer-pair qualification |
+| Oxford-IIIT Pet | [tutorial template](oxford_iiit_pet/tutorial_demo/README.md), [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | start with the [Pet tutorial](../tutorials/supplementary/pet/README.md) |
 | DAVIS | [`two_iteration_qualification/`](davis_future_prediction/two_iteration_qualification/) | consumer-pair qualification |
-| Cancer MTG | [`p0_final_pair_qualification/`](cancer_gene_identification/p0_final_pair_qualification/) | consumer-pair qualification |
+| Cancer MTG | [`mtg_size_qualification/`](cancer_gene_identification/mtg_size_qualification/) | launcher available; no uninterrupted complete discovery-chain qualification is claimed |
+| Majorana Low-AvsE (MJD) | [profiles and qualification](majorana_low_avse/README.md) | research launcher; supplementary notebook planned |
+| SuperNEMO | [profiles and qualification](supernemo_signal_background/README.md) | research launcher; supplementary notebook planned |
 | PhyTS TESS | [`main_fixed_workflow/`](phyts_tess/main_fixed_workflow/) | historical NoPrior execution recorded; current-pair qualification is separate |
 | PhyTS LIGO | [`main_fixed_workflow/`](phyts_ligo/main_fixed_workflow/) | NoPrior; archived launch/startup evidence is indexed separately |
 | PhyTS Project 8 | [`main_fixed_workflow/`](phyts_project8/main_fixed_workflow/) and [dual representation](phyts_project8/main_fixed_workflow_dual_representation/README.md) | distinct input contracts; keep their evidence separate |
@@ -23,7 +31,12 @@ For the paper's recorded source/configuration pairs and their limits, use the
 launch responsibilities are grouped under [shared support](shared/README.md).
 
 Archived experiments are retained as dated evidence and are not current launch
-routes. Campaign coordination belongs under [`campaigns/`](../campaigns/README.md).
+routes. The [P0 final-pair wrappers](p0_final_pair_qualification/README.md)
+intentionally require their separate historical infra revision. They do not
+qualify the current release. Cancer, MJD and SuperNEMO supplementary notebooks
+remain planned. Coding-agent and orchestration preparation directories may also
+require deployment work; their own pages state whether they are launchable.
+Campaign coordination belongs under [`campaigns/`](../campaigns/README.md).
 
 Each experiment directory selects one static task package and one workflow,
 then owns one concrete treatment: parameter values, advice, literature-review
@@ -71,6 +84,7 @@ Historical locked launchers retain their own `SIDERIUS_REVISION` beside the
 experiment. The repository-root revision names the current development pair;
 updating it must not silently retarget an archived experiment.
 
-Final consumer-pair qualification wrappers live under each task's
-`p0_final_pair_qualification/` directory and support exact-checkout,
-fresh-workspace and `--dry-run` validation.
+Historical P0 consumer-pair wrappers live under each task's
+`p0_final_pair_qualification/` directory. Use the revision required by their
+[shared historical pin](p0_final_pair_qualification/SIDERIUS_REVISION), a fresh
+workspace and `--dry-run`; do not substitute the repository-root release pin.

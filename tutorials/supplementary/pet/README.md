@@ -44,9 +44,11 @@ AMD/ROCm compatibility is experimental and untested; required driver/process
 accounting is not implemented, so this tutorial currently refuses that path.
 Intel GPU and CPU training are unsupported. Keep the frozen installation and
 required protection intact; no ROCm installation profile is qualified here.
-This portability update awaits final paired source qualification and framework
-pin promotion. A framework missing the discovery API refuses launch rather than
-borrowing another checkout's environment.
+The [current source-pair qualification](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+records the pinned framework and offline installation/compatibility checks.
+It does not establish a fresh Pet run with Luna or fresh GPU qualification;
+the archived run below retains its original model and source provenance. A framework missing the
+discovery API refuses launch rather than borrowing another checkout's environment.
 
 ## 2. Reuse images, or download once
 
