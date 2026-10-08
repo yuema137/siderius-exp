@@ -1,0 +1,10 @@
+SIDERIUS historical compatibility package
+=========================================
+
+Original SIDERIUS compatibility code and bundled historical prompt material
+are licensed under the MIT License in LICENSE. This package does not include
+external scientific datasets or tutorial photographs. The parent siderius-exp
+repository's NOTICE identifies those separately distributed materials.
+
+License metadata does not change the preserved historical source, prompt
+templates, configuration, package version or runtime identity inputs.
