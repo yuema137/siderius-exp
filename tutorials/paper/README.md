@@ -290,12 +290,14 @@ separately defined experiment.
 
 ## 4. Choose existing data OR a download
 
-On the shared 5090 machine, reuse the existing source files instead of downloading:
+If you already have the pinned source files, set `TESS_SOURCE` to their absolute
+external directory and reuse them instead of downloading:
 
 ```bash
+export TESS_SOURCE="/absolute/path/to/TESS/split"
 cd "$EXP_CHECKOUT"
 .venv/bin/python -B -m tutorials.paper.data_entry --task tess \
-  --project "$TUTORIAL_HOME" --source /home/klz/Data/TESS/split
+  --project "$TUTORIAL_HOME" --source "$TESS_SOURCE"
 ```
 
 This verifies the pinned Parquet files and writes only the two required NPZ run

@@ -53,15 +53,17 @@ never overwritten.
 
 ## 3. Choose one data entrance
 
-**A — Shared 5090 host: read the existing prepared data.** No large data is
+**A — Read existing prepared data.** Set `PREPARED_SOURCE` to the absolute external
+directory for your selected task. No large data is
 copied or downloaded. Only the selected rows are saved in your project. For
 Project8, the source is the original prepared time-input view; the helper adds
 the existing task's FFT representation to those selected rows.
 
 ```bash
+export PREPARED_SOURCE="/absolute/path/to/prepared/$DEMO_TASK"
 .venv/bin/python -B -m tutorials.paper.prepared.data \
   --task "$DEMO_TASK" --project "$TUTORIAL_HOME" \
-  --source "/home/klz/Data/SIDERIUS-ICLR/prepared/phyts-paper-v1-20260922/$DEMO_TASK"
+  --source "$PREPARED_SOURCE"
 ```
 
 **B — Your own machine: fetch only selected byte ranges from the public data.**

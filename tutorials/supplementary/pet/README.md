@@ -47,9 +47,9 @@ borrowing another checkout's environment.
 ## 2. Reuse images, or download once
 
 If the dataset is already available, pass its **images directory**, containing
-files such as `Abyssinian_100.jpg`, directly to project initialization. On the
-shared 5090 host, the operator-provided location is
-`/home/klz/Data/OXFORD_IIIT_PET/images`; this is an example deployment, not a default.
+files such as `Abyssinian_100.jpg`, directly to project initialization. Supply
+your own absolute external path with `--images`; no machine-specific data
+location is assumed.
 No JPEGs are copied or downloaded by initialization.
 
 For another machine, the repository provides an explicit acquisition tool:

@@ -26,12 +26,13 @@ and export keys below before starting Jupyter.
 
 ## Choose existing data OR a download
 
-**Shared 5090 machine:** reuse the existing large files, without copying or
-re-downloading them:
+**Existing data:** set `TIDMAD_SOURCE` to your absolute external directory and
+reuse the large files, without copying or re-downloading them:
 
 ```bash
+export TIDMAD_SOURCE="/absolute/path/to/TIDMAD"
 .venv/bin/python -B -m tutorials.paper.data_entry --task tidmad \
-  --project "$TUTORIAL_HOME" --source /home/klz/Data/TIDMAD
+  --project "$TUTORIAL_HOME" --source "$TIDMAD_SOURCE"
 ```
 
 This verifies the eight source hashes and creates only symbolic links in
