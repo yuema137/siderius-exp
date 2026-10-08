@@ -1,6 +1,28 @@
 # STATUS — NatureBench cancer-gene identification
 
-## Maturity: **L2 — real-data GPU training proven; no complete discovery-chain witness**
+## Current evidence and limits
+
+The [CPDB teaching demo](../../tutorials/supplementary/cancer/example/README.md)
+completed three LLM-driven discovery iterations, including all six Trial/Formal
+attempts, using real CPDB data, GPT-6 Luna and an RTX 5090. Its
+[receipt](../../tutorials/supplementary/cancer/example/provenance.json) records
+exp `9e5b4c166dc0a58271c251e93e6f3f453c8310bd` and infra
+`52373be9a52bead36fd1f15d706385967e0a129d`.
+
+This witness uses only `compositions/cpdb_tutorial.yaml` and CPDB's original
+Train/Validation masks. Validation feeds search; reserved Test labels were not
+loaded or scored. The task declares no Health checks, so successful execution
+is not Health PASS. It does not qualify an uninterrupted two-network chain,
+an eight-network comparison, final refit/test, independent replication or every
+later source pair. It is teaching evidence, not a paper artifact.
+
+## Historical qualification ledger
+
+The following maturity assessment, server observations and remaining-work list
+belong to the earlier multi-network qualification. Preserve their original
+scope: the later CPDB-only witness does not retroactively complete those runs.
+
+### Recorded maturity: **L2 — real-data GPU training proven; no complete discovery-chain witness**
 
 The maturity vocabulary and pack-governance authority are
 `docs/design/siderius_generic_framework_upgrade.md` §22.23. This pack is an
@@ -48,7 +70,7 @@ Proven on the `ligroup` development server:
   failure class was isolated. The artifacts remain diagnostic evidence and
   are not a scored result.
 
-Not yet proven:
+Not established by that qualification:
 
 - acquisition and identity verification of the eight real NatureBench HDF5
   files on TestPod;

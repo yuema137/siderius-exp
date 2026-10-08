@@ -34,6 +34,9 @@ implements average precision and ROC AUC without importing a second benchmark
 package; targeted tie-handling tests pin the threshold semantics.
 
 The local synthetic fixtures in
-`tests/unit/examples/test_cancer_gene_identification_pack.py` are generated at
-test time and are not scientific evidence. No real-data or GPU workload has
-run on this branch as of this status.
+`tests/tasks/cancer_gene_identification/test_cancer_package_contract.py` are
+generated at test time and are not scientific evidence. The later
+[CPDB tutorial receipt](../../tutorials/supplementary/cancer/example/provenance.json)
+records a real-data, three-iteration GPU workflow at its exact source pair.
+See [STATUS.md](STATUS.md) for the CPDB-only scope and the separate historical
+multi-network qualification; neither establishes the full comparator result.
