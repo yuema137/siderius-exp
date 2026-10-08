@@ -9,7 +9,7 @@ import shlex
 import shutil
 from pathlib import Path
 
-from tutorials.shared.bootstrap import shell_setup_guard
+from tutorials.shared import saved_script
 from tutorials.shared.llm_setup import write_test_llm_config
 from tutorials.shared.runtime import ROOT, disjoint
 from tutorials.supplementary.pet.settings import PetExperiment
@@ -18,48 +18,22 @@ TEMPLATES = ROOT / "experiments/oxford_iiit_pet/tutorial_demo"
 
 
 def write_launcher(destination: Path, experiment: Path) -> None:
-    source = (
-        "#!/usr/bin/env bash\nset -euo pipefail\n"
-        "# Edit the saved experiment; export credentials before running this script.\n"
-        f"EXP_CHECKOUT={shlex.quote(str(ROOT))}\n"
-        f"EXPERIMENT={shlex.quote(str(experiment.resolve()))}\n"
-        + shell_setup_guard()
-        + 'cd "$EXP_CHECKOUT"\n'
-        'exec "$EXP_CHECKOUT/.venv/bin/python" -B -m tutorials.supplementary.pet.runner '
-        '--experiment "$EXPERIMENT" "$@"\n'
+    saved_script.write_launcher(
+        destination,
+        experiment,
+        checkout=ROOT,
+        runner_module="tutorials.supplementary.pet.runner",
     )
-    with destination.open("x") as stream:
-        stream.write(source)
-    destination.chmod(0o755)
 
 
 def validate_launcher(experiment: Path, script: Path) -> None:
-    """Check the literal saved-file handoff before review or delegation.
-
-    This checks generated-script bindings, not arbitrary shell-code safety.
-    """
-    lines = script.read_text().splitlines()
-    for key, expected in (("EXPERIMENT", experiment.resolve()), ("EXP_CHECKOUT", ROOT)):
-        assignments = [
-            line.split("=", 1)[1] for line in lines if line.startswith(key + "=")
-        ]
-        if len(assignments) != 1:
-            raise ValueError(f"launcher must have one literal {key} binding")
-        values = shlex.split(assignments[0])
-        if (
-            len(values) != 1
-            or not Path(values[0]).is_absolute()
-            or Path(values[0]).resolve() != expected
-        ):
-            raise ValueError(
-                f"launcher {key} does not match the selected saved experiment/checkout"
-            )
-    entry = (
-        'exec "$EXP_CHECKOUT/.venv/bin/python" -B -m tutorials.supplementary.pet.runner '
-        '--experiment "$EXPERIMENT" "$@"'
+    """Check the selected saved-file bindings before review or delegation."""
+    saved_script.validate_launcher(
+        experiment,
+        script,
+        checkout=ROOT,
+        runner_module="tutorials.supplementary.pet.runner",
     )
-    if entry not in lines:
-        raise ValueError("launcher is not the Pet tutorial runner")
 
 
 def save_variant(
