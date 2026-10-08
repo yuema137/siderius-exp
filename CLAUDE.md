@@ -212,6 +212,12 @@ case-insensitively:
   complete enough that an agent can implement or verify the contract without
   reconstructing missing decisions. Agent-facing does not mean opaque prose.
 
+Human-facing README pages and notebook Markdown must not display raw checksum
+values or explain hash bookkeeping. Give the verification command, expected
+success and recovery action instead. Keep exact digests and identity details in
+the owning agent-facing technical reference or machine-readable manifest; link
+to that owner when needed. Preserve the actual checks and frozen evidence.
+
 Tutorial notebooks (`.ipynb`) remain learner-facing. A Markdown filename
 containing `tutorial` does not change its audience. Runtime prompt, skill and
 advice Markdown also carries executable input meaning: changing its wording
