@@ -1,4 +1,10 @@
 {
   "schema_version": 1,
-  "assemblies": []
+  "assemblies": [
+    {
+      "infra_revision": "ec92186d64622742473a421c4e9d61c5134b05e3",
+      "assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad",
+      "scope": "Frozen verifier source oracles and installed policy, child, session and standard CLI compatibility. Final paired prompt qualification is separate."
+    }
+  ]
 }

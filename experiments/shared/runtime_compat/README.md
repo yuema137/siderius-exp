@@ -4,12 +4,18 @@ Use this package when you want a **new external workspace** to apply a paper
 experiment's original timing rules. Ordinary tutorials use the framework's
 corrected default and do not need this package. Installing it changes no default.
 
+**Release qualification is in progress.** Offline timing and installation checks
+pass with infra `ec92186d`, but the standard exp installation does not yet install
+that candidate. Independent review and the final prompt comparison remain open.
+The commands below explain the installation procedure; they are not yet a
+ready-to-run public installation guide.
+
 The paper runs estimated training time from observed steps. Their rules could
 reject a short phase even after every requested step had finished, because too
 few observations were stable. New infra can use the actual time of completed
 work. This package preserves the original timing algorithms and selects the
-original admission rule explicitly, so that replaying old evidence can reproduce
-the old decisions as well as the old prompt text.
+original admission rule explicitly. The separate historical prompt adapters can
+then present those decisions to the agents in the original format.
 
 ## Prepare your own launch
 
@@ -63,18 +69,14 @@ not installed there. An unqualified assembly or different identity means the
 source pair is not verified together. Fix the installation; do not remove the
 historical arguments or bypass the check.
 
-**Qualification is in progress.** The package currently refuses production
-selection until a reviewed infra source assembly is recorded. These commands
-are the installation procedure, not a claim that this development candidate is
-already publicly installable or ready for a real launch.
-
 Use a fresh workspace. Do not edit old locks, overwrite archived evidence or
 import old timing-calibration entries as though the new profile had produced
 them. New measurements record the selected profile's identity.
 
 This package restores the tested timing decisions; it does not restore deleted
 artifacts or guarantee identical new LLM responses, trained weights or scores.
-The [technical contract](contract.md) lists the original sources, test boundaries
-and remaining qualification. [Prompt adapters](../prompt_compat/README.md) and
+The [technical contract](contract.md) and [qualification results](qualification-report.json)
+list the original sources, test boundaries and remaining qualification.
+[Prompt adapters](../prompt_compat/README.md) and
 the [static estimator adapter](../preflight_compat/README.md) remain separate
 historical requirements.

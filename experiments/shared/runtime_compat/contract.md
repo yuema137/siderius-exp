@@ -54,8 +54,11 @@ current configuration schema and prevents assuming that future defaults match.
 Each profile declares the package factory, adapter, all imported frozen modules,
 source inventory and qualification file as source identity inputs. Its identity
 also binds the infra runtime verifier assembly. `qualification.json` is an
-allowlist of reviewed assemblies; it is currently empty pending final pairing.
-Unknown assemblies fail closed. Profiles have explicit version `1`; no implicit
+allowlist of qualified assemblies. Its current candidate is infra `ec92186d`
+(assembly `0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad`).
+The [qualification report](qualification-report.json) records the installed source
+hashes and passing offline checks; independent review and final pairing remain
+pending. Unknown assemblies fail closed. Profiles have explicit version `1`; no implicit
 historical default or automatic fallback is installed.
 
 The launch and execution environments must install the same package and paired
@@ -95,10 +98,19 @@ gaps. The candidate must match those outputs without rewriting the oracles.
 The two original fast-suffix failures that newer native infra would accept are
 particularly important: matching only pre-fix infra would miss this gap.
 
-Pending final-source qualification must exercise installed entrypoint discovery,
-actual policy validation and serialization to a child, all 23 session outcomes,
-version-specific branches, unknown/changed identities, and the existing 47
-frozen prompt messages. Infra owns generic native completion and boundary tests;
+The installed candidate passes 65 focused tests: all 23 session outcomes match
+the unchanged original measurements, predictions, statuses and admissions; all
+12 original version-branch oracles match; all 11 paper-unit flag sets pass the
+actual standard CLI and launch projection; three independent children resolve
+the same identity and construct the selected historical verifier. Controls reject
+missing providers, changed identities, unknown assemblies and incompatible
+completion selections. The report verifies 17 installed infra closure files and
+all eight package identity files against the source checkouts. Both installs are
+normal, noneditable installations in this exp checkout's own environment.
+
+Final-source qualification still requires independent review, generated-record
+historical presentation checks, and the existing 47 frozen prompt messages.
+Infra owns generic native completion and boundary tests;
 exp owns historical selection and comparisons. Prompt equality is not proof of
 live control-flow parity. No complete conversation, training, score reproduction,
 API call, GPU execution or dataset download is claimed by these offline checks.

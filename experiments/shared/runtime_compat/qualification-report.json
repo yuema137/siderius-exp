@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "infra_revision": "ec92186d64622742473a421c4e9d61c5134b05e3",
+  "assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad",
+  "infra_source_sha256": {
+    "core/runtime_control/verifier_provider.py": "2c96ead09beb3dbfa8690311d012d6a5a70ded461ba0229028c49c89f3c827f8",
+    "core/runtime_control/adaptive.py": "325e84c29511bde5bfe64d9fb12d96ed4ebe97b95c4b0d10b44f68a96595bd15",
+    "core/runtime_control/steady_state.py": "b2ee5e7c32d915684848ae772acedf7bc4c8ab6d304509089e72a8c56ab749db",
+    "core/runtime_control/distribution_shift.py": "f45a3f328282419991532113b562ea4718e0a61b4d342a3d6ca35c9c8cfcd6dd",
+    "core/runtime_control/session.py": "867894818c60ae9044e16c9d17c5c17437f9c7d80e66783590a48b8d8b09c450",
+    "core/runtime_control/records.py": "80385839e040b6792f100ff998342a4df986d39ba42493ebccea59a14b40f422",
+    "core/runtime_control/workload.py": "34e7628d95f6184dbddc5de83a5706f9906ac5bc92e4a8c3bfe58a4ecdbafb1f",
+    "core/runtime_control/completion.py": "baa49fdf4e29588fe10d2715703d4392f3eb90c896fb51ff953869d53a8eab3b",
+    "core/runtime_control/execution_status.py": "ac874512c02f0af29c050cb5b145a1dbab8227147c0d698aaa38078462359495",
+    "core/run_invariants.py": "f15f9ddabba59f015ba2a0e6986f0853bb43d3d8dc60a6eecd140ac1a73b80dc",
+    "core/sandbox_executor.py": "20a295c11b043445d376f9e2af8e8ba78676b73b0eebc619843099181f89cb53",
+    "nodes/ml_hyperparameter_tune_agent/runtime.py": "d1fde37d70465170aba29ce2b788d0438bd55660e7da05b8f01eb52f9b81b455",
+    "core/runtime_control/observation_store.py": "8926ce82040c352304a65581e8da40dc62d3509c563cf58958261bec3425f138",
+    "execute_tools/train_engine_sandbox.py": "c2b68b9467446689a250d6015bc2b9efb42c01cd3aebc613bf66e2c49dfc7cb3",
+    "execute_tools/training_budget_execution.py": "da6a8644a33da6b40ed25930f8d28e7513f5c1f97f2e94a9f532aa0803907220",
+    "execute_tools/inference_runtime.py": "4026a37559ed875de4d6b2f17cef6e19382b3307eec2a1df2a1fc03c7a24b8f2",
+    "execute_tools/inference_single.py": "f9f8d2f27448cf661ca1ba5c05934d2d900c001fc420b39d44875a4db0a22f35"
+  },
+  "package_source_sha256": {
+    "adaptive_345c802d.py": "480b752b39541f22a99deeb8e9e6951679850f76c0fd167f0a4c8f356297f9d0",
+    "adapter.py": "241168b834eab905ff1680cca1b848742ee061f947bb3f979d5e4c55b67e3904",
+    "source-inventory.json": "3c9ef4a50cf2a912fd5b6e1affcc1b7f08a565866f157a3b41747e0c1687a5bc",
+    "adaptive_7689fd58.py": "489c1673f4be02393afc0aa246330413c2c836a326a1b2fb874ba6e19da4ba93",
+    "steady_state.py": "b2ee5e7c32d915684848ae772acedf7bc4c8ab6d304509089e72a8c56ab749db",
+    "__init__.py": "15cb1668619295bc359bb316c0f6c793c1f5fa831e05d9d84f02fa845b55c502",
+    "qualification.json": "f34c3015baf297b7959602b10561a95fd2f5e8c631c6f3585229db73f64dc958",
+    "adaptive_349b6cd6.py": "f4dd4caac2743236b1fd63cbde135485ee169787b0e901bc710b1a1fe0e78b18"
+  },
+  "profiles": [
+    {
+      "name": "legacy-345c802d-verifier-v1",
+      "version": "1",
+      "content_sha256": "1d89ab6703903cdcbf2f3cb4279bd54382f4275185b45004065e49fddcd6a508",
+      "assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad"
+    },
+    {
+      "name": "legacy-7689fd58-verifier-v1",
+      "version": "1",
+      "content_sha256": "1d89ab6703903cdcbf2f3cb4279bd54382f4275185b45004065e49fddcd6a508",
+      "assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad"
+    },
+    {
+      "name": "legacy-349b6cd6-verifier-v1",
+      "version": "1",
+      "content_sha256": "1d89ab6703903cdcbf2f3cb4279bd54382f4275185b45004065e49fddcd6a508",
+      "assembly_sha256": "0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad"
+    }
+  ],
+  "normal_noneditable_installs_verified": true,
+  "checks": {
+    "pytest_passed": 65,
+    "original_archive_session_cases": 23,
+    "original_version_branch_cases": 12,
+    "paper_unit_cli_projection_cases": 11,
+    "independent_child_profile_cases": 3
+  },
+  "scope": "Installed timing algorithm, session decision and launch identity boundaries; not final prompt qualification or complete training replay.",
+  "api_calls": 0,
+  "gpu_runs": 0,
+  "training_calls": 0,
+  "remaining": [
+    "Independent review of the exact source pair",
+    "Generated-record historical prompt projection and existing 47 message qualification",
+    "Root-owned final dependency pin and public installation verification"
+  ]
+}
