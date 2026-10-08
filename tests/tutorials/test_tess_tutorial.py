@@ -67,24 +67,6 @@ def test_symlink_alias_cannot_put_workspace_inside_source(tmp_path):
         runner.build_command(settings(tmp_path, workspace=tmp_path / "data/run"))
 
 
-def test_gpu_mismatch_and_overbudget_refuse_before_cuda_probe(tmp_path, monkeypatch):
-    """An unsupported GPU or impossible budget must not reach a training command."""
-    calls = []
-
-    def run(command, **kwargs):
-        calls.append(command)
-        return subprocess.CompletedProcess(
-            command, 0, stdout="NVIDIA GeForce RTX 5090, 32607\n"
-        )
-
-    monkeypatch.setattr(runner.subprocess, "run", run)
-    with pytest.raises(ValueError, match="expected one H100"):
-        runner.verify_gpu(settings(tmp_path, gpu="H100"))
-    with pytest.raises(ValueError, match="physical capacity"):
-        runner.verify_gpu(settings(tmp_path, vram_gib=40))
-    assert len(calls) == 2 and all(command[0] == "nvidia-smi" for command in calls)
-
-
 def test_environment_displaces_ambient_plugins_but_keeps_launch_key(
     tmp_path, monkeypatch
 ):

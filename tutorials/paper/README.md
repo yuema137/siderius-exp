@@ -75,9 +75,9 @@ line can include invalid points. CSV, PNG and SVG outputs are saved under your
 project's `plots/`.
 
 Before a new run, the notebook and script check the checkout Python environments,
-required input files, exported API key names and NVIDIA GPU access. Errors list
-missing items and repair steps. The native preflight also checks source pins,
-data integrity and CUDA allocation. Export keys **before starting Jupyter**;
+required input files and exported API key names. Errors list missing items and
+repair steps. Launch additionally checks source pins, data integrity and the
+selected visible GPU through the framework environment. Export keys **before starting Jupyter**;
 restart its server from that terminal after changing the environment. Key presence
 does not verify provider authentication or credit.
 
@@ -90,9 +90,11 @@ manual model-selection step in TIDMAD, not part of any quick-demo validation plo
 
 ## Before you start
 
-- Linux, Python 3.12, `git`, `uv`, and one supported NVIDIA RTX 5090 or H100.
-  AMD/Intel GPUs and CPU training are unsupported. The launcher supports H100,
-  but we have not tested this tutorial on an H100.
+- Linux, Python 3.12, `git`, `uv`, and one visible GPU supported by the frozen
+  PyTorch installation and required resource accounting. NVIDIA model names are
+  not restricted. AMD/ROCm is experimental and untested; its missing driver
+  accounting currently prevents this protected tutorial route. Intel GPU and
+  CPU training are unsupported.
 - Access to the selected LLM providers and exported API keys. Runs can incur
   charges. Training budgets do not cap total script duration or API spending.
 - Two installed source repositories plus a **third, separate directory** for
@@ -136,10 +138,16 @@ workflow/treatment, define and qualify its experiment entrypoint explicitly.
 
 ## 1. Install in the two exact checkouts
 
-Use Linux and Python 3.12. The teaching launcher accepts one RTX 5090 or H100
-with a working NVIDIA driver and the locked CUDA PyTorch installation. AMD,
-Intel GPU and CPU execution are not supported. The TESS paper deployment used
-RTX 5090 with an 8 GiB model budget; H100 is an additional tutorial route.
+Use Linux and Python 3.12 with the exact paired framework and experiment
+revisions. The current frozen installation selects CUDA packages. A different
+NVIDIA device may work when its driver and this PyTorch build support it; the
+launcher checks that combination before starting the run. The historical TESS
+deployment used RTX 5090 with an 8 GiB model budget. That record does not qualify
+a new device or backend.
+
+This portability update still awaits final paired qualification and promotion
+of the framework pin. Until then, launch refuses a framework lacking the new
+discovery API; do not bypass the pin check or substitute another environment.
 
 Choose a new location for the public exp checkout:
 
@@ -406,8 +414,8 @@ experiment JSON; moving files alone does not rebind references.
 
 Preview validates source pins, routing and composition and prints JSON. It
 needs no credentials, prepared data or GPU. Launch additionally checks keys,
-both staged populations, hashes, GPU name/capacity and an actual CUDA allocation
-in infra's environment. It refuses root execution.
+both staged populations, hashes, selected GPU properties, required accounting
+capability and a tiny kernel in infra's environment. It refuses root execution.
 
 The initial manual experiment (distinct from the three-iteration Run All demo) runs one iteration with one Trial and one Formal opportunity,
 one-epoch ceilings, 2/5-minute training attempt budgets and an 8 GiB VRAM budget. A
@@ -440,26 +448,30 @@ outcome before retrying. This wrapper only starts fresh runs.
 | Change | Where | Effect |
 |---|---|---|
 | Iterations, epochs, time, VRAM | Your `experiments/*.json` | New demo schedule/budgets |
-| RTX 5090 ↔ H100 | `gpu` and suitable `vram_gib` | New hardware run; launcher checks physical card |
+| Selected GPU | Optional `gpu` expectation and suitable `vram_gib` | New hardware run; checks the visible logical device |
 | Provider/model | Your `llm/*.json` selected by `llm_config` | New model treatment and possibly new required keys |
 | Task description | Copy of the whole task package selected by `composition` | New fingerprint; notebook demonstrates a controlled edit |
 | Train/validation membership | Demo 4 creates a new task manifest and matching NPZ archives | New scientific split; preserve whole-star independence |
 | Input length, metric, Health | Task declaration **and** runtime/tests | Qualify the changed task; not an arbitrary launcher override |
 
-For **another NVIDIA GPU**, first verify that locked PyTorch can allocate a
-CUDA tensor on it. Choose a VRAM budget below physical capacity; review RAM,
-disk and time budgets. The current installed launcher accepts RTX 5090/H100 only; another card needs
-a separately qualified launcher release from the maintainers. Do not edit the
-installed repository as a tutorial step. Unknown GPUs are refused until an
-updated release supports them. Do not
-remove CUDA or capacity checks. `CUDA_VISIBLE_DEVICES` does not turn the
-one-physical-GPU check into multi-GPU support.
+Set `gpu` to `null` (or omit it) to use the visible device without a model-name
+expectation. An explicit string such as `H100` remains a required substring of
+the detected name. On a multi-GPU host, select one visible device before launch,
+for example `CUDA_VISIBLE_DEVICES=2`; the framework sees that physical card as
+logical device 0. This tutorial does not launch distributed multi-GPU training.
 
-A new card may need another driver/PyTorch build. If the frozen environment
-cannot run it, create a separately tested dependency revision. AMD/Intel
-adaptation is out of scope. Supporting a card here does not change the paper
-supervisor. Different GPUs complete different amounts of search in the same
-wall time, so changing hardware is not an identical experiment.
+Choose effective Trial/Formal VRAM budgets below that device's capacity. There
+is no fixed 80 GiB schema ceiling; a larger device still needs working kernels
+and resource accounting. Review host RAM, storage and time budgets separately.
+A tiny kernel witness is a setup check, not proof that the generated model fits.
+Native measurement, admission and runtime protection retain their own checks.
+
+AMD/ROCm compatibility is experimental and untested. Required driver/process
+accounting is not implemented for it, so this tutorial refuses that path before
+allocation or provider calls. No ROCm installation profile is qualified here;
+do not swap individual wheels or disable protection. A new dependency selection
+requires a separately reviewed frozen environment. Hardware changes also change
+how much search fits within a time budget; they do not reproduce the paper run.
 
 ## Execution boundary and the paper route
 

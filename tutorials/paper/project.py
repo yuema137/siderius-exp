@@ -83,7 +83,7 @@ def create_project(project: Path, infra: Path) -> None:
         run_name="tess_demo_001",
         trial_train_fraction=1.0,
         trial_val_fraction=1.0,
-        gpu="RTX 5090",
+        gpu=None,
         composition=task / "compositions/rotation_regression.yaml",
         llm_config=project / "llm/agents.json",
     )

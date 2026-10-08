@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import shlex
-import shutil
 from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, ConfigDict
@@ -116,14 +115,8 @@ def require_ready(
     if missing_data:
         add(
             "Missing data files:\n    " + "\n    ".join(missing_data),
-            "Follow this notebook's Data setup step: reuse the existing shared data on the 5090 host, "
+            "Follow this notebook's Data setup step: reuse existing data at your configured data location, "
             "or download/stage it locally once. Set data_dir in the saved experiment JSON; do not redownload existing large files.",
-        )
-    if shutil.which("nvidia-smi") is None:
-        add(
-            "nvidia-smi is unavailable; an NVIDIA CUDA GPU is required.",
-            "Install/enable the NVIDIA driver, or enable GPU access in the container/job. "
-            "Run nvidia-smi in the launching terminal. AMD and Intel GPUs are unsupported.",
         )
     if issues:
         details = "\n".join(
@@ -135,7 +128,7 @@ def require_ready(
             + details
         )
     print(
-        "Setup files and required key names are present. Native source, data integrity and CUDA checks run before launch; key authentication is not yet verified.",
+        "Setup files and required key names are present. Native source, data integrity and selected-device checks run before launch; key authentication is not yet verified.",
         flush=True,
     )
 

@@ -94,7 +94,7 @@ def create_project(project: Path, infra: Path):
         data_dir=project / "data/band-0-3",
         workspace=project / "runs/paper-pool-001",
         run_name="tidmad_pool_001",
-        gpu="RTX 5090",
+        gpu=None,
         trial_train_fraction=0.5,
         trial_val_fraction=0.1,
         composition=project
