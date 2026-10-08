@@ -2,6 +2,7 @@
 
 import ast
 import json
+import re
 import shlex
 import sys
 from pathlib import Path
@@ -69,6 +70,7 @@ def test_prepared_default_prints_saved_location_without_preparation(
     assert command is None
     assert str(tmp_path / "project/data") in output
     assert "Run once" not in output
+    assert "No data preparation or validation was performed." in output
     assert list(tmp_path.iterdir()) == []
 
 
@@ -160,3 +162,24 @@ def test_quick_settings_do_not_force_recorded_gpu_name(tmp_path, name):
     )
     assert namespace["QUICK_SETTINGS"]["gpu"] is None
     assert namespace["QUICK_SETTINGS"]["composition"].is_absolute()
+
+
+def test_touched_current_tutorial_links_do_not_use_retired_main_branch():
+    instructions = [
+        ROOT / "tutorials/paper/README.md",
+        ROOT / "tutorials/paper/tidmad/README.md",
+        ROOT / "tutorials/paper/prepared/README.md",
+        ROOT / "tutorials/supplementary/pet/README.md",
+    ]
+    texts = [(str(path), path.read_text()) for path in instructions]
+    for path in NOTEBOOKS.glob("*.ipynb"):
+        notebook = json.loads(path.read_text())
+        texts.extend(
+            (f"{path}:cell{index}", "".join(cell["source"]))
+            for index, cell in enumerate(notebook["cells"])
+        )
+    retired = re.compile(
+        r"https://github\.com/yuema137/(?:siderius-exp|SIDERIUS)/(?:tree|blob)/main(?:[/#?)]|$)"
+    )
+    for location, text in texts:
+        assert retired.search(text) is None, location
