@@ -4,6 +4,19 @@ Scientific tasks and their experiments for the SIDERIUS framework.
 This repository is the place where task meaning and experiment choices live;
 the generic framework lives in the separate [SIDERIUS repository](https://github.com/yuema137/SIDERIUS).
 
+## Paper
+
+[Beyond a Better Score: Long-Horizon Agentic ML Development and Evaluation Protocol for Physics Time Series](https://zenodo.org/records/23071121)
+introduces SIDERIUS and evaluates agent-driven model development on TIDMAD,
+TESS, Project8, and LIGO. It combines reusable research capabilities, scientific
+validity checks, and exploration within compute budgets, evaluating whether
+models are scientifically valid as well as how well they score.
+
+This repository provides the task packages, experiment configurations, and
+archived evidence. The tutorials below are simplified workflow demos; use the
+[paper artifact reference](experiments/paper-artifacts.md) for reproduction
+configurations and the available historical records.
+
 ## Start here
 
 For a guided notebook plus terminal-script example, start with the
