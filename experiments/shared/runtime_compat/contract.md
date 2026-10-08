@@ -74,6 +74,31 @@ reused or relabelled as this profile's evidence. Original policy identity bytes
 are not a replay requirement: any necessary historical prompt presentation is
 an explicit exp projection, never mutation of the raw record.
 
+## Explicit historical presentation
+
+`siderius-planner-compat` 0.9 provides two new explicit profiles,
+`legacy-9b78d505cb11-paper-verifier-v8` and its `paper-late-verifier-v8` counterpart.
+They wrap the existing storage v7 provider; older profiles and the installation
+default remain unchanged. The eleven-unit overlay declares the corresponding
+external `tune.planner_strategy` alongside the launch arguments. This is an LLM
+configuration setting, not a standard-workflow CLI flag.
+
+The runtime package owns `historical_identities()` and
+`require_historical_identity()`. The planner v8 source identity binds those exact
+qualified profile identities plus its own source and inherited v7 identity.
+Only selecting v8 requires the optional `historical-runtime` package dependency;
+importing or selecting an older planner profile remains possible without it.
+
+For a new runtime policy, v8 requires all three provenance fields, exact matching
+package-owned and registered verifier identity, `verified-prediction-v1` and
+measured admission. Unknown policy fields, incompatible selection and any phase
+completion evidence refuse. It removes only `runtime_completion_policy`,
+`runtime_verifier` and `runtime_verifier_identity` from a deep-copied prompt
+representation. Measurement, prediction, numeric admission, status and the
+original saved record are unchanged. Archived records without those fields
+retain their existing representation. This does not establish completeness of
+an arbitrary full workflow's earlier or later information flow.
+
 ## Evidence and limits
 
 Read-only inspection confirmed that all 130 preserved root/iteration lock files
@@ -108,8 +133,22 @@ completion selections. The report verifies 17 installed infra closure files and
 all eight package identity files against the source checkouts. Both installs are
 normal, noneditable installations in this exp checkout's own environment.
 
-Final-source qualification still requires independent review, generated-record
-historical presentation checks, and the existing 47 frozen prompt messages.
+The subsequent [presentation qualification](presentation-qualification.json)
+preserves the initial report as evidence of its earlier source checkpoint.
+Original TESS and Project8 interpreters recaptured all 23 sessions independently;
+`fixtures/paper-session-policies.json` preserves their policy values, complete
+component hashes and capture provenance. Actual current sessions match those
+original components and admissions. Wrapped in a minimal planner record, their
+v8 requests match the original-policy v7 requests byte-for-byte; the same new
+inputs intentionally differ under v7. This is a session-to-request boundary
+comparison, not a complete execution-produced experiment record.
+
+The 47 separate original-reference request comparisons also match (94 system
+and user message bodies). Focused projection, refusal, existing storage/runtime
+presentation and verifier checks total 132 passing tests. Independent review and
+final release pairing remain pending; no future combined source is qualified by
+these checks against `ec92186d`.
+
 Infra owns generic native completion and boundary tests;
 exp owns historical selection and comparisons. Prompt equality is not proof of
 live control-flow parity. No complete conversation, training, score reproduction,

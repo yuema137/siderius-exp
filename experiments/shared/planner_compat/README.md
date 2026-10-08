@@ -15,6 +15,7 @@ this package does not update or qualify the framework.
 | Installation and selection | [Installation and selection](usage.md#install-into-the-environment-that-will-run-infra) |
 | Actual task startup evidence | [Actual task startup evidence](paper-startup-parity.md) |
 | Latest storage-view contract | [Latest storage-view contract](storage-provenance-compatibility.md) |
+| Present explicitly selected historical timing decisions | [Historical timing setup](../runtime_compat/README.md) |
 | New-workspace migration requirements | [New-workspace migration requirements](migration.md) |
 
 Use a new external workspace for a changed profile. Preserve historical source,

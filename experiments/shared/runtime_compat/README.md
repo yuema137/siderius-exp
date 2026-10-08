@@ -5,8 +5,9 @@ experiment's original timing rules. Ordinary tutorials use the framework's
 corrected default and do not need this package. Installing it changes no default.
 
 **Release qualification is in progress.** Offline timing and installation checks
-pass with infra `ec92186d`, but the standard exp installation does not yet install
-that candidate. Independent review and the final prompt comparison remain open.
+pass with infra `ec92186d`, including the historical prompt comparisons, but the
+standard exp installation does not yet install that candidate. Independent
+review and final release source pairing remain open.
 The commands below explain the installation procedure; they are not yet a
 ready-to-run public installation guide.
 
@@ -49,6 +50,19 @@ then present those decisions to the agents in the original format.
    These are additional arguments, not a standalone launch command. Keep the
    copied command's other required arguments and replace conflicting flags
    instead of appending duplicates. Installing exp does not apply the overlay.
+4. In your copied `llm/agents.json`, set `tune.planner_strategy` to the value in
+   that unit's `llm_configuration` section of the same overlay. Install the
+   [planner compatibility package](../planner_compat/usage.md#install-into-the-environment-that-will-run-infra)
+   in the launch environment. For TESS `nop_004`, the setting is:
+
+   ```json
+   {"tune": {"planner_strategy": "legacy-9b78d505cb11-paper-verifier-v8"}}
+   ```
+
+   Merge this field into your existing configuration; keep its model, credentials
+   and other routes. This explicit planner profile presents the old timing
+   format to the agent while saved results retain the new verifier identity.
+   Selecting only the timing algorithm does not restore the old prompt format.
 
 The overlay covers eleven native paper units: TESS, LIGO, Project8 dual
 representation, four TIDMAD NoPrior bands and four TIDMAD analysis-on bands.
@@ -75,7 +89,7 @@ them. New measurements record the selected profile's identity.
 
 This package restores the tested timing decisions; it does not restore deleted
 artifacts or guarantee identical new LLM responses, trained weights or scores.
-The [technical contract](contract.md) and [qualification results](qualification-report.json)
+The [technical contract](contract.md) and [qualification results](presentation-qualification.json)
 list the original sources, test boundaries and remaining qualification.
 [Prompt adapters](../prompt_compat/README.md) and
 the [static estimator adapter](../preflight_compat/README.md) remain separate

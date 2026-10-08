@@ -32,6 +32,11 @@ def test_every_native_paper_unit_retains_its_original_launch_identity():
         assert row["launch_parameters"] == {
             "--runtime_verifier": f"legacy-{family}-verifier-v1"
         }
+        late = row["historical_infra_revision"].startswith(("349b6cd6", "c0467447"))
+        prefix = "legacy-9b78d505cb11-paper" + ("-late" if late else "")
+        assert row["llm_configuration"] == {
+            "tune": {"planner_strategy": prefix + "-verifier-v8"}
+        }
     assert overlay["launch_parameters"] == {
         "--runtime_completion_policy": "verified-prediction-v1",
         "--trial_time_admission_source": "measured",

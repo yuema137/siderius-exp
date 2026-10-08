@@ -4,13 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-planner-compat"
-version = "0.8.0"
+version = "0.9.0"
 description = "Experiment-owned historical SIDERIUS planner prompt providers"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
 
+[project.optional-dependencies]
+historical-runtime = ["siderius-runtime-compat==0.1.0"]
+
 [project.entry-points."siderius.planner_strategies"]
+legacy-9b78d505cb11-paper-verifier-v8 = "siderius_planner_compat.runtime_verifier_v8:historical_verifier_v8"
+legacy-9b78d505cb11-paper-late-verifier-v8 = "siderius_planner_compat.runtime_verifier_v8:historical_verifier_late_v8"
 legacy-9b78d505cb11-paper-storage-v7 = "siderius_planner_compat.storage_provenance_v7:historical_storage_v7"
 legacy-9b78d505cb11-paper-late-storage-v7 = "siderius_planner_compat.storage_provenance_v7:historical_storage_late_v7"
 legacy-9b78d505cb11-paper-preflight-v6 = "siderius_planner_compat.static_preflight_v6:historical_preflight_v6"

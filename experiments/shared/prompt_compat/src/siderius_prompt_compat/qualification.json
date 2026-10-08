@@ -52,6 +52,11 @@
       "infra_revision": "faff23aad38a2892160f64a4f3cefe1c9d6c3632",
       "assembly_sha256": "e672969596e4baad66b55a29ba2768d7e43d37611ef10e189bceaf687f00adce",
       "scope": "Optional protected execution schema/transport; frozen absent-policy rendering requests and four historical proposer routes only, not selected-policy evidence or runtime protection qualification"
+    },
+    {
+      "infra_revision": "ec92186d64622742473a421c4e9d61c5134b05e3",
+      "assembly_sha256": "d407276fc430f8c8f18dc2c565241b888d63f471454028d45909b07ac5423f5d",
+      "scope": "Explicit runtime completion and verifier identity transport; existing frozen request corpus only. New session history is separately checked with the explicit planner v8 projection; not complete conversation replay."
     }
   ]
 }
