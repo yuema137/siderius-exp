@@ -1,10 +1,10 @@
 [project]
 name = "siderius-exp"
-version = "0.0.0"
+version = "1.0.0"
 description = "Scientific tasks and experiment campaigns for SIDERIUS"
 requires-python = ">=3.12"
 dependencies = [
-    "siderius @ git+https://github.com/yuema137/SIDERIUS.git@b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
+    "siderius @ git+https://github.com/yuema137/SIDERIUS.git@52373be9a52bead36fd1f15d706385967e0a129d",
     "torch==2.10.0",
     "siderius-planner-compat==0.9.0",
     "siderius-preflight-compat==0.2.0",

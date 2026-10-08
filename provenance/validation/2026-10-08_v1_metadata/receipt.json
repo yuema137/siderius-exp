@@ -1,0 +1,89 @@
+{
+  "infra_revision": "52373be9a52bead36fd1f15d706385967e0a129d",
+  "exp_baseline_revision": "9bf6b0ec90a51a76ce3fbb2fdfecd78cbb27ca12",
+  "release_version": "1.0.0",
+  "qualified_source_revision": "b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
+  "prior_qualification": "../2026-10-08_standalone_inference_release/receipt.json",
+  "metadata_checks": {
+    "infra_parsed_pyproject_only_root_version_changed": true,
+    "infra_parsed_lock_only_root_version_changed": true,
+    "exp_parsed_pyproject_only_root_version_and_infra_pin_changed": true,
+    "exp_parsed_lock_only_two_root_versions_and_infra_pin_changed": true,
+    "exp_virtual_project": true,
+    "exp_version_evidence": "pyproject.toml project.version and uv.lock virtual siderius-exp version; no installed consumer distribution claimed"
+  },
+  "infra_unchanged_git_trees": {
+    "src": "864e91dfe1ab9951f9c0948937c49c66638c0de6",
+    "configs": "d0eaf9ea686f027d6cc70fe1c5802cc46c911daf"
+  },
+  "canonical_closures": {
+    "runtime": {
+      "members": 18,
+      "assembly_sha256": "57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da",
+      "source_members_and_bytes_unchanged": true,
+      "installed_source_bytes_match": true
+    },
+    "preflight": {
+      "members": 78,
+      "assembly_sha256": "d299175819b0bda402e05f63161d31f57cff9dab782864c4b127f0713e38102f",
+      "source_members_and_bytes_unchanged": true,
+      "installed_source_bytes_match": true
+    },
+    "rendering": {
+      "members": 158,
+      "assembly_sha256": "f032911dd790843720989dbdeffa7ddfac8f58736be05d940a9065cbe9464d4e",
+      "source_members_and_bytes_unchanged": true,
+      "installed_source_bytes_match": true
+    },
+    "planner": {
+      "members": 10,
+      "assembly_sha256": "d1321a044c946859faa180a21c4eda21ca8fe79ff838a0c816bc68e5ba265b3b",
+      "source_members_and_bytes_unchanged": true,
+      "installed_source_bytes_match": true
+    }
+  },
+  "compatibility_versions_unchanged": {
+    "prompt_compat": "0.9.0",
+    "planner_compat": "0.9.0",
+    "preflight_compat": "0.2.0",
+    "runtime_compat": "0.1.0"
+  },
+  "compatibility_source_files_matching_both_environments": 51,
+  "compatibility_source_and_parent_child_identities_equal_prior_receipt": true,
+  "installed_framework": {
+    "version": "1.0.0",
+    "direct_url": {
+      "url": "https://github.com/yuema137/SIDERIUS.git",
+      "vcs_info": {
+        "vcs": "git",
+        "commit_id": "52373be9a52bead36fd1f15d706385967e0a129d",
+        "requested_revision": "52373be9a52bead36fd1f15d706385967e0a129d"
+      }
+    },
+    "source_equivalence_verified": true
+  },
+  "pin_binding_test": {
+    "passed": 1,
+    "command": "SIDERIUS_CHECKOUT=/path/to/exact/infra .venv/bin/python -m pytest tests/test_external_startup_preflight.py::test_dependency_pin_matches_the_checkout_under_qualification -q"
+  },
+  "installation": {
+    "frozen_sync": "uv sync --group dev --frozen",
+    "normal_compatibility_installs": true,
+    "dependency_fetch": "Command-scoped public-URL to Galileo-Sandbox URL rewrite; no persistent Git configuration",
+    "public_host_availability_verified": false
+  },
+  "preserved": {
+    "historical_qualification_evidence": true,
+    "scientific_tasks_experiments_campaigns": true,
+    "all_old_qualification_rows": true
+  },
+  "validation_scope": "Metadata, dependency binding, canonical byte equivalence and installed identity only. Prior47 requests/94 bodies,44routes and36+143tests remain historical evidence; unchanged corpora were not rerun.",
+  "release_status": "Prepared for final readiness review only; no tag, release or public synchronization performed by this change.",
+  "known_limitations": [
+    "Resumed generic inference still excludes child model preparation; infra issue673 is deferred.",
+    "Source-equivalent metadata qualification does not add full historical conversation/training/score reproduction or GPU evidence."
+  ],
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "training_calls": 0
+}
