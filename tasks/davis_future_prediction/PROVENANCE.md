@@ -1,5 +1,8 @@
 # Provenance — `davis_future_prediction`
 
+Historical tool/test paths below identify the original import or qualification
+checkpoint. Current owners are linked in the regeneration section.
+
 ## Data source (official)
 
 - **Paper**: J. Pont-Tuset, F. Perazzi, S. Caelles, P. Arbeláez, A. Sorkine-Hornung,
@@ -93,14 +96,78 @@ regeneration commit.
 
 ## Regeneration (explicit operator act)
 
+This produces a metadata candidate for review, not a complete task package.
+Run from the exp checkout root after `uv sync --group dev --frozen`, using its
+own `.venv`. Replace the paths below with locations outside both repositories,
+including any symlink targets. Reuse existing metadata first; if it is missing,
+use the optional acquisition block below before running this recipe.
+
+The [metadata generator](tools/davis_future_prediction.py) reads the pinned
+`db_info.yaml` without downloading or inspecting frames. Verify that input,
+then select a candidate path that does not yet exist:
+
 ```bash
-curl -sSL -o /tmp/davis/db_info.yaml \
-  https://raw.githubusercontent.com/davisvideochallenge/davis-2017/97d08bf8b6201abf15509a67a985db3745a75ccd/data/db_info.yaml
-sha256sum /tmp/davis/db_info.yaml   # must equal the SHA-256 above
+set -euo pipefail
+davis_metadata=/absolute/external/davis-metadata
+davis_candidate=/absolute/external/regeneration/davis-metadata-candidate
+(
+  cd "$davis_metadata"
+  sha256sum --check <<'PINS'
+b14a9c264d04ffc6f99a92985fe024a388a7ee08e115f65e4005b72527420c4b  db_info.yaml
+PINS
+)
+test ! -e "$davis_candidate"
+test ! -L "$davis_candidate"
 .venv/bin/python -m tasks.davis_future_prediction.tools.davis_future_prediction \
-  --db-info /tmp/davis/db_info.yaml
-# alternatively: --lists train.txt val.txt (official one-name-per-line files)
+  --db-info "$davis_metadata/db_info.yaml" \
+  --root "$davis_candidate"
+cmp -- tasks/davis_future_prediction/data/manifests/sequences.csv \
+  "$davis_candidate/data/manifests/sequences.csv"
 ```
+
+The input check prints `OK`; a matching CSV makes `cmp` succeed silently. A
+source mismatch, existing candidate or changed CSV stops the recipe. Do not
+refetch over mismatched inputs or change pins to force agreement. You must choose
+an external destination; the absence checks belong to this recipe. The generator itself can
+overwrite an existing root and defaults to the retired `examples/` location
+without `--root`.
+
+**Only if metadata is missing**, fetch the small pinned source file. An existing
+file, including a dangling symlink, is never overwritten:
+
+```bash
+set -euo pipefail
+davis_metadata=/absolute/external/davis-metadata
+mkdir -p -- "$davis_metadata"
+if [[ ! -e "$davis_metadata/db_info.yaml" && ! -L "$davis_metadata/db_info.yaml" ]]; then
+  curl --fail --location --output "$davis_metadata/db_info.yaml" \
+    https://raw.githubusercontent.com/davisvideochallenge/davis-2017/97d08bf8b6201abf15509a67a985db3745a75ccd/data/db_info.yaml
+fi
+```
+
+Then run the primary verification/generation recipe with that metadata directory;
+the downloaded file must pass its recorded pin before use. An interrupted fetch
+needs operator review or a new staging directory, not an automatic overwrite.
+No frame archive or extraction is needed; [frame acquisition](tools/fetch_davis.py)
+is a separate operation. The generator also accepts two official one-name-per-line
+lists via `--lists`, but those inputs need their own source verification and are
+not covered by the `db_info.yaml` pin.
+
+The candidate contains `sequences.csv`, its checksum file and initial model/metric
+declarations. It does not rebuild clip identities, execution probes, Health
+policy, runtime/plugins or compositions. The
+[execution artifact generator](tools/davis_execution.py) separately owns clips
+and probes; [contract tests](../../tests/tasks/davis_future_prediction/test_davis_package_contract.py)
+cover the task package. Compare only `sequences.csv`, keep candidate declarations
+for review, and never copy the candidate wholesale into `tasks/`. In particular,
+the writer's sequences-only `SHA256SUMS` would replace the complete task's file
+if pointed at a populated task root.
+
+Byte-identical candidates establish this metadata derivation only, not runtime
+or scientific qualification. Any changed manifest needs a reviewed regeneration
+commit with its reason and source pin recorded here. A change in scientific
+meaning also requires a distinct task identity and corresponding implementation
+and provenance updates.
 
 ## Health threshold provenance (Step 08c C4)
 

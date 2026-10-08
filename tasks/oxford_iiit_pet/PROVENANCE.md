@@ -1,5 +1,8 @@
 # Provenance — `oxford_iiit_pet`
 
+Historical tool/test paths below identify the original import or qualification
+checkpoint. Current owners are linked in the regeneration section.
+
 ## Data source (official — use it, not Kaggle / HF mirrors, as provenance)
 
 - **Paper**: O. M. Parkhi, A. Vedaldi, A. Zisserman, C. V. Jawahar, *Cats and
@@ -77,16 +80,89 @@ any regeneration commit.
 
 ## Regeneration (explicit operator act)
 
+This produces a metadata candidate for review, not a complete task package.
+Run from the exp checkout root after `uv sync --group dev --frozen`, using its
+own `.venv`. Replace the paths below with locations outside both repositories,
+including any symlink targets. Reuse existing metadata first; if it is missing,
+use the optional acquisition block below before running this recipe.
+
+The [metadata generator](tools/oxford_iiit_pet.py) reads only `trainval.txt` and
+`test.txt`; `list.txt` is recorded provenance, not a required generator input.
+Verify those two inputs, then select a candidate path that does not yet exist:
+
 ```bash
-curl -sSL -o /tmp/pets/annotations.tar.gz https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz
-sha256sum /tmp/pets/annotations.tar.gz      # must equal the archive SHA-256 above
-tar -xzf /tmp/pets/annotations.tar.gz -C /tmp/pets annotations/trainval.txt annotations/test.txt
+set -euo pipefail
+pet_metadata=/absolute/external/oxford-pet/annotations
+pet_candidate=/absolute/external/regeneration/pet-metadata-candidate
+(
+  cd "$pet_metadata"
+  sha256sum --check <<'PINS'
+408f3f609481b939c94634169e6413414b733a3faeba440cbdcc5c02142eebdc  trainval.txt
+a5454003774ffe01f4f322756d3ba5495bae21cb30bb217ab285dbfa2bef245c  test.txt
+PINS
+)
+test ! -e "$pet_candidate"
+test ! -L "$pet_candidate"
 .venv/bin/python -m tasks.oxford_iiit_pet.tools.oxford_iiit_pet \
-  --annotations-dir /tmp/pets/annotations
+  --annotations-dir "$pet_metadata" \
+  --root "$pet_candidate"
+for split in train validation final; do
+  cmp -- "tasks/oxford_iiit_pet/data/manifests/$split.csv" \
+    "$pet_candidate/data/manifests/$split.csv"
+done
 ```
 
-A regeneration that changes any manifest byte must be committed with its
-reason and the new source SHA-256 recorded here.
+The input checks print `OK`; matching CSVs make `cmp` succeed silently. A source
+mismatch, existing candidate or changed CSV stops the recipe. Do not refetch over
+mismatched inputs or change pins to force agreement. You must choose an external
+destination; the absence checks belong to this recipe. The generator itself
+can overwrite an existing root and defaults to the retired `examples/` location
+when `--root` is omitted.
+
+**Only if metadata is missing**, fetch the annotations archive into external
+staging. An existing archive or extraction is never overwritten. Verify the
+archive before extracting only the two required members:
+
+```bash
+set -euo pipefail
+pet_stage=/absolute/external/oxford-pet
+mkdir -p -- "$pet_stage"
+if [[ ! -e "$pet_stage/annotations.tar.gz" && ! -L "$pet_stage/annotations.tar.gz" ]]; then
+  curl --fail --location --output "$pet_stage/annotations.tar.gz" \
+    https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz
+fi
+(
+  cd "$pet_stage"
+  sha256sum --check <<'PINS'
+52425fb6de5c424942b7626b428656fcbd798db970a937df61750c0f1d358e91  annotations.tar.gz
+PINS
+)
+if [[ ! -e "$pet_stage/annotations" && ! -L "$pet_stage/annotations" ]]; then
+  tar -xzf "$pet_stage/annotations.tar.gz" -C "$pet_stage" \
+    annotations/trainval.txt annotations/test.txt
+fi
+```
+
+Then run the primary verification/generation recipe with `pet_metadata` set to
+that stage's `annotations` directory. An interrupted download or extraction
+needs operator review or a new staging directory, not an automatic overwrite.
+No image archive is needed; the full [acquisition tool](tools/fetch_oxford_iiit_pet.py)
+also handles images and is not this metadata-only route.
+
+The candidate contains the three base CSVs, their checksum file and initial
+model/metric declarations. It does not rebuild Gate subsets, transform probes,
+Health fixtures/policy, runtime/plugins or compositions. The
+[execution artifact generator](tools/oxford_iiit_pet_execution.py) separately owns
+subsets and probes; [contract tests](../../tests/tasks/oxford_iiit_pet/test_package_contract.py)
+cover the task package. Compare only the intended base CSVs, keep candidate
+declarations for review, and never copy the candidate wholesale into `tasks/`.
+Its fresh checksum file is not a replacement for the complete task's file.
+
+Byte-identical candidates establish this metadata derivation only, not runtime
+or scientific qualification. Any change to manifest bytes requires a reviewed
+regeneration commit with its reason and source SHA-256 recorded here, even when
+the source identity is unchanged. A change in scientific meaning also requires
+a distinct task identity and corresponding implementation and provenance updates.
 
 ## Health fixture-of-record (Step 08c C3)
 
