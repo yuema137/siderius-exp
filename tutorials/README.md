@@ -17,7 +17,7 @@ actual notebook coverage.
 | Project8 | Predict electron energy from time and frequency views | [Setup](paper/prepared/README.md) · [Notebook](paper/notebooks/03_project8_tutorial.ipynb) |
 | LIGO | Predict chirp mass from two detector channels | [Setup](paper/prepared/README.md) · [Notebook](paper/notebooks/04_ligo_tutorial.ipynb) |
 | Oxford-IIIT Pet | Classify pet images by breed | [Setup](supplementary/pet/README.md) · [Notebook](supplementary/pet/pet_tutorial.ipynb) |
-| MJD / Majorana | Classify detector waveforms | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
+| MJD / Majorana | Classify detector waveforms | [Setup](supplementary/mjd/README.md) · [Notebook](supplementary/mjd/mjd_tutorial.ipynb) · [Recorded result](supplementary/mjd/example/README.md) |
 | SuperNEMO | Classify signal and background events | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
 | Cancer | Rank candidate cancer genes using biological networks | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
 | DAVIS | Predict future video frames | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
@@ -54,7 +54,7 @@ results. Choose research or custom model routing separately from run budgets.
   They teach the workflow and editable parameters; they do not reproduce the
   paper's complete campaigns or coding-agent comparisons.
 - [Supplementary tutorials](supplementary/README.md) cover tasks outside those
-  four experiments. Pet currently has a notebook; the other task packages have
+  four experiments. Pet and MJD have notebooks and recorded demos; the other task packages have
   separate experiment references while their tutorials are developed.
 - [Paper artifacts](../experiments/paper-artifacts.md) contain the route to frozen
   configurations, original source pairs, historical evidence and its limits.

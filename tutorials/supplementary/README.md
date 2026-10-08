@@ -10,16 +10,23 @@ setup. The [setup guide](pet/README.md) explains data reuse/download, keys,
 parameter changes, preview and execution. These are process demos, not paper
 artifacts or promises of a particular score.
 
+## MJD waveform tutorial
+
+[MJD setup](mjd/README.md) and its [notebook](mjd/mjd_tutorial.ipynb) now provide
+the external-project and saved-script walkthrough. CPU previews use local official
+data; the [recorded three-iteration demo](mjd/example/README.md) includes actual
+waveforms, scores and provenance. Official Test feeds search evaluation, not a
+blind final test.
+
 ## Tasks awaiting a notebook
 
-MJD, SuperNEMO, Cancer and DAVIS already have task packages and experiment code.
+SuperNEMO, Cancer and DAVIS already have task packages and experiment code.
 Their notebook-plus-script tutorials are **not yet available**. The references
 below are for inspecting existing work; they are not interchangeable with the
 Pet walkthrough or evidence of a newly qualified three-iteration demo.
 
 | Task | Existing references |
 |---|---|
-| MJD / Majorana waveform classification | [Task](../../tasks/majorana_low_avse/README.md) · [Experiment profiles](../../experiments/majorana_low_avse/README.md) |
 | SuperNEMO event classification | [Task](../../tasks/supernemo_signal_background/README.md) · [Experiment profiles](../../experiments/supernemo_signal_background/README.md) |
 | Cancer-gene identification | [Task and current entrypoints](../../tasks/cancer_gene_identification/README.md) · [Two-network qualification reference](../../experiments/cancer_gene_identification/two_network_qualification/README.md) |
 | DAVIS future-frame prediction | [Task](../../tasks/davis_future_prediction/README.md) · [Bounded qualification reference](../../experiments/davis_future_prediction/two_iteration_qualification/README.md) |
