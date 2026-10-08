@@ -30,8 +30,8 @@ uv sync --python 3.12 --group dev --frozen
 
 Each checkout uses its own `.venv`. Pet explicitly selects the built-in
 `native-timing-v1` planner. Preflight compares the planner identities resolved in
-both environments and rejects missing or mismatched providers. All five fresh
-tutorial projects select this native planner; archived paper treatments retain
+both environments and rejects missing or mismatched providers. Fresh tutorial
+projects select this native planner; archived paper treatments retain
 their historical settings. Model routing and historical replay are separate choices.
 
 The launcher uses the one visible logical GPU in the selected framework

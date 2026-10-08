@@ -14,7 +14,7 @@ belongs to a separate optional example, described below.
 
 ## Initialize your own project
 
-Follow the [shared installation instructions](../README.md#1-install-in-the-two-exact-checkouts),
+Follow the [shared installation instructions](../../shared/setup/README.md#1-install-the-two-exact-checkouts),
 then run from the exact exp checkout:
 
 ```bash
@@ -44,10 +44,20 @@ This verifies the eight source hashes and creates only symbolic links in
 paths available; tutorial execution reads them and writes outputs elsewhere.
 
 **Your own machine:** use the official [TIDMAD downloader](https://github.com/jessicafry/TIDMAD),
-kept outside both source checkouts:
+kept outside both source checkouts. Its [download script](https://github.com/jessicafry/TIDMAD/blob/main/download_data.py)
+uses Python's standard library and the Linux `wget` command; it needs no additional
+Python packages. Check the external command first:
 
 ```bash
-python /absolute/path/to/TIDMAD/download_data.py \
+command -v wget
+```
+
+If no executable path is printed, install `wget` with your operating system's
+package manager before continuing. Run the downloader with the installed exp
+interpreter, not an unrelated system Python:
+
+```bash
+"$EXP_CHECKOUT/.venv/bin/python" /absolute/path/to/TIDMAD/download_data.py \
   --output_dir "$TUTORIAL_HOME/data/band-0-3" \
   --train_files 4 --validation_files 4 --science_files 0
 ```
@@ -68,7 +78,7 @@ export OPENAI_API_KEY
 ```
 
 This keeps the value out of shell history and notebook cells. For repeat use,
-see the [shared key instructions](../README.md#2-configure-keys-without-storing-them-in-a-notebook).
+see the [shared key instructions](../../shared/setup/README.md#2-export-keys-before-starting-jupyter).
 TIDMAD keeps literature review enabled; changing provider routing can change
 which key names are required. The launcher checks the selected routing.
 
@@ -202,7 +212,7 @@ disables human advice and data analysis but retains literature review.
 Select one visible GPU with working kernels and required accounting, and keep
 resource budgets below its capacity. Names are not restricted to specific NVIDIA
 models; an explicit `gpu` value remains a name expectation. Follow the
-[shared hardware instructions](../README.md#6-change-settings-or-hardware-deliberately),
+[shared hardware instructions](../../shared/hardware/README.md),
 including the source-pair qualification limits. AMD/ROCm is experimental and
 untested; missing driver accounting currently prevents this tutorial route.
 Intel GPU training is unsupported. Per-stage time allowances are not total campaign

@@ -4,7 +4,7 @@
 to `tutorials.paper.runner`, the TESS tutorial runner. It is not the launcher for
 TIDMAD, Project8 or LIGO.
 
-For a first run, follow the [setup guide](../README.md) and use Quick B in your
+For a first run, follow the [setup guide](../tess/README.md) and use Quick B in your
 copied notebook, or the exact generated `scripts/run-*.sh` command shown by
 Quick A. That external script already selects your saved experiment JSON.
 

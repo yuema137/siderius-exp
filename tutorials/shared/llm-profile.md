@@ -6,7 +6,8 @@
 It is not derived from `experiments/`, does not change infra defaults, and does
 not install an implicit historical strategy. `llm_setup.write_test_llm_config`
 validates it with the installed `WorkflowLLMConfig` then uses exclusive creation.
-All five initializers refuse existing project roots before copying files.
+All tutorial initializers refuse existing project roots before copying files.
+Eight initializer modules serve nine tasks: Project8 and LIGO share one module.
 
 The source records eleven routes explicitly: four single-call slots (`interpret`,
 `data_analysis`, `implement`, `validate`), three proposer slots, two tuner slots
@@ -32,10 +33,18 @@ routing remain unchanged.
 
 ## Evidence and documentation
 
-Offline tests use the actual installed workflow schema and its node projection,
-exercise all five new external project initializers, and reject overwrite attempts.
-These tests do not call providers, prove account/model access, train, or establish
-score quality. Existing gallery images, notebook outputs and provenance retain
-their original identity; introductory Markdown labels them as earlier runs.
+`tests/tutorials/test_planner_setup.py` uses the actual installed workflow schema
+and node projection and parameterizes the original five task cases: TESS, TIDMAD,
+Project8, LIGO and Pet. It verifies routing and overwrite refusal; it is not a
+nine-task live test. MJD, SuperNEMO, Cancer and DAVIS also have their owning
+initializer/runtime tests. Offline tests do not contact providers, establish
+account/model access, train or establish score quality.
+
+Separate Luna-medium live witnesses are recorded in the supplementary MJD,
+SuperNEMO, Cancer and DAVIS `example/provenance.json` receipts and explained by
+their example READMEs. These qualify their recorded source/data/hardware sequence,
+not every task or hardware combination. Earlier paper-task and Pet galleries
+retain their original model/source identity and must not be relabeled as Luna.
+All recorded images, outputs and provenance remain unchanged by this guide.
 The top-level tutorial guide owns navigation; README.md here owns configuration
 level recommendations; task guides own their launch and parameter instructions.

@@ -78,8 +78,8 @@ every GPU.
 
 | Tutorial | Initial short-demo VRAM allowance | Data and host-memory considerations |
 |---|---:|---|
-| [TESS](../../paper/README.md) | 8 GiB | Keep room for the selected source/staged arrays and run outputs. Changing the waveform population changes data memory; no universal host-RAM minimum has been established. |
-| [TIDMAD](../../paper/README.md) | 8 GiB | Reuse the required original files; choosing a small fraction does not shrink them. Decoding selected waveform segments also uses host RAM. Follow the one-band setup and inspect its selected files before downloading. |
+| [TESS](../../paper/tess/README.md) | 8 GiB | Keep room for the selected source/staged arrays and run outputs. Changing the light-curve population changes data memory; no universal host-RAM minimum has been established. |
+| [TIDMAD](../../paper/tidmad/README.md) | 8 GiB | Reuse the required original files; choosing a small fraction does not shrink them. Decoding selected waveform segments also uses host RAM. Follow the one-band setup and inspect its selected files before downloading. |
 | [Project8](../../paper/prepared/README.md) | 8 GiB | The two complete source files total about 9.83 GB. The preparation helper can use selected row ranges and reports actual transfers; allow additional space for staged time/frequency arrays and outputs. |
 | [LIGO](../../paper/prepared/README.md) | 8 GiB | The source manifest lists about 2.36 GB across 60 files; selected-row preparation can transfer less. Keep additional room for staged arrays and outputs. |
 | [Pet](../../supplementary/pet/README.md) | 8 GiB | Account for downloaded archives, extracted images, manifests and checkpoints. Fewer training images do not remove the original dataset or extraction space. |

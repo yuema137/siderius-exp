@@ -50,7 +50,8 @@ considerations; choosing a cheaper LLM does not reduce GPU requirements.
 
 ## What a fresh tutorial selects
 
-TESS, TIDMAD, Project8, LIGO and Pet use the same independent test template.
+All nine [tutorial tasks](../README.md) use the same independent test template,
+including the supplementary MJD, SuperNEMO, Cancer and DAVIS entrypoints.
 Every configured workflow route uses OpenAI `gpt-6-luna` with `medium` reasoning:
 interpretation, Data Analysis, all three proposer stages, implementation,
 validation, tuning's planner and reflector, and both literature-review routes.
@@ -82,8 +83,14 @@ runner to GPT-6 Luna too if you want an entirely Luna-based test; `llm/agents.js
 controls only workflow calls. Optional setup-review tooling likewise uses its
 own reviewer configuration.
 
-The template has offline routing checks; **a successful live Luna run has not yet
-been established by those checks**. Archived notebook pictures and scores remain
-from their original recorded runs and model choices. They demonstrate the process,
-not the results you will obtain from this profile. See the
-[technical contract](llm-profile.md) for verification and ownership details.
+Offline routing checks validate configuration; they do not prove provider access.
+Separate real Luna-medium runs are recorded for [MJD](../supplementary/mjd/example/README.md),
+[SuperNEMO](../supplementary/supernemo/example/README.md),
+[Cancer](../supplementary/cancer/example/README.md) and
+[DAVIS](../supplementary/davis/example/README.md). Their receipts identify the
+source pair, data, hardware, costs and actual outcomes, including failures.
+That evidence does not qualify every task, GPU or generated model.
+
+The four paper-task galleries and Pet retain their earlier model/source identities;
+they are not new Luna qualifications. None of these examples promises your score.
+See the [technical contract](llm-profile.md) for verification ownership.

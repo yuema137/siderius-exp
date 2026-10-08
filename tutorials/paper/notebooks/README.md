@@ -11,7 +11,7 @@ artifact reproductions. Do not execute or edit these repository templates.
 
 | Notebook | Task and data scope | Prepare your project |
 |---|---|---|
-| [01 TESS](01_tess_tutorial.ipynb) | Stellar rotation; released train/validation light curves and whole-star splits | [TESS setup](../README.md#1-install-in-the-two-exact-checkouts) |
+| [01 TESS](01_tess_tutorial.ipynb) | Stellar rotation; released train/validation light curves and whole-star splits | [TESS setup](../tess/README.md) |
 | [02 TIDMAD](02_tidmad_tutorial.ipynb) | Denoising; one band, file-index validation and optional separate final test | [TIDMAD setup](../tidmad/README.md) |
 | [03 Project8](03_project8_tutorial.ipynb) | Electron energy; time I/Q plus complex FFT channels, small event subset | [Project8/LIGO setup](../prepared/README.md) |
 | [04 LIGO](04_ligo_tutorial.ipynb) | Chirp mass; two detector channels, small event subset | [Project8/LIGO setup](../prepared/README.md) |

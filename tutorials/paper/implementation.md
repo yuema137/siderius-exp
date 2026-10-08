@@ -455,3 +455,14 @@ notebook selection/save/review cells, inspect rendered native commands and test
 read-only reopening plus existing-destination and invalid-change refusal. The
 lesson needs no additional live API/GPU run: execution is still the existing
 saved script, and the changed behavior is validated file selection/persistence.
+
+## Human guide ownership
+
+The paper README introduces the four tasks and links their guides. Shared
+`../shared/setup/README.md` owns paired installation and key-export instructions;
+`../shared/hardware/README.md` owns GPU/readiness limits and checks; the shared
+README owns LLM configuration levels. `tess/README.md` owns the TESS external
+project, data, kernel, Quick A/B/C and saved-variant route. TIDMAD and prepared
+Project8/LIGO guides retain their task-specific initialization and final-test
+boundaries. Notebook Markdown links route to those owners; execution cells,
+archive figures and recorded scientific configurations are unchanged.

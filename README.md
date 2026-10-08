@@ -1,102 +1,96 @@
 # siderius-exp
 
-Learn how to use [SIDERIUS](https://github.com/yuema137/SIDERIUS) on a scientific
-dataset: define the problem, choose an experiment, run it, and inspect the results.
-This repository contains task packages, tutorials and recorded experiments;
-SIDERIUS provides the execution framework.
+Learn to use [SIDERIUS](https://github.com/yuema137/SIDERIUS) on scientific data:
+define a prediction task, run a small experiment and inspect what happened.
+This repository supplies task packages, tutorials and recorded experiments;
+SIDERIUS supplies the execution framework.
 
-## Start with a tutorial
+## Start with TESS
 
-**For a first try, start with [TESS](tutorials/paper/README.md).** It predicts
-stellar rotation from brightness measurements and has a small downloadable
-dataset. Browse the notebook's data pictures and recorded result plot first;
-then follow its setup guide to run your own copy.
+**Follow the [TESS tutorial](tutorials/paper/tess/README.md).** It predicts stellar
+rotation from brightness measurements and uses a small downloadable dataset.
+You can browse its notebook before installing anything.
 
-The [tutorial index](tutorials/README.md) lists every task and shows which ones
-already have a notebook. The other available walkthroughs cover TIDMAD, Project8,
-LIGO and Pet image classification. MJD, SuperNEMO, Cancer and DAVIS have task and
-experiment code, but their beginner notebooks are not yet available.
+| One real training input | A recorded three-iteration result |
+|---|---|
+| ![TESS light curve and target](tutorials/paper/examples/tess-data.png) | ![Recorded TESS score versus iteration](tutorials/paper/examples/tess-progress.png) |
 
-We recommend working with your coding agent. Open this repository and say:
+These are genuine archived examples, not your results or promised scores.
+Their [source and limitations](tutorials/paper/examples/README.md) remain recorded.
+The [tutorial index](tutorials/README.md) has notebook/script demos for all nine
+tasks, including detector waveforms, images, graphs and video.
+
+We recommend using your coding agent. Open this repository and say:
 
 ```text
-Help me run the small TESS tutorial in a new project at /absolute/path/my-tess-demo, starting with environment and data setup.
+Help me run the small TESS tutorial in a new project at /absolute/path/my-tess-demo. Guide me through environment and data setup, explain the saved files, and ask before paid execution.
 ```
 
-Your agent should follow the selected tutorial, prepare the files, explain the
-choices and show the saved launch command. You supply provider credentials and
-approve paid execution. You can also follow the same guide yourself.
+You provide credentials through your environment and decide when to spend API
+credit/GPU time. You can follow the same instructions manually.
 
-## What you will do
+## Understand the files before running
 
-1. **Choose a task and inspect its example.** See the data format and what the
-   model predicts before installing anything.
-2. **Install the paired environments.** Follow that tutorial's setup guide for
-   the exp and infra installations and required keys.
-3. **Follow its project and data steps in order.** Use a fresh project path
-   outside both repositories; do not create it manually before initialization.
-   Reuse existing data or download it once as instructed. Depending on the task,
-   task files are copied during initialization or created during data preparation.
-   Edit only the files saved in your external project.
-4. **Preview, then run the saved script.** Inspect the saved files, effective
-   parameters and output path before spending API or GPU time. Notebook Run All
-   can invoke that same script; it does not contain a second training engine.
-5. **Read the score-versus-iteration plot.** Change settings in your project and
-   use a new run directory for the next experiment.
+```mermaid
+flowchart LR
+    A[Task package: prediction problem] --> C[Notebook: inspect and save]
+    B[Experiment: settings and paths] --> C
+    C --> D[Saved script: run the experiment]
+    D --> E[Run records and score plot]
+```
 
-Use the [Luna test configuration](tutorials/shared/README.md) for a first process
-check. For research, start from the paper's LLM routing or choose your own models.
-Model selection does not set a dollar limit; data, training and API budgets are
-separate. Keep keys, datasets, generated models and results outside the repos.
-
-## Which files own your choices?
-
-| You want to change | Edit in your external project |
+| Your choice | Where it belongs in your external project |
 |---|---|
-| The prediction problem: inputs, labels, data splits, metric or scientific checks | The **task package** |
-| How the search runs: iterations, Trial/Formal data fractions, time/VRAM budgets or LLM routing | The **experiment** and its linked configuration files |
-| Which saved experiment to launch | The generated **shell script** or its documented arguments |
+| Inputs, target, train/validation split, metric and scientific checks | **Task package** |
+| Iterations, data fractions, time/VRAM budgets and model routing | **Experiment** and linked configuration |
+| Which saved experiment to execute | **Shell script** shown by the notebook |
 
-For example, a new train/validation split changes the task definition. Keeping
-that split and increasing the iteration count changes the experiment. Each
-tutorial shows its actual file layout and the parameters its launcher supports.
+Changing the split changes the task; keeping that split and running four instead
+of three iterations changes the experiment. A notebook variable affects a run
+only after it is saved. Each guide shows the actual filenames and launch command.
 
-## Paper and historical experiments
+Your project lives **outside both repositories**. Keep editable tasks, notebooks,
+JSON, scripts and results there; keep credentials separately. Start with the
+[Luna test configuration](tutorials/shared/README.md). For research, use the
+paper's routing as a starting point or choose your own models. Model choice and
+training budgets are not a whole-run API spending limit.
+
+## Tutorials and the paper
 
 [Beyond a Better Score: Long-Horizon Agentic ML Development and Evaluation Protocol for Physics Time Series](https://zenodo.org/records/23071121)
-introduces SIDERIUS and studies agent-driven model development on TIDMAD, TESS,
+introduces SIDERIUS and studies agent-driven development on TIDMAD, TESS,
 Project8 and LIGO, including scientific validity and compute budgets.
 
 **Tutorials are simplified process demos, not one-click reproductions of paper
-artifacts or scores.** Their pictures include recorded examples with their own
-provenance. A new LLM-driven run can produce different models and results.
-For historical reproduction settings and available evidence, use the
-[paper artifact reference](experiments/paper-artifacts.md).
+artifacts or scores.** Fresh LLM-driven runs can produce different models and
+outcomes. Use the [paper artifact reference](experiments/paper-artifacts.md) for
+historical source pairs, configurations, available evidence and their limits.
 
-## Explore beyond the walkthroughs
+## Find the right level of detail
 
-| Directory | When you need it |
+| Need | Start here |
 |---|---|
-| [Tasks](tasks/README.md) | Understand or extend a task's data, model and scoring contracts |
-| [Experiments](experiments/README.md) | Inspect a particular workflow treatment, launcher or recorded run |
-| [Campaigns](campaigns/README.md) | Coordinate several experiments; not needed for a first tutorial |
-| [Deployments](deployments/README.md) | Configure a particular execution environment |
-| [Contributor rules](CLAUDE.md) | Change repository code or run development checks |
+| Choose a small demo | [Tutorials](tutorials/README.md) |
+| Understand or extend scientific contracts | [Tasks](tasks/README.md) |
+| Inspect a workflow treatment or recorded run | [Experiments](experiments/README.md) |
+| Coordinate multiple experiments | [Campaigns](campaigns/README.md) |
+| Configure an execution environment | [Deployments](deployments/README.md) |
+| Contribute code | [Contributor rules](CLAUDE.md) |
 
 <a id="framework-revision"></a>
-The exact framework dependency is recorded in [SIDERIUS_REVISION](SIDERIUS_REVISION)
-and the frozen dependency files. Follow the selected tutorial's installation
-instructions; do not substitute another checkout's virtualenv or source path.
-Some historical launchers have their own older pins, documented by their owners.
+The framework pin is in [SIDERIUS_REVISION](SIDERIUS_REVISION). Each checkout
+needs its own frozen environment. Paper-task demos share a
+[paired installation guide](tutorials/shared/setup/README.md); supplementary
+guides provide their own complete setup. Historical launchers may have older pins.
 
 <a id="running-the-live-tests"></a>
-Developer tests and scientific runs are separate. For contribution validation,
-follow [the contributor rules](CLAUDE.md#validation-and-independent-review) and
-the selected experiment's technical contract.
+Developer checks and scientific runs are separate. Follow the
+[validation rules](CLAUDE.md#validation-and-independent-review) and the selected
+experiment's contract.
 
 ## License
 
 Original software and documentation use the [MIT License](LICENSE). Third-party
 code, datasets and data-derived examples retain their own terms; see [NOTICE](NOTICE)
-and each task's provenance. The project license does not grant additional rights
-to external data, paper content or dependencies.
+and task provenance. This license grants no additional rights to external data,
+paper content or dependencies.

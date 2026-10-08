@@ -1,18 +1,17 @@
 # Choose a task and run a small demo
 
-**New to SIDERIUS? Start with [TESS](paper/README.md).** Open its notebook to see
+**New to SIDERIUS? Start with [TESS](paper/tess/README.md).** Open its notebook to see
 example data and a recorded result plot, then follow the setup guide. You do not
 need to understand the full experiment directory before starting.
 
-The repository has nine task families. A task package or experiment launcher
-does not automatically include a beginner tutorial; the table below shows the
-actual notebook coverage.
+All nine tasks below have a notebook, saved-script walkthrough and genuine
+recorded example. Choose by your data and prediction problem.
 
 ## Find your task
 
 | Task | What the model does | Tutorial entry |
 |---|---|---|
-| TESS | Predict stellar rotation from a light curve | [Setup](paper/README.md) · [Notebook](paper/notebooks/01_tess_tutorial.ipynb) |
+| TESS | Predict stellar rotation from a light curve | [Setup](paper/tess/README.md) · [Notebook](paper/notebooks/01_tess_tutorial.ipynb) |
 | TIDMAD | Recover a waveform from noisy detector data, using one band | [Setup](paper/tidmad/README.md) · [Notebook](paper/notebooks/02_tidmad_tutorial.ipynb) |
 | Project8 | Predict electron energy from time and frequency views | [Setup](paper/prepared/README.md) · [Notebook](paper/notebooks/03_project8_tutorial.ipynb) |
 | LIGO | Predict chirp mass from two detector channels | [Setup](paper/prepared/README.md) · [Notebook](paper/notebooks/04_ligo_tutorial.ipynb) |
@@ -23,6 +22,14 @@ actual notebook coverage.
 | DAVIS | Predict future video frames | [Setup](supplementary/davis/README.md) · [Notebook](supplementary/davis/davis_tutorial.ipynb) · [Recorded demo](supplementary/davis/example/README.md) |
 
 ## Follow this sequence
+
+```mermaid
+flowchart LR
+    A[Choose a task] --> B[Set up an external project]
+    B --> C[Save and check configuration]
+    C --> D[Run the saved script]
+    D --> E[Inspect records and plot]
+```
 
 1. **Browse the example.** Notebook pictures and plots show the data and a
    recorded run. Their provenance is documented; they are not your results.

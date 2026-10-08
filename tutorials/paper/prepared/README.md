@@ -23,14 +23,14 @@ independent final-test step here.
 
 ## 1. Install the exact source pair
 
-Follow [section 1 of the shared setup](../README.md#1-install-in-the-two-exact-checkouts)
+Follow [section 1 of the shared setup](../../shared/setup/README.md#1-install-the-two-exact-checkouts)
 first. Keep `EXP_CHECKOUT` and `INFRA_CHECKOUT` exported. Those commands clone
 [yuema137/siderius-exp](https://github.com/yuema137/siderius-exp) and
 [yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS), then select the locked
 infra revision. Each checkout must have its own frozen virtual environment.
 
 Use Linux, Python 3.12 and one visible GPU supported by the frozen installation
-and required accounting. Follow the [shared hardware instructions](../README.md#6-change-settings-or-hardware-deliberately)
+and required accounting. Follow the [shared hardware instructions](../../shared/hardware/README.md)
 for optional name expectations, capacity checks and source-pair qualification limits.
 AMD/ROCm is experimental and untested; its missing driver accounting currently
 prevents these tutorial launches. Intel GPU training is unsupported. This fixed workflow has no separate coding-agent
@@ -148,8 +148,8 @@ cd "$TUTORIAL_HOME"
 ```
 
 Select **SIDERIUS paper tutorials**. Open `03_project8_tutorial.ipynb` or
-`04_ligo_tutorial.ipynb` in your project, then Run All. Quick A saves and reopens
-the experiment; Quick B executes its script; Quick C saves PNG/SVG/CSV results.
+`04_ligo_tutorial.ipynb` in your project, then Run All. Quick A saves or verifies
+the named experiment; Quick B executes its script; Quick C saves PNG/SVG/CSV results.
 For a key changed after Jupyter started, restart the server from the configured
 terminal; a kernel restart alone does not update the server's environment.
 
