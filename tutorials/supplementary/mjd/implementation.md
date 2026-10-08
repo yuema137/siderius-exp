@@ -65,12 +65,17 @@ Plotting uses saved experiment/composition and records only, independent of laun
 
 Notebook: exact exp kernel and TUTORIAL_HOME binding; no config literals silently
 saved on Run All. Save-as is opt-in. Live execution is explicitly disclosed before
-RUN_QUICK_DEMO; native preview has a separate switch. All committed code cells
-have empty outputs/counts. There is no training gallery until separately authorized
-fresh qualification. Real CPU data figures must not be presented as training.
+RUN_QUICK_DEMO; native preview has a separate switch. The source notebook embeds archived PNG outputs at the data and score cells,
+with provenance in `example/provenance.json`; its other outputs are empty and
+execution counts are null. Initialization clears all outputs/counts. CPU data
+figures and actual training records are labeled separately.
 
 Validation owners: focused tests cover native mappings, official manifest
 substitution/refusal, actual fixture loader/normalization, source isolation,
 quoted scripts/save-as, cache handoff, no-Health plotting and offline notebook
 execution. Real CPU preview/native dry-run evidence is separate from fixtures.
-No API/GPU/training qualification has been performed for this new treatment.
+The recorded three-iteration API/GPU qualification completed on the source
+revision recorded in `example/provenance.json`; subsequent gallery edits are
+presentation only. Cached Run All was verified with no new API requests and an unchanged
+completion receipt. This establishes the
+recorded sequence, not universal generated-model or hardware qualification.

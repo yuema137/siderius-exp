@@ -1,0 +1,139 @@
+{
+  "kind": "mjd-process-demo-evidence",
+  "paper_artifact": false,
+  "executed_exp_revision": "9fc82f963f565ea907f4834b8e0d5ff0169397aa",
+  "infra_revision": "52373be9a52bead36fd1f15d706385967e0a129d",
+  "composition_fingerprint": "65539fdd3ff66d3dfe4587c44e008079fdcadb152740e1ada88c0cc9e3b2eb80",
+  "planner_strategy_identity": {
+    "name": "native-timing-v1",
+    "version": "1",
+    "content_sha256": "41d4a916d489cbf1ba073c2961bb2adc8e368fdfd636d13b56adea9cafd3fe17",
+    "assembly_sha256": "d1321a044c946859faa180a21c4eda21ca8fe79ff838a0c816bc68e5ba265b3b"
+  },
+  "llm": {
+    "model": "gpt-6-luna",
+    "reasoning_effort": "medium",
+    "provider": "openai",
+    "purpose": "test routing"
+  },
+  "hardware": "NVIDIA GeForce RTX 5090",
+  "settings": {
+    "version": "mjd-tutorial-v1",
+    "run_name": "mjd_demo_001",
+    "gpu": null,
+    "iterations": 3,
+    "rounds": 2,
+    "epochs": 1,
+    "trial_train_fraction": 0.01,
+    "trial_eval_fraction": 0.01,
+    "formal_train_fraction": 0.01,
+    "formal_eval_fraction": 0.01,
+    "trial_minutes": 2.0,
+    "formal_minutes": 5.0,
+    "vram_gib": 10.0,
+    "trial_vram_gib": null,
+    "formal_vram_gib": null,
+    "train_portion": 1.0,
+    "advice_file": null
+  },
+  "data": {
+    "release": "https://zenodo.org/records/8257027",
+    "supervised_files": 22,
+    "bytes": 43535055168,
+    "launch_verification": "size_and_md5",
+    "official_manifest_sha256": "7fb5e9a6b1f5845f4e3c22dbd537849209794b896885b943fee49fe44b350903",
+    "evaluation_role": "Official Test supplies search feedback, not a blind final holdout"
+  },
+  "illustrative_scope_counts": {
+    "seed": 42,
+    "training_samples": 7834,
+    "training_per_class": 3917,
+    "evaluation_samples": 2846,
+    "evaluation_per_class": 1423,
+    "qualification": "CPU scope preview; actual attempt sampling can differ"
+  },
+  "native_output_sha256": {
+    "runs/mjd_demo_001/iter_001/iteration_001/gated_dilated_waveform_net/run_output_iter_001.json": "786945d966f94d327e0a5a968ceb3a66ae107aeb1643c572bed4d0b64e1a91ec",
+    "runs/mjd_demo_001/iter_002/iteration_002/compact_multires_spectral_waveform_net/run_output_iter_002.json": "8fb1f2da1f02de3e10dd3f5f1ac7ee95a62d2d3c4cf2597f15e21a52602c4f62",
+    "runs/mjd_demo_001/iter_003/iteration_003/extended_dilation_gated_waveform_net/run_output_iter_003.json": "3b91bb40531dc51c74a6f68fc740137d827cb90a73e1d7c71ae8cada21b2f195"
+  },
+  "records": [
+    {
+      "exp_id": "gated_dilated_waveform_net_iter_001_001",
+      "role": "trial",
+      "score": 0.7704350330925427,
+      "metric": "energy_matched_roc_auc",
+      "direction": "higher",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "gated_dilated_waveform_net_iter_001_002",
+      "role": "formal",
+      "score": 0.8590823022468451,
+      "metric": "energy_matched_roc_auc",
+      "direction": "higher",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "compact_multires_spectral_waveform_net_iter_002_001",
+      "role": "trial",
+      "score": 0.6212711092765482,
+      "metric": "energy_matched_roc_auc",
+      "direction": "higher",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "compact_multires_spectral_waveform_net_iter_002_002",
+      "role": "formal",
+      "score": 0.783024825614057,
+      "metric": "energy_matched_roc_auc",
+      "direction": "higher",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "extended_dilation_gated_waveform_net_iter_003_001",
+      "role": "trial",
+      "score": 0.7467439509620352,
+      "metric": "energy_matched_roc_auc",
+      "direction": "higher",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "extended_dilation_gated_waveform_net_iter_003_002",
+      "role": "formal",
+      "score": 0.8184723435307115,
+      "metric": "energy_matched_roc_auc",
+      "direction": "higher",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    }
+  ],
+  "qualification": {
+    "status": "completed",
+    "all_three_iterations_completed": true,
+    "request_count": 33,
+    "conservative_accounted_usd": "0.048273625",
+    "unknown_requests": 0,
+    "cumulative_command_seconds_upper_bound": 926.477340919897,
+    "command_time_includes_api_wait_and_initial_failure": true,
+    "campaign_wall_seconds": 1159.3738591531292,
+    "prior_attempt": "An initial tutorial Trial fraction of 0.005 was rejected by the native CLI before API calls or training. The tutorial was corrected to the native minimum 0.01; this completed run uses the recorded source revision. Prior records were preserved.",
+    "result_reuse": "Repeated Run All reused the saved result without new API requests and left the completion receipt unchanged.",
+    "limits": "Observed validation accounting, not limits automatically imposed by the public notebook.",
+    "notebook_saved_script_elapsed_seconds": 811.3810751326382,
+    "full_notebook_command_elapsed_seconds": 819.6122777238488
+  },
+  "display_paths": "CSV source paths are relative to the external project; numeric values and original PNG/SVG bytes are unchanged. Notebook retains image outputs only; no console, prompt or machine-path output is published.",
+  "source_csv_sha256": "9a9afbec5cacc1690d068bb650371ba36fa977ffda9159387a0ba03fc3ea486c",
+  "asset_sha256": {
+    "score-versus-iteration.csv": "54180282bad0e94ebc84af58eca8f44b892336870ccf8c5ce36c6fa77a98fc08",
+    "score-versus-iteration.png": "9c08b65a07bd052c1ee98238388b1d7d74c45e73fe780f73a64f45417e9c2f18",
+    "score-versus-iteration.svg": "c0177e0d8c3b699fbb7d84f5480b08f8b6730ac394dd35074408c07c6f883392",
+    "waveform.png": "15e70f91133d4d1ccf927fa1f49ac7deac9c5a98982b2551f4c5b8493e303da5"
+  }
+}

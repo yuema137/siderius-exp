@@ -6,12 +6,20 @@ recorded AUC scores. Open the [notebook](mjd_tutorial.ipynb) for the ordered
 walkthrough. Your editable task, notebook, routing and experiment live in a new
 external project; the repositories and raw data stay unchanged.
 
-**Fresh three-iteration API/GPU qualification is pending.** The implementation
-provides an offline walkthrough and a live entrypoint, but there is no current
-recorded score gallery or promised performance. Its default notebook Run All
-includes an explicitly labeled API/GPU cell; set `RUN_QUICK_DEMO=False` to keep
-execution offline. Data figures read local Train waveforms and are not training
-results. This supplementary tutorial is not a paper reproduction.
+The [recorded three-iteration demo](example/README.md) shows real input waveforms,
+measured scores and exact execution provenance. It completed with the Luna test
+configuration on an RTX 5090; no particular score or performance is promised.
+Default notebook Run All includes an explicitly labeled API/GPU cell; set
+`RUN_QUICK_DEMO=False` to keep execution offline. This supplementary tutorial
+is not a paper reproduction.
+
+![Actual Train waveform and normalized model input](example/waveform.png)
+
+![Measured Formal AUC across three iterations](example/score-versus-iteration.png)
+
+These are archived example outputs. Initialization clears them from your copied
+notebook, which then inspects your own data and plots your own run. The waveform
+is a CPU data preview; the score chart comes from actual training records.
 
 The model receives one `[1,3800]` waveform and predicts rejection/acceptance by
 the Low-AvsE cut. The task normalizes using the first 500 samples and balances

@@ -14,8 +14,9 @@ artifacts or promises of a particular score.
 
 [MJD setup](mjd/README.md) and its [notebook](mjd/mjd_tutorial.ipynb) now provide
 the external-project and saved-script walkthrough. CPU previews use local official
-data. A fresh three-iteration API/GPU qualification is pending; no recorded score
-gallery is claimed. Official Test feeds search evaluation, not a blind final test.
+data; the [recorded three-iteration demo](mjd/example/README.md) includes actual
+waveforms, scores and provenance. Official Test feeds search evaluation, not a
+blind final test.
 
 ## Tasks awaiting a notebook
 

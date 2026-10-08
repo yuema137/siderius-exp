@@ -12,4 +12,5 @@ Majorana task owns official Train/Test roles, waveform preprocessing and AUC.
 Official Test is used during search; there is no separate blind holdout here.
 
 The historical qualification/campaign/demo profiles in the parent directory are
-unchanged. This tutorial has no fresh API/GPU qualification witness yet.
+unchanged. The [recorded three-iteration demo](../../../tutorials/supplementary/mjd/example/README.md)
+provides the completed API/GPU witness and its exact source provenance.
