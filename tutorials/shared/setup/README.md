@@ -17,16 +17,9 @@ files and plots but cannot run these training demos. AMD/ROCm is experimental
 and lacks required accounting; Intel GPU training is unsupported. Read the
 [hardware guide](../hardware/README.md) before a large data download.
 
-You need three separate locations:
-
-```text
-SIDERIUS-tutorial/     installed framework and its own .venv
-siderius-exp/          installed tutorials and their own .venv
-my-task-project/      your editable task, experiment, notebook, scripts and runs
-```
-
-Credentials stay outside these directories. A run workspace is an output
-subdirectory of your project; it is not either source checkout.
+The [tutorial directory guide](../../README.md#source-project-data-and-run-directories)
+explains source checkouts, your external project, input data and per-run outputs.
+Keep credentials separate from those locations.
 
 ## 1. Install the two exact checkouts
 
@@ -95,9 +88,9 @@ initializer, data route, project path and kernel commands:
 - [TIDMAD](../../paper/tidmad/README.md)
 - [Project8 or LIGO](../../paper/prepared/README.md)
 
-Choose a fresh external project path; let its initializer create it. Reuse
-existing data when available instead of downloading it again. Do not create the
-run workspace yourself: the script requires a fresh output directory.
+Follow the selected guide to initialize a fresh external project and download
+and prepare its dataset. Initialization alone does not supply data. If you have
+already completed that preparation on your machine, keep it for later runs.
 
 Before paid execution, inspect the saved JSON/script, run the task's preview,
 and check the exact JSON with the [hardware-only command](../hardware/README.md).

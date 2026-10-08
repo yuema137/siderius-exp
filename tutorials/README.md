@@ -29,8 +29,8 @@ recorded example. Choose by your data and prediction problem.
 
 1. **Browse the example.** Notebook pictures and plots show the data and a
    recorded run. Their provenance is documented; they are not your results.
-2. **Use the task's setup link.** It gives the paired installations, data path or
-   download procedure, required keys, supported hardware and project initializer.
+2. **Use the task's setup link.** It gives the paired installations, dataset
+   download/preparation, required keys, hardware and project initializer.
 3. **Open the copied notebook in your external project.** It explains the task
    package, saves experiment settings and shows the exact files to inspect.
 4. **Preview the saved launch command.** Check data fractions, iterations,
@@ -40,16 +40,42 @@ recorded example. Choose by your data and prediction problem.
    early or have unscored attempts. It uses API credit and GPU time. A failed or
    invalid model remains a result to inspect; a high score is not the demo goal.
 
-Keep the source repositories unchanged. Your editable notebook, task files,
-experiment, LLM configuration, script and results belong in the separate project
-created by the tutorial. Keep secrets external and export them before starting
-Jupyter. Setting `RUN_QUICK_DEMO=False` skips the notebook's live-demo execution;
-other preparation cells can still save files.
+Keep secrets external and export them before starting Jupyter. Setting
+`RUN_QUICK_DEMO=False` skips paid execution; preparation cells can still save
+files and data-preview cells still read local inputs.
 
 New projects use the [GPT-6 Luna test profile](shared/README.md). It is a starting
 point for checking the process, not a whole-run spending cap. The recorded
 galleries retain each recorded run's model and settings; inspect their provenance
 rather than assuming every example used Luna. Choose research or custom model routing separately from run budgets.
+
+## Source, project, data and run directories
+
+The task setup guide defines your actual paths and the order of initialization
+and data preparation. Replace its example paths with locations on your machine.
+For the paper tutorials, keep these exported settings in the terminal that starts
+Jupyter; supplementary guides use their own variable names.
+
+| Location | What belongs there |
+|---|---|
+| `EXP_CHECKOUT` and `INFRA_CHECKOUT` | Installed `siderius-exp` and SIDERIUS source, each with its own environment. Edit tutorial copies in your project. |
+| `TUTORIAL_HOME` | Your project outside both source checkouts: editable notebook, task/configuration copies, launch scripts and results. Its initializer creates it. |
+| Experiment `data_dir` | Inputs in the layout required by the selected task. This may be `TUTORIAL_HOME/data/...` or another external dataset/preparation directory. |
+| Experiment `workspace` | One run's output directory, usually under `TUTORIAL_HOME/runs/`: records, logs and model artifacts. Let the launcher create a fresh workspace. |
+
+Project initialization does not supply the dataset. Follow your task's download
+and preparation steps; some tasks require prepared data before initialization.
+Keep input data and outputs outside both source checkouts. A completed preparation
+can serve later runs; outputs in `runs/` are not source data.
+
+The **selected experiment JSON** owns `data_dir`, `workspace` and the task entry.
+Changing a shell variable alone does not update that JSON. For paper demos,
+Quick A saves and reviews the JSON/script pair; the script runs those settings.
+
+See the [file-role overview](../README.md#understand-the-files-before-running)
+for tasks, experiments and scripts, and the [LLM guide](shared/README.md) for
+provider/model routing. Human advice is optional and task-guide-specific;
+placing an advice file in the project does not enable it.
 
 ## How the directories relate to the paper
 

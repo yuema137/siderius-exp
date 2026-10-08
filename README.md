@@ -45,8 +45,8 @@ Changing the split changes the task; keeping that split and running four instead
 of three iterations changes the experiment. A notebook variable affects a run
 only after it is saved. Each guide shows the actual filenames and launch command.
 
-Your project lives **outside both repositories**. Keep editable tasks, notebooks,
-JSON, scripts and results there; keep credentials separately. Start with the
+See the [tutorial directory guide](tutorials/README.md#source-project-data-and-run-directories)
+for source checkouts, your editable project, input data and run outputs. Start with the
 [Luna test configuration](tutorials/shared/README.md). For research, use the
 paper's routing as a starting point or choose your own models. Model choice and
 training budgets are not a whole-run API spending limit.
