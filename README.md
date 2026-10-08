@@ -91,3 +91,11 @@ be hidden in a shell argument or an old run receipt.
 - [campaign index](campaigns/README.md)
 - [migration evidence](provenance/MIGRATION.md)
 - [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/e800fc1f08b0e067fc21076a200f3f70d04b38b8/docs/reference/task-composition.md)
+
+## License
+
+Original siderius-exp software and documentation are available under the
+[MIT License](LICENSE). Third-party code, datasets and data-derived examples
+retain their own terms and attribution; see [NOTICE](NOTICE) and the selected
+task's provenance. The project license does not grant new rights to external
+data, paper content or dependencies.

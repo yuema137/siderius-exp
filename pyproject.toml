@@ -1,7 +1,7 @@
 [project]
 name = "siderius-exp"
 version = "0.0.0"
-description = "Private scientific tasks and experiment campaigns for SIDERIUS"
+description = "Scientific tasks and experiment campaigns for SIDERIUS"
 requires-python = ">=3.12"
 dependencies = [
     "siderius @ git+https://github.com/yuema137/SIDERIUS.git@e800fc1f08b0e067fc21076a200f3f70d04b38b8",

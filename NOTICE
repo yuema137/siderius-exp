@@ -1,0 +1,108 @@
+siderius-exp licensing and third-party notices
+============================================
+
+Original SIDERIUS software and documentation are licensed under the MIT License
+in LICENSE. That grant does not replace the licenses of external datasets,
+adapted material or photographs. Notices below also cover copies embedded in
+notebooks. Installed dependencies retain their own terms.
+
+Dataset downloads stay outside this repository. This notice identifies the
+sources of distributed previews and derived records; it does not grant rights
+to redistribute an external dataset. Each tasks/*/PROVENANCE.md records the
+task's acquisition, identity and source-specific limitations.
+
+TIDMAD (CC BY 4.0)
+-----------------
+
+Credit: TIDMAD Team. Upstream software and data are offered under Creative
+Commons Attribution 4.0 International. Preserve attribution when reusing its
+material. The full upstream license is in LICENSES/CC-BY-4.0.txt.
+https://creativecommons.org/licenses/by/4.0/
+https://github.com/jessicafry/TIDMAD/blob/7e46f97de9c9fde371036eb09d18bdae1e8d480d/README.md#license
+
+This notice covers tutorials/paper/examples/tidmad-data.png, its embedded copy
+in tutorials/paper/02_tidmad_tutorial.ipynb, and upstream-derived records in
+tasks/tidmad/reference_data/. The preview selects and plots data locally;
+task adapters and reference records may transform or reformat upstream inputs.
+SIDERIUS-generated measurements are identified by their individual provenance,
+not represented as copies of upstream records. See tasks/tidmad/PROVENANCE.md.
+
+PhyTS and the TESS, Project 8 and LIGO previews
+-------------------------------------------
+
+Credit: PhyTS contributors and the original scientific dataset contributors.
+The aggregate PhyTS-bench dataset card at the pinned revision declares MIT:
+https://huggingface.co/datasets/PhyTS-team/PhyTS-bench/blob/9f203f4c338645a1e4b2c9dc7d6f820269ca5114/README.md
+The companion PhyTS code license is preserved in LICENSES/PhyTS-MIT.txt:
+Copyright (c) 2026 Kyungseop Yoon.
+https://github.com/kyoon-mit/PhyTS/blob/ec02ff71e6dddbcefa8824b1b714c7cef6f95f3a/LICENSE
+
+Affected previews: tutorials/paper/examples/tess-data.png, project8-data.png
+and ligo-data.png, including the corresponding attachments in
+01_tess_tutorial.ipynb, 03_project8_tutorial.ipynb and 04_ligo_tutorial.ipynb.
+They are locally generated figures from selected training samples, with the
+tutorials' preprocessing and plotting. TESS uses the TESS-Gaia Light Curve
+pipeline and source catalog labels described in tasks/phyts_tess/PROVENANCE.md.
+Other task provenance and the pinned tutorials/paper/prepared/sources.json
+identify the original sources and transformations.
+
+The aggregate card records the publisher's license declaration; it does not
+establish that every original scientific dataset has identical terms. In
+particular, TIDMAD retains the separate CC BY 4.0 notice above. Consult the
+original source terms before redistributing data beyond these previews.
+
+Oxford-IIIT Pet photographs (CC BY-SA 4.0)
+----------------------------------------
+
+Source: Oxford-IIIT Pet Dataset, https://www.robots.ox.ac.uk/~vgg/data/pets/
+Attribution: O. M. Parkhi, A. Vedaldi, A. Zisserman and C. V. Jawahar,
+"Cats and Dogs," IEEE Conference on Computer Vision and Pattern Recognition,
+2012. Copyright in the photographs remains with the original image owners.
+
+The official dataset page identifies Creative Commons Attribution-ShareAlike
+4.0 International. The full license is in LICENSES/CC-BY-SA-4.0.txt:
+https://creativecommons.org/licenses/by-sa/4.0/
+
+The photographs and assembled preview in
+tutorials/supplementary/pet/example/images.png, including its image output in
+tutorials/supplementary/pet/pet_tutorial.ipynb, are covered by those terms,
+not the repository's MIT grant. SIDERIUS resized/preprocessed selected images
+and assembled the labeled preview. This adapted preview is distributed under
+CC BY-SA 4.0. Derived identity manifests are in
+tasks/oxford_iiit_pet/data/manifests/.
+
+tasks/oxford_iiit_pet/PROVENANCE.md also preserves different, older wording
+from the annotations archive (research use and original-owner copyright).
+That archive-specific statement is not erased or presented as a uniform MIT
+license. This repository relies on the official page's stated CC BY-SA 4.0
+terms for the displayed preview, not a new grant over the raw archive.
+
+DAVIS metadata (BSD 3-Clause)
+---------------------------
+
+Derived manifest metadata in tasks/davis_future_prediction/data/manifests/
+uses the official DAVIS toolkit's data/db_info.yaml at revision
+97d08bf8b6201abf15509a67a985db3745a75ccd. Credit: Federico Perazzi and the
+DAVIS contributors. Copyright (c) 2016, Federico Perazzi. All rights reserved.
+The BSD 3-Clause notice and disclaimer are preserved in
+LICENSES/DAVIS-BSD-3-Clause.txt.
+https://github.com/davisvideochallenge/davis-2017/blob/97d08bf8b6201abf15509a67a985db3745a75ccd/LICENSE
+
+SIDERIUS selects and reformats metadata for task identities and clip manifests.
+No video frames are distributed here. Toolkit, annotation and video-frame
+terms are distinct; the toolkit license is not a blanket video license.
+See tasks/davis_future_prediction/PROVENANCE.md.
+
+Run plots and other external task sources
+----------------------------------------
+
+The paper examples' *-progress.png files and supplementary Pet
+score-versus-iteration plots, including notebook outputs, are locally generated
+SIDERIUS run visualizations. Their underlying task/data attribution still
+applies. They are simplified demo results, not copied paper figures or a claim
+of one-command reproduction of paper artifacts.
+
+SuperNEMO, Majorana and Cancer task provenance records identify their external
+sources and applicable terms. Their raw datasets are not included. In particular,
+an aggregate benchmark's software license does not replace third-party data
+terms. Consult each task's PROVENANCE.md before acquiring or redistributing it.

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,8 @@ name = "siderius-prompt-compat"
 version = "0.6.0"
 description = "Explicit experiment-owned historical prompt rendering profiles"
 requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
 
 [project.entry-points."siderius.prompt_renderers"]
 paper-early-v1 = "siderius_prompt_compat:early"

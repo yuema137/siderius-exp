@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,8 @@ name = "siderius-planner-compat"
 version = "0.8.0"
 description = "Experiment-owned historical SIDERIUS planner prompt providers"
 requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
 
 [project.entry-points."siderius.planner_strategies"]
 legacy-9b78d505cb11-paper-storage-v7 = "siderius_planner_compat.storage_provenance_v7:historical_storage_v7"
