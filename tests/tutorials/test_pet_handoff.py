@@ -81,7 +81,7 @@ def test_mismatched_script_refused_before_data_keys_or_launch(
 
     monkeypatch.setattr("tutorials.supplementary.pet.demo.inspect_data", fail)
     monkeypatch.setattr("tutorials.supplementary.pet.runner.require_credentials", fail)
-    monkeypatch.setattr("tutorials.supplementary.pet.demo.subprocess.Popen", fail)
+    monkeypatch.setattr("tutorials.shared.saved_run.subprocess.Popen", fail)
     with pytest.raises(ValueError, match="launcher"):
         entry(target, script)
     assert not list((root / "runs").iterdir())

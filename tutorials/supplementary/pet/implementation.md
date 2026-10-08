@@ -26,7 +26,8 @@ result authority and blocking Health. The initial three iterations/two rounds/
 Pet's runtime refuses smaller values. Invalid Health is not demo failure by itself.
 A missing score is never fabricated.
 
-`demo.run_demo` delegates to the saved script with a separate process group. Its
+`demo.run_demo` delegates through the [shared saved-script lifecycle](../../shared/saved-run.md)
+to the saved script with a separate process group. Its
 completion receipt binds experiment, script, routing, workflow and all task files;
 changed inputs cannot reuse a completed result. This is input provenance, not a
 content hash of the external JPEG dataset. The operator must preserve dataset
