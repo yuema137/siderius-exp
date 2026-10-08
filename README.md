@@ -109,7 +109,7 @@ be hidden in a shell argument or an old run receipt.
 - [experiment index](experiments/README.md)
 - [campaign index](campaigns/README.md)
 - [migration evidence](provenance/MIGRATION.md)
-- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/46ee992043a1ccb0e2db57cac1afc8a73171e063/docs/reference/task-composition.md)
+- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/b13b9263c939c33b8d06361b1ae2fd0f99c3a900/docs/reference/task-composition.md)
 
 ## License
 

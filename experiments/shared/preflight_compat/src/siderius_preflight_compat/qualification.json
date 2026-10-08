@@ -36,6 +36,11 @@
       "infra_revision": "46ee992043a1ccb0e2db57cac1afc8a73171e063",
       "assembly_sha256": "594ff090d26de377453f791dbf1095514bb94c756e3faf83452828b13a17176b",
       "scope": "Typed task objective and Health binding round trips; frozen historical rendering and static decision corpus. No new scientific configuration, runtime estimator or training algorithm; not full conversation replay."
+    },
+    {
+      "infra_revision": "b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
+      "assembly_sha256": "d299175819b0bda402e05f63161d31f57cff9dab782864c4b127f0713e38102f",
+      "scope": "Canonical closure now includes shared phase_launch; standalone inference setup measurement starts before model construction. Frozen static phase estimates and batch decisions with static_only and protected GPU policy unselected remain the qualified scope. No live GPU, protected/measured execution, universal producer geometry or stochastic training parity claim."
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"
