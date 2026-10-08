@@ -29,10 +29,13 @@ Keys belong in your launching environment, never in the notebook or routing JSON
 
 ## 2. Create your external project and its kernel
 
-Choose a **new directory outside both repositories**. Do not make it beforehand;
-the initializer creates it and refuses to overwrite an existing project.
+Use your installed checkout paths from section 1 and choose a **new project
+directory outside both repositories**. Replace every `/absolute/...` example
+with your own path. Do not create the project directory beforehand: initialize
+it now, before downloading data. The initializer refuses an existing project.
 
 ```bash
+export EXP_CHECKOUT="/absolute/path/to/siderius-exp"
 export TUTORIAL_HOME="/absolute/path/to/my-tess-project"
 export PYTHONDONTWRITEBYTECODE=1
 cd "$EXP_CHECKOUT"
@@ -74,41 +77,46 @@ Each iteration proposes a candidate model. **Trial** tries training settings;
 **Formal** evaluates the chosen configuration with its declared data and budgets.
 Both use workflow validation; Formal is not an untouched final test.
 
-## 3. Prepare data once: reuse OR download
+## 3. Download and prepare data once
 
-**Have the original released Parquet files?** Reuse them:
-
-```bash
-export TESS_SOURCE="/absolute/path/to/PhyTS/TESS/split"
-cd "$EXP_CHECKOUT"
-.venv/bin/python -B -m tutorials.paper.data_entry --task tess \
-  --project "$TUTORIAL_HOME" --source "$TESS_SOURCE"
-```
-
-The helper verifies the declared source files and stages only the two required NPZ archives.
-It does not copy or download the raw Parquet. If verified run-input NPZ files
-already exist, point the initial `experiments/tess-experiment.json` `data_dir`
-to their absolute directory before Quick A; no staging is needed.
-
-**Need the public data?** Instead, use new destination directories:
+The initialized project contains settings, not the dataset. In the same terminal,
+run this first-time preparation with two new directories inside your external
+project:
 
 ```bash
+export TESS_DATA="$TUTORIAL_HOME/data/tess-data"
 cd "$EXP_CHECKOUT"
 .venv/bin/python -m tutorials.paper.prepare_tess \
   --raw-dir "$TUTORIAL_HOME/data/raw-tess" \
-  --data-dir "$TUTORIAL_HOME/data/tess-data"
+  --data-dir "$TESS_DATA"
 ```
 
-This downloads about 31 MB from the pinned
+The helper downloads `tess_regression_train.parquet` and
+`tess_regression_val.parquet` from the pinned
 [PhyTS release](https://huggingface.co/datasets/PhyTS-team/PhyTS-bench/tree/9f203f4c338645a1e4b2c9dc7d6f820269ca5114/TESS/split),
-verifies the files against the [source declaration](../configs/tess_source.json), then stages 3,338
-training and 442 validation curves. The 403 held-out test curves are not
-downloaded or used. No Hugging Face token is needed for these public files.
+verifies them against the [source declaration](../configs/tess_source.json), and
+converts them to the two run inputs: `tess_rotation_train.npz` and
+`tess_rotation_val.npz`. Allow about 31 MB for originals and 18 MB for these NPZ
+files, plus run outputs. This stages 3,338 training and 442 validation curves;
+the 403 held-out test curves are not downloaded or used. No Hugging Face token
+is needed.
 
-Do not run both preparations. The helpers preserve existing data and refuse
-occupied destinations; after a failed download, inspect the error and use new
-destinations for a retry. Fraction controls later sample within the saved split;
-they do not redefine which stars belong to validation.
+After success, both NPZ files must be in `TESS_DATA`. The initial
+`experiments/tess-experiment.json` saves that default directory as `data_dir`;
+`runs/` is for output. Changing an environment variable does not update the JSON.
+If you choose another destination, update `data_dir` before the first notebook
+code cell and Quick A.
+
+The helper refuses occupied destinations. If preparation fails, stop, inspect
+the error and choose new destinations for a retry; do not treat partial output
+as ready. Quick A lists required files as `FOUND` or `MISSING`: fix missing or
+mismatched data before plotting. File presence and the script preview are not
+full verification; launch performs the data check.
+
+**Already completed this setup on your machine?** Keep the matching NPZ pair
+and saved `data_dir`; skip downloading. The notebook's later advanced data-entry
+cell is optional and does not require another preparation. Fraction controls
+sample within the saved split; they do not change which stars belong to validation.
 
 ## 4. Open your notebook and inspect Quick A
 
@@ -123,6 +131,8 @@ Open `notebooks/01_tess_tutorial.ipynb` and choose **SIDERIUS exp tutorial**.
 For a cautious first pass, set `RUN_QUICK_DEMO=False` in Quick A. Run through
 Quick A to save and review the exact demo files, and inspect a real training curve.
 No API/GPU training starts with that switch off; preparation cells can save files.
+The real-data preview still reads local NPZ files, so fix Quick A data errors
+before proceeding to it.
 
 The default `DEMO_NAME="quick-demo-001"` saves this pair:
 

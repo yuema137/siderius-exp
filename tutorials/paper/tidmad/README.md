@@ -8,7 +8,7 @@ workflow LLM stages. It is independent of paper routing. Recorded figures below
 come from earlier runs and do not establish live Luna compatibility.
 
 The [notebook](../notebooks/02_tidmad_tutorial.ipynb) teaches a complete sequence:
-choose data, change settings, save your task/experiment, open the saved files,
+download your data, change settings, save your task/experiment, open the saved files,
 then run the script that selects them. It uses **band 0–3** only. The notebook
 prepares and explains; its Run All quick-demo cell invokes a saved search
 script and plots score versus iteration. Set `RUN_QUICK_DEMO=False` to skip paid
@@ -18,9 +18,12 @@ belongs to a separate optional example, described below.
 ## Initialize your own project
 
 Follow the [shared installation instructions](../../shared/setup/README.md#1-install-the-two-exact-checkouts),
-then run from the exact exp checkout:
+then use those installed checkout paths below. Replace every `/absolute/...`
+example with your own path. Initialize a new external project **before** the
+data download; do not create its directory beforehand:
 
 ```bash
+export EXP_CHECKOUT=/absolute/path/to/siderius-exp
 export TUTORIAL_HOME=/absolute/path/to/my-tidmad-study
 export PYTHONDONTWRITEBYTECODE=1
 cd "$EXP_CHECKOUT"
@@ -28,47 +31,57 @@ cd "$EXP_CHECKOUT"
   --project "$TUTORIAL_HOME" --infra-checkout "$INFRA_CHECKOUT"
 ```
 
-The project directory must be new and outside both repositories. Prepare data
-and export keys below before starting Jupyter.
+The initializer creates the band directory and its local `segment_anchors.json`,
+but downloads no large data files. Keep project and data outside both source
+repositories. Download data and export keys below before starting Jupyter.
 
-## Choose existing data OR a download
+## Download your band data
 
-**Existing data:** set `TIDMAD_SOURCE` to your absolute external directory and
-reuse the large files, without copying or re-downloading them:
-
-```bash
-export TIDMAD_SOURCE="/absolute/path/to/TIDMAD"
-.venv/bin/python -B -m tutorials.paper.data_entry --task tidmad \
-  --project "$TUTORIAL_HOME" --source "$TIDMAD_SOURCE"
-```
-
-This verifies the eight original files and creates only symbolic links in
-`data/band-0-3/`. The small scoring anchor is local. Keep the shared source
-paths available; tutorial execution reads them and writes outputs elsewhere.
-
-**Your own machine:** use the official [TIDMAD downloader](https://github.com/jessicafry/TIDMAD),
-kept outside both source checkouts. Its [download script](https://github.com/jessicafry/TIDMAD/blob/main/download_data.py)
-uses Python's standard library and the Linux `wget` command; it needs no additional
-Python packages. Check the external command first:
+Keep the initialization terminal open. You need `curl` to obtain the official
+script and Linux `wget` for its data downloads. Check both first:
 
 ```bash
+command -v curl
 command -v wget
 ```
 
-If no executable path is printed, install `wget` with your operating system's
-package manager before continuing. Run the downloader with the installed exp
-interpreter, not an unrelated system Python:
+If either prints no executable path, install it with your operating system's
+package manager before continuing. Save the official
+[TIDMAD downloader](https://github.com/jessicafry/TIDMAD/blob/main/download_data.py)
+inside your external project, then run it with the installed exp interpreter:
 
 ```bash
-"$EXP_CHECKOUT/.venv/bin/python" /absolute/path/to/TIDMAD/download_data.py \
-  --output_dir "$TUTORIAL_HOME/data/band-0-3" \
+export TIDMAD_DATA="$TUTORIAL_HOME/data/band-0-3"
+mkdir -p "$TUTORIAL_HOME/tools"
+curl --fail --location \
+  https://raw.githubusercontent.com/jessicafry/TIDMAD/main/download_data.py \
+  --output "$TUTORIAL_HOME/tools/download_data.py"
+"$EXP_CHECKOUT/.venv/bin/python" "$TUTORIAL_HOME/tools/download_data.py" \
+  --output_dir "$TIDMAD_DATA" \
   --train_files 4 --validation_files 4 --science_files 0
 ```
 
-Do not run both preparations. Both options yield the same `data_dir`: only
-training/validation files 0000–0003 and `segment_anchors.json`. One band still
-represents about 32 GB of uncompressed channel samples. No download occurs
-when you run notebook cells.
+The output directory already exists because project initialization created it.
+Allow about 32 GB of uncompressed channel samples, plus later run outputs. After
+download, that directory must contain only:
+
+- `abra_training_0000.h5` through `abra_training_0003.h5`;
+- `abra_validation_0000.h5` through `abra_validation_0003.h5`;
+- the local `segment_anchors.json` supplied by initialization.
+
+The initial `experiments/tidmad-experiment.json` saves this default `data_dir`;
+`runs/` holds outputs. If using another complete band directory, edit that JSON
+before the first notebook code cell and Quick A. Changing an environment variable
+alone does not update saved settings.
+
+Quick A lists required files as `FOUND` or `MISSING`. Stop and fix missing or
+mismatched inputs before its real-data preview. Downloader completion, file
+presence and script preview do not establish full verification: launch checks
+all eight original files and the anchor. No download occurs in notebook cells.
+
+**Already completed this setup on your machine?** Keep the prepared band view
+and saved `data_dir`; skip downloading. Any linked original files must remain
+available. The later advanced data-entry cell is optional, not another download.
 
 ## Export keys, select the kernel, then run the notebook
 
@@ -102,7 +115,9 @@ cd "$TUTORIAL_HOME"
 
 Open `notebooks/02_tidmad_tutorial.ipynb`, select **SIDERIUS exp tutorial**, then
 use **Run All**. Quick A saves/checks inputs, Quick B runs the saved script,
-and Quick C plots the records. You can stop at the plot; no extra terminal
+and Quick C plots the records. `RUN_QUICK_DEMO=False` skips paid execution but
+still reads real data in the training preview; fix Quick A data errors first.
+You can stop at the plot; no extra terminal
 launch is needed. With the default `DEMO_NAME="quick-demo-001"`, your files are:
 
 ```text
