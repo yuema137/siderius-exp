@@ -31,7 +31,9 @@ credit/GPU time. You can follow the same instructions manually.
 
 ## Understand the files before running
 
-![Task and experiment settings are inspected and saved in the notebook. A saved script launches SIDERIUS, producing run records, models and score plots in your external project.](docs/assets/tutorial-workflow.svg)
+<p align="center">
+  <img src="docs/assets/tutorial-workflow.svg" width="80%" alt="Task and experiment settings are inspected and saved in the notebook. A saved script launches SIDERIUS, producing run records, models and score plots in your external project.">
+</p>
 
 | Your choice | Where it belongs in your external project |
 |---|---|
