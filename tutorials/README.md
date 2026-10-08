@@ -20,7 +20,7 @@ actual notebook coverage.
 | MJD / Majorana | Classify detector waveforms | [Setup](supplementary/mjd/README.md) · [Notebook](supplementary/mjd/mjd_tutorial.ipynb) · [Recorded result](supplementary/mjd/example/README.md) |
 | SuperNEMO | Classify signal and background events | [Setup](supplementary/supernemo/README.md) · [Notebook](supplementary/supernemo/supernemo_tutorial.ipynb) · [Recorded result](supplementary/supernemo/example/README.md) |
 | Cancer | Rank candidate cancer genes in one complete CPDB graph | [Setup](supplementary/cancer/README.md) · [Notebook](supplementary/cancer/cancer_tutorial.ipynb) · [Recorded example](supplementary/cancer/example/README.md) |
-| DAVIS | Predict future video frames | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
+| DAVIS | Predict future video frames | [Setup](supplementary/davis/README.md) · [Notebook](supplementary/davis/davis_tutorial.ipynb) · [Recorded demo](supplementary/davis/example/README.md) |
 
 ## Follow this sequence
 
@@ -54,8 +54,8 @@ rather than assuming every example used Luna. Choose research or custom model ro
   They teach the workflow and editable parameters; they do not reproduce the
   paper's complete campaigns or coding-agent comparisons.
 - [Supplementary tutorials](supplementary/README.md) cover tasks outside those
-  four experiments. Pet, MJD, SuperNEMO and Cancer have notebooks and recorded
-  demos. DAVIS has task/experiment references while its tutorial is developed.
+  four experiments. Pet, MJD, SuperNEMO, Cancer and DAVIS each have a notebook,
+  a saved-script walkthrough and a recorded demo.
 - [Paper artifacts](../experiments/paper-artifacts.md) contain the route to frozen
   configurations, original source pairs, historical evidence and its limits.
 - [Recorded example gallery](paper/examples/README.md) explains the four paper

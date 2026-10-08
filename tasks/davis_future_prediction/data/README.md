@@ -1,45 +1,64 @@
-# `data/` — DAVIS 2017 TrainVal 480p (sequence manifest only; no data here)
+# DAVIS data: keep videos outside the repository
 
-This directory holds the **sequence-level identity manifest** and its SHA-256
-pin — never frames, never the archive (roadmap §22.23.10). Cloning SIDERIUS
-downloads no dataset.
+This directory contains the task's committed sequence/clip manifests and decode
+probes, not video files. Cloning the repository downloads no dataset. The task
+reads RGB frames from the official DAVIS 2017 TrainVal 480p archive; segmentation
+annotations in that archive are not used.
 
-## Acquisition (explicit user action; nothing is fetched by the framework)
+## Reuse an existing copy
 
-Official source (`https://davischallenge.org/davis2017/code.html`):
+Set `DAVIS_DATA` to the directory containing both the archive and its extracted
+`DAVIS/` tree. Run from your installed exp checkout:
 
 ```bash
-# ~833 MB — into a MACHINE-LOCAL directory outside the tree
-curl -L -o DAVIS-2017-trainval-480p.zip https://data.vision.ee.ethz.ch/csergi/share/davis/DAVIS-2017-trainval-480p.zip
+export DAVIS_DATA="/absolute/path/DAVIS_2017"
+.venv/bin/python -m tasks.davis_future_prediction.tools.fetch_davis \
+  --dest "$DAVIS_DATA" --no-download --check-layout
 ```
 
-The archive holds `DAVIS/JPEGImages/480p/<sequence_name>/<frame>.jpg` (the RGB
-frames this task consumes), `Annotations/` (segmentation masks — NOT used by
-this task) and `ImageSets/2017/{train,val}.txt`. **Decided by D14-3** (the deferrals this paragraph carried): the
-machine-local root reaches the framework as the data-path seam's OWN
-`data_dir` (no new config channel); acquisition is
-`tools/example_packs/fetch_davis.py --dest <machine-local dir> --extract
---check-layout` (verify-before-anything against the archive SHA-256 pin;
-an in-tree `--dest` is refused); and the artifact's terms are verified and
-pinned in `../PROVENANCE.md` (§D14-3 VERIFICATION — verdict COMPATIBLE).
+This verifies the archive hash and checks the 90 committed sequence directories
+contain JPEGs. It does not download or modify your frames. A layout check alone
+does not verify every frame's contents or prove all task windows decode.
 
-## Manifest
+## Acquire it on a new machine
 
-| file | rows | meaning |
-|---|---|---|
-| `manifests/sequences.csv` | 90 | `sequence_name, scope` — 60 `train` / 15 `validation` / 15 `final` |
-| `manifests/SHA256SUMS` | — | integrity / provenance pin |
+The [official source](https://davischallenge.org/davis2017/code.html) links the
+832,766,765-byte archive (about 0.833 GB). Keep extra disk space for extraction,
+environments and run outputs. If you do not already have it:
 
-Sequence-disjoint by construction; runtime resampling is forbidden (§22.9a).
-Derivation rule and source hash: `../PROVENANCE.md`.
+```bash
+.venv/bin/python -m tasks.davis_future_prediction.tools.fetch_davis \
+  --dest "$DAVIS_DATA" --extract --check-layout
+```
 
-**Clip identity landed at D14-3.** `manifests/clips.csv` (600 rows:
-`sequence_name, start_frame, scope`) records which windows materialize —
-8 context → 4 future frames, caps 8 / 4 / 4 per train / validation / final
-sequence — derived by the pure rule
-`execute_tools/davis_data_path.py::clip_starts` from each sequence's
-on-disk frame count (no RNG). `manifests/execution.json` carries the
-decode / resize rule and 10 window probe hashes;
-`manifests/gate2_*.csv` are the bounded Gate subsets (first clip of every
-sequence). Frames themselves stay machine-local — never in the tracked
-tree.
+The helper verifies SHA-256 before extraction and refuses a destination inside
+the exp repository. It reuses a present archive; `--no-download` makes accidental
+network fetching an error. Existing extracted directories are not overwritten.
+Consult the recorded [source and data terms](../PROVENANCE.md) before reuse.
+
+Expected layout:
+
+```text
+DAVIS_DATA/
+  DAVIS-2017-trainval-480p.zip
+  DAVIS/JPEGImages/480p/<sequence_name>/00000.jpg
+```
+
+## Understand the original manifests
+
+| File | What it declares |
+|---|---|
+| `manifests/sequences.csv` | 90 sequence identities: 60 Train / 15 Validation / 15 Final |
+| `manifests/clips.csv` | 600 fixed windows across those disjoint roles |
+| `manifests/gate2_train.csv` | First window of each of 60 Train sequences |
+| `manifests/gate2_validation.csv` | First window of each of 15 Validation sequences |
+| `manifests/gate2_final.csv` | First window of each of 15 reserved Final sequences |
+| `manifests/execution.json` | Frozen decoder settings and ten decoded-window hashes |
+| `manifests/SHA256SUMS` | Manifest integrity pins |
+
+Each window has eight RGB context frames and four future target frames, resized
+to 128×224 and scaled to [0,1] by the task-owned
+[runtime decoder](../runtime/davis_data_path.py). Sequences never cross roles.
+The [tutorial](../../../tutorials/supplementary/davis/README.md) uses the bounded
+Train/Validation manifests, leaves Final unused and verifies required frames
+before launch. Do not regenerate or reshuffle manifests as a setup step.

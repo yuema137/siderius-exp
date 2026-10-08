@@ -33,16 +33,16 @@ explain one complete CPDB graph, original label masks and editable active-label
 fractions. The [recorded example](cancer/example/README.md) shows a real graph
 preview and three completed iterations; original Test labels remain unused.
 
-## Tasks awaiting a notebook
+## DAVIS video tutorial
 
-DAVIS already has a task package and experiment code.
-Its notebook-plus-script tutorial is **not yet available**. The references
-below are for inspecting existing work; they are not interchangeable with the
-Pet walkthrough or evidence of a newly qualified three-iteration demo.
-
-| Task | Existing references |
-|---|---|
-| DAVIS future-frame prediction | [Task](../../tasks/davis_future_prediction/README.md) · [Bounded qualification reference](../../experiments/davis_future_prediction/two_iteration_qualification/README.md) |
+[DAVIS setup](davis/README.md) and its [notebook](davis/davis_tutorial.ipynb)
+show eight context frames and four targets, original sequence splits and whole-clip
+fraction controls. The [recorded three-iteration demo](davis/example/README.md)
+keeps the first Health-invalid result as a hollow point, followed by two passing
+results. The original
+[task](../../tasks/davis_future_prediction/README.md) and
+[qualification profile](../../experiments/davis_future_prediction/two_iteration_qualification/README.md)
+remain separate references.
 
 In particular, an older experiment profile called `demo` may run many iterations
 and use historical settings. Follow its declared source pin and configuration;

@@ -48,8 +48,8 @@ supplies approved values for that workflow.
 Use the task-owned acquisition tool:
 
 ```bash
-.venv/bin/python tasks/davis_future_prediction/tools/fetch_davis.py \
-    --dest /path/to/davis-root --extract
+.venv/bin/python -m tasks.davis_future_prediction.tools.fetch_davis \
+    --dest /path/to/davis-root --extract --check-layout
 ```
 
 The runtime expects `/path/to/davis-root/DAVIS/JPEGImages/480p` and selects
@@ -72,3 +72,13 @@ this task package.
 Qualification scores prove execution and lower-is-better ordering. They are
 not automatically competitive scientific results. Infrastructure validity,
 Health validity, and scientific quality remain separate claims.
+
+## Learn with a short tutorial
+
+The [DAVIS notebook and setup](../../tutorials/supplementary/davis/README.md)
+copy this task into your external project, show real 8-context/4-target frames,
+and explain saved clip fractions and launch commands. It uses the original
+bounded Train/Validation manifests and leaves Final unused. The
+[recorded three-iteration demo](../../tutorials/supplementary/davis/example/README.md)
+verifies the workflow and retains its first Health-invalid candidate; the next
+two passed. This is process evidence, not a paper artifact or a quality guarantee.

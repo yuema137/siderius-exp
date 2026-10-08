@@ -1,0 +1,270 @@
+{
+  "kind": "davis-future-frame-process-demo-evidence",
+  "paper_artifact": false,
+  "executed_exp_revision": "a06096a19de7362f5ffadbab7da3f194c444983d",
+  "infra_revision": "52373be9a52bead36fd1f15d706385967e0a129d",
+  "composition_fingerprint": "331fc2f4db6052c946b7816e6eff11fef8fe1bc3eae6f57eb30fcbcc1471a707",
+  "llm": {
+    "model": "gpt-6-luna",
+    "reasoning_effort": "medium",
+    "provider": "openai",
+    "purpose": "test routing"
+  },
+  "hardware": "NVIDIA GeForce RTX 5090",
+  "settings": {
+    "version": "davis-tutorial-v1",
+    "run_name": "davis_demo_001",
+    "gpu": null,
+    "iterations": 3,
+    "rounds": 2,
+    "epochs": 1,
+    "trial_train_fraction": 0.25,
+    "trial_eval_fraction": 1.0,
+    "formal_train_fraction": 0.5,
+    "formal_eval_fraction": 1.0,
+    "trial_minutes": 2.0,
+    "formal_minutes": 5.0,
+    "vram_gib": 10.0,
+    "trial_vram_gib": null,
+    "formal_vram_gib": null,
+    "advice_file": null
+  },
+  "data": {
+    "source": "https://data.vision.ee.ethz.ch/csergi/share/davis/DAVIS-2017-trainval-480p.zip",
+    "archive_bytes": 832766765,
+    "archive_sha256": "e3d0b5b77c3d031b000a19e0e25e3e2cac65d183755601bc2cf066df1a2aa492",
+    "launch_verification": "Complete archive SHA-256 and ten frozen decoded-window probes; not a full integrity proof of all extracted frames.",
+    "train_sequences": 60,
+    "validation_sequences": 15,
+    "reserved_final_sequences": 15,
+    "context_frames": 8,
+    "target_frames": 4,
+    "height": 128,
+    "width": 224,
+    "preview": "CPU-decoded Train rhino sequence, first window; targets are ground truth, not generated predictions.",
+    "evaluation_role": "Original Validation clips supply search feedback; reserved Final clips are not loaded or scored."
+  },
+  "native_output_sha256": {
+    "runs/davis_demo_001/iter_001/iteration_001/compact_channel_stacked_unet/run_output_iter_001.json": "cf2be2f6789f3acb1fba3a73bf3d6278d24e40aed804b3f1c7fb96900bfd931f",
+    "runs/davis_demo_001/iter_002/iteration_002/lowres_convgru_residual_forecaster/run_output_iter_002.json": "968ba16b4d83689601dd0ac9181885d7c55d93f27fe5875f5409cf763e67af43",
+    "runs/davis_demo_001/iter_003/iteration_003/quarter_temporal_fusion_forecaster/run_output_iter_003.json": "4b4c5dc6c1c1a0924be03039162eb469c59db1c156a847aad6c764d87727fa03"
+  },
+  "records": [
+    {
+      "exp_id": "compact_channel_stacked_unet_iter_001_001",
+      "role": "trial",
+      "score": 0.06453681676127408,
+      "metric": "mse",
+      "direction": "lower",
+      "status": "failed_mode_collapse",
+      "result_authority": "diagnostic",
+      "health": {
+        "gate": "davis_dispersion_blocking",
+        "passed": false,
+        "action": "invalidate_round",
+        "dispersion": 0.020126852301509072,
+        "floor": 0.04
+      },
+      "actual_scope": {
+        "training_fraction": 0.25,
+        "selected_training_clips": 15,
+        "validation_fraction": 1.0,
+        "selected_validation_clips": 15,
+        "epoch_train_portion": 1.0,
+        "batch_size": 2,
+        "drop_last": true
+      },
+      "native_timing_seconds": {
+        "train_time_s": 6.5,
+        "validation_time_s": 0.8,
+        "inference_time_s": 4.2,
+        "scoring_time_s": 3.1
+      }
+    },
+    {
+      "exp_id": "compact_channel_stacked_unet_iter_001_002",
+      "role": "formal",
+      "score": 0.06336049753623357,
+      "metric": "mse",
+      "direction": "lower",
+      "status": "failed_mode_collapse",
+      "result_authority": "diagnostic",
+      "health": {
+        "gate": "davis_dispersion_blocking",
+        "passed": false,
+        "action": "invalidate_round",
+        "dispersion": 0.03888713683934469,
+        "floor": 0.04
+      },
+      "actual_scope": {
+        "training_fraction": 0.5,
+        "selected_training_clips": 30,
+        "validation_fraction": 1.0,
+        "selected_validation_clips": 15,
+        "epoch_train_portion": 1.0,
+        "batch_size": 2,
+        "drop_last": true
+      },
+      "native_timing_seconds": {
+        "train_time_s": 6.5,
+        "validation_time_s": 0.7,
+        "inference_time_s": 3.7,
+        "scoring_time_s": 3.1
+      }
+    },
+    {
+      "exp_id": "lowres_convgru_residual_forecaster_iter_002_001",
+      "role": "trial",
+      "score": 0.017721109277741814,
+      "metric": "mse",
+      "direction": "lower",
+      "status": "success",
+      "result_authority": "diagnostic",
+      "health": {
+        "gate": "davis_dispersion_blocking",
+        "passed": true,
+        "action": "continue",
+        "dispersion": 0.2468102383148791,
+        "floor": 0.04
+      },
+      "actual_scope": {
+        "training_fraction": 0.25,
+        "selected_training_clips": 15,
+        "validation_fraction": 1.0,
+        "selected_validation_clips": 15,
+        "epoch_train_portion": 1.0,
+        "batch_size": 2,
+        "drop_last": true
+      },
+      "native_timing_seconds": {
+        "train_time_s": 5.5,
+        "validation_time_s": 0.7,
+        "inference_time_s": 3.0,
+        "scoring_time_s": 3.1
+      }
+    },
+    {
+      "exp_id": "lowres_convgru_residual_forecaster_iter_002_002",
+      "role": "formal",
+      "score": 0.016874447743063105,
+      "metric": "mse",
+      "direction": "lower",
+      "status": "success",
+      "result_authority": "diagnostic",
+      "health": {
+        "gate": "davis_dispersion_blocking",
+        "passed": true,
+        "action": "continue",
+        "dispersion": 0.24489241050884453,
+        "floor": 0.04
+      },
+      "actual_scope": {
+        "training_fraction": 0.5,
+        "selected_training_clips": 30,
+        "validation_fraction": 1.0,
+        "selected_validation_clips": 15,
+        "epoch_train_portion": 1.0,
+        "batch_size": 2,
+        "drop_last": true
+      },
+      "native_timing_seconds": {
+        "train_time_s": 6.0,
+        "validation_time_s": 0.6,
+        "inference_time_s": 2.9,
+        "scoring_time_s": 2.9
+      }
+    },
+    {
+      "exp_id": "quarter_temporal_fusion_forecaster_iter_003_001",
+      "role": "trial",
+      "score": 0.019324123029036494,
+      "metric": "mse",
+      "direction": "lower",
+      "status": "success",
+      "result_authority": "diagnostic",
+      "health": {
+        "gate": "davis_dispersion_blocking",
+        "passed": true,
+        "action": "continue",
+        "dispersion": 0.24964152984410506,
+        "floor": 0.04
+      },
+      "actual_scope": {
+        "training_fraction": 0.25,
+        "selected_training_clips": 15,
+        "validation_fraction": 1.0,
+        "selected_validation_clips": 15,
+        "epoch_train_portion": 1.0,
+        "batch_size": 1,
+        "drop_last": true
+      },
+      "native_timing_seconds": {
+        "train_time_s": 5.8,
+        "validation_time_s": 0.7,
+        "inference_time_s": 3.3,
+        "scoring_time_s": 3.4
+      }
+    },
+    {
+      "exp_id": "quarter_temporal_fusion_forecaster_iter_003_002",
+      "role": "formal",
+      "score": 0.016247714316916854,
+      "metric": "mse",
+      "direction": "lower",
+      "status": "success",
+      "result_authority": "diagnostic",
+      "health": {
+        "gate": "davis_dispersion_blocking",
+        "passed": true,
+        "action": "continue",
+        "dispersion": 0.24467402941180255,
+        "floor": 0.04
+      },
+      "actual_scope": {
+        "training_fraction": 0.5,
+        "selected_training_clips": 30,
+        "validation_fraction": 1.0,
+        "selected_validation_clips": 15,
+        "epoch_train_portion": 1.0,
+        "batch_size": 1,
+        "drop_last": true
+      },
+      "native_timing_seconds": {
+        "train_time_s": 6.7,
+        "validation_time_s": 0.7,
+        "inference_time_s": 3.2,
+        "scoring_time_s": 3.1
+      }
+    }
+  ],
+  "qualification": {
+    "status": "workflow completed with retained Health-invalid attempts",
+    "manifest_status_by_iteration": [
+      "no_records",
+      "completed",
+      "completed"
+    ],
+    "request_count": 31,
+    "accounted_usd": "0.048500750",
+    "unknown_requests": 0,
+    "cumulative_command_seconds_upper_bound": 761.114178805612,
+    "campaign_wall_seconds_at_closure_check": 817.1563057759777,
+    "full_notebook_command_elapsed_seconds": 756.00006429106,
+    "cached_notebook_command_elapsed_seconds": 5.114114514552057,
+    "notebook_saved_script_elapsed_seconds": 745.8729257546365,
+    "automatic_retries": "All three first implementations passed native validation; no implementation retries or manual repairs. Health-invalid outcomes were retained without score-driven reruns.",
+    "result_authority": "diagnostic",
+    "result_reuse": "Repeated Run All made no new API requests and preserved the completion receipt.",
+    "command_time_includes_api_wait": true,
+    "limits": "Observed validation accounting, not limits automatically imposed by the public notebook; command time is not measured GPU utilization."
+  },
+  "display_paths": "CSV source paths are project-relative; score/status values and PNG/SVG bytes are unchanged. Notebook publishes image outputs only, not console, prompts or machine-path output.",
+  "source_csv_sha256": "2e4f913376e4960001c6ad4c0926e1b0ed450cdc3ec54e7bc105e9b003763519",
+  "asset_sha256": {
+    "clip.png": "22cf80df72d739809bd07c0787c8ffd8231bbe036c4b93daf9fa61558b191f75",
+    "score-versus-iteration.csv": "a8800c2b91e3ffd67c008606288d401a776bf6c92aa5be9aa106eb4314e56fda",
+    "score-versus-iteration.png": "96990fb6617bd9cd5a6b5d7c93fb0574f91c9ff5c77d3f6f0d10daa43b26f362",
+    "score-versus-iteration.svg": "357159e0d7ef706d83372d00e22d6675759481aec9e1767b7ed475cafff35b88"
+  },
+  "scope_evidence_authority": "Persisted native TrialConfig and task_scope establish actual selected data; reflector prose is not an execution receipt."
+}
