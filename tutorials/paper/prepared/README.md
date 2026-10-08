@@ -76,32 +76,25 @@ initial experiment JSON and launcher. The next step creates the matching small
 task/data pair. It never edits repository templates. An existing project is
 never overwritten.
 
-## 3. Choose one data entrance
+## 3. Download your demo data
 
-**A — Read existing prepared data.** Set `PREPARED_SOURCE` to the absolute external
-directory for your selected task. No large data is
-copied or downloaded. Only the selected rows are saved in your project. For
-Project8, the source is the original prepared time-input view; the helper adds
-the existing task's FFT representation to those selected rows.
-
-```bash
-export PREPARED_SOURCE="/absolute/path/to/prepared/$DEMO_TASK"
-.venv/bin/python -B -m tutorials.paper.prepared.data \
-  --task "$DEMO_TASK" --project "$TUTORIAL_HOME" \
-  --source "$PREPARED_SOURCE"
-```
-
-**B — Your own machine: fetch only selected byte ranges from the public data.**
-The helper opens pinned release HDF5 shards through HTTPS ranges, reads the
-selected observations, and writes the same small array layout. It refuses a
-server that ignores ranges, rather than downloading a multi-gigabyte shard.
+The project created above has settings but no data. Keep that terminal open:
+`EXP_CHECKOUT` must name your installed exp checkout, `TUTORIAL_HOME` your new
+external project, and `DEMO_TASK` the task you selected. Replace any example
+paths with your actual locations. For a first run, download the required data:
 
 ```bash
+cd "$EXP_CHECKOUT"
 .venv/bin/python -B -m tutorials.paper.prepared.data \
   --task "$DEMO_TASK" --project "$TUTORIAL_HOME" --download
 ```
 
-Both routes create `data/demo-001/` and `tasks/<task>-demo-001/`. Initial rows
+The helper opens pinned release HDF5 shards through HTTPS ranges, reads selected
+observations and writes small local arrays. It refuses a server that ignores
+ranges rather than downloading a multi-gigabyte shard. Project8 preparation
+adds the task's FFT representation to the selected time-domain observations.
+
+Success prints `Saved task:`, `Saved data:` and row counts. The helper creates `data/demo-001/` and `tasks/<task>-demo-001/`. Initial rows
 are deterministic: the first 512 training and 1,000 validation events in the
 selected source ordering. The prepared arrays occupy about 595 MB for Project8
 and 12.4 MB for LIGO; downloaded ranges also include HDF5 metadata and neighboring
@@ -109,14 +102,23 @@ bytes. The manifest records actual transferred bytes for the download route.
 No test file is requested. Data are from the pinned
 [PhyTS release](https://huggingface.co/datasets/PhyTS-team/PhyTS-bench/tree/9f203f4c338645a1e4b2c9dc7d6f820269ca5114).
 
-The helper checks the source manifest and array metadata when reusing local
-prepared data; it does not verify every byte of the large source arrays.
-Partial downloads cannot verify the complete source files either. Both routes
-create verification records for every small output array; the launcher checks
-each array before execution. The manifest records this coverage limit and the
-selected source rows.
+Partial downloads do not verify the complete source files. Preparation records
+the selected source rows and verification information for every small output
+array; the launcher checks all five arrays before execution.
 
-Do not repeat data preparation for every run. Reuse the prepared task/data pair.
+Before opening the copied notebook, confirm `data/demo-001/` contains
+`manifest.json`, `training/{inputs,targets}.npy`, and
+`evaluator/validation/{inputs,targets,loss_indices}.npy`. Its paired task entry is
+`tasks/<task>-demo-001/compositions/regression.yaml`. Keep `DATA_NAME="demo-001"`
+in Quick A: it saves the matching task and `data_dir` together. Inputs belong
+under `data/`; `runs/` holds output. Fix missing files or a `STOP` message before
+reading your data or launching. Turning off paid execution does not skip data
+previews.
+
+Do not repeat a successful preparation for every run. Reuse your downloaded
+pair; occupied destinations are refused to protect earlier inputs. After an
+incomplete preparation, inspect the error and use a fresh name for a retry.
+
 To choose different row counts, pass `--train-rows` (20–2000) and
 `--validation-rows` (20–1000, a multiple of 10) with a new `--name`. Then select
 that new pair by setting `DATA_NAME` to your new dataset name in Quick A,
