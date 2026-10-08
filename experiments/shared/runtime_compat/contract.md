@@ -54,11 +54,15 @@ current configuration schema and prevents assuming that future defaults match.
 Each profile declares the package factory, adapter, all imported frozen modules,
 source inventory and qualification file as source identity inputs. Its identity
 also binds the infra runtime verifier assembly. `qualification.json` is an
-allowlist of qualified assemblies. Its current candidate is infra `ec92186d`
-(assembly `0be63770919ae1636a7a2ad316b2b4da3bce9e1885e3e46759359231999a3bad`).
-The [qualification report](qualification-report.json) records the installed source
-hashes and passing offline checks; independent review and final pairing remain
-pending. Unknown assemblies fail closed. Profiles have explicit version `1`; no implicit
+allowlist of qualified assemblies. The current pair pins infra
+`52373be9a52bead36fd1f15d706385967e0a129d` (runtime assembly
+`57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da`).
+The [version and source receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+links the final source qualification and records normal installations in both
+environments. The original [qualification report](qualification-report.json)
+remains historical evidence for its recorded revision, not the current pair.
+Public-host installation remains a separate post-synchronization release check.
+Unknown assemblies fail closed. Profiles have explicit version `1`; no implicit
 historical default or automatic fallback is installed.
 
 The launch and execution environments must install the same package and paired

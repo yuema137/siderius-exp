@@ -4,12 +4,13 @@ Use this package when you want a **new external workspace** to apply a paper
 experiment's original timing rules. Ordinary tutorials use the framework's
 corrected default and do not need this package. Installing it changes no default.
 
-**Release qualification is in progress.** Offline timing and installation checks
-pass with the current paired infra `7d0d3214`, including the historical prompt
-comparisons. The optional historical packages still need the installation steps
-below. Independent review and public-source installation verification remain open.
-The commands below explain the installation procedure; they are not yet a
-ready-to-run public installation guide.
+The qualified infra version is `52373be9` (SIDERIUS 1.0.0). Offline timing,
+historical prompt comparisons and installation checks passed; the
+[version and source receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+links the supporting results. Those checks used the development repository;
+installation from the public repository is a separate release check after
+synchronization. The optional historical packages still need the installation
+steps below.
 
 The paper runs estimated training time from observed steps. Their rules could
 reject a short phase even after every requested step had finished, because too
@@ -89,7 +90,7 @@ them. New measurements record the selected profile's identity.
 
 This package restores the tested timing decisions; it does not restore deleted
 artifacts or guarantee identical new LLM responses, trained weights or scores.
-The [technical contract](contract.md) and [current qualification results](../../../provenance/validation/2026-10-08_release_luna_pair/receipt.json)
+The [technical contract](contract.md) and [current qualification results](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
 list the original sources, test boundaries and remaining qualification.
 [Prompt adapters](../prompt_compat/README.md) and
 the [static estimator adapter](../preflight_compat/README.md) remain separate
