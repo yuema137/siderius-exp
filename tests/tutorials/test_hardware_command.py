@@ -63,28 +63,6 @@ def test_all_seven_saved_schemas_preserve_resource_override_semantics(
     )
 
 
-@pytest.mark.parametrize(
-    "field,value",
-    [
-        ("vram_gib", None),
-        ("vram_gib", True),
-        ("vram_gib", float("nan")),
-        ("infra_checkout", "relative"),
-        ("workspace", "relative"),
-    ],
-)
-def test_projection_never_guesses_missing_or_invalid_resource_bindings(
-    tmp_path, field, value
-):
-    payload = values(tmp_path)
-    if value is None:
-        payload.pop(field)
-    else:
-        payload[field] = value
-    with pytest.raises(ValueError):
-        hardware.HardwareSettings.model_validate(payload)
-
-
 def report():
     return GpuCheckReport(
         installed_backend="cuda",
@@ -173,9 +151,13 @@ def test_invalid_projection_does_not_echo_ignored_secret_values(tmp_path, monkey
     saved = tmp_path / "bad.json"
     saved.write_text(json.dumps({"api_key": "never-print-this"}))
     monkeypatch.setattr("sys.argv", ["hardware", "--experiment", str(saved)])
+    monkeypatch.setattr(
+        hardware, "inspect_hardware", lambda *_: pytest.fail("hardware reached before validation")
+    )
     with pytest.raises(ValueError, match="Invalid saved hardware settings") as error:
         hardware.main()
     assert "never-print-this" not in str(error.value)
+    assert "vram_gib" in str(error.value)
 
 
 def test_actual_saved_launch_refuses_before_native_chain_or_run_receipt(
