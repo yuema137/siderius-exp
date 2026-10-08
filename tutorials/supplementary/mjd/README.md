@@ -131,11 +131,13 @@ from the correct terminal after changing keys or these environment bindings.
 ## 4. Inspect, save changes, and run
 
 The initial experiment requests three iterations, two tuner rounds (Trial then
-Formal), a one-epoch ceiling, Trial/Formal training fractions `.005`/`.01`, and
+Formal), a one-epoch ceiling, Trial/Formal training fractions `.01`/`.01`, and
 both evaluation fractions `.01`. All training fractions precede exact class
 balancing. Per-epoch thinning is fixed at `train_portion=1`. The notebook calls
 the selected loader for actual illustrative counts instead of multiplying a
-historical full-population count. These counts depend on sampling seed.
+historical full-population count. These counts depend on sampling seed. All four exposed fractions must be between
+`.01` and `1`, matching the native workflow parser; values below one percent are
+rejected when saving, before any launch.
 
 Initial training allowances are 2/5 minutes and 10 GiB per Trial/Formal attempt.
 They are experiment settings, not framework defaults, runtime predictions or

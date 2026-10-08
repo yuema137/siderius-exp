@@ -123,6 +123,60 @@ def test_native_arguments_keep_scopes_epochs_and_disabled_treatment_distinct(pro
     assert "--advice" not in command and "--trial_time_admission_source" not in command
 
 
+def test_initial_saved_defaults_pass_native_iteration_parser(project):
+    """The shell dry-run can print arguments the actual iteration parser rejects."""
+    from workflows.standard_cli import build_parser, normalize_args
+
+    initial = MjdExperiment(
+        **{
+            field: getattr(project.settings, field)
+            for field in (
+                "infra_checkout",
+                "data_dir",
+                "workspace",
+                "composition",
+                "llm_config",
+                "workflow",
+            )
+        }
+    )
+    command = runner.build_command(initial)
+    # run_chain consumes only these shell-level switches before the Python CLI.
+    arguments = command[2:]
+    for flag, width in (
+        ("--mode", 2),
+        ("--num_iterations", 2),
+        ("--no_auto_resume", 1),
+    ):
+        index = arguments.index(flag)
+        del arguments[index : index + width]
+    arguments.extend(["--start_iteration", "1"])
+    parsed = normalize_args(build_parser().parse_args(arguments))
+    assert parsed.trial_portion == parsed.eval_portion == 0.01
+    assert parsed.formal_portion == parsed.formal_eval_portion == 0.01
+    assert not initial.workspace.exists()
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "trial_train_fraction",
+        "trial_eval_fraction",
+        "formal_train_fraction",
+        "formal_eval_fraction",
+    ],
+)
+def test_saved_subfloor_fraction_is_refused_before_script_creation(project, field):
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="greater than or equal to 0.01"):
+        save_variant(
+            project.root, project.experiment, name="too-small", changes={field: 0.005}
+        )
+    assert not (project.root / "experiments/too-small.json").exists()
+    assert not (project.root / "scripts/run-too-small.sh").exists()
+
+
 def test_real_task_loader_preserves_official_test_role_balance_and_transform(project):
     reports = data.scope_counts(project.settings)
     assert [r.official_role for r in reports] == ["train", "test", "train", "test"]
@@ -167,7 +221,7 @@ def test_source_manifest_substitution_and_corrupt_source_bytes_refused(project):
 def test_missing_official_file_refuses_even_for_tiny_fraction(project):
     (project.settings.data_dir / "MJD_Test_5.hdf5").unlink()
     tiny = MjdExperiment.model_validate(
-        {**project.settings.model_dump(), "trial_train_fraction": 0.0001}
+        {**project.settings.model_dump(), "trial_train_fraction": 0.01}
     )
     with pytest.raises(ValueError, match="all 16 Train and 6 Test"):
         data.verify_files(tiny)

@@ -9,7 +9,8 @@ new train/validation/final split. Official Test feeds search evaluation.
 schemas remain authoritative for workflow/task execution. `runner.build_command`
 owns exposed-knob/native-flag mapping. Train fractions map to trial_portion and
 formal_portion; eval fractions map to eval_portion and formal_eval_portion.
-Both epoch train_portion flags are fixed at 1. Snapshot strategies are explicit.
+All four exposed scope fractions use the native CLI range [0.01, 1.0];
+both Trial and Formal training default to 0.01. Both epoch train_portion flags are fixed at 1. Snapshot strategies are explicit.
 The new workflow uses native timing defaults, no DA/literature/advice, diagnostic
 authority and the task's explicit no-Health declaration. Healthgate mode stays
 blocking; no checks are invented or bypassed for the no-Health task.
