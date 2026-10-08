@@ -50,6 +50,27 @@ The initial VRAM allowance is 10 GiB; it must fit the selected device. On a
 multi-GPU machine, set `CUDA_VISIBLE_DEVICES` before starting Jupyter or the
 script. Offline inspection needs neither GPU training nor API credentials.
 
+### Check hardware before paid execution
+
+The default demo uses a 10 GiB VRAM allowance. Available room and deployment
+limits must accommodate that allowance as well as current device occupancy; a
+card's advertised capacity alone is insufficient. CPU training is unsupported.
+See the [hardware guide](../../shared/hardware/README.md) for this task's data,
+host-RAM and storage considerations, supported backends and failure remedies.
+
+After creating your external project below, check its saved settings without API
+keys or training:
+
+```bash
+cd "$EXP_CHECKOUT"
+.venv/bin/python -m tutorials.shared.hardware \
+  --experiment "$TUTORIAL_HOME/experiments/supernemo-demo.json"
+```
+
+For a variant, use its own saved JSON. This hardware-only check creates no run
+workspace and does not validate every task setting. Fresh launches repeat the
+GPU check; later native measurement still decides whether a generated model fits.
+
 ## 2. Reuse raw data and prepare event indexes once
 
 If the four official files already exist locally, set `RAW_DATA` to that

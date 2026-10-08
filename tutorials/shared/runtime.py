@@ -10,6 +10,7 @@ from typing import Protocol
 
 from tutorials.shared.gpu_check import (
     GPU_CHECK_RESPONSE,
+    GpuCheckReport,
     GpuCheckRequest,
 )
 
@@ -39,8 +40,8 @@ def disjoint(left: Path, right: Path) -> bool:
     return not (left.is_relative_to(right) or right.is_relative_to(left))
 
 
-def verify_gpu(settings: RuntimeSettings) -> str:
-    """Run the launch-only check in infra's environment, without source overlays."""
+def gpu_report(settings: RuntimeSettings) -> GpuCheckReport:
+    """Run an explicit hardware check in infra's environment, without overlays."""
     python = settings.infra_checkout / ".venv/bin/python"
     if not python.is_file() or not os.access(python, os.X_OK):
         raise ValueError(
@@ -83,9 +84,18 @@ def verify_gpu(settings: RuntimeSettings) -> str:
         ) from error
     if report.status == "failed":
         raise ValueError(report.message)
+    return report
+
+
+def verify_gpu(settings: RuntimeSettings) -> str:
+    """Preserve the launch receipt interface around the shared typed check."""
+    report = gpu_report(settings)
     details = (
         f"{report.device_name}; logical device {report.logical_index}; "
         f"{report.capacity_gib:g} GiB; backend {report.installed_backend}; "
+        f"{report.occupied_gib:g} GiB occupied; "
+        f"{report.configured_cap_gib:g} GiB configured cap within "
+        f"{report.effective_ceiling_gib:g} GiB effective ceiling; "
         "driver queries and kernel witness passed; live admission/accounting checks still required"
     )
     return details + (

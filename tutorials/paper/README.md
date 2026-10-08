@@ -90,6 +90,25 @@ manual model-selection step in TIDMAD, not part of any quick-demo validation plo
 
 ## Before you start
 
+All four quick demos begin with an 8 GiB VRAM allowance. That is a configured
+limit, not a measured minimum: capacity, current occupancy and deployment limits
+all matter. Read the [per-task hardware guide](../shared/hardware/README.md)
+before downloading large data or attempting training on a small machine.
+After Quick A saves your experiment, check that exact JSON without paid calls:
+
+```bash
+cd "$EXP_CHECKOUT"
+.venv/bin/python -m tutorials.shared.hardware \
+  --experiment "$TUTORIAL_HOME/experiments/tess_quick-demo-001.json"
+```
+
+Replace the filename with `tidmad_quick-demo-001.json`,
+`project8_quick-demo-001.json` or `ligo_quick-demo-001.json` for the selected
+notebook, or the actual variant you saved. The command checks hardware fields
+only, needs no API key and creates no run workspace. Fresh launches repeat GPU
+checks before provider calls. A passing snapshot neither reserves VRAM nor
+guarantees that a generated model fits.
+
 - Linux, Python 3.12, `git`, `uv`, and one visible GPU supported by the frozen
   PyTorch installation and required resource accounting. NVIDIA model names are
   not restricted. AMD/ROCm is experimental and untested; its missing driver
