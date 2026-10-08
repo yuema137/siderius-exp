@@ -51,6 +51,27 @@ It does not establish a fresh Pet run with Luna or fresh GPU qualification;
 the archived run below retains its original model and source provenance. A framework missing the
 discovery API refuses launch rather than borrowing another checkout's environment.
 
+### Check hardware before paid execution
+
+The default demo uses an 8 GiB VRAM allowance. Available room and deployment
+limits must accommodate that allowance as well as current device occupancy; a
+card's advertised capacity alone is insufficient. CPU training is unsupported.
+See the [hardware guide](../../shared/hardware/README.md) for this task's data,
+host-RAM and storage considerations, supported backends and failure remedies.
+
+After creating your external project below, check its saved settings without API
+keys or training:
+
+```bash
+cd "$EXP_CHECKOUT"
+.venv/bin/python -m tutorials.shared.hardware \
+  --experiment "$TUTORIAL_HOME/experiments/pet-demo.json"
+```
+
+For a variant, use its own saved JSON. This hardware-only check creates no run
+workspace and does not validate every task setting. Fresh launches repeat the
+GPU check; later native measurement still decides whether a generated model fits.
+
 ## 2. Reuse images, or download once
 
 If the dataset is already available, pass its **images directory**, containing

@@ -16,6 +16,8 @@ from tutorials.supplementary.pet.settings import PetExperiment
 
 @pytest.fixture
 def native(monkeypatch):
+    monkeypatch.delenv("SIDERIUS_GPU_VRAM_QUOTA_MIB", raising=False)
+    monkeypatch.delenv("SIDERIUS_PAIR_VRAM_CEILING_GIB", raising=False)
     context = hardware.HardwareContext(
         device_name="Arbitrary NVIDIA device",
         total_memory_bytes=192 * 1024**3,
@@ -46,20 +48,21 @@ def native(monkeypatch):
         implemented_accounting_adapter="nvidia-smi",
         limitations=(),
     )
-    # The unchanged exp pin intentionally predates this additive API.
+    # Synthetic facts exercise the current pinned API without probing hardware.
     monkeypatch.setattr(hardware, "inspect_gpu_runtime", lambda: facts, raising=False)
     monkeypatch.setattr(
         accounting,
-        "sample_device_baseline",
-        lambda device: accounting.DeviceBaselineSnapshot(
+        "sample",
+        lambda pid, device: accounting.GpuAccountingSnapshot(
             device=device,
             telemetry_available=True,
-            sampled_at=0.0,
             device_total_mib=192 * 1024,
             device_used_mib=0,
-            device_free_mib=192 * 1024,
-            processes=(),
-            process_count=0,
+            own_tree_mib=0,
+            other_mib=0,
+            unattributed_mib=0,
+            per_pid_total_mib=0,
+            accounting_skew_mib=0,
         ),
     )
     calls = []
@@ -158,17 +161,16 @@ def test_implemented_adapter_and_uuid_require_real_queries_before_kernel(
     assert facts.implemented_accounting_adapter == "nvidia-smi"
     assert facts.hardware.active_device_uuid == "GPU-example"
 
-    def query(device):
+    def query(pid, device):
         assert device.uuid == "GPU-example"
         if failed_query == "exception":
             raise OSError("private-driver-output")
-        return accounting.DeviceBaselineSnapshot(
+        return accounting.GpuAccountingSnapshot(
             device=device,
             telemetry_available=False,
-            sampled_at=0.0,
         )
 
-    monkeypatch.setattr(accounting, "sample_device_baseline", query)
+    monkeypatch.setattr(accounting, "sample", query)
     with pytest.raises(ValueError, match="queries") as error:
         gpu_check.check_gpu(request())
     assert "private-driver-output" not in str(error.value)
@@ -251,6 +253,14 @@ def test_adapter_uses_selected_interpreter_effective_budgets_and_no_overlay(
                 device_name="Any GPU",
                 capacity_gib=24.0,
                 device_uuid="GPU-example",
+                occupied_gib=2.0,
+                trial_vram_gib=12.0,
+                formal_vram_gib=8.0,
+                configured_cap_gib=12.0,
+                effective_ceiling_gib=24.0,
+                remaining_after_cap_gib=10.0,
+                host_quota_gib=None,
+                operator_ceiling_gib=None,
                 limitations=(),
             ).model_dump_json(),
         )
@@ -395,3 +405,86 @@ def test_each_actual_preview_stays_off_the_gpu_path(tmp_path, monkeypatch, task)
     result = runner.inspect(selected, launch=False)
     report = result.model_dump() if task == "tess" else result
     assert report["gpu"] is None
+
+
+def occupancy(monkeypatch, *, used=0, total=192 * 1024, **changes):
+    """Hidden usage is present at device level without visible process rows."""
+    values = {
+        "telemetry_available": True,
+        "device_total_mib": total,
+        "device_used_mib": used,
+        "own_tree_mib": 0,
+        "other_mib": 0,
+        "unattributed_mib": used,
+        "per_pid_total_mib": 0,
+        "accounting_skew_mib": used,
+    }
+    values.update(changes)
+
+    def sample(pid, device):
+        import os
+
+        assert pid == os.getpid()
+        return accounting.GpuAccountingSnapshot(device=device, **values)
+
+    monkeypatch.setattr(accounting, "sample", sample)
+
+
+def test_busy_same_device_refuses_before_kernel_and_idle_passes(native, monkeypatch):
+    occupancy(monkeypatch, used=80 * 1024)
+    with pytest.raises(ValueError, match="Insufficient GPU headroom"):
+        gpu_check.check_gpu(request())
+    assert native[1] == []
+    occupancy(monkeypatch, used=2 * 1024)
+    result = gpu_check.check_gpu(request())
+    assert (result.occupied_gib, result.remaining_after_cap_gib) == (2, 62)
+
+
+def test_stage_caps_are_sequential_and_exact_equality_is_allowed(native, monkeypatch):
+    occupancy(monkeypatch, used=64 * 1024)
+    result = gpu_check.check_gpu(request())
+    assert result.configured_cap_gib == 128  # Not 96 + 128.
+    assert result.remaining_after_cap_gib == 0
+
+
+@pytest.mark.parametrize(
+    "variable,value",
+    [
+        ("SIDERIUS_GPU_VRAM_QUOTA_MIB", str(127 * 1024)),
+        ("SIDERIUS_PAIR_VRAM_CEILING_GIB", "127"),
+    ],
+)
+def test_declared_limit_is_not_replaced_by_physical_capacity(
+    native, monkeypatch, variable, value
+):
+    monkeypatch.setenv(variable, value)
+    with pytest.raises(ValueError, match="effective 127 GiB ceiling"):
+        gpu_check.check_gpu(request())
+    assert native[1] == []
+
+
+@pytest.mark.parametrize("value", ["0", "garbage", "nan", "-1"])
+def test_malformed_quota_refuses_before_kernel(native, monkeypatch, value):
+    monkeypatch.setenv("SIDERIUS_GPU_VRAM_QUOTA_MIB", value)
+    with pytest.raises(ValueError, match="Invalid GPU ceiling or quota"):
+        gpu_check.check_gpu(request())
+    assert native[1] == []
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        {"device_total_mib": None},
+        {"device_used_mib": None},
+        {"used": 193 * 1024},
+        {"used": 1024, "accounting_skew_mib": -1},
+        {"used": 1024, "per_pid_total_mib": 2048},
+    ],
+)
+def test_incomplete_or_incoherent_occupancy_is_not_free_memory(
+    native, monkeypatch, values
+):
+    occupancy(monkeypatch, **values)
+    with pytest.raises(ValueError, match="missing or inconsistent"):
+        gpu_check.check_gpu(request())
+    assert native[1] == []

@@ -44,6 +44,10 @@ compatibility selectors just to use the paper's models. Reproducing a recorded
 treatment additionally requires its source/configuration pair and explicit
 historical settings, as described in the artifact reference above.
 
+Before paid execution, follow the [hardware check guide](hardware/README.md) for
+your saved experiment. It covers GPU readiness and each tutorial's data/RAM/storage
+considerations; choosing a cheaper LLM does not reduce GPU requirements.
+
 ## What a fresh tutorial selects
 
 TESS, TIDMAD, Project8, LIGO and Pet use the same independent test template.

@@ -55,6 +55,27 @@ detected name; a string requires that name. Initial Trial/Formal VRAM budgets
 are 10 GiB and must fit the card. The [shared GPU checks](../../shared/gpu-runtime.md)
 own backend support and admission; a successful preview is not a GPU test.
 
+### Check hardware before paid execution
+
+The default demo uses a 10 GiB VRAM allowance. Available room and deployment
+limits must accommodate that allowance as well as current device occupancy; a
+card's advertised capacity alone is insufficient. CPU training is unsupported.
+See the [hardware guide](../../shared/hardware/README.md) for this task's data,
+host-RAM and storage considerations, supported backends and failure remedies.
+
+After creating your external project below, check its saved settings without API
+keys or training:
+
+```bash
+cd "$EXP_CHECKOUT"
+.venv/bin/python -m tutorials.shared.hardware \
+  --experiment "$TUTORIAL_HOME/experiments/mjd-demo.json"
+```
+
+For a variant, use its own saved JSON. This hardware-only check creates no run
+workspace and does not validate every task setting. Fresh launches repeat the
+GPU check; later native measurement still decides whether a generated model fits.
+
 ## 2. Reuse data, or acquire the official files once
 
 Bind an existing external dataset directory directly. The initializer neither

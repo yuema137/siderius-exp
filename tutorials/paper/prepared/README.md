@@ -36,6 +36,27 @@ AMD/ROCm is experimental and untested; its missing driver accounting currently
 prevents these tutorial launches. Intel GPU training is unsupported. This fixed workflow has no separate coding-agent
 filesystem sandbox; generated models execute under your user account.
 
+### Hardware and storage before running
+
+Project8 and LIGO short demos each request an 8 GiB VRAM allowance. The selected
+GPU needs greater physical capacity and sufficient current room under deployment
+limits. Neither notebook supports CPU training. Their complete source manifests
+list about 9.83 GB and 2.36 GB respectively; selected-row preparation can transfer
+less, while staged arrays and run outputs need additional space. A universal
+training RAM minimum has not been qualified. See the [hardware guide](../../shared/hardware/README.md).
+
+After Quick A saves a JSON, run the hardware-only check from the exp checkout:
+
+```bash
+cd "$EXP_CHECKOUT"
+.venv/bin/python -m tutorials.shared.hardware \
+  --experiment "$TUTORIAL_HOME/experiments/project8_quick-demo-001.json"
+```
+
+For LIGO, use `ligo_quick-demo-001.json`; for a variant, use its actual saved
+filename. No API key, training or run workspace is required. The check is a
+current hardware snapshot; native model-fit checks and monitoring still apply.
+
 ## 2. Create a separate project
 
 Choose **one** task and a new directory outside both repositories. Repeat these
