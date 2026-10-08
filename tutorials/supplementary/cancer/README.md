@@ -130,7 +130,7 @@ classification with task-owned masked binary cross-entropy.
 ## 5. Check hardware, keys and the exact saved script
 
 Run this **from the exp checkout**, after saving the experiment you intend to
-launch. For a named variant, replace the JSON path with that variant's path:
+launch. The following pair selects the initial demo:
 
 ```bash
 cd "$EXP_CHECKOUT"
@@ -138,6 +138,12 @@ cd "$EXP_CHECKOUT"
   --experiment "$TUTORIAL_HOME/experiments/cancer-demo.json"
 bash "$TUTORIAL_HOME/scripts/run-cancer.sh"
 ```
+
+For a saved variant, change **both paths** to the pair printed by the notebook.
+For example, `cancer-four-001` uses
+`experiments/cancer-four-001.json` for the hardware check and
+`scripts/run-cancer-four-001.sh` for the preview. Each script is bound to its
+matching JSON; `run-cancer.sh` continues to select the initial demo.
 
 The first command checks hardware without keys or training; it runs a tiny GPU
 kernel and reports current capacity, occupancy, quota and host RAM/disk
