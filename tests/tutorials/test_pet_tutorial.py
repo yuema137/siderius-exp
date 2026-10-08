@@ -172,6 +172,11 @@ def test_timeout_stops_detached_worker(project, monkeypatch):
 
     path, experiment = project
     script = path / "scripts/run-pet.sh"
+    # This test substitutes a process-tree fixture, not a generated Pet launcher.
+    # Binding mismatch refusal is covered separately by the handoff regressions.
+    monkeypatch.setattr(
+        "tutorials.supplementary.pet.demo.validate_launcher", lambda *args: None
+    )
     monkeypatch.setenv("OPENAI_API_KEY", "local-test-only-not-sent")
     worker = path / "worker.py"
     marker = path / "child.pid"
