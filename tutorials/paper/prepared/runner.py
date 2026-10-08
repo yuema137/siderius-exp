@@ -54,6 +54,16 @@ def credential_status(settings: PreparedExperiment) -> dict[str, bool]:
     return {name: bool(os.environ.get(name, "").strip()) for name in sorted(required)}
 
 
+def workflow_files(settings: PreparedExperiment) -> tuple[Path, Path]:
+    variant = (
+        "main_fixed_workflow_dual_representation"
+        if settings.task == "project8"
+        else "main_fixed_workflow"
+    )
+    experiment = ROOT / f"experiments/phyts_{settings.task}" / variant
+    return experiment / "workflow.json", experiment / "information_treatment.yaml"
+
+
 def build_command(settings: PreparedExperiment) -> list[str]:
     if settings.composition is None or settings.llm_config is None:
         raise ValueError("select the saved external task and LLM routing")
@@ -62,16 +72,11 @@ def build_command(settings: PreparedExperiment) -> list[str]:
         for p in (ROOT, settings.infra_checkout)
     ):
         raise ValueError("select your external llm/literature_review.yaml")
-    variant = (
-        "main_fixed_workflow_dual_representation"
-        if settings.task == "project8"
-        else "main_fixed_workflow"
-    )
-    experiment = ROOT / f"experiments/phyts_{settings.task}" / variant
+    workflow, treatment = workflow_files(settings)
     command = shared_command(
         settings,
-        workflow=experiment / "workflow.json",
-        treatment_path=experiment / "information_treatment.yaml",
+        workflow=workflow,
+        treatment_path=treatment,
     )
     # Both demos expose user-owned Formal fractions, including LIGO's agent-owned default.
     command[command.index("--formal_training_scope_source") + 1] = "operator"
