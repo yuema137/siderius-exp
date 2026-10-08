@@ -13,10 +13,12 @@ separates recovered inputs from supplementary branch tests and missing evidence.
 ## 1. Install into the infra environment
 
 Set `INFRA_CHECKOUT` and `EXP_CHECKOUT` to your own absolute checkout paths.
-Use the infra revision recorded in
-[qualification.json](src/siderius_prompt_compat/qualification.json); the package
-refuses an unqualified rendering assembly. Both repositories need the companion
-changes described in the coverage report.
+For current installation, use the framework revision selected by this exp
+checkout's [SIDERIUS_REVISION](../../../SIDERIUS_REVISION). The
+[qualification manifest](src/siderius_prompt_compat/qualification.json) records
+accepted renderer assemblies and their historical checkpoints; it is not an
+instruction to select its first recorded revision. The package refuses an
+unqualified rendering assembly. Historical replay retains its recorded bindings.
 
 ```bash
 cd "$INFRA_CHECKOUT"
@@ -27,8 +29,8 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
 ```
 
 This installs the package versions declared by the selected exp checkout
-(currently planner compatibility 0.8.0 and prompt compatibility 0.9.0) as normal
-packages. Do not share another checkout's virtualenv or add its source through
+in [planner metadata](../planner_compat/pyproject.toml) and
+[prompt metadata](pyproject.toml), as normal packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
 
@@ -55,9 +57,10 @@ Version 0.9.0 adds the exact final-pair renderer assembly at infra
 `faff23aad38a2892160f64a4f3cefe1c9d6c3632`. See the
 [final-pair report](qualifications/final-pair/report.md) for actual offline evidence.
 Only absent-policy historical inputs are within this comparison; newly selected
-protected-execution evidence is not recast as an old message. The repository pin
-now selects this reviewed source; public-source availability is verified separately
-when the release is synchronized.
+protected-execution evidence is not recast as an old message. That report
+qualifies its recorded renderer assembly; it does not select the current launch
+revision or establish a later public-source installation check. The current pin
+is owned by [SIDERIUS_REVISION](../../../SIDERIUS_REVISION).
 
 ## 2. Configure copies in a new workspace
 

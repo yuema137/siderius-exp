@@ -45,9 +45,12 @@ original target units. Statistics travel with the checkpoint and fitting time
 counts toward the attempt budget. Constant or nonfinite targets fail explicitly.
 This does not change the frozen dataset or preprocessing.
 
-These policies are bound to infra `v0.2.13`. Local native GPU qualification
-has passed; archive verification and deployment readiness remain required
-before any fresh formal launch.
+Current launches use the exact framework version selected by the repository's
+[version file](../../../SIDERIUS_REVISION), with its matching dependencies and
+lockfile. The earlier `v0.2.13` policy introduction and local GPU qualification
+are historical evidence; they do not qualify a newer source pair. Follow the
+[paper artifact reference](../../paper-artifacts.md) for recorded runs. Archive
+verification and deployment readiness remain required before a fresh Formal launch.
 
 Both Trial and Formal export the earliest checkpoint with minimum loss on
 their fixed training-validation snapshot, through the workflow rule

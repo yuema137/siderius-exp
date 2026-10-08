@@ -61,7 +61,8 @@ The [version and source receipt](../../../provenance/validation/2026-10-08_v1_me
 links the final source qualification and records normal installations in both
 environments. The original [qualification report](qualification-report.json)
 remains historical evidence for its recorded revision, not the current pair.
-Public-host installation remains a separate post-synchronization release check.
+The receipt does not establish a later public-host installation check;
+synchronizing source alone does not add that evidence.
 Unknown assemblies fail closed. Profiles have explicit version `1`; no implicit
 historical default or automatic fallback is installed.
 

@@ -74,8 +74,9 @@ configuration, and a changed profile identity requires a fresh workspace.
 The current installed framework pin is declared by
 [SIDERIUS_REVISION](../SIDERIUS_REVISION). The
 [source-pair qualification record](../provenance/validation/2026-10-08_v1_metadata/receipt.json)
-states the checked installation and offline compatibility scope; verification
-of installation from the public source remains pending release synchronization.
+states the installation and offline compatibility scope at its recorded
+checkpoint. It does not establish a later public-source installation check;
+repository synchronization alone is not installation evidence.
 An installed storage or preflight profile does not by itself establish support
 for its producers or every historical runtime path. Read the selected adapter's
 qualification contract before choosing a profile. These current-installation

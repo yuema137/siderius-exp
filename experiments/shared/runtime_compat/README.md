@@ -4,13 +4,12 @@ Use this package when you want a **new external workspace** to apply a paper
 experiment's original timing rules. Ordinary tutorials use the framework's
 corrected default and do not need this package. Installing it changes no default.
 
-The qualified infra version is `52373be9` (SIDERIUS 1.0.0). Offline timing,
-historical prompt comparisons and installation checks passed; the
-[version and source receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
-links the supporting results. Those checks used the development repository;
-installation from the public repository is a separate release check after
-synchronization. The optional historical packages still need the installation
-steps below.
+Use the framework version named by the [repository version file](../../../SIDERIUS_REVISION).
+The [qualification receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+records the checked version and offline timing, prompt and installation results.
+Those checks used the development repository; they do not establish a later
+public-source installation check. The optional historical packages need the
+installation steps below even after normal exp setup.
 
 The paper runs estimated training time from observed steps. Their rules could
 reject a short phase even after every requested step had finished, because too

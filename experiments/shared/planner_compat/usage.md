@@ -24,10 +24,12 @@ owns that historical strategy text.
 
 ## Install into the environment that will run infra
 
-Use the infra checkout for the paired issue #372 change. A released infra
-revision without `agent.planner_strategy` cannot load this package. First
-create that checkout's own environment using its installation instructions.
-Then install this directory into that environment:
+For current installation, use the exact framework revision in this exp
+checkout's [SIDERIUS_REVISION](../../../SIDERIUS_REVISION). Create that framework
+checkout's own environment with `uv sync --group dev --frozen`, then install
+this package into it. Historical replay retains its recorded framework and
+package identities. A framework without `agent.planner_strategy` cannot load
+this package.
 
 ```bash
 # Replace both paths with your checkouts; no credentials are needed here.
@@ -40,8 +42,8 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" --no-deps \
 Use a normal installation for a run whose identity must remain fixed. Do not
 edit the package during execution. Both repositories' public download locations
 are [yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS) and
-[yuema137/siderius-exp](https://github.com/yuema137/siderius-exp); the paired
-change must be merged and synchronized before those paths include this API.
+[yuema137/siderius-exp](https://github.com/yuema137/siderius-exp). Use the selected
+exp version's binding rather than substituting the latest framework branch.
 
 Inspect the selected identity without calling an LLM:
 
