@@ -164,7 +164,7 @@ def test_quick_settings_do_not_force_recorded_gpu_name(tmp_path, name):
     assert namespace["QUICK_SETTINGS"]["composition"].is_absolute()
 
 
-def test_touched_current_tutorial_links_do_not_use_retired_main_branch():
+def test_current_tutorial_links_use_each_public_repository_default():
     instructions = [
         ROOT / "tutorials/paper/README.md",
         ROOT / "tutorials/paper/tidmad/README.md",
@@ -178,8 +178,11 @@ def test_touched_current_tutorial_links_do_not_use_retired_main_branch():
             (f"{path}:cell{index}", "".join(cell["source"]))
             for index, cell in enumerate(notebook["cells"])
         )
-    retired = re.compile(
-        r"https://github\.com/yuema137/(?:siderius-exp|SIDERIUS)/(?:tree|blob)/main(?:[/#?)]|$)"
+    # Public defaults differ from the private development exp's master branch.
+    defaults = {"siderius-exp": "main", "SIDERIUS": "master"}
+    current_branch_link = re.compile(
+        r"https://github\.com/yuema137/(siderius-exp|SIDERIUS)/(?:tree|blob)/(main|master)(?:[/#?)]|$)"
     )
     for location, text in texts:
-        assert retired.search(text) is None, location
+        for repository, branch in current_branch_link.findall(text):
+            assert branch == defaults[repository], location
