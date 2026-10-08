@@ -1,5 +1,9 @@
 # Tasks
 
+For your first run, use the [tutorial index](../tutorials/README.md): it shows
+which tasks have a notebook and a step-by-step setup guide. This directory is
+the reference for the scientific task definitions behind those examples.
+
 Start here when you need to understand a scientific problem and its immutable
 task-owned inputs. Choose a package below; its `STATUS.md` describes capability
 and its `PROVENANCE.md` describes data identity and historical evidence. A task

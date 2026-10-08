@@ -1,48 +1,67 @@
-# Tutorials: learn a task, save your experiment, run it
+# Choose a task and run a small demo
 
-**Browse first:** each notebook includes real training-sample pictures, a recorded
-three-iteration result plot and exact scores. No setup is needed to view these
-archived examples; your own results appear after you configure and run the demo.
-See the [example gallery](paper/examples/README.md) for provenance and limitations.
+**New to SIDERIUS? Start with [TESS](paper/README.md).** Open its notebook to see
+example data and a recorded result plot, then follow the setup guide. You do not
+need to understand the full experiment directory before starting.
 
-These tutorials are for readers who are new to SIDERIUS. They show how to copy a
-scientific task into your own project, change its experiment settings, inspect
-the saved files, and start a run from a terminal script. The notebooks teach and
-edit configuration, then their Run All quick demo invokes the saved script and
-plots three iterations of real results. The scripts own research execution.
-Run All requires prepared data/exported keys and incurs API/GPU work;
-`RUN_QUICK_DEMO=False` skips API/GPU execution. Quick demo A still saves
-input files in your external project.
+The repository has nine task families. A task package or experiment launcher
+does not automatically include a beginner tutorial; the table below shows the
+actual notebook coverage.
 
-New projects use **GPT-6 Luna across all workflow LLM stages** to check the
-process before spending more on scientific searches. Read the
-[LLM configuration levels](shared/README.md): offline checks, inexpensive live
-demos, the paper's recommended research LLM configuration or your own model
-choices, and separately archived paper replay.
-The gallery contains earlier recorded runs; it is not evidence of a Luna run.
+## Find your task
 
-**Start with [the paper tutorial guide](paper/README.md).** It explains installation,
-API keys, data preparation, supported hardware, and what the demos can establish.
-
-| Tutorial | What you will learn | Open |
+| Task | What the model does | Tutorial entry |
 |---|---|---|
-| TESS: stellar rotation from light curves | Change iterations, Trial/Formal data fractions, time/VRAM budgets and whole-star train/validation membership | [TESS notebook](paper/notebooks/01_tess_tutorial.ipynb) · [setup guide](paper/README.md#1-install-in-the-two-exact-checkouts) |
-| TIDMAD: waveform denoising, one band | Change budgets and fractions; assign file indices to training, workflow validation and a separate final test | [TIDMAD guide](paper/tidmad/README.md) · [notebook](paper/notebooks/02_tidmad_tutorial.ipynb) |
-| Project8: electron energy from time and frequency views | Inspect four-channel inputs, change budgets/fractions and create a new event split | [Project8 notebook](paper/notebooks/03_project8_tutorial.ipynb) · [setup](paper/prepared/README.md) |
-| LIGO: chirp mass from two detector channels | Prepare a tiny real-data subset, run three iterations and inspect R² | [LIGO notebook](paper/notebooks/04_ligo_tutorial.ipynb) · [setup](paper/prepared/README.md) |
+| TESS | Predict stellar rotation from a light curve | [Setup](paper/README.md) · [Notebook](paper/notebooks/01_tess_tutorial.ipynb) |
+| TIDMAD | Recover a waveform from noisy detector data, using one band | [Setup](paper/tidmad/README.md) · [Notebook](paper/notebooks/02_tidmad_tutorial.ipynb) |
+| Project8 | Predict electron energy from time and frequency views | [Setup](paper/prepared/README.md) · [Notebook](paper/notebooks/03_project8_tutorial.ipynb) |
+| LIGO | Predict chirp mass from two detector channels | [Setup](paper/prepared/README.md) · [Notebook](paper/notebooks/04_ligo_tutorial.ipynb) |
+| Oxford-IIIT Pet | Classify pet images by breed | [Setup](supplementary/pet/README.md) · [Notebook](supplementary/pet/pet_tutorial.ipynb) |
+| MJD / Majorana | Classify detector waveforms | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
+| SuperNEMO | Classify signal and background events | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
+| Cancer | Rank candidate cancer genes using biological networks | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
+| DAVIS | Predict future video frames | Notebook not yet available; [task and experiment references](supplementary/README.md#tasks-awaiting-a-notebook) |
 
-The `paper/` directory groups teaching examples based on the paper's tasks.
-**These four tutorials are workflow demos, not reproductions of paper artifacts.** The
-[paper artifact reference](../experiments/paper-artifacts.md) points to frozen
-settings, recorded source pairs and missing-evidence limits. New LLM searches are not guaranteed to recover the paper's models or
-scores, and very small training budgets can yield unusable models.
+## Follow this sequence
 
-Read notebooks here to browse, but execute only the copies initialized in your
-own external project. Keep datasets, API keys and run outputs out of both source
-repositories. The intended public sources are
-[yuema137/siderius-exp](https://github.com/yuema137/siderius-exp) and
-[yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS).
+1. **Browse the example.** Notebook pictures and plots show the data and a
+   recorded run. Their provenance is documented; they are not your results.
+2. **Use the task's setup link.** It gives the paired installations, data path or
+   download procedure, required keys, supported hardware and project initializer.
+3. **Open the copied notebook in your external project.** It explains the task
+   package, saves experiment settings and shows the exact files to inspect.
+4. **Preview the saved launch command.** Check data fractions, iterations,
+   budgets, model routes and result locations. Fix missing prerequisites first.
+5. **Run and plot.** Run All explicitly calls the saved shell script to request
+   three iterations and plots the scores actually recorded. A run can stop
+   early or have unscored attempts. It uses API credit and GPU time. A failed or
+   invalid model remains a result to inspect; a high score is not the demo goal.
 
-## Supplementary tasks
+Keep the source repositories unchanged. Your editable notebook, task files,
+experiment, LLM configuration, script and results belong in the separate project
+created by the tutorial. Keep secrets external and export them before starting
+Jupyter. Setting `RUN_QUICK_DEMO=False` skips the notebook's live-demo execution;
+other preparation cells can still save files.
 
-[Supplementary process demos](supplementary/README.md) start with Oxford-IIIT Pet image classification. These use the same notebook/edit/save/script/plot sequence and are not paper artifacts.
+New projects use the [GPT-6 Luna test profile](shared/README.md). It is a starting
+point for checking the process, not a whole-run spending cap. The recorded
+gallery uses the original runs' models and settings, not newly measured Luna
+results. Choose research or custom model routing separately from run budgets.
+
+## How the directories relate to the paper
+
+- [Paper-task tutorials](paper/README.md) cover TESS, TIDMAD, Project8 and LIGO.
+  They teach the workflow and editable parameters; they do not reproduce the
+  paper's complete campaigns or coding-agent comparisons.
+- [Supplementary tutorials](supplementary/README.md) cover tasks outside those
+  four experiments. Pet currently has a notebook; the other task packages have
+  separate experiment references while their tutorials are developed.
+- [Paper artifacts](../experiments/paper-artifacts.md) contain the route to frozen
+  configurations, original source pairs, historical evidence and its limits.
+- [Recorded example gallery](paper/examples/README.md) explains the four paper
+  demos' figures; [Pet's example](supplementary/pet/example/README.md) has its own
+  provenance.
+
+Install from [yuema137/siderius-exp](https://github.com/yuema137/siderius-exp) and
+[yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS), using the source pair
+specified by your setup guide.

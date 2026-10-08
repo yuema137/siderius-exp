@@ -1,120 +1,102 @@
 # siderius-exp
 
-Scientific tasks and their experiments for the SIDERIUS framework.
-This repository is the place where task meaning and experiment choices live;
-the generic framework lives in the separate [SIDERIUS repository](https://github.com/yuema137/SIDERIUS).
+Learn how to use [SIDERIUS](https://github.com/yuema137/SIDERIUS) on a scientific
+dataset: define the problem, choose an experiment, run it, and inspect the results.
+This repository contains task packages, tutorials and recorded experiments;
+SIDERIUS provides the execution framework.
 
-## Paper
+## Start with a tutorial
+
+**For a first try, start with [TESS](tutorials/paper/README.md).** It predicts
+stellar rotation from brightness measurements and has a small downloadable
+dataset. Browse the notebook's data pictures and recorded result plot first;
+then follow its setup guide to run your own copy.
+
+The [tutorial index](tutorials/README.md) lists every task and shows which ones
+already have a notebook. The other available walkthroughs cover TIDMAD, Project8,
+LIGO and Pet image classification. MJD, SuperNEMO, Cancer and DAVIS have task and
+experiment code, but their beginner notebooks are not yet available.
+
+We recommend working with your coding agent. Open this repository and say:
+
+```text
+Help me run the small TESS tutorial in a new project at /absolute/path/my-tess-demo, starting with environment and data setup.
+```
+
+Your agent should follow the selected tutorial, prepare the files, explain the
+choices and show the saved launch command. You supply provider credentials and
+approve paid execution. You can also follow the same guide yourself.
+
+## What you will do
+
+1. **Choose a task and inspect its example.** See the data format and what the
+   model predicts before installing anything.
+2. **Install the paired environments.** Follow that tutorial's setup guide for
+   the exp and infra installations and required keys.
+3. **Follow its project and data steps in order.** Use a fresh project path
+   outside both repositories; do not create it manually before initialization.
+   Reuse existing data or download it once as instructed. Depending on the task,
+   task files are copied during initialization or created during data preparation.
+   Edit only the files saved in your external project.
+4. **Preview, then run the saved script.** Inspect the saved files, effective
+   parameters and output path before spending API or GPU time. Notebook Run All
+   can invoke that same script; it does not contain a second training engine.
+5. **Read the score-versus-iteration plot.** Change settings in your project and
+   use a new run directory for the next experiment.
+
+Use the [Luna test configuration](tutorials/shared/README.md) for a first process
+check. For research, start from the paper's LLM routing or choose your own models.
+Model selection does not set a dollar limit; data, training and API budgets are
+separate. Keep keys, datasets, generated models and results outside the repos.
+
+## Which files own your choices?
+
+| You want to change | Edit in your external project |
+|---|---|
+| The prediction problem: inputs, labels, data splits, metric or scientific checks | The **task package** |
+| How the search runs: iterations, Trial/Formal data fractions, time/VRAM budgets or LLM routing | The **experiment** and its linked configuration files |
+| Which saved experiment to launch | The generated **shell script** or its documented arguments |
+
+For example, a new train/validation split changes the task definition. Keeping
+that split and increasing the iteration count changes the experiment. Each
+tutorial shows its actual file layout and the parameters its launcher supports.
+
+## Paper and historical experiments
 
 [Beyond a Better Score: Long-Horizon Agentic ML Development and Evaluation Protocol for Physics Time Series](https://zenodo.org/records/23071121)
-introduces SIDERIUS and evaluates agent-driven model development on TIDMAD,
-TESS, Project8, and LIGO. It combines reusable research capabilities, scientific
-validity checks, and exploration within compute budgets, evaluating whether
-models are scientifically valid as well as how well they score.
+introduces SIDERIUS and studies agent-driven model development on TIDMAD, TESS,
+Project8 and LIGO, including scientific validity and compute budgets.
 
-This repository provides the task packages, experiment configurations, and
-archived evidence. The tutorials below are simplified workflow demos; use the
-[paper artifact reference](experiments/paper-artifacts.md) for reproduction
-configurations and the available historical records.
+**Tutorials are simplified process demos, not one-click reproductions of paper
+artifacts or scores.** Their pictures include recorded examples with their own
+provenance. A new LLM-driven run can produce different models and results.
+For historical reproduction settings and available evidence, use the
+[paper artifact reference](experiments/paper-artifacts.md).
 
-For a first flow check, use the inexpensive Luna test configuration. For
-production research, we recommend starting with the paper's LLM configuration;
-your own supported model choices are also welcome. See
-[LLM configuration levels](tutorials/shared/README.md) for the files to edit
-and the distinction between model selection and historical replay.
+## Explore beyond the walkthroughs
 
-## Start here
-
-For a guided notebook plus terminal-script example, start with the
-[tutorial index](tutorials/README.md), then choose TESS, one-band TIDMAD,
-Project8 (time/frequency inputs), or LIGO. The [paper tutorial guide](tutorials/paper/README.md) explains setup and
-supported changes. These are simplified demos, not one-click paper artifact
-reproduction. For frozen source/configuration pairs and archived evidence, use
-the [paper artifact reference](experiments/paper-artifacts.md).
-
-1. Choose a scientific problem in [`tasks/`](tasks/README.md).
-2. Choose one bounded treatment in [`experiments/`](experiments/README.md).
-3. Use [`campaigns/`](campaigns/README.md) only for coordinated, multi-run work.
-4. Put data, workspaces, logs, models, and secrets outside both repositories.
-
-The shortest safe path is to read the relevant task page, then the experiment
-page, and use its dry-run command before an effectful launch.
-
-## What belongs here
-
-- `tasks/`: scientific meaning, data identity, splits, plugins, metrics, and validity rules.
-- `experiments/`: one task plus one workflow and its concrete parameters, advice, budgets, and result identity.
-- `campaigns/`: authorization and coordination across runs, bands, or stages.
-- `deployments/`: machine and scheduler setup.
-- `provenance/`: dated migration and validation evidence.
-
-Task, experiment, and campaign are separate axes. Trial and Formal are
-workflow roles; they may appear in an ordinary experiment as well as in a
-campaign. A task declares scientific meaning independently of the workflow.
-Intentional scientific changes create a new task identity. Changing a workflow
-treatment creates a different experiment, not a different task.
+| Directory | When you need it |
+|---|---|
+| [Tasks](tasks/README.md) | Understand or extend a task's data, model and scoring contracts |
+| [Experiments](experiments/README.md) | Inspect a particular workflow treatment, launcher or recorded run |
+| [Campaigns](campaigns/README.md) | Coordinate several experiments; not needed for a first tutorial |
+| [Deployments](deployments/README.md) | Configure a particular execution environment |
+| [Contributor rules](CLAUDE.md) | Change repository code or run development checks |
 
 <a id="framework-revision"></a>
-
-## Environments and data
-
-The dependency is pinned by [`SIDERIUS_REVISION`](SIDERIUS_REVISION),
-`pyproject.toml`, and `uv.lock`. Use the exact checkout's own environment:
-
-```bash
-uv sync --group dev --frozen
-```
-
-Do not mix checkouts with `PYTHONPATH`, another virtualenv, or an editable
-install. For API-backed work, inject the enabled providers' keys into the
-launching process from a mode-600 external file or managed secret. Never
-commit credentials. The fixed-workflow supervisor checks its environment
-before starting; a file that a later child might load cannot satisfy that
-check. Raw datasets, generated output, caches and workspaces stay external.
-The complete agent contract is in
-[`CLAUDE.md`](CLAUDE.md#environment-and-launch-credentials).
+The exact framework dependency is recorded in [SIDERIUS_REVISION](SIDERIUS_REVISION)
+and the frozen dependency files. Follow the selected tutorial's installation
+instructions; do not substitute another checkout's virtualenv or source path.
+Some historical launchers have their own older pins, documented by their owners.
 
 <a id="running-the-live-tests"></a>
-
-## Validation
-
-Tests that inspect or execute framework source require an explicit
-`SIDERIUS_CHECKOUT`; those checks fail when it is missing. Follow the selected
-experiment's validation instructions. To collect tests without running them:
-
-```bash
-SIDERIUS_CHECKOUT=/path/to/pinned/SIDERIUS .venv/bin/python -m pytest --collect-only -q
-```
-
-Current task and campaign status is recorded by their `STATUS.md` or current
-index. Historical records are evidence, not launch authorization.
-
-## Task, experiment, and campaign are different things
-
-Use a **task package** when you need to change scientific meaning: data layout,
-model input/output, objective, metric, deliverable encoding, or Health rules.
-Use an **experiment** when you need to change how the search runs: information
-treatment, advice, model routing, band, iteration/round schedule, time/VRAM
-budget, or workspace identity. Use a **campaign** when you coordinate several
-experiment units.
-
-For TIDMAD, a different existing band can use the fixed-workflow launcher with
-a different `--band` and external `--data_dir`. A new scientific parent or file
-identity requires a new task/experiment binding and provenance; it should not
-be hidden in a shell argument or an old run receipt.
-
-## More detail
-
-- [task index](tasks/README.md)
-- [experiment index](experiments/README.md)
-- [campaign index](campaigns/README.md)
-- [migration evidence](provenance/MIGRATION.md)
-- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/52373be9a52bead36fd1f15d706385967e0a129d/docs/reference/task-composition.md)
+Developer tests and scientific runs are separate. For contribution validation,
+follow [the contributor rules](CLAUDE.md#validation-and-independent-review) and
+the selected experiment's technical contract.
 
 ## License
 
-Original siderius-exp software and documentation are available under the
-[MIT License](LICENSE). Third-party code, datasets and data-derived examples
-retain their own terms and attribution; see [NOTICE](NOTICE) and the selected
-task's provenance. The project license does not grant new rights to external
-data, paper content or dependencies.
+Original software and documentation use the [MIT License](LICENSE). Third-party
+code, datasets and data-derived examples retain their own terms; see [NOTICE](NOTICE)
+and each task's provenance. The project license does not grant additional rights
+to external data, paper content or dependencies.
