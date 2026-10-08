@@ -1,5 +1,8 @@
 # TIDMAD: one band, saved configurations, and file-range holdout
 
+Predict a clean injected waveform from a noisy detector waveform, using one
+frequency band to learn the search and evaluation workflow.
+
 New projects use the [shared GPT-6 Luna test configuration](../../shared/README.md) for all
 workflow LLM stages. It is independent of paper routing. Recorded figures below
 come from earlier runs and do not establish live Luna compatibility.
