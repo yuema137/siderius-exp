@@ -13,4 +13,5 @@ native resource and scoreability checks still apply.
 The task's original event split remains unchanged. Search uses training and
 validation, never the reserved test partition. This is a supplementary workflow
 demo, not a paper artifact or a replacement for historical experiment profiles.
-Fresh API/GPU qualification is pending; offline readiness is not a training result.
+The [recorded three-iteration demo](../../../tutorials/supplementary/supernemo/example/README.md)
+provides a completed API/GPU witness and its exact source provenance.

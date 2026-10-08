@@ -6,9 +6,15 @@ The [notebook](supernemo_tutorial.ipynb) explains and edits files; a saved shell
 script starts the experiment. This is a supplementary process demo, not a
 paper reproduction or a promise of a particular score.
 
-**Live three-iteration qualification is still pending.** Data inspection and
-offline checks are separate from successful training. No current score gallery
-is claimed until that qualification is complete.
+The [recorded three-iteration demo](example/README.md) shows actual event inputs,
+measured scores and exact execution provenance from the Luna test configuration
+on an RTX 5090. The examples below are also embedded in the notebook.
+Initialization clears these archived outputs from your copy; your run uses your
+own data, saved settings and results.
+
+![Actual Train event and capped/padded model input](example/event.png)
+
+![Measured Formal AUC across three iterations](example/score-versus-iteration.png)
 
 An event contains multiple detector-hit rows. Its identity is
 `(process, ev_no)`; those rows stay together when assigning data partitions.

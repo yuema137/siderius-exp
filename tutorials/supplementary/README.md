@@ -22,8 +22,9 @@ blind final test.
 
 [SuperNEMO setup](supernemo/README.md) and its [notebook](supernemo/supernemo_tutorial.ipynb)
 explain whole-event inputs, separate raw/prepared/project directories and the
-saved-script workflow. CPU data preparation is supported; fresh three-iteration
-API/GPU qualification is pending. No measured score gallery is claimed yet.
+saved-script workflow. The [recorded three-iteration demo](supernemo/example/README.md)
+includes a real Train event, measured scores and provenance. Reserved test
+events remain unused.
 
 ## Tasks awaiting a notebook
 

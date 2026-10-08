@@ -52,8 +52,9 @@ a new external project, then writes saved JSON and shared-generated shell script
 No indexing, provider call or GPU work happens during initialization. The project,
 prepared directory, original raw parents and both checkouts are separate; saved
 output workspaces are also rejected inside raw parents behind the prepared links.
-The source notebook may eventually hold a measured gallery; initialized copies
-always clear code outputs and execution counts.
+The source notebook embeds authentic PNG outputs at data cell 4 and score cell 12.
+Other outputs are empty and execution counts are null. Initialized copies always
+clear all code outputs and execution counts.
 
 ## Sample and execution semantics
 
@@ -105,6 +106,9 @@ Real CPU preparation uses official files and the unchanged profiler; real loader
 counts and event visualization are separate from fixture results. Native dry-run
 arguments must also pass the actual per-iteration parser, not just shell printing.
 
-No current three-iteration API/GPU qualification has been completed for this new
-treatment. A later authorized run and independently reviewed provenance are
-required before publishing a measured score gallery or claiming live completion.
+A three-iteration API/GPU notebook run completed at the exact source pair recorded
+in `example/provenance.json`. All Trial/Formal attempts in that sequence succeeded;
+normal proposer retries required no manual model/source intervention. Repeated
+Run All made no new API requests and preserved the completion receipt. The gallery
+presentation commit does not replace the executed revision. These observations
+establish the recorded sequence, not universal hardware/model qualification.
