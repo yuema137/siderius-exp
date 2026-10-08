@@ -6,8 +6,8 @@ records with different source pins. A directory or a profile named `demo` is not
 by itself a ready-to-run beginner tutorial; follow the selected entry's guide.
 
 Start here when you have selected a task and need one concrete treatment.
-For a first run, choose one of the [five notebook demos](../tutorials/README.md):
-the four paper-task demos or supplementary Pet. They are simplified examples,
+For a first run, choose one of the [nine notebook demos](../tutorials/README.md):
+four paper-task demos and five supplementary tasks. They are simplified examples,
 not one-click paper reproductions. The table below also includes research
 launchers, which need their declared data, environments and budgets.
 
@@ -25,8 +25,8 @@ supported before preparing an effectful launch.
 | Oxford-IIIT Pet | [tutorial template](oxford_iiit_pet/tutorial_demo/README.md), [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | start with the [Pet tutorial](../tutorials/supplementary/pet/README.md) |
 | DAVIS | [`two_iteration_qualification/`](davis_future_prediction/two_iteration_qualification/) | consumer-pair qualification |
 | Cancer MTG | [`mtg_size_qualification/`](cancer_gene_identification/mtg_size_qualification/) | launcher available; no uninterrupted complete discovery-chain qualification is claimed |
-| Majorana Low-AvsE (MJD) | [profiles and qualification](majorana_low_avse/README.md) | research launcher; supplementary notebook planned |
-| SuperNEMO | [profiles and qualification](supernemo_signal_background/README.md) | research launcher; supplementary notebook planned |
+| Majorana Low-AvsE (MJD) | [profiles and qualification](majorana_low_avse/README.md) | start with the [MJD tutorial](../tutorials/supplementary/mjd/README.md) |
+| SuperNEMO | [profiles and qualification](supernemo_signal_background/README.md) | start with the [SuperNEMO tutorial](../tutorials/supplementary/supernemo/README.md) |
 | PhyTS TESS | [`main_fixed_workflow/`](phyts_tess/main_fixed_workflow/) | historical NoPrior execution recorded; current-pair qualification is separate |
 | PhyTS LIGO | [`main_fixed_workflow/`](phyts_ligo/main_fixed_workflow/) | NoPrior; archived launch/startup evidence is indexed separately |
 | PhyTS Project 8 | [`main_fixed_workflow/`](phyts_project8/main_fixed_workflow/) and [dual representation](phyts_project8/main_fixed_workflow_dual_representation/README.md) | distinct input contracts; keep their evidence separate |
@@ -38,8 +38,7 @@ launch responsibilities are grouped under [shared support](shared/README.md).
 Archived experiments are retained as dated evidence and are not current launch
 routes. The [P0 final-pair wrappers](p0_final_pair_qualification/README.md)
 intentionally require their separate historical infra revision. They do not
-qualify the current release. Cancer, MJD and SuperNEMO supplementary notebooks
-remain planned. Coding-agent and orchestration preparation directories may also
+qualify the current release. Coding-agent and orchestration preparation directories may also
 require deployment work; their own pages state whether they are launchable.
 Campaign coordination belongs under [`campaigns/`](../campaigns/README.md).
 

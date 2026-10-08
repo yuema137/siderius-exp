@@ -1,5 +1,12 @@
 # Majorana Low-AvsE experiments
 
+**For a first run, use the [three-iteration Majorana Low-AvsE tutorial](../../tutorials/supplementary/mjd/README.md).**
+It explains data setup, editable settings, the saved launch script and results.
+Its [teaching template](tutorial_demo/README.md) is separate from the research
+profiles below; the profile named `demo` runs **30 iterations**.
+
+## Research profiles
+
 `launch.sh` exposes three profiles:
 
 - `qualification`: two iterations, one Trial round plus one forced Formal

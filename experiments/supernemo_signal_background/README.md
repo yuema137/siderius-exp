@@ -1,5 +1,12 @@
 # SuperNEMO experiments
 
+**For a first run, use the [three-iteration SuperNEMO tutorial](../../tutorials/supplementary/supernemo/README.md).**
+It explains data setup, editable settings, the saved launch script and results.
+Its [teaching template](tutorial_demo/README.md) is separate from the research
+profiles below; the profile named `demo` runs **30 iterations**.
+
+## Research profiles
+
 The static scientific task lives under
 `tasks/supernemo_signal_background/`. This directory owns workflow treatment.
 
