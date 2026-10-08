@@ -1,0 +1,11 @@
+{
+  "version": "siderius-exp-fixed-workflow-v1",
+  "task_composition": "tasks/supernemo/compositions/signal_background.yaml",
+  "agent_parameters": "llm/agents.json",
+  "agent_parameters_owner": "experiment",
+  "parameters": {
+    "--allowed_output_types": "classifier",
+    "--formal_training_scope_source": "operator",
+    "--min_formal_batch_size": 1
+  }
+}
