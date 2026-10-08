@@ -8,17 +8,17 @@ experiment or campaign selects its data root explicitly with `--data_dir`.
 The bound [dataset profile](../resolved/dataset_profile.json) declares file
 patterns and topology; `resolved/identity.json` is an imported reference snapshot.
 The selected launcher owns data preflight. Use the [experiment guide](../../../experiments/tidmad/main_fixed_workflow/README.md)
-for the fixed workflow's band/checksum requirements, or the tutorial above for
+for the fixed workflow's band and input checks, or the tutorial above for
 its separate file-holdout route. Prepare the anchor before making the data root
 read-only. Keep derived data, caches and run artifacts outside both repositories.
 
 ## Stage the approved anchor
 
-The composed metric (`runtime/scoring.py::_task_owned_score_kwargs`) and Trial
-adapter (`runtime/tidmad_data_path.py::trial_anchor_path`) both select
-`data_dir/segment_anchors.json`. They do not automatically use the copy shipped
-in this task. Stage it during data-root preparation, before making that root
-read-only, and verify the bytes again before an affected fresh run.
+The run needs `segment_anchors.json` in its data directory as a scoring
+reference. Copy the approved file during data preparation, before making that
+directory read-only. The command below copies it only when absent, then checks
+that the selected file exactly matches the approved copy. Run the check again
+before a fresh run.
 
 From the exact siderius-exp checkout, with the explicit prepared data root:
 
@@ -31,18 +31,13 @@ if [[ ! -e "$tidmad_data_dir/segment_anchors.json" && ! -L "$tidmad_data_dir/seg
     cp --no-clobber -- "$tidmad_anchor" "$tidmad_data_dir/segment_anchors.json"
 fi
 cmp -- "$tidmad_anchor" "$tidmad_data_dir/segment_anchors.json"
-sha256sum -- "$tidmad_anchor" "$tidmad_data_dir/segment_anchors.json"
 ```
 
-Both hashes must be
-`0c44b6084dc8afc4dc2fa34f5253bc8d780b4e8ae086945e7051d8bf7928ba90`.
-If comparison fails, stop and resolve which input was selected; do not overwrite
-an existing ruler, regenerate anchors, or recalibrate to make a run proceed.
-The command copies only the approved committed anchor when absent, never HDF5
-data. Record the comparison and both hashes with the fresh run's provenance.
+Success returns without an error; `cmp` prints nothing when the files match.
+If comparison fails, stop and check which data directory was selected. Do not
+overwrite an existing scoring reference, regenerate anchors or recalibrate to
+make a run proceed. This command copies no HDF5 data.
 
-The campaign preflight checks anchor presence, not this byte equality. Gold
-pooled Stage3 uses the committed anchor via `campaigns/tidmad_gold/paths.py`;
-that separate reader does not certify the composed metric's staged input.
-No real-data directory or historical workspace is changed by these instructions
-until an operator explicitly performs the staging step.
+See the [staging contract](staging.md) for reader ownership, exact reference
+identity and the different preflight checks. Existing data and historical
+workspaces are unchanged until you explicitly run the staging command.

@@ -1,7 +1,8 @@
 # Oxford-IIIT Pet data preparation
 
-This directory stores image identities and integrity pins. Dataset archives and
-extracted files stay outside both the `siderius-exp` and `SIDERIUS` repositories.
+This directory stores image identities and verification records. Dataset
+archives and extracted files stay outside both the `siderius-exp` and
+`SIDERIUS` repositories.
 Cloning this repository does not download the dataset.
 
 ## Acquire or verify the data
@@ -16,16 +17,18 @@ Cloning this repository does not download the dataset.
    ```
 
    Missing archives are downloaded from the official Oxford source: about
-   792 MB of images and 19 MB of annotations. Each archive is checked against
-   the tool's SHA-256 pin before extraction. Success prints `[verified]` for
+   792 MB of images and 19 MB of annotations. Each archive is verified
+   against the approved source before extraction. Success prints `[verified]` for
    both archives and leaves `images/` and `annotations/` under the destination.
    An existing extraction directory is skipped.
 3. Pass `/path/to/external/oxford-iiit-pet/images` as the experiment's `data_dir`.
    The runtime reads the images named in the selected committed manifests;
    acquisition does not regenerate or change those manifests.
 
-Existing archives are verified rather than downloaded again. A digest mismatch
-stops the command. To verify local archives without allowing any download, run:
+Existing archives are verified rather than downloaded again. If verification
+fails, stop and inspect the error; use a fresh external destination if you need
+to acquire another copy from the official source. To verify local archives
+without allowing any download, run:
 
 ```bash
 .venv/bin/python -m tasks.oxford_iiit_pet.tools.fetch_oxford_iiit_pet \
@@ -37,8 +40,8 @@ verified archives when their extraction directories do not already exist.
 The tool rejects destinations inside the executing `siderius-exp` checkout
 before creating directories or fetching data.
 
-The archive pins live in [the acquisition tool](../tools/fetch_oxford_iiit_pet.py).
-[PROVENANCE.md](../PROVENANCE.md) records their origin and the split derivation.
+[PROVENANCE.md](../PROVENANCE.md) records the archive sources, verification
+details and split derivation.
 
 ## Manifests and runtime ownership
 
@@ -50,8 +53,8 @@ The archive pins live in [the acquisition tool](../tools/fetch_oxford_iiit_pet.p
 | `manifests/gate2_train.csv` | 370 | Bounded training subset |
 | `manifests/gate2_validation.csv` | 74 | Bounded validation subset |
 | `manifests/gate2_final.csv` | 370 | Bounded final evaluation subset |
-| `manifests/SHA256SUMS` | — | Integrity pins for every committed CSV manifest |
-| `manifests/execution.json` | — | Transform specification and 37 class-covering tensor hashes |
+| `manifests/SHA256SUMS` | — | Verification record for the committed CSV manifests |
+| `manifests/execution.json` | — | Transform settings and reference checks covering all 37 classes |
 
 CSV columns are `image_id`, `class_index` (0–36), `official_class_id` (1–37)
 and `scope`. Each `image_id` names `images/<image_id>.jpg`. The training,

@@ -16,9 +16,10 @@ export DAVIS_DATA="/absolute/path/DAVIS_2017"
   --dest "$DAVIS_DATA" --no-download --check-layout
 ```
 
-This verifies the archive hash and checks the 90 committed sequence directories
-contain JPEGs. It does not download or modify your frames. A layout check alone
-does not verify every frame's contents or prove all task windows decode.
+This verifies the archive and checks that the 90 committed sequence directories
+contain JPEGs. Success prints `[verified]` and `[layout]` messages. It does not
+download or modify your frames. A layout check alone does not verify every
+frame's contents or prove all task windows decode.
 
 ## Acquire it on a new machine
 
@@ -31,10 +32,12 @@ environments and run outputs. If you do not already have it:
   --dest "$DAVIS_DATA" --extract --check-layout
 ```
 
-The helper verifies SHA-256 before extraction and refuses a destination inside
-the exp repository. It reuses a present archive; `--no-download` makes accidental
-network fetching an error. Existing extracted directories are not overwritten.
-Consult the recorded [source and data terms](../PROVENANCE.md) before reuse.
+The helper verifies the archive against the approved source before extraction
+and refuses a destination inside the exp repository. It reuses a present
+archive; `--no-download` makes accidental network fetching an error. Existing extracted directories are not overwritten.
+If verification fails, stop and inspect the error; use a fresh external
+destination if you need another copy from the official source. Consult the
+recorded [source and data terms](../PROVENANCE.md) before reuse.
 
 Expected layout:
 
@@ -53,8 +56,8 @@ DAVIS_DATA/
 | `manifests/gate2_train.csv` | First window of each of 60 Train sequences |
 | `manifests/gate2_validation.csv` | First window of each of 15 Validation sequences |
 | `manifests/gate2_final.csv` | First window of each of 15 reserved Final sequences |
-| `manifests/execution.json` | Frozen decoder settings and ten decoded-window hashes |
-| `manifests/SHA256SUMS` | Manifest integrity pins |
+| `manifests/execution.json` | Frozen decoder settings and reference checks for ten decoded windows |
+| `manifests/SHA256SUMS` | Manifest verification record |
 
 Each window has eight RGB context frames and four future target frames, resized
 to 128×224 and scaled to [0,1] by the task-owned

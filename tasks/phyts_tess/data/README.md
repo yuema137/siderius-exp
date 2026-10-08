@@ -18,7 +18,7 @@ whatever happens to sit in `--data_dir`.
 | `train` | 3,338 | 505 |
 | `val` | 442 | 64 |
 
-sha256 `b03b8872943b696ab3dc7a63a8579f5dec379c2bc0562ab1c613122e3cea50ad`
+The manifest's source and verification record are in [PROVENANCE.md](../PROVENANCE.md).
 
 The held-out **test** population (403 curves, 64 stars) has **no row and no
 target here**. Its targets are not committed anywhere in this repository.
