@@ -428,3 +428,30 @@ execution remains owned by the existing saved launcher.
 Missing data/fields produce setup and saved-config repair guidance. Out-of-range
 rows report the valid PREVIEW_ROW interval. These local-only checks do not
 require provider credentials or a GPU and do not replace launch preflight.
+
+## Saved quick-demo modification lesson
+
+`tutorials.paper.saved_demo` serves only the TESS/TIDMAD lesson after Quick C.
+`load_demo` reads the selected named JSON through `read_settings`, checks run
+identity and the existing literal launcher contract, and creates no files.
+`save_variant` revalidates the selected pair, merges explicit changes through
+the existing experiment model and derives a fresh run name/workspace. It checks
+JSON, script, workspace and sibling receipts/logs for collisions before writing
+a new JSON and calling the existing task launcher writer. Existing files are
+never overwritten; task trees are not copied or regenerated. Scientific/data
+validation and launch/reuse semantics remain with their existing owners.
+
+The opt-in notebook lesson preserves unedited saved fields, including TIDMAD's
+file-holdout composition/protocol and all fractions. Task/routing/data bindings
+remain shared references. SAVE_CHANGED_DEMO defaults to false. Saving selects
+the new pair for review and result-path display but never calls run_demo. Later
+sessions explicitly select SELECTED_DEMO_NAME with quick execution and saving
+disabled. Advanced paper-pool/split/final-test lessons retain their separate
+initializer baseline. No initial-creator, cache identity, archived result or
+paper scientific contract changes.
+
+Focused tests use different initializer and saved settings, execute the actual
+notebook selection/save/review cells, inspect rendered native commands and test
+read-only reopening plus existing-destination and invalid-change refusal. The
+lesson needs no additional live API/GPU run: execution is still the existing
+saved script, and the changed behavior is validated file selection/persistence.

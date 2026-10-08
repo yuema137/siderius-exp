@@ -105,6 +105,26 @@ The notebook prints absolute paths and lets you reopen the saved JSON. The
 quick demo is complete even if its scores are invalid; those points are hollow.
 A three-iteration run took about 35 minutes on our RTX 5090, including LLM work.
 
+## Change the quick demo without changing its split
+
+Immediately after Quick C, use **Change the demo you just ran**. It loads the
+saved quick-demo JSON and shows its current values. Set `SAVE_CHANGED_DEMO=True`
+once with a fresh `NEW_DEMO_NAME`; the example changes three iterations to four.
+The new JSON and script keep the existing file-holdout task, data, LLM routing,
+fractions, epochs and budgets. The task stays shared by reference; no file split
+is regenerated. The original inputs and results are retained.
+
+The cell selects the new pair and shows its paths, checklist and exact terminal
+preview/launch commands. **Saving does not start another run.** After launching
+that script, copy the printed workspace into Quick C's `PLOT_WORKSPACE` and
+execute only Quick C to plot the new results.
+
+On reopening the notebook, set `RUN_QUICK_DEMO=False`, set `SELECTED_DEMO_NAME`
+to your saved name and leave `SAVE_CHANGED_DEMO=False`. The selection reads the
+existing variant instead of rebuilding it from the initial paper-pool template.
+The exercises below deliberately start from that initial template and teach
+separate scientific choices; they do not change the quick-demo file holdout.
+
 ## Optional advanced examples: what files do my edits create?
 
 These examples save **different experiments** from the quick demo above. Use

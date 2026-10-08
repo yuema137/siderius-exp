@@ -360,6 +360,19 @@ runs its script, and Quick C plots the results. You can stop at the plot. You do
 not also need to run a terminal command. `RUN_QUICK_DEMO=False` skips API/GPU
 execution, but Quick A still saves inputs. Completed unchanged runs are reused.
 
+**Change the run you just saw:** TESS and TIDMAD add an optional **Change the
+demo you just ran** section immediately after Quick C. It reads that saved
+quick-demo JSON, changes three iterations to four and saves a fresh JSON/script/
+workspace pair. Other settings stay as saved, including TIDMAD's existing
+file-holdout task. The task remains shared by reference; this is not a new split.
+Set `SAVE_CHANGED_DEMO=True` once and choose a fresh name; review the selected
+files, then use its displayed terminal commands. Saving does not launch training.
+
+For a later notebook session, set `RUN_QUICK_DEMO=False`, select the saved name
+with `SELECTED_DEMO_NAME` in that section and leave `SAVE_CHANGED_DEMO=False`.
+To inspect results, set Quick C's `PLOT_WORKSPACE` to the printed run directory
+and execute only that plotting cell. Keep the original inputs/results intact.
+
 **Optional advanced/manual route:** continue below only when you want to save
 and launch a different example. Each has its own JSON, script and result folder;
 it does not change the quick demo you just ran.
