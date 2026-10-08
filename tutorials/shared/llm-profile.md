@@ -16,11 +16,11 @@ or budget fields are inserted into the JSON.
 
 ## Limits and boundaries
 
-`max_retries=1` is requested where the current workflow projects it. Tuner retry
-configuration comes from its planner and applies to the shared bridge. The
-literature owner does not forward leaf retry settings, so those fields are
-absent; no uniform retry-cap guarantee is made. Invalid-output repair and workflow
-round/attempt controls are distinct from transient provider retries. The profile
+Every route explicitly sets `max_retries=1`, meaning one initial attempt and no
+additional retry for transient provider status errors. The tuner reflector and
+literature search receive their own typed retry policies through the workflow;
+they do not silently inherit a different route's explicit limit. Timeout retries,
+invalid-output repair and workflow round/attempt controls are distinct. The profile
 is neither a campaign spending guard nor a training/workflow budget.
 
 Optional workflow stages remain controlled by experiment settings. External

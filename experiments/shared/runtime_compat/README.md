@@ -5,9 +5,9 @@ experiment's original timing rules. Ordinary tutorials use the framework's
 corrected default and do not need this package. Installing it changes no default.
 
 **Release qualification is in progress.** Offline timing and installation checks
-pass with infra `ec92186d`, including the historical prompt comparisons, but the
-standard exp installation does not yet install that candidate. Independent
-review and final release source pairing remain open.
+pass with the current paired infra `7d0d3214`, including the historical prompt
+comparisons. The optional historical packages still need the installation steps
+below. Independent review and public-source installation verification remain open.
 The commands below explain the installation procedure; they are not yet a
 ready-to-run public installation guide.
 
@@ -89,7 +89,7 @@ them. New measurements record the selected profile's identity.
 
 This package restores the tested timing decisions; it does not restore deleted
 artifacts or guarantee identical new LLM responses, trained weights or scores.
-The [technical contract](contract.md) and [qualification results](presentation-qualification.json)
+The [technical contract](contract.md) and [current qualification results](../../../provenance/validation/2026-10-08_release_luna_pair/receipt.json)
 list the original sources, test boundaries and remaining qualification.
 [Prompt adapters](../prompt_compat/README.md) and
 the [static estimator adapter](../preflight_compat/README.md) remain separate

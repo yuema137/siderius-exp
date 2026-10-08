@@ -146,8 +146,17 @@ comparison, not a complete execution-produced experiment record.
 The 47 separate original-reference request comparisons also match (94 system
 and user message bodies). Focused projection, refusal, existing storage/runtime
 presentation and verifier checks total 132 passing tests. Independent review and
-final release pairing remain pending; no future combined source is qualified by
-these checks against `ec92186d`.
+final release pairing were pending at that checkpoint; it does not qualify future
+combined sources by itself.
+
+The subsequent [release pair qualification](../../../provenance/validation/2026-10-08_release_luna_pair/receipt.json)
+checks infra `7d0d3214` explicitly. Its 17 runtime-verifier closure members are
+byte-identical to `ec92186d`; the changed bridge is bound by the planner's ten-file
+assembly and checked by the actual session-to-planner request comparisons.
+All 23 requests, 12 verifier branch oracles, eleven-unit bindings, 47 separate
+original prompt requests and 44 static historical routes pass. Prior receipts
+remain evidence of their own source checkpoints. See that receipt for exact
+installed identities, source hashes and remaining publication limitations.
 
 Infra owns generic native completion and boundary tests;
 exp owns historical selection and comparisons. Prompt equality is not proof of

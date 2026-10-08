@@ -67,10 +67,8 @@ def test_all_eleven_resolved_routes_select_luna(role, prefix):
     assert routing.tune.planner_strategy == "native-timing-v1"
 
 
-def test_profile_does_not_claim_unsupported_literature_retry_controls():
+def test_all_routes_project_the_explicit_transient_status_attempt_limit():
     data = json.loads(TEST_LLM_CONFIG.read_text())
-    assert "max_retries" not in data["lit_review"]["main"]
-    assert "max_retries" not in data["lit_review"]["search"]
     routing = WorkflowLLMConfig.model_validate(data)
     for role in (
         "interpret",
@@ -81,6 +79,9 @@ def test_profile_does_not_claim_unsupported_literature_retry_controls():
         "tune",
     ):
         assert routing.get(role)["max_retries"] == 1
+    assert routing.get("tune")["reflect_retry_policy"].max_retries == 1
+    assert routing.get("lit_review")["llm_max_retries"] == 1
+    assert routing.get("lit_review")["search_llm_retry_policy"].max_retries == 1
 
 
 @pytest.mark.parametrize("mode", ["match", "missing", "different"])

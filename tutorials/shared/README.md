@@ -33,9 +33,10 @@ fractions, attempts and training budgets in the saved experiment using your
 notebook's examples. Run the script's preview first. Starting the actual script
 or a notebook's live-demo cell makes paid API calls and performs training.
 
-Most routes request `max_retries: 1` for transient provider errors. Literature
-review currently does not forward that setting, so its entries omit it. Workflow
-repair attempts and failed rounds are separate controls. This JSON sets no dollar
+Every route sets `max_retries: 1`: one initial attempt for transient provider
+status errors such as 429 or 503, with no extra status-error retry. Tuning's
+reflector and literature search keep their own limits. Timeouts, invalid-output
+repair and failed workflow rounds are separate controls. This JSON sets no dollar
 ceiling or output-token limit and does not bound the total number of calls.
 Do not treat choosing Luna as permission for unbounded retries.
 
