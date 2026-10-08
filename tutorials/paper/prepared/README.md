@@ -25,10 +25,11 @@ first. Keep `EXP_CHECKOUT` and `INFRA_CHECKOUT` exported. Those commands clone
 [yuema137/SIDERIUS](https://github.com/yuema137/SIDERIUS), then select the locked
 infra revision. Each checkout must have its own frozen virtual environment.
 
-Use Linux, Python 3.12 and one RTX 5090 or H100 with working NVIDIA/CUDA access.
-H100 is supported by the guard but not locally tested. Other NVIDIA devices need
-the [hardware adaptation procedure](../README.md#6-change-settings-or-hardware-deliberately); AMD and
-Intel GPUs are unsupported. This fixed workflow has no separate coding-agent
+Use Linux, Python 3.12 and one visible GPU supported by the frozen installation
+and required accounting. Follow the [shared hardware instructions](../README.md#6-change-settings-or-hardware-deliberately)
+for optional name expectations, capacity checks and pending paired qualification.
+AMD/ROCm is experimental and untested; its missing driver accounting currently
+prevents these tutorial launches. Intel GPU training is unsupported. This fixed workflow has no separate coding-agent
 filesystem sandbox; generated models execute under your user account.
 
 ## 2. Create a separate project

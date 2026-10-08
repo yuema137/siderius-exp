@@ -29,13 +29,20 @@ Each checkout uses its own `.venv`. Pet explicitly selects the built-in
 both environments and rejects missing or mismatched providers. Unlike the four
 historical paper demos, Pet does not select a legacy planner plugin.
 
-An NVIDIA RTX 5090 or H100 with working CUDA is supported by this launcher.
-Run `nvidia-smi` first. For another NVIDIA GPU, save the previewed native command as a new script in
-your external project, install PyTorch/CUDA for that device, and explicitly set
-`--trial_vram_budget_gb` / `--formal_vram_budget_gb` below its physical VRAM.
-Qualify that separate launch adapter on the device before relying on it; the
-provided notebook launcher continues to refuse unsupported GPU names. Keep the
-source repositories unchanged. A device-name change alone is not a validated port. AMD and Intel GPUs are unsupported.
+The launcher uses the one visible logical GPU in the selected framework
+installation. Set `gpu` to `null` for automatic name selection, or keep a string
+as a required name expectation. NVIDIA models have no name whitelist. On a
+multi-GPU host, select one card with `CUDA_VISIBLE_DEVICES` before launch. Set
+Trial/Formal VRAM budgets below its capacity; the tiny kernel check does not
+prove a generated model will fit.
+
+AMD/ROCm compatibility is experimental and untested; required driver/process
+accounting is not implemented, so this tutorial currently refuses that path.
+Intel GPU and CPU training are unsupported. Keep the frozen installation and
+required protection intact; no ROCm installation profile is qualified here.
+This portability update awaits final paired source qualification and framework
+pin promotion. A framework missing the discovery API refuses launch rather than
+borrowing another checkout's environment.
 
 ## 2. Reuse images, or download once
 

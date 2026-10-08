@@ -80,7 +80,7 @@ def create_project(project: Path, infra: Path, task: Task):
         data_dir=project / "data/demo-001",
         workspace=project / "runs/initial-001",
         run_name=f"{task}_initial_001",
-        gpu="RTX 5090",
+        gpu=None,
         iterations=3,
         epochs=4,
         trial_train_fraction=0.5,

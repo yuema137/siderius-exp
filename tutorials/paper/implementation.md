@@ -24,8 +24,8 @@ provider requests.
 
 Preview requires the clean source pair and exact exp virtualenv, but no GPU,
 key or data. Launch checks key names only, validates staged curve keys and
-finite data, hashes both archives, probes the physical NVIDIA GPU and executes
-a CUDA allocation through infra's own Python. Root execution, unknown GPU,
+finite data, hashes both archives, and uses the [shared GPU setup adapter](../shared/gpu-runtime.md)
+through infra's own Python. Root execution, unavailable required GPU capabilities,
 insufficient headroom, existing workspace and nested source/data/output paths
 refuse before model calls. This is a trusted-user teaching tool, not a security
 sandbox or private evaluator.

@@ -20,14 +20,13 @@ def test_setup_collects_missing_inputs_without_exposing_secrets(tmp_path, monkey
         lambda _: {"OPENAI_API_KEY": False, "GEMINI_API_KEY": True},
     )
     monkeypatch.setenv("GEMINI_API_KEY", "do-not-print-this-secret")
-    monkeypatch.setattr("shutil.which", lambda _: None)
     with pytest.raises(ValueError) as error:
         require_ready(settings, task="tess")
     message = str(error.value)
     assert "OPENAI_API_KEY" in message
     assert "do-not-print-this-secret" not in message
     assert "tess_rotation_train.npz" in message and "tess_rotation_val.npz" in message
-    assert "nvidia-smi" in message and "uv sync" in message
+    assert "nvidia-smi" not in message and "uv sync" in message
     assert "Fix:" in message and "No API call or training was started" in message
 
 
