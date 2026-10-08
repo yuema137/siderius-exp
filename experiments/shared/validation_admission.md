@@ -28,11 +28,17 @@ the deployment and persist them with request/result evidence.
 
 ## Still required before deployment
 
-- Trusted epoch snapshot issuance, objective bundle assembly and file verification.
-- Bind the implemented review stages and protected publication to the actual launcher; the purpose verdict alone is insufficient.
-- Protected model/loss workers, with only allowed aggregate loss/status returned.
-- Native epoch-history integration, existing baseline candidate submission and
-  the requested real H100 smoke. Current unit tests do not qualify these paths.
+Epoch snapshot issuance, objective bundle assembly and verification, protected
+model/loss workers, and native epoch-history integration are implemented. The
+[concrete TIDMAD handler](#concrete-task-handler) has synthetic integration
+coverage; this does not qualify an installed service.
+
+Deployment must still establish protected job/cache directories, host accounts
+and installed sudo transitions, exact namespace/mount policy, live provider
+credential binding, baseline-equivalent execution policy, and the requested
+H100 workload and overhead witness. Preparation continues to record
+`launch_ready: false` and `pending_deployed_native_route`; a purpose verdict
+alone cannot make the deployment launchable.
 
 ## Repeated validation cost
 
@@ -660,11 +666,13 @@ research command itself. Native arguments and original cwd remain untrusted;
 the handler owns source/input capture, task admission, model/loss review,
 namespace/UID selection, execution and complete process-group cleanup.
 
-The current tests establish caller refusal, policy permissions, deadline
+The launcher tests establish caller refusal, policy permissions, deadline
 preservation and real child-process dispatch/environment replacement. They do
-not establish an installed sudo transition or a completed task handler. Do not
-install/grant this wrapper until the configured task handler is implemented and
-qualified. Fixed workflow and the existing baseline scorer are unchanged.
+not establish an installed sudo transition or deployment qualification of the
+configured task handler. The concrete TIDMAD handler and its synthetic coverage
+are described below. Installation still requires the host-identity and policy
+qualification described there; do not grant this wrapper before that
+qualification. Fixed workflow and the existing baseline scorer are unchanged.
 
 `AdmissionProbeRuntime.loss_selection` runs native name lookup in a confined
 fresh process with operator-staged loss directories and an optional finite
