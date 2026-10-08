@@ -69,6 +69,13 @@ def selected_split(settings: TidmadExperiment) -> FileSplit | None:
     )
 
 
+def workflow_files() -> tuple[Path, Path]:
+    return (
+        ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json",
+        ROOT / "experiments/tidmad/information_treatments/main-fixed-no-prior.yaml",
+    )
+
+
 def build_command(settings: TidmadExperiment) -> list[str]:
     split = selected_split(settings)
     literature = (
@@ -79,11 +86,11 @@ def build_command(settings: TidmadExperiment) -> list[str]:
     health_files = (
         "0-3" if split is None else ",".join(map(str, sorted(split.validation_files)))
     )
+    workflow, treatment = workflow_files()
     return shared_command(
         settings,
-        workflow=ROOT / "experiments/tidmad/main_fixed_workflow/workflow.json",
-        treatment_path=ROOT
-        / "experiments/tidmad/information_treatments/main-fixed-no-prior.yaml",
+        workflow=workflow,
+        treatment_path=treatment,
     ) + [
         "--data_scope",
         "0-3",

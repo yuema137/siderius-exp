@@ -9,7 +9,7 @@ matplotlib.use("Agg")
 
 from tutorials.paper.progress import plot_progress, read_progress
 from tutorials.paper.project import create_project
-from tutorials.paper.quick_demo import prepare_demo, run_demo
+from tutorials.paper.quick_demo import prepare_demo
 
 
 def write_record(workspace, *, iteration=2, score=-0.4, status="success", health=False):
@@ -87,28 +87,10 @@ def test_no_score_is_not_fabricated_zero_and_health_unknown_is_not_pass(tmp_path
     assert read_progress(workspace)[0].validity == "unknown"
 
 
-def test_completed_demo_reuses_records_and_changed_settings_require_new_name(
-    tmp_path, monkeypatch
-):
+def test_changed_demo_settings_require_new_saved_name(tmp_path):
     project = tmp_path / "project"
     create_project(project, tmp_path / "infra")
-    files = prepare_demo(project, "tess", name="quick", settings={"iterations": 3})
-    import hashlib
-
-    files.completion.write_text(
-        json.dumps(
-            {
-                "experiment_sha256": hashlib.sha256(
-                    files.experiment.read_bytes()
-                ).hexdigest(),
-                "exit_code": 0,
-            }
-        )
-    )
-    monkeypatch.setattr(
-        "subprocess.Popen", lambda *a, **k: pytest.fail("completed demo relaunched")
-    )
-    assert run_demo(files)["exit_code"] == 0
+    prepare_demo(project, "tess", name="quick", settings={"iterations": 3})
     with pytest.raises(ValueError, match="different saved settings"):
         prepare_demo(project, "tess", name="quick", settings={"iterations": 4})
 

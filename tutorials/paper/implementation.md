@@ -289,11 +289,67 @@ No new paid model search was needed for these presentation changes.
 experiment schema, saves a uniquely named external JSON/script, and refuses a
 same-name settings change. TIDMAD uses a separate copied file-holdout task.
 `run_demo` delegates to the saved bash launcher after key/presence/binding review,
-logs outside source, and records completion plus experiment digest. Completed
-runs are reused; interrupted/existing unreceipted runs require inspection and
-a new name, not automatic resume. Kernel interruption terminates its owned child
+logs outside source, and records a versioned local-input identity with completion.
+Only matching completed runs with an existing workspace are reused;
+interrupted/existing unreceipted runs require inspection and a new name, not
+automatic resume. Kernel interruption terminates its owned child
 process group. Nonzero chain exits remain visible; plotted failure records do
 not become successful scientific results.
+
+### Completed-demo reuse identity
+
+`result_identity.DemoCompletion` owns the `paper-demo-completion-v2` notebook
+receipt boundary. The saved experiment is reloaded through its task-specific
+schema before reuse. Its workspace must match `DemoFiles.workspace`; a receipt
+must name that same existing directory. This is local cache reuse, not training
+resume, scientific provenance or fresh source/GPU qualification.
+
+`input_identity` hashes the saved experiment, shell script, selected LLM routing,
+and every regular file in the selected task package (the directory above
+`compositions/`), excluding `__pycache__` and `.pyc`. Prepared Project8/LIGO also
+include their copied sibling `tasks/shared/` adapter files and the selected
+`literature_config`. TIDMAD's literature YAML is already inside its task tree.
+The task runner's `workflow_files` owner supplies the actual fixed workflow and
+information-treatment paths to both command construction and hashing. Absolute
+selected paths, resolved file targets and contents enter the digest; additions,
+deletions and byte edits change it. This deliberately conservative package
+identity may invalidate reuse after a task README edit too.
+
+Both source checkout paths, Git HEAD revisions and tracked working-tree diffs
+against HEAD are included. Even an unrelated tracked source edit or a new
+source commit requires a fresh demo name rather than relabeling an old run.
+Untracked checkout files, installed dependencies, environment variables,
+provider/account state, external raw data and result contents are not hashed.
+Data identity declarations inside the task are included; rehashing dataset bytes
+remains launch preflight's responsibility. This helper covers the standard
+initialized package layout, not arbitrary external imports, directory symlink
+closures or a forensic replay of all runtime dependencies. Its Git/file reads do
+not execute task plugins, import the selected framework checkout, contact a
+provider, require credentials, or perform native composition/GPU preflight.
+
+New runs capture the identity before launch checks, verify it again immediately
+before spawning the saved script, and compare after child exit. An observed
+mid-run change or unreadable input writes `inputs_unchanged=false` beside the
+real exit code and elapsed time. That receipt never permits automatic reuse,
+even if the old bytes are later restored. These snapshots do not lock mutable
+files or detect a change restored entirely between snapshots. Concurrent editing
+of launch inputs is unsupported; a changed run remains evidence for inspection,
+not a newly qualified experiment.
+
+Old experiment-only receipts and malformed receipts refuse reuse with explicit
+read-only plotting and new-name guidance. They are never upgraded, overwritten,
+or treated as authorization to run again. Missing input files or result workspace
+also refuse without invoking launch checks or the script. All original records
+remain available: select `PLOT_WORKSPACE` in TESS/TIDMAD or `PLOT_EXPERIMENT` in
+Project8/LIGO and execute only the plotting cell. A valid unchanged v2 receipt
+with a nonzero script exit remains reusable for inspecting recorded scores; its
+exit code is printed and preserved, never converted into a successful search.
+
+Focused regressions drive actual `run_demo` decisions using initialized external
+projects and a fake saved-script process. They cover all four task routes, linked
+input changes, bytecode exclusion, missing/mismatched workspace, legacy/malformed
+receipts, unchanged no-preflight reuse, nonzero outcomes, and preflight/mid-run
+edits. These deterministic witnesses do not qualify paid or GPU execution.
 
 `progress.read_progress` validates native HyperparamTuningOutput, uses outer
 chain `iter_NNN` as x, keeps Formal records only, and reads `metric_result.scalar`

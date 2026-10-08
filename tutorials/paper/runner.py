@@ -131,14 +131,22 @@ def validate_locations(settings: TutorialExperiment) -> None:
                 )
 
 
+def workflow_files() -> tuple[Path, Path]:
+    """The fixed workflow and treatment consumed by this tutorial runner."""
+    return WORKFLOW, TREATMENT
+
+
 def build_command(
     settings: TutorialExperiment,
     *,
-    workflow: Path = WORKFLOW,
-    treatment_path: Path = TREATMENT,
+    workflow: Path | None = None,
+    treatment_path: Path | None = None,
 ) -> list[str]:
     """Reuse production workflow/treatment renderers, overriding only demo knobs."""
     validate_locations(settings)
+    default_workflow, default_treatment = workflow_files()
+    workflow = workflow if workflow is not None else default_workflow
+    treatment_path = treatment_path if treatment_path is not None else default_treatment
     args = render_siderius_args(
         workflow, repository_root=ROOT, siderius_checkout=settings.infra_checkout
     )

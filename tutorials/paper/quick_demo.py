@@ -14,6 +14,11 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
+from tutorials.paper.result_identity import (
+    DemoCompletion,
+    input_identity,
+    read_settings,
+)
 from tutorials.paper.runner import ROOT, TutorialExperiment, disjoint
 
 
@@ -109,28 +114,67 @@ def run_demo(files: DemoFiles) -> dict:
     require inspection rather than silent retry or process adoption.
     """
     from tutorials.paper.launch_review import launch_review
-    from tutorials.paper.tidmad.runner import TidmadExperiment
 
-    sha = hashlib.sha256(files.experiment.read_bytes()).hexdigest()
+    recovery = (
+        "Nothing was relaunched. Keep the old records and plot them directly using "
+        "PLOT_WORKSPACE (TESS/TIDMAD) or PLOT_EXPERIMENT (Project8/LIGO); "
+        "choose a new DEMO_NAME for a new run."
+    )
+    try:
+        settings = read_settings(files.experiment, files.task)
+    except (OSError, ValueError) as error:
+        guidance = (
+            recovery
+            if files.completion.exists()
+            else "No script was launched. Reload Quick A after repairing the saved configuration."
+        )
+        raise ValueError(
+            f"Cannot read the saved experiment {files.experiment} "
+            f"({type(error).__name__}). Restore its original JSON or repair its "
+            "configuration before using it, including for PLOT_EXPERIMENT. " + guidance
+        ) from None
+    if settings.workspace.resolve() != files.workspace.resolve():
+        raise ValueError("saved experiment and demo workspace disagree; reload Quick A")
     if files.completion.exists():
-        result = json.loads(files.completion.read_text())
-        if result["experiment_sha256"] != sha:
+        try:
+            completed = DemoCompletion.model_validate_json(files.completion.read_text())
+        except ValueError:
             raise ValueError(
-                "saved experiment changed since execution; choose a new DEMO_NAME"
+                "Old or invalid completion receipt cannot establish unchanged inputs. "
+                + recovery
+            ) from None
+        if completed.workspace.resolve() != files.workspace.resolve():
+            raise ValueError("Completion belongs to a different workspace. " + recovery)
+        if not files.workspace.is_dir():
+            raise ValueError(
+                "Completed workspace is missing; restore it first. " + recovery
             )
+        if not completed.inputs_unchanged:
+            raise ValueError("Inputs changed during the recorded run. " + recovery)
+        try:
+            identity = input_identity(
+                files.experiment, files.script, settings, task=files.task
+            )
+        except (OSError, ValueError, subprocess.SubprocessError):
+            raise ValueError(
+                "Cannot verify the recorded run's local inputs. " + recovery
+            ) from None
+        if completed.input_sha256 != identity:
+            raise ValueError("Saved inputs changed since execution. " + recovery)
         print(f"Reusing recorded run (no API/GPU work): {files.workspace}", flush=True)
-        return result
+        if completed.exit_code != 0:
+            print(
+                f"Recorded script exit code: {completed.exit_code}. Inspect {completed.log}; "
+                "recorded scores remain available for plotting.",
+                flush=True,
+            )
+        return completed.model_dump(mode="json")
     if files.workspace.exists() or files.log.exists():
         raise ValueError(
             f"Unfinished/existing run: inspect {files.log}; choose a new DEMO_NAME after stopping any active run. Nothing was relaunched."
         )
-    if files.task in ("project8", "ligo"):
-        from tutorials.paper.prepared.runner import PreparedExperiment
-
-        schema = PreparedExperiment
-    else:
-        schema = TidmadExperiment if files.task == "tidmad" else TutorialExperiment
-    settings = schema.model_validate_json(files.experiment.read_text())
+    sha = hashlib.sha256(files.experiment.read_bytes()).hexdigest()
+    identity = input_identity(files.experiment, files.script, settings, task=files.task)
     from tutorials.paper.preflight import require_ready
 
     require_ready(settings, task=files.task)
@@ -148,6 +192,10 @@ def run_demo(files: DemoFiles) -> dict:
         raise ValueError(
             "Complete the saved-file/data checklist above before running the demo."
         )
+    if identity != input_identity(
+        files.experiment, files.script, settings, task=files.task
+    ):
+        raise ValueError("Inputs changed during launch checks. " + recovery)
     started = time.monotonic()
     files.log.parent.mkdir(parents=True, exist_ok=True)
     # Native launcher repeats source/data/GPU/credential checks before effects.
@@ -181,15 +229,30 @@ def run_demo(files: DemoFiles) -> dict:
                 os.killpg(process.pid, signal.SIGKILL)
                 process.wait()
             raise
-    result = {
-        "experiment_sha256": sha,
-        "exit_code": code,
-        "elapsed_seconds": time.monotonic() - started,
-        "workspace": str(files.workspace),
-        "log": str(files.log),
-    }
+    try:
+        unchanged = identity == input_identity(
+            files.experiment, files.script, settings, task=files.task
+        )
+    except (OSError, ValueError, subprocess.SubprocessError):
+        unchanged = False
+    completed = DemoCompletion(
+        input_sha256=identity,
+        experiment_sha256=sha,
+        inputs_unchanged=unchanged,
+        exit_code=code,
+        elapsed_seconds=time.monotonic() - started,
+        workspace=files.workspace,
+        log=files.log,
+    )
+    result = completed.model_dump(mode="json")
     with files.completion.open("x") as stream:
-        json.dump(result, stream, indent=2)
+        stream.write(completed.model_dump_json(indent=2))
+    if not unchanged:
+        print(
+            "Inputs changed or became unavailable during execution; this receipt "
+            "cannot be reused. Keep the recorded scores for direct plotting.",
+            flush=True,
+        )
     print(f"Search exit code: {code}. Evidence: {files.completion}", flush=True)
     if code != 0:
         print(
