@@ -23,13 +23,9 @@ recorded example. Choose by your data and prediction problem.
 
 ## Follow this sequence
 
-```mermaid
-flowchart LR
-    A[Choose a task] --> B[Set up an external project]
-    B --> C[Save and check configuration]
-    C --> D[Run the saved script]
-    D --> E[Inspect records and plot]
-```
+<p align="center">
+  <img src="../docs/assets/tutorial-sequence.svg" width="80%" alt="Choose a task, set up an external project, save and check settings, run the saved script, then inspect records and plot.">
+</p>
 
 1. **Browse the example.** Notebook pictures and plots show the data and a
    recorded run. Their provenance is documented; they are not your results.

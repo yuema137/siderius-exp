@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIDERIUS tutorial: five steps from task to results</title>
+  <style>
+    @page { size: 960px 208px; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #fff; }
+    body { font-family: Arial, Helvetica, sans-serif; color: #22313e; }
+    .figure { position: relative; width: 960px; height: 208px; }
+    .steps { position: absolute; top: 16px; left: 32px; display: flex;
+      gap: 24px; margin: 0; padding: 0; list-style: none; }
+    .card { position: relative; width: 160px; height: 176px; padding: 14px 12px 14px 17px;
+      border: 1.5px solid #d2dee7;
+      border-radius: 12px; background: var(--fill); }
+    .card::before { content: ""; position: absolute; top: -1.5px; bottom: -1.5px;
+      left: -1.5px; width: 6px; border-radius: 6px; background: var(--accent); }
+    .step { display: block; margin-bottom: 14px; color: #405363;
+      font-size: 18px; font-weight: 700; }
+    .card h2 { margin: 0; font-size: 22px; line-height: 1.2; }
+    .task { --accent: #9e50ca; --fill: #f5effa; }
+    .project { --accent: #13b59c; --fill: #eaf8f5; }
+    .settings { --accent: #2b8ed0; --fill: #eaf4fc; }
+    .script { --accent: #34495e; --fill: #f3f6f9; }
+    .results { --accent: #f4a318; --fill: #fff4e4; }
+    .connections { position: absolute; inset: 0; width: 960px; height: 208px; }
+    @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <main class="figure" aria-label="Five tutorial steps, from left to right.">
+    <svg class="connections" viewBox="0 0 960 208" aria-hidden="true">
+      <defs>
+        <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#849195"/>
+        </marker>
+      </defs>
+      <g fill="none" stroke="#849195" stroke-width="2" marker-end="url(#arrow)">
+        <path d="M194 104 H212"/>
+        <path d="M378 104 H396"/>
+        <path d="M562 104 H580"/>
+        <path d="M746 104 H764"/>
+      </g>
+    </svg>
+    <ol class="steps">
+      <li class="card task"><span class="step">01</span><h2>Choose<br>a task</h2></li>
+      <li class="card project"><span class="step">02</span><h2>Set up an<br>external<br>project</h2></li>
+      <li class="card settings"><span class="step">03</span><h2>Save and<br>check<br>settings</h2></li>
+      <li class="card script"><span class="step">04</span><h2>Run the<br>saved<br>script</h2></li>
+      <li class="card results"><span class="step">05</span><h2>Inspect<br>records<br>and plot</h2></li>
+    </ol>
+  </main>
+</body>
+</html>
