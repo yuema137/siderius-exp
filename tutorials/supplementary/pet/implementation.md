@@ -42,3 +42,35 @@ split isolation, missing/overlapping inputs and output alias refusal. Offline
 notebook execution covers saved-file review and delegation setup. A bounded real
 three-iteration qualification must establish actual generated-model execution,
 recorded scoring/Health transport and visual output before claiming real completion.
+
+
+## Saved experiment handoff
+
+The notebook requires `TUTORIAL_HOME/project.json` and the bound exp kernel,
+independent of cwd. README setup registers the kernel externally and opens
+Jupyter at the project root. Default Run All reloads `SELECTED_EXPERIMENT` and
+never overlays tutorial literals onto its saved JSON.
+
+`project.save_variant` validates the selected external JSON with `PetExperiment`,
+merges explicit changes and assigns the same fresh name to experiment/script/run
+paths. It refuses existing JSON, script or workspace. Originals remain untouched;
+I/O failure may leave a partial new pair requiring a new name or manual inspection.
+Saving is opt-in. After saving once, disable the switch and select that saved
+name for subsequent notebook passes. The optional resplit retains its existing
+seed/stratification/final preservation and saves its changed composition through
+this separate-pair handoff rather than replacing the parent experiment.
+
+`project.validate_launcher` checks exactly one literal absolute `EXPERIMENT` and
+`EXP_CHECKOUT` assignment plus the generated Pet runner exec line. Both saved-file
+review and `run_demo` call it before data inspection or execution/reuse effects.
+It catches mismatched saved inputs; it is not a parser or safety certificate for
+arbitrary shell code. Execution still belongs to the saved script and existing
+runner. Pet's existing cache and timeout semantics are unchanged.
+
+`PLOT_EXPERIMENT` and `PLOT_OUTPUT` select saved results independently of the live
+launch flag. Only the plotting cell needs to execute to replot an existing run;
+it reads the saved workspace and native score records, with no launch/preflight.
+`RUN_NATIVE_PREVIEW=False` disables the notebook's native preview for an explicitly
+offline file walkthrough; it does not disable saved-launcher checks on real runs.
+The source notebook's archived outputs and separate gallery retain their original
+provenance. Initialized copies still clear all code outputs.

@@ -22,16 +22,17 @@ paths with your own absolute paths throughout these instructions.
 git clone https://github.com/yuema137/siderius-exp.git /absolute/path/siderius-exp
 git clone https://github.com/yuema137/SIDERIUS.git /absolute/path/SIDERIUS
 cd /absolute/path/siderius-exp
-uv sync --group dev --group tutorial --frozen
+uv sync --python 3.12 --group dev --group tutorial --frozen
 git -C /absolute/path/SIDERIUS checkout "$(cat SIDERIUS_REVISION)"
 cd /absolute/path/SIDERIUS
-uv sync --group dev --frozen
+uv sync --python 3.12 --group dev --frozen
 ```
 
 Each checkout uses its own `.venv`. Pet explicitly selects the built-in
 `native-timing-v1` planner. Preflight compares the planner identities resolved in
-both environments and rejects missing or mismatched providers. Unlike the four
-historical paper demos, Pet does not select a legacy planner plugin.
+both environments and rejects missing or mismatched providers. All five fresh
+tutorial projects select this native planner; archived paper treatments retain
+their historical settings. Model routing and historical replay are separate choices.
 
 The launcher uses the one visible logical GPU in the selected framework
 installation. Set `gpu` to `null` for automatic name selection, or keep a string
@@ -103,14 +104,28 @@ set +a`. Never put key values in the notebook, JSON, shell script or repository.
 Preflight reports only key names and whether they are present; authentication is
 not proved until the service accepts a request.
 
-Start Jupyter from the copied notebook directory, using the exp interpreter:
+Register the exact exp kernel and start Jupyter at your project root. This makes
+`notebooks/`, `experiments/`, `tasks/` and `scripts/` visible in one file browser.
+Run these commands in the same terminal where you exported keys:
 
 ```bash
-cd /absolute/path/my-pet-project/notebooks
-/absolute/path/siderius-exp/.venv/bin/python -m jupyterlab
+export EXP_CHECKOUT="/absolute/path/siderius-exp"
+export TUTORIAL_HOME="/absolute/path/my-pet-project"
+"$EXP_CHECKOUT/.venv/bin/python" -m ipykernel install \
+  --prefix "$TUTORIAL_HOME/.jupyter" --name siderius-pet \
+  --display-name "SIDERIUS Pet tutorial"
+export JUPYTER_PATH="$TUTORIAL_HOME/.jupyter/share/jupyter${JUPYTER_PATH:+:$JUPYTER_PATH}"
+export IPYTHONDIR="$TUTORIAL_HOME/.ipython"
+export MPLCONFIGDIR="$TUTORIAL_HOME/.matplotlib"
+export JUPYTER_RUNTIME_DIR="$TUTORIAL_HOME/.jupyter/runtime"
+cd "$TUTORIAL_HOME"
+"$EXP_CHECKOUT/.venv/bin/jupyter" lab --ServerApp.root_dir="$TUTORIAL_HOME"
 ```
 
-Select that environment's Python kernel. The notebook checks the interpreter.
+Open `notebooks/pet_tutorial.ipynb` and select **SIDERIUS Pet tutorial**. The
+notebook reads `TUTORIAL_HOME/project.json` and checks the exact interpreter;
+it does not infer the project from the kernel's current directory. If keys or
+`TUTORIAL_HOME` change later, restart the Jupyter server from this terminal.
 
 ## 4. Edit, review, then run
 
@@ -120,6 +135,26 @@ tuner rounds, 32-epoch ceilings, Trial training/validation fractions of 0.5,
 Formal fractions of 1.0, Trial/Formal time ceilings of 2/5 minutes and 8 GiB VRAM.
 These are demo settings, not framework defaults or expected runtimes.
 
+Default Run All **reads your saved JSON without rewriting its settings**. Keep
+`SAVE_VARIANT=False` for the initial run. To adjust the initial run before launch,
+edit `experiments/pet-demo.json` in Jupyter and rerun the inspection cell.
+To preserve an earlier run, set `SAVE_VARIANT=True`, choose a fresh name such as
+`pet-more-001`, and set `CHANGES={"iterations": 4}`. This creates:
+
+```text
+experiments/pet-more-001.json      new settings; original JSON retained
+scripts/run-pet-more-001.sh        reads that exact JSON
+runs/pet-more-001/                 created only by launching that script
+```
+
+The remaining cells select this new pair. After saving once, set
+`SAVE_VARIANT=False` and set `SELECTED_EXPERIMENT="pet-more-001"` in the first
+cell before the next Run All. Reusing a save name is refused. Review and launch
+both verify the script's literal experiment, exp-checkout and runner bindings.
+The check detects an accidentally mismatched script; it does not certify arbitrary
+shell code. The optional split exercise also saves a separate named experiment
+and script, preserving the original files.
+
 There are 370 training, 74 validation and 370 independent final images. Validation
 feeds the agent; final is not run here. Pet requires `train_portion=1`, disabling additional per-epoch subsampling.
 Trial/Formal fractions choose the attempt scope first. The generated training
@@ -127,7 +162,10 @@ configuration still controls batching; `drop_last=True` omits an incomplete last
 batch. Inspect its saved config and loader counts for exact samples per epoch. The optional notebook resplit example saves a **new** task with
 333 training and 111 validation images while preserving final membership.
 
-Before the first run, inspect all saved values and execute this preview:
+For the **initial `pet-demo.json` experiment**, inspect all saved values and
+execute the preview below. If you selected a named variant, use the exact
+preview/launch commands printed by the notebook review instead; `run-pet.sh`
+continues to select the initial JSON.
 
 ```bash
 bash /absolute/path/my-pet-project/scripts/run-pet.sh
@@ -142,7 +180,12 @@ an error before execution. To also check native launcher argument parsing:
 bash /absolute/path/my-pet-project/scripts/run-pet.sh --dry-run
 ```
 
-Then either use Run All in the notebook or execute the **same saved script**:
+For that initial experiment, either use Run All with
+`SELECTED_EXPERIMENT="pet-demo"` or execute the same `run-pet.sh` below.
+For a variant such as `pet-more-001`, run its reviewed
+`scripts/run-pet-more-001.sh --launch` command instead.
+
+Initial experiment launch:
 
 ```bash
 bash /absolute/path/my-pet-project/scripts/run-pet.sh --launch
@@ -159,17 +202,27 @@ execution checks still apply.
 
 ## 5. Read your results and rerun deliberately
 
-The notebook plots Formal scores from `runs/pet_demo_001/`. Filled points passed
+The initial experiment stores Formal scores under `runs/pet_demo_001/`.
+Named variants use their own saved workspace; the plot cell reads the selected
+`PLOT_EXPERIMENT` JSON. Filled points passed
 recorded Health checks, hollow points have scores but failed checks, and attempts
 without scores remain unscored. No Health PASS or high accuracy is required to
 teach this workflow. A run with no measured Formal scores cannot produce a
 meaningful score chart; inspect the log instead of treating it as zero accuracy.
 
-`plots/pet_demo_001/` receives `score-versus-iteration.png`, `.svg` and `.csv`.
+For the initial experiment, `plots/pet_demo_001/` receives `score-versus-iteration.png`, `.svg` and `.csv`.
 The notebook reuses a completed run only while all saved task/config/script inputs
-match its receipt. To change parameters and run again, save a new `run_name` and
-`workspace` in the experiment JSON. Keep the previous files for comparison.
+match its receipt. To change parameters and run again, use the named save-as exercise above.
+It sets the new run name and workspace together and retains earlier JSON/scripts.
 Interrupted directories are not silently resumed.
+
+For plotting only, set `PLOT_EXPERIMENT` to the saved JSON for the run you want
+and choose `PLOT_OUTPUT`, then execute only the final plotting cell. This does
+not invoke the launch cell and works with `RUN_QUICK_DEMO=False`. A missing
+workspace produces guidance; a workspace without measured Formal scores reports
+that condition instead of drawing zero accuracy. For offline file editing, set
+both `RUN_NATIVE_PREVIEW=False` and `RUN_QUICK_DEMO=False`; local data inspection
+still requires the declared images.
 
 ## Recorded example
 

@@ -15,6 +15,7 @@ import psutil
 
 from tutorials.shared.progress import plot_progress, read_progress
 from tutorials.supplementary.pet.data import inspect_data, read_splits
+from tutorials.supplementary.pet.project import validate_launcher
 from tutorials.supplementary.pet.settings import PetExperiment
 
 
@@ -37,6 +38,7 @@ def input_digest(experiment: Path, script: Path) -> str:
 def review(experiment: Path, script: Path) -> str:
     """Show every saved setting and each exact command before execution."""
     settings = PetExperiment.model_validate_json(experiment.read_text())
+    validate_launcher(experiment, script)
     reports = inspect_data(settings.composition, settings.data_dir)
     values = "\n".join(
         f"| `{key}` | `{value}` |"
@@ -79,6 +81,7 @@ def run_demo(experiment: Path, script: Path, *, timeout_seconds: float = 3600) -
     Real validation uses a separately qualified operator budget guard.
     """
     settings = PetExperiment.model_validate_json(experiment.read_text())
+    validate_launcher(experiment, script)
     workspace = settings.workspace
     completion = workspace.with_suffix(".notebook-run.json")
     log_path = workspace.with_suffix(".console.log")

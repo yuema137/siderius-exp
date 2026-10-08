@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shlex
 import shutil
 from pathlib import Path
@@ -30,6 +31,68 @@ def write_launcher(destination: Path, experiment: Path) -> None:
     with destination.open("x") as stream:
         stream.write(source)
     destination.chmod(0o755)
+
+
+def validate_launcher(experiment: Path, script: Path) -> None:
+    """Check the literal saved-file handoff before review or delegation.
+
+    This checks generated-script bindings, not arbitrary shell-code safety.
+    """
+    lines = script.read_text().splitlines()
+    for key, expected in (("EXPERIMENT", experiment.resolve()), ("EXP_CHECKOUT", ROOT)):
+        assignments = [
+            line.split("=", 1)[1] for line in lines if line.startswith(key + "=")
+        ]
+        if len(assignments) != 1:
+            raise ValueError(f"launcher must have one literal {key} binding")
+        values = shlex.split(assignments[0])
+        if (
+            len(values) != 1
+            or not Path(values[0]).is_absolute()
+            or Path(values[0]).resolve() != expected
+        ):
+            raise ValueError(
+                f"launcher {key} does not match the selected saved experiment/checkout"
+            )
+    entry = (
+        'exec "$EXP_CHECKOUT/.venv/bin/python" -B -m tutorials.supplementary.pet.runner '
+        '--experiment "$EXPERIMENT" "$@"'
+    )
+    if entry not in lines:
+        raise ValueError("launcher is not the Pet tutorial runner")
+
+
+def save_variant(
+    project: Path, source: Path, *, name: str, changes: dict
+) -> tuple[Path, Path]:
+    """Save a new external JSON/script pair without replacing an earlier experiment."""
+    project, source = project.resolve(), source.resolve()
+    settings = PetExperiment.model_validate_json(source.read_text())
+    if source.parent != project / "experiments" or any(
+        not disjoint(project, path)
+        for path in (ROOT, settings.infra_checkout, settings.data_dir)
+    ):
+        raise ValueError("save variants inside your initialized external project")
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,60}", name):
+        raise ValueError("choose a short filename-safe variant name")
+    experiment = project / "experiments" / f"{name}.json"
+    script = project / "scripts" / f"run-{name}.sh"
+    changed = PetExperiment.model_validate(
+        {
+            **settings.model_dump(),
+            **changes,
+            "run_name": name,
+            "workspace": project / "runs" / name,
+        }
+    )
+    if any(p.exists() for p in (experiment, script, changed.workspace)):
+        raise ValueError(
+            "choose a new variant name; existing files and results are never overwritten"
+        )
+    with experiment.open("x") as stream:
+        stream.write(changed.model_dump_json(indent=2) + "\n")
+    write_launcher(script, experiment)
+    return experiment, script
 
 
 def create_project(project: Path, infra: Path, images: Path) -> Path:
