@@ -1,0 +1,9 @@
+siderius-runtime-compat
+
+Frozen adaptive-verifier and steady-state sources originate from the SIDERIUS
+project, maintained by its contributors. Exact original Git revisions, source
+paths and hashes are recorded in src/siderius_runtime_compat/source-inventory.json.
+The sole source relocation changes the adaptive modules' steady-state import
+so each profile uses its frozen detector. No numerical or stopping algorithm
+is modified in those frozen files. These sources are distributed under the
+repository's MIT license. Original source comments and attributions are retained.

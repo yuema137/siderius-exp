@@ -15,6 +15,7 @@ shared responsibility.
 | Compare historical planner inputs | [Planner compatibility](planner_compat/README.md) |
 | Compare other historical agent messages | [Prompt compatibility](prompt_compat/README.md) |
 | Select historical resource formulas | [Preflight compatibility](preflight_compat/README.md) |
+| Preserve historical timing decisions | [Runtime compatibility](runtime_compat/README.md) |
 
 Compatibility checks have their own framework-version requirements. They do not
 change the repository dependency pin or reconstruct a complete paper result.
