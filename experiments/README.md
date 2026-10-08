@@ -1,5 +1,10 @@
 # Experiments
 
+For a first hands-on run, start with the [tutorial index](../tutorials/README.md).
+This directory includes reusable treatments, qualification scripts and historical
+records with different source pins. A directory or a profile named `demo` is not
+by itself a ready-to-run beginner tutorial; follow the selected entry's guide.
+
 Start here when you have selected a task and need one concrete treatment.
 For a first run, choose one of the [five notebook demos](../tutorials/README.md):
 the four paper-task demos or supplementary Pet. They are simplified examples,
