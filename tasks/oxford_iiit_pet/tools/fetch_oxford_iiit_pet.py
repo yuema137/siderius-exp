@@ -1,11 +1,9 @@
-"""Fetch/verify the official Oxford-IIIT Pet archives (D14-2 C1).
+"""Fetch and verify the official Oxford-IIIT Pet archives outside the repository.
 
-The pack's committed lifecycle (`examples/oxford_iiit_pet/data/README.md`,
-roadmap §22.23.10) is the authority: the archives and the extracted images
-live in an OPERATOR-SUPPLIED machine-local directory OUTSIDE the tree; the
-tracked tree carries only the pins. The machine-local root then reaches the
-framework as the seam's existing ``data_dir`` (child design §2.1) — this
-tool never writes inside the repository.
+See ``tasks/oxford_iiit_pet/data/README.md`` for acquisition instructions.
+Archives and extracted data live in an operator-supplied external directory;
+the tracked task carries identity manifests and pins. Pass the extracted
+``images/`` directory as the runtime's ``data_dir``.
 
 Pins are module constants — the executable authority; ``PROVENANCE.md``
 documents the same values for a human reader. The images pin was recorded at
@@ -13,10 +11,10 @@ first fetch (2026-08-18T20:04:03Z, size 791 918 971 bytes) and is
 independently corroborated: the archive's MD5 equals torchvision's official
 ``OxfordIIITPet`` resource pin (``5c4f3ee8e5d25df40f4fd59a7f44e54c``).
 
-Usage::
+From the siderius-exp repository root, using its frozen environment::
 
     .venv/bin/python -m tasks.oxford_iiit_pet.tools.fetch_oxford_iiit_pet \
-        --dest /home/klz/Data/OXFORD_IIIT_PET --extract
+        --dest /path/to/external/oxford-iiit-pet --extract
 
 Idempotent: an existing archive is VERIFIED (never re-downloaded); a
 mismatch FAILS CLOSED naming both digests; ``--no-download`` makes absence
@@ -78,7 +76,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    repo = Path(__file__).resolve().parents[2]
+    repo = Path(__file__).resolve().parents[3]
     dest = require_out_of_tree(args.dest, repo, parser.error)
 
     for spec in ARCHIVES:

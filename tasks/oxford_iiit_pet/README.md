@@ -45,16 +45,21 @@ under `experiments/oxford_iiit_pet/`.
 
 ## Data preparation
 
-Download and verify the official images with the task-owned tool:
+From the `siderius-exp` repository root, after `uv sync --group dev --frozen`,
+download, verify and extract the official images and annotations. Replace the
+destination with a directory outside both source repositories:
 
 ```bash
-.venv/bin/python tasks/oxford_iiit_pet/tools/fetch_oxford_iiit_pet.py \
-    --dest /path/to/oxford-iiit-pet --extract
+.venv/bin/python -m tasks.oxford_iiit_pet.tools.fetch_oxford_iiit_pet \
+    --dest /path/to/external/oxford-iiit-pet --extract
 ```
 
-The runtime consumes `/path/to/oxford-iiit-pet/images`. It selects identities
-from the committed manifests rather than scanning the directory to invent a
-split.
+The tool prints `[verified]` for each archive and creates `images/` and
+`annotations/` under the destination. Existing archives are verified rather
+than downloaded again. Pass `/path/to/external/oxford-iiit-pet/images` as the
+experiment's `data_dir`; the runtime selects images from the committed manifests.
+See [data preparation details](data/README.md) for offline verification and
+manifest ownership.
 
 ## Experiments
 

@@ -1,47 +1,66 @@
-# `data/` — Oxford-IIIT Pet (identity manifests only; no data here)
+# Oxford-IIIT Pet data preparation
 
-This directory holds the **identity manifests** and their SHA-256 pins —
-never the images (roadmap §22.23.10). Cloning SIDERIUS downloads no dataset.
+This directory stores image identities and integrity pins. Dataset archives and
+extracted files stay outside both the `siderius-exp` and `SIDERIUS` repositories.
+Cloning this repository does not download the dataset.
 
-## Acquisition (explicit user action; nothing is fetched by the framework)
+## Acquire or verify the data
 
-Official source (use it as provenance, not a mirror):
+1. From the `siderius-exp` repository root, prepare its environment with
+   `uv sync --group dev --frozen`.
+2. Choose an external destination and run the task-owned acquisition tool:
+
+   ```bash
+   .venv/bin/python -m tasks.oxford_iiit_pet.tools.fetch_oxford_iiit_pet \
+       --dest /path/to/external/oxford-iiit-pet --extract
+   ```
+
+   Missing archives are downloaded from the official Oxford source: about
+   792 MB of images and 19 MB of annotations. Each archive is checked against
+   the tool's SHA-256 pin before extraction. Success prints `[verified]` for
+   both archives and leaves `images/` and `annotations/` under the destination.
+   An existing extraction directory is skipped.
+3. Pass `/path/to/external/oxford-iiit-pet/images` as the experiment's `data_dir`.
+   The runtime reads the images named in the selected committed manifests;
+   acquisition does not regenerate or change those manifests.
+
+Existing archives are verified rather than downloaded again. A digest mismatch
+stops the command. To verify local archives without allowing any download, run:
 
 ```bash
-# ~792 MB images + ~19 MB annotations — into a MACHINE-LOCAL directory outside the tree
-curl -L -o images.tar.gz      https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz
-curl -L -o annotations.tar.gz https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz
-sha256sum annotations.tar.gz  # 52425fb6de5c424942b7626b428656fcbd798db970a937df61750c0f1d358e91 (2026-08-15)
+.venv/bin/python -m tasks.oxford_iiit_pet.tools.fetch_oxford_iiit_pet \
+    --dest /path/to/external/oxford-iiit-pet --no-download
 ```
 
-**Decided by D14-2** (the deferral this paragraph carried): the
-machine-local root reaches the framework as the data-path seam's OWN
-`data_dir` (`EpochSamplingParams` / `EvalMaterializationParams` — the same
-channel TIDMAD's `data_dir` uses; no new YAML). Acquisition is
-`tools/example_packs/fetch_oxford_iiit_pet.py --dest <machine-local dir>
---extract` — verify-before-anything against the SHA-256 pins in
-`PROVENANCE.md`; an in-tree `--dest` is refused.
+A missing archive is an error in this mode. Add `--extract` to also extract
+verified archives when their extraction directories do not already exist.
+The tool rejects destinations inside the executing `siderius-exp` checkout
+before creating directories or fetching data.
 
-## Manifests
+The archive pins live in [the acquisition tool](../tools/fetch_oxford_iiit_pet.py).
+[PROVENANCE.md](../PROVENANCE.md) records their origin and the split derivation.
 
-| file | rows | meaning |
-|---|---|---|
-| `manifests/train.csv` | 2 946 | canonical TRAINING scope |
-| `manifests/validation.csv` | 734 | canonical VALIDATION scope |
-| `manifests/final.csv` | 3 669 | canonical FINAL-EVAL scope (= the official test list) |
-| `manifests/SHA256SUMS` | — | integrity / provenance pins |
+## Manifests and runtime ownership
 
-Columns: `image_id, class_index (0-based), official_class_id (1-37), scope`.
-`image_id` is the official stem (`<Breed>_<n>`); the JPEG is
-`images/<image_id>.jpg` in the official archive. The scopes are pairwise
-disjoint; runtime resampling is forbidden (§22.9a). Derivation rule and
-source hashes: `../PROVENANCE.md`.
+| File | Rows | Meaning |
+|---|---:|---|
+| `manifests/train.csv` | 2,946 | Canonical training identities |
+| `manifests/validation.csv` | 734 | Canonical validation identities |
+| `manifests/final.csv` | 3,669 | Final evaluation identities: the official test list |
+| `manifests/gate2_train.csv` | 370 | Bounded training subset |
+| `manifests/gate2_validation.csv` | 74 | Bounded validation subset |
+| `manifests/gate2_final.csv` | 370 | Bounded final evaluation subset |
+| `manifests/SHA256SUMS` | — | Integrity pins for every committed CSV manifest |
+| `manifests/execution.json` | — | Transform specification and 37 class-covering tensor hashes |
 
-Preparation (decode → resize → crop → tensor) is CODE since D14-2 —
-`execute_tools/pets_data_path.py::decode_and_transform`, pinned by
-`manifests/execution.json` (37 class-covering probe hashes). The gate
-subsets `manifests/gate2_*.csv` are committed, derived first-N-per-class
-from the frozen identity manifests, and — since Step 12 / PR-12d D5
-(F-12d-5) — carry their own `SHA256SUMS` pins, because a Gate reads them.
-Both pack writers re-pin the WHOLE manifest directory, so regenerating the
-identity manifests can no longer silently drop the subsets' coverage.
+CSV columns are `image_id`, `class_index` (0–36), `official_class_id` (1–37)
+and `scope`. Each `image_id` names `images/<image_id>.jpg`. The training,
+validation and final identities are pairwise disjoint; bounded subsets take
+the first specified number per class in committed manifest order.
+
+[The task runtime](../runtime/pets_data_path.py) owns image decoding and the
+resize, crop and tensor conversion in `decode_and_transform`.
+[The identity generator](../tools/oxford_iiit_pet.py) owns split derivation;
+[the execution artifact generator](../tools/oxford_iiit_pet_execution.py) owns
+the bounded subsets and transform probes. These are maintenance tools;
+ordinary data acquisition uses the committed manifests as supplied.
