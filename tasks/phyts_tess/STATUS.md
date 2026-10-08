@@ -1,12 +1,42 @@
-# STATUS — `phyts_tess` (honest maturity)
+# TESS task execution status
 
-## Maturity: **declarations complete; composed production execution NOT YET RUN**
+## Current evidence boundary
 
-Every family a composed run needs is declared and every unit of it has been
-exercised in process. **No SIDERIUS chain has executed this task.** Nothing
-below should be read as a qualification.
+Composed execution has been observed. The historical NoPrior unit
+[nop_004](../../experiments/phyts_tess/main_fixed_workflow/runs/nop_004/RESULTS.md)
+produced sixteen completed iterations and stopped at its six-hour deadline.
+Its [machine-readable record](../../experiments/phyts_tess/main_fixed_workflow/runs/nop_004/results.json)
+identifies infra `7689fd58b91d410788e953b51ea69a9dbc528a7d` and reports exp
+`12bd80af795be8402bab0dacfca6968054554b1d`.
 
-## What has actually been verified (2026-09-20)
+The separate paper-startup audit retains an unknown original exp revision for
+that same unit. The [paper artifact reference](../../experiments/paper-artifacts.md)
+records this difference in provenance certification. Do not treat either historical
+receipt as a new qualification of the repository's current framework pin.
+
+The task declarations, loaders, scoring and Health plugins remain owned here.
+The [fixed workflow](../../experiments/phyts_tess/main_fixed_workflow/README.md)
+owns treatment and launch settings. Tutorial execution has separate, smaller
+budgets and [separate provenance](../../tutorials/paper/examples/README.md).
+
+## Limitations
+
+- The recorded score is validation R², not a held-out test result or reproduction
+  of published PhyTS test figures.
+- The historical run has no independent replicate. It does not establish
+  significance between its candidate scores.
+- The dispersion check is an observational task declaration; passing it does
+  not establish scientific usefulness. The poor negative-R² model in the run
+  also passed its configured dispersion floor.
+- A new source pair or changed task/configuration needs its own qualification.
+  This documentation audit performed no new training, provider calls or Gates.
+
+## Earlier component checks
+
+The following dated observations describe the initial in-process qualification,
+before the later composed run. They remain evidence for that earlier scope.
+
+### Component observations (2026-09-20)
 
 Run from this checkout's own `.venv/bin/python`, against the real released
 data staged into a run data root.
@@ -30,26 +60,3 @@ data staged into a run data root.
 An untrained reference CNN over the full validation scope scored
 `r2 = -4.688`, `rmse = 1.340`, `mae = 1.218`. That is an execution
 observation, not a baseline: the network was never trained.
-
-## What is NOT claimed
-
-1. **No composed run.** `run_chain.sh` has never been pointed at this
-   composition. Manifest resolution, child-process scope transport, Health
-   materialization inside a real round, and resume behaviour are all
-   unverified here.
-2. **No scientific result.** No model has been trained. The PhyTS reference
-   figures (S4D 0.665, LinOSS 0.612, CNN 0.617, mean baseline -0.017) are
-   quoted from the paper and were not reproduced.
-3. **No Gate evidence.** Neither Gate 1 nor Gate 2 has been run.
-4. **Health thresholds are provisional.** The dispersion floor is derived
-   from the target spread, not from a measured healthy prediction artifact,
-   and its disposition is `recording` for exactly that reason.
-   `declared/task_health.yaml` carries the promotion path.
-5. **The held-out test split has never been read.** No number in this
-   repository was computed against it.
-
-## Next
-
-A composed `--dry-run` against a real experiment, then a bounded real run.
-Until one exists, this package is a declaration that type-checks and whose
-units compute — which is less than it looks like.

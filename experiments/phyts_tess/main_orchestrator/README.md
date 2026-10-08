@@ -8,10 +8,11 @@ condition. It never starts a clock, calls an LLM, trains or scores on its own.
 **Shortest route** (operator, on the host):
 
 ```bash
-python -m experiments.phyts_tess.main_orchestrator.prepare \
-    --siderius-checkout <framework> --agent-view <views>/agent --output <bundle>
-python -m experiments.phyts_tess.main_orchestrator.verify_launcher_policy --installed /etc/tess-native/policy.json
-python -m experiments.phyts_tess.main_orchestrator.verify_evaluator_policy --installed /etc/tess-native/evaluator.json
+.venv/bin/python -m experiments.phyts_tess.main_orchestrator.prepare \
+    --siderius-checkout /path/to/pinned/SIDERIUS \
+    --agent-view /path/to/views/agent --output /path/to/new/bundle
+.venv/bin/python -m experiments.phyts_tess.main_orchestrator.verify_launcher_policy --installed /etc/tess-native/policy.json
+.venv/bin/python -m experiments.phyts_tess.main_orchestrator.verify_evaluator_policy --installed /etc/tess-native/evaluator.json
 bash experiments/phyts_tess/main_orchestrator/machine/probe_authorization.sh
 ```
 

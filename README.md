@@ -8,8 +8,10 @@ the generic framework lives in the separate [SIDERIUS repository](https://github
 
 For a guided notebook plus terminal-script example, start with the
 [tutorial index](tutorials/README.md), then choose TESS, one-band TIDMAD,
-Project8 (time/frequency inputs), or LIGO. The [paper tutorial guide](tutorials/paper/README.md) explains setup,
-supported changes and the distinction between a demo and paper reproduction.
+Project8 (time/frequency inputs), or LIGO. The [paper tutorial guide](tutorials/paper/README.md) explains setup and
+supported changes. These are simplified demos, not one-click paper artifact
+reproduction. For frozen source/configuration pairs and archived evidence, use
+the [paper artifact reference](experiments/paper-artifacts.md).
 
 1. Choose a scientific problem in [`tasks/`](tasks/README.md).
 2. Choose one bounded treatment in [`experiments/`](experiments/README.md).
@@ -18,17 +20,6 @@ supported changes and the distinction between a demo and paper reproduction.
 
 The shortest safe path is to read the relevant task page, then the experiment
 page, and use its dry-run command before an effectful launch.
-
-For the ICLR scientific work, read the package README before opening a
-launcher. The package README explains what the data means; the experiment
-README explains which files and run settings are used.
-
-| You want to… | Read first |
-| --- | --- |
-| Understand TIDMAD files, channels, splits, score, and Health | [`tasks/tidmad/README.md`](tasks/tidmad/README.md) |
-| Run or change the TIDMAD fixed workflow | [`experiments/tidmad/main_fixed_workflow/README.md`](experiments/tidmad/main_fixed_workflow/README.md) |
-| Compare TIDMAD information treatments | [`experiments/tidmad/information_treatments/README.md`](experiments/tidmad/information_treatments/README.md) |
-| Prepare the external TIDMAD data root | [`tasks/tidmad/data/README.md`](tasks/tidmad/data/README.md) |
 
 ## What belongs here
 
@@ -40,8 +31,11 @@ README explains which files and run settings are used.
 
 Task, experiment, and campaign are separate axes. Trial and Formal are
 workflow roles; they may appear in an ordinary experiment as well as in a
-campaign. A task is static. Changing a workflow treatment creates a different
-experiment, not a different task.
+campaign. A task declares scientific meaning independently of the workflow.
+Intentional scientific changes create a new task identity. Changing a workflow
+treatment creates a different experiment, not a different task.
+
+<a id="framework-revision"></a>
 
 ## Environments and data
 
@@ -60,6 +54,8 @@ before starting; a file that a later child might load cannot satisfy that
 check. Raw datasets, generated output, caches and workspaces stay external.
 The complete agent contract is in
 [`CLAUDE.md`](CLAUDE.md#environment-and-launch-credentials).
+
+<a id="running-the-live-tests"></a>
 
 ## Validation
 
@@ -94,4 +90,4 @@ be hidden in a shell argument or an old run receipt.
 - [experiment index](experiments/README.md)
 - [campaign index](campaigns/README.md)
 - [migration evidence](provenance/MIGRATION.md)
-- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/14494576671ad6f6b1a772d966b1fced02fab2a9/docs/reference/task-composition.md)
+- [framework task-composition contract](https://github.com/yuema137/SIDERIUS/blob/e800fc1f08b0e067fc21076a200f3f70d04b38b8/docs/reference/task-composition.md)

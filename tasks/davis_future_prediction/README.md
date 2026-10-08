@@ -48,7 +48,7 @@ supplies approved values for that workflow.
 Use the task-owned acquisition tool:
 
 ```bash
-python tasks/davis_future_prediction/tools/fetch_davis.py \
+.venv/bin/python tasks/davis_future_prediction/tools/fetch_davis.py \
     --dest /path/to/davis-root --extract
 ```
 

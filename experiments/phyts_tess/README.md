@@ -5,9 +5,9 @@ rotation regression from TESS light curves, selected on R-squared.
 
 | experiment | what it is | state |
 |---|---|---|
-| [`main_fixed_workflow/`](main_fixed_workflow/README.md) | SIDERIUS reference workflow, 1 trial + 1 formal per iteration, 6-hour budget, one RTX 5090 | both arms complete; **never run** |
+| [`main_fixed_workflow/`](main_fixed_workflow/README.md) | SIDERIUS reference workflow, 1 trial + 1 formal per iteration, 6-hour budget, one RTX 5090 | NoPrior `nop_004` completed; [historical evidence](main_fixed_workflow/runs/nop_004/RESULTS.md) |
 | [`coding_agent_baseline/`](coding_agent_baseline/README.md) | general coding agent on the same task | answer-separation built; **not launchable** |
-| [`main_orchestrator/`](main_orchestrator/README.md) | external caller selects capabilities | **not implemented**; constraints recorded |
+| [`main_orchestrator/`](main_orchestrator/README.md) | external caller selects capabilities | operator preparation and execution boundary implemented; see its deployment and evidence records |
 
 The information treatment — what the agent is told — is a separate axis from
 the workflow, and lives in

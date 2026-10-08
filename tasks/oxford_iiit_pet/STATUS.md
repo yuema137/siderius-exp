@@ -1,9 +1,19 @@
-# STATUS — `oxford_iiit_pet` (honest maturity; MIRROR of roadmap §15.1 / §22.12)
+# oxford_iiit_pet capability and historical evidence
 
-The roadmap (`docs/design/siderius_generic_framework_upgrade.md`) is the ONE
-status authority; this file mirrors it for a reader of the pack.
+The active task is declared by its [composition](compositions/) and implemented
+by its task-owned runtime/plugins. See the [task guide](README.md) for current
+entrypoints. The ledger below preserves pre-separation source revisions, paths
+and observations; its roadmap was an implementation plan, not today's capability
+authority. Old references to framework `examples/` paths name that historical
+checkout, not paths in this repository.
 
-## Maturity: **L4** (Step 12 / PR-12d D-FINAL, on `G-12d` evidence) — on top of **L2/L3 EXECUTABLE (D14-2)**
+A separate [Pet tutorial](../../tutorials/supplementary/pet/README.md) has recorded
+three-iteration demo evidence. Its settings and [receipt](../../tutorials/supplementary/pet/example/README.md)
+are distinct from the older full-task qualification below.
+
+## Historical maturity ledger
+
+### Recorded maturity: **L4** (Step 12 / PR-12d D-FINAL, on `G-12d` evidence) — on top of **L2/L3 EXECUTABLE (D14-2)**
 
 **Promoted, and only now.** Until D-FINAL this heading read *"L4 DECLARATIONS
 COMPLETE / L4 EXECUTION PENDING"*, because the pack declared everything a

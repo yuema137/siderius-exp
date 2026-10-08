@@ -48,7 +48,7 @@ under `experiments/oxford_iiit_pet/`.
 Download and verify the official images with the task-owned tool:
 
 ```bash
-python tasks/oxford_iiit_pet/tools/fetch_oxford_iiit_pet.py \
+.venv/bin/python tasks/oxford_iiit_pet/tools/fetch_oxford_iiit_pet.py \
     --dest /path/to/oxford-iiit-pet --extract
 ```
 

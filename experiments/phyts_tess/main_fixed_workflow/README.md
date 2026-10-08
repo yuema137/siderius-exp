@@ -46,28 +46,12 @@ checkout would change the revision it claims to be running.
 
 ### Why the formal training scope is operator-owned
 
-The intended value was `agent`. It is **unusable at the pinned framework
-revision**, and the failure is silent until the second iteration.
+The treatment retains `operator` after an earlier iteration-2 identity defect
+([SIDERIUS#563](https://github.com/Galileo-Sandbox/SIDERIUS/issues/563)). The
+framework repair is present in the selected lineage, but changing this field
+would still change the treatment and requires its own two-iteration evidence.
 
-`model_exploration.py` passes `formal_training_scope_source` into the
-`LockLaunchIdentity` it writes the workspace lock from, while
-`run_one_iteration.py::compute_expected_invariants` builds the same carrier
-**without** it and so recomputes the field's `operator` default. The field is
-in the compared set, so iteration 1 locks `agent`, iteration 2 presents
-`operator`, and the run refuses its own workspace:
-
-```
-run-invariants lock violation:
-  formal_training_scope_source: locked='agent' vs this run='operator'
-```
-
-Observed live on unit `nop_002`, and confirmed by constructing both call
-sites. Any composed run using `agent` hits it. Tracked upstream as
-[SIDERIUS#563](https://github.com/Galileo-Sandbox/SIDERIUS/issues/563), which
-is **closed**: `compute_expected_invariants` now passes the field, and the
-fix is contained in the framework revision this experiment pins.
-
-The value here stays `operator` anyway. The fix being present is half the
+The value here stays `operator`. The fix being present is half the
 condition; the other half is **a two-iteration run actually surviving**,
 because a single-iteration run cannot detect this class of defect and so
 cannot be the evidence that it is gone. Restore `agent` after that run, not
@@ -131,20 +115,15 @@ unchanged identity.
 host-wide timing evidence from an unrelated run, while a resume continues
 its own.
 
-## Not yet done
+## Recorded execution and remaining qualification
 
-Three launches have run and **none produced an experiment record**. Each
-halted for a different reason: literature review enabled without a
-task-owned config, a data path missing `validate_health_coverage`, the lock
-violation above, and finally 17 consecutive runtime-verification rejections
-in 31 minutes ([SIDERIUS#565](https://github.com/Galileo-Sandbox/SIDERIUS/issues/565),
-since fixed and released). The first two were repaired here; the other two
-were framework defects.
+The earlier failed launches were followed by
+[nop_004](runs/nop_004/RESULTS.md): sixteen completed iterations, formal scores
+and a clean deadline stop. Its source pair is historical, and the paper replay inventory
+does not certify an exp revision for the same unit; see the
+[paper artifact reference](../../paper-artifacts.md).
 
-So no model has been trained to completion, no score exists, and the
-deadline kill has never fired — every attempt ended far inside the six
-hours. Read [`../../../tasks/phyts_tess/STATUS.md`](../../../tasks/phyts_tess/STATUS.md)
-for what the task package itself has and has not verified.
-
-Each attempt is preserved rather than reused: `.chain_halted` is never
-erased to retry, and a retry takes a fresh unit directory.
+This evidence supersedes the old claim that no model or score exists. It does
+not qualify a new source pair, another arm, changed Formal scope ownership or
+held-out test performance. Preserve each unit's inputs and receipts and use a
+fresh unit directory for a new identity.
