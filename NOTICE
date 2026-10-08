@@ -21,7 +21,7 @@ https://creativecommons.org/licenses/by/4.0/
 https://github.com/jessicafry/TIDMAD/blob/7e46f97de9c9fde371036eb09d18bdae1e8d480d/README.md#license
 
 This notice covers tutorials/paper/examples/tidmad-data.png, its embedded copy
-in tutorials/paper/02_tidmad_tutorial.ipynb, and upstream-derived records in
+in tutorials/paper/notebooks/02_tidmad_tutorial.ipynb, and upstream-derived records in
 tasks/tidmad/reference_data/. The preview selects and plots data locally;
 task adapters and reference records may transform or reformat upstream inputs.
 SIDERIUS-generated measurements are identified by their individual provenance,
