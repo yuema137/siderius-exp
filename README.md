@@ -31,13 +31,7 @@ credit/GPU time. You can follow the same instructions manually.
 
 ## Understand the files before running
 
-```mermaid
-flowchart LR
-    A[Task package: prediction problem] --> C[Notebook: inspect and save]
-    B[Experiment: settings and paths] --> C
-    C --> D[Saved script: run the experiment]
-    D --> E[Run records and score plot]
-```
+![Task and experiment settings are inspected and saved in the notebook. A saved script launches SIDERIUS, producing run records, models and score plots in your external project.](docs/assets/tutorial-workflow.svg)
 
 | Your choice | Where it belongs in your external project |
 |---|---|

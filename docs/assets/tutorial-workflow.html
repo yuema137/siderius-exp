@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIDERIUS exp: from task definition to run results</title>
+  <style>
+    @page { size: 960px 768px; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #fff; }
+    body { font-family: Arial, Helvetica, sans-serif; color: #22313e; }
+    .figure { position: relative; width: 960px; height: 768px; overflow: hidden; }
+    .heading { position: absolute; top: 26px; left: 32px; margin: 0;
+      font-size: 25px; font-weight: 700; letter-spacing: 1px; }
+    .subtitle { position: absolute; top: 65px; left: 32px; margin: 0;
+      color: #405363; font-size: 20px; }
+    .card { position: absolute; width: 432px; height: 168px; padding: 16px 16px;
+      border: 1.5px solid #d2dee7; border-left: 6px solid var(--accent);
+      border-radius: 12px; background: var(--fill); }
+    .card h2 { margin: 0 0 10px; font-size: 25px; line-height: 1.2; }
+    .card p { margin: 0; font-size: 20px; line-height: 1.4; color: #33485a; }
+    .path { display: block; margin-top: 10px; font: 700 23px/1.2 monospace;
+      color: #22313e; }
+    .task { left: 32px; top: 112px; --accent: #9e50ca; --fill: #f5effa; }
+    .experiment { left: 496px; top: 112px; --accent: #13b59c; --fill: #eaf8f5; }
+    .notebook { left: 190px; top: 340px; width: 580px; height: 144px;
+      --accent: #2b8ed0; --fill: #eaf4fc; }
+    .notebook h2 { margin-bottom: 10px; }
+    .script { left: 32px; top: 558px; height: 158px;
+      --accent: #34495e; --fill: #f3f6f9; }
+    .results { left: 496px; top: 558px; height: 158px;
+      --accent: #f4a318; --fill: #fff4e4; }
+    .note { position: absolute; top: 739px; left: 32px; right: 32px; margin: 0;
+      text-align: center; font-size: 18px; font-style: italic; color: #596977; }
+    .connections { position: absolute; inset: 0; width: 960px; height: 768px; }
+    @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <main class="figure" aria-label="Task and experiment feed the notebook; the saved script launches the run and produces results.">
+    <h1 class="heading">FROM YOUR TASK TO RUN RESULTS</h1>
+    <p class="subtitle">Your editable files and results live in a project outside both repositories.</p>
+
+    <svg class="connections" viewBox="0 0 960 768" aria-hidden="true">
+      <defs>
+        <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#849195"/>
+        </marker>
+      </defs>
+      <g fill="none" stroke="#849195" stroke-width="2.5" stroke-linejoin="round">
+        <path d="M248 280 V306 H712 V280"/>
+        <path d="M480 306 V333" marker-end="url(#arrow)"/>
+        <path d="M480 484 V520 H248 V551" marker-end="url(#arrow)"/>
+        <path d="M464 637 H489" marker-end="url(#arrow)"/>
+      </g>
+    </svg>
+
+    <section class="card task">
+      <h2>TASK PACKAGE</h2>
+      <p>Data, split and prediction target<br>Metric and scientific checks</p>
+      <code class="path">tasks/</code>
+    </section>
+    <section class="card experiment">
+      <h2>EXPERIMENT</h2>
+      <p>Iterations and data fractions<br>Budgets and linked LLM settings</p>
+      <code class="path">experiments/*.json</code>
+    </section>
+    <section class="card notebook">
+      <h2>NOTEBOOK: INSPECT AND SAVE</h2>
+      <p>See the data, edit your task and experiment, then save.</p>
+      <code class="path">notebooks/*.ipynb</code>
+    </section>
+    <section class="card script">
+      <h2>RUN THE SAVED SCRIPT</h2>
+      <p>Reads your saved settings<br>Launches SIDERIUS</p>
+      <code class="path">scripts/run-*.sh</code>
+    </section>
+    <section class="card results">
+      <h2>INSPECT RESULTS</h2>
+      <p>Run records and generated models<br>Score versus iteration</p>
+      <code class="path">runs/ &nbsp; plots/</code>
+    </section>
+    <p class="note">The notebook explains and saves. The script executes.</p>
+  </main>
+</body>
+</html>
