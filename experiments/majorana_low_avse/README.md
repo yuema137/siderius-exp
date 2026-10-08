@@ -32,7 +32,7 @@ by one forced Formal round. Trial uses half of the Formal scope, with a
 official Train and 10% of official Test. The launcher locks both training and
 evaluation selection to deterministic snapshot scopes. The versioned demo
 advice states the same time and 10-GiB VRAM limits to the proposer and tuner;
-its SHA-256 is pinned by the launcher.
+the launcher verifies that the selected advice is unchanged.
 
 The actual September 2026 demo later continued at iteration 21 with 20-minute
 Trial and 40-minute Formal budgets after the original windows caused repeated

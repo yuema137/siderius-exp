@@ -18,7 +18,7 @@ that calibration window is separate from both training budgets. The model may
 choose an epoch count in the declared range [5, 50]. Batch size remains
 task-locked to 1 because MTG is a variable-size transductive graph. A versioned
 advice artifact states these limits and the complete-graph memory semantics to
-the proposer and tuner; its SHA-256 is pinned by the launcher.
+the proposer and tuner; the launcher verifies that the selected advice is unchanged.
 
 ```bash
 bash experiments/cancer_gene_identification/launch.sh \

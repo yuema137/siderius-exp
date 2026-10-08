@@ -14,7 +14,7 @@ agent. They do not change the TIDMAD task, data, metric, or validity rules.
 The YAML file selects information exposure. All rows share `workflow.json`
 and the base scientific task. DA-only and Full use an external composition
 derived from that base with the verified analysis binding added. Advice is an
-explicit artifact with a SHA-256 when enabled; an advice-off row records
+explicit, verified file when enabled; an advice-off row records
 `mode: disabled` and no artifact. Module states are explicit so a missing key
 cannot silently turn Data Analysis on or off.
 
@@ -30,7 +30,7 @@ in `tasks/tidmad`:
 - `prerelease-without-advice.yaml` explicitly includes no human advice.
 
 The launch adapter resolves one of these files before doing any work. When
-advice is enabled, its checksum is checked before launch. When it is disabled,
+advice is enabled, the selected file is verified before launch. When it is disabled,
 the absence is recorded instead of being left implicit.
 
 Module states are also explicit. For example, literature review can be turned
@@ -40,8 +40,8 @@ product that has no matching workflow module.
 ## How a treatment is called
 
 The fixed-workflow preflight resolves the selected treatment before building
-the SIDERIUS command. It records the treatment id, artifact digest, and module
-states in the launch receipt. Users normally select the treatment through the
+the SIDERIUS command. The launch receipt records the selected treatment, verified advice and module
+states. Users normally select the treatment through the
 fixed workflow's launcher binding; they should not edit the generated command
 to add or remove an advice/data-analysis flag. To create a new condition, add a
 new treatment file and qualify it against the same task composition.
