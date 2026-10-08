@@ -8,8 +8,41 @@ is not the acceptance criterion for this first run.
 |---|---|---|
 | Offline checks | Inspect files, credentials by name, resolved settings and launch commands | Preview only; no LLM call and no proof of model access |
 | Functional demo | Exercise the complete process on a small dataset | The [GPT-6 Luna test profile](openai_smoke_luna.json), copied into each new project's `llm/agents.json` |
-| Research run | Investigate your task after the process works | Deliberately edit provider/model choices in your external project's `llm/agents.json`; choose effort and budgets separately |
+| Production / research run | Investigate your task after the process works | Start with the paper's LLM routing below; choose run size and API budgets separately |
+| Custom routing | Use your preferred supported providers and models | Edit the individual routes in your external project's `llm/agents.json`, then preview and test them |
 | Paper replay | Recover a recorded experiment's declared treatment | Follow the [paper artifact reference](../../experiments/paper-artifacts.md) and its historical configurations; never use these as smoke-test defaults |
+
+## Move from a demo to research
+
+**Luna is the inexpensive testing configuration. For production research, we
+recommend the paper's LLM configuration as a starting point.** You can use
+your own supported providers and models instead. Neither choice guarantees
+the paper's scores on your task.
+
+Inspect the paper task's routing file before editing your external project:
+
+- [TESS agent routes](../../experiments/phyts_tess/main_fixed_workflow/agents.json)
+- [LIGO agent routes](../../experiments/phyts_ligo/main_fixed_workflow/agents.json)
+- [Project8 agent routes](../../experiments/phyts_project8/main_fixed_workflow_dual_representation/agents.json)
+- [TIDMAD experiment and treatment choices](../../experiments/tidmad/main_fixed_workflow/README.md)
+
+The linked TESS, LIGO, and Project8 files specify `gpt-5.6-sol` with `medium`
+reasoning across their workflow routes. TIDMAD has multiple treatments; choose
+the intended experiment rather than assuming one configuration covers them all.
+These are recorded model choices; verify current model access with your provider.
+
+In your project's `llm/agents.json`, set `provider`, `model_id`, and
+`reasoning_effort` for each route you want to change, including the three
+proposal stages and the planner/reflector. Review optional analysis and literature
+routes too. Keep retries and run budgets explicit; changing models can increase
+API costs. Run the saved script's preview, check the resolved routes and required
+key names, then do a small real run before increasing the workload.
+
+**Model choice and historical replay are separate.** For a new research run,
+keep the project's intended planner and runtime policies; do not copy historical
+compatibility selectors just to use the paper's models. Reproducing a recorded
+treatment additionally requires its source/configuration pair and explicit
+historical settings, as described in the artifact reference above.
 
 ## What a fresh tutorial selects
 

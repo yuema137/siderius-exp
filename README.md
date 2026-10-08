@@ -17,6 +17,12 @@ archived evidence. The tutorials below are simplified workflow demos; use the
 [paper artifact reference](experiments/paper-artifacts.md) for reproduction
 configurations and the available historical records.
 
+For a first flow check, use the inexpensive Luna test configuration. For
+production research, we recommend starting with the paper's LLM configuration;
+your own supported model choices are also welcome. See
+[LLM configuration levels](tutorials/shared/README.md) for the files to edit
+and the distinction between model selection and historical replay.
+
 ## Start here
 
 For a guided notebook plus terminal-script example, start with the

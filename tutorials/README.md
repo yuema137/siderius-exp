@@ -17,7 +17,8 @@ input files in your external project.
 New projects use **GPT-6 Luna across all workflow LLM stages** to check the
 process before spending more on scientific searches. Read the
 [LLM configuration levels](shared/README.md): offline checks, inexpensive live
-demos, your own research configuration, and separately archived paper replay.
+demos, the paper's recommended research LLM configuration or your own model
+choices, and separately archived paper replay.
 The gallery contains earlier recorded runs; it is not evidence of a Luna run.
 
 **Start with [the paper tutorial guide](paper/README.md).** It explains installation,
