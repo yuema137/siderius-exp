@@ -4,6 +4,14 @@ This package declares 37-way pet-breed classification over the official
 Oxford-IIIT Pet dataset. It owns the scientific task independently of any one
 training workflow or resource budget.
 
+## Start with the tutorial
+
+Follow the [Pet notebook and setup guide](../../tutorials/supplementary/pet/README.md)
+to prepare data, create an external project, change parameters and run a
+three-iteration demo through its saved script. The guide includes a recorded
+example and explains where your own results appear. This is a process demo,
+not a paper artifact or a promise of a high score.
+
 ## Scientific contract
 
 | Aspect | Declaration |

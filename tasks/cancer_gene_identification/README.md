@@ -1,9 +1,21 @@
 # NatureBench cancer-gene identification task package
 
 This package declares the NatureBench `s41551-024-01312-5` cancer-gene task. It
-is a transductive binary node-classification problem over eight biological
-networks. The primary metric is the unweighted mean of per-network validation
-AUPRC values; higher is better.
+ranks genes as cancer-related or not across eight biological networks. Each
+gene is a graph node. The model sees the full graph and all node features, but
+learns from training labels only (a transductive task). The primary metric is
+the unweighted mean of per-network validation average precision, reported as
+AUPRC; higher is better.
+
+## CPDB teaching tutorial
+
+The [notebook and saved-script tutorial](../../tutorials/supplementary/cancer/README.md)
+uses a new `compositions/cpdb_tutorial.yaml` variant with only CPDB and its original
+masks. It shares the existing graph, loss, metric and forward contracts; the task
+description explicitly names the teaching population. `declared/tutorial_source_files.json`
+owns its pinned single-file identity. The [recorded example](../../tutorials/supplementary/cancer/example/README.md)
+shows a completed three-iteration CPDB workflow with diagnostic scores.
+Original multi-network experiments and historical evidence remain separate.
 
 ## Scientific contract
 
@@ -13,7 +25,8 @@ preserving node and active-split markers. The task-owned masked BCE objective
 uses labels only on the active node mask, and task parameter rules require
 batch size one.
 
-Validation masks remain held out during model search. A fair official
+Validation labels are excluded from the training loss, but their scores guide
+model search; they are not an untouched final test. A fair official
 comparison requires freezing a selected method, refitting under the comparator
 protocol, exporting test probabilities, and running the untouched NatureBench
 evaluator. Validation AUPRC alone is not an official test result.
@@ -25,6 +38,7 @@ separate.
 ## Static task compositions
 
 ```text
+compositions/cpdb_tutorial.yaml  one complete cpdb graph for the teaching demo
 compositions/two_network.yaml    complete cpdb and ltg graphs
 compositions/mtg_size.yaml       one complete mtg graph for size qualification
 compositions/eight_network.yaml  all eight complete NatureBench graphs
@@ -79,13 +93,3 @@ Sources:
 - <https://huggingface.co/datasets/FrontisAI/NatureBench/tree/main/tasks/s41551-024-01312-5>
 - <https://github.com/aibuildai/AI-Build-AI/tree/main/tasks/cancer-gene-identification>
 - <https://github.com/Blair1213/TREE>
-
-## CPDB teaching tutorial
-
-The [notebook and saved-script tutorial](../../tutorials/supplementary/cancer/README.md)
-uses a new `compositions/cpdb_tutorial.yaml` variant with only CPDB and its original
-masks. It shares the existing graph, loss, metric and forward contracts; the task
-description explicitly names the teaching population. `declared/tutorial_source_files.json`
-owns its pinned single-file identity. The [recorded example](../../tutorials/supplementary/cancer/example/README.md)
-shows a completed three-iteration CPDB workflow with diagnostic scores.
-Original multi-network experiments and historical evidence remain separate.

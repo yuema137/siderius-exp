@@ -5,15 +5,28 @@ double-beta signal (`0nubb`) or background (`2nubb`, `Bi214`, `Tl208`). One ML
 sample is one physical event, not one HDF5 row. Rows sharing the same `ev_no`
 within one process file are tracker hits belonging to the same event.
 
+## Start with the tutorial
+
+Follow the [SuperNEMO notebook and setup guide](../../tutorials/supplementary/supernemo/README.md)
+to prepare data, create an external project, change parameters and run a
+three-iteration demo through its saved script. The guide includes a recorded
+example and explains where your own results appear. This is a process demo,
+not a paper artifact or a promise of a high score.
+
 ## Scientific contract
 
 - Event inputs: `E1`, `E2`, `dY`, `dZ`, and `phiR`.
 - Tracker-hit inputs: the variable-length collection of `tX`, `tY`, `tZ`, and
   `tR` rows associated with the event.
+- Model tensor: float32 `[224, 11]`; events with more than 224 hits are
+  truncated, and shorter events are zero-padded. Valid-row and missing-radius
+  flags distinguish padding and missing values. The
+  [forward contract](declared/task_config.yaml) defines the channels.
 - Forbidden inputs: `theta` and `phiS` are simulation-truth quantities;
   `ev_no` is an identity field. None may reach a classifier.
 - Target: `0nubb = 1`; every released background process equals `0`.
-- Golden metric: deterministic energy-matched ROC AUC, higher is better.
+- Golden metric: deterministic energy-matched ROC AUC, measuring how well
+  signal ranks above background; higher is better.
 - Training objective: cross entropy on two logits (`ce`, reduction `mean`).
 - Data cuts: no energy-window or TPP-separation cut is introduced implicitly.
 
