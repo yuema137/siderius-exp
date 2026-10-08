@@ -20,9 +20,8 @@ inspect the frozen launch before an authorized effectful run.
 
 The experiment's optional information is declared once in
 [`../information_treatments/prerelease-with-advice.yaml`](../information_treatments/prerelease-with-advice.yaml).
-The launcher validates that declaration and the advice checksum before it calls
-SIDERIUS. It does not keep a second copy of the advice path, digest, or
-literature-review setting.
+The launcher verifies the selected declaration and advice before calling
+SIDERIUS. The declaration owns the advice selection and literature-review setting.
 
 The default is the reviewed advice-on treatment. To reproduce the otherwise
 identical explicit advice-off treatment, add `--advice-treatment off`; the
@@ -45,7 +44,4 @@ other recording metrics are diagnostic.
 
 No dataset, workspace, model, API credential, or result is stored here.
 
-Advice provenance: `tasks/tidmad/reference_data/legacy_baseline_configs.json`
-sha256 `2e15932ae8c87500b888f95efb4f356f16ed646a2f42b144fafd9610163728b0`;
-`tasks/tidmad/reference_data/official_paper_result/fcnet.md` sha256
-`74dff62030771e72b5bfe286cc8a5acd1616aed29311985ee43bf7adc9d62706`.
+See [advice source provenance](provenance.md) for the original reference files.
