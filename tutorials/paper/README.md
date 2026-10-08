@@ -165,10 +165,6 @@ export INFRA_CHECKOUT="/absolute/path/to/SIDERIUS-tutorial"
 git clone https://github.com/yuema137/SIDERIUS.git "$INFRA_CHECKOUT"
 git -C "$INFRA_CHECKOUT" checkout --detach "$(cat "$EXP_CHECKOUT/SIDERIUS_REVISION")"
 (cd "$INFRA_CHECKOUT" && uv sync --python 3.12 --group dev --frozen)
-
-# Install the exp-owned planner prompts into infra's own environment.
-uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
-  "$EXP_CHECKOUT/experiments/shared/planner_compat"
 ```
 
 The exp environment runs notebooks and preparation tools; the infra
@@ -176,14 +172,13 @@ environment executes the research loop. Neither borrows the other's
 `site-packages` or uses `PYTHONPATH`. Both source checkouts must be clean at
 preview/launch time. Do not edit the version pin to work around a refusal.
 
-New projects write `tune.planner_strategy: legacy-9b78d505cb11-v1` into your
-`llm/agents.json`. This preserves the planner strategy used by the previous
-tutorial version; it does not reproduce a paper run. Other routing fields and
-explicit strategy selections are preserved. Preview resolves the strategy in
-both environments and records `planner_strategy_identity` in its receipt.
-If a package is missing or the identities disagree, follow the reported install
-commands before retrying. Repeat the plugin install after running `uv sync` in
-infra, since sync removes packages absent from infra's own lock.
+New projects copy the independent [test LLM profile](../shared/README.md),
+which selects GPT-6 Luna for every workflow LLM route and explicitly selects
+`native-timing-v1`. It does not borrow paper routing or historical prompts.
+This native planner is built into infra; no historical planner package is needed.
+Preview resolves its identity in both environments and records it in the receipt.
+If the identities disagree, restore the paired revisions and environments before
+retrying. These checks are offline; they do not prove your account can call Luna.
 
 Existing user projects are not rewritten. To upgrade one, create a fresh project
 and a fresh run workspace, then transfer your intended parameter edits. Do not
@@ -219,9 +214,11 @@ whitespace-only values before contacting providers. Merely creating a local
 credential file does not export its contents. Neither check prints key values.
 These checks use the selected routing, including an external routing file.
 
-The historical model ID is retained. If your account cannot use it, edit
-your project's `llm/agents.json` and select an available model there, as shown in the notebook. That is a new model treatment, not an exact
-paper rerun. Key presence does not prove provider access; only a request can.
+The tutorial model is GPT-6 Luna. Inspect all routes in your project's
+`llm/agents.json` before launching. If you choose another available model, make
+that change in your external copy and start a fresh run. See the
+[configuration levels](../shared/README.md) before increasing model cost.
+Key presence does not prove provider access; only a request can.
 
 ## 3. Create your own project and register its notebook kernel
 

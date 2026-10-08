@@ -1,5 +1,9 @@
 # TIDMAD: one band, saved configurations, and file-range holdout
 
+New projects use the [shared GPT-6 Luna test configuration](../../shared/README.md) for all
+workflow LLM stages. It is independent of paper routing. Recorded figures below
+come from earlier runs and do not establish live Luna compatibility.
+
 The [notebook](../notebooks/02_tidmad_tutorial.ipynb) teaches a complete sequence:
 choose data, change settings, save your task/experiment, open the saved files,
 then run the script that selects them. It uses **band 0–3** only. The notebook

@@ -1,5 +1,9 @@
 # Pet image-classification demo
 
+New projects use the [shared GPT-6 Luna test configuration](../../shared/README.md) for all
+workflow LLM stages. It is independent of paper routing. Recorded figures below
+come from earlier runs and do not establish live Luna compatibility.
+
 Learn how a task package turns JPEG images into a classification problem, change
 an experiment, run three research iterations, and plot the measured scores.
 This supplementary example uses Oxford-IIIT Pet; it is **not a paper artifact,

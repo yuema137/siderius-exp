@@ -44,13 +44,18 @@ Hugging Face LFS objects and are verified again locally. No test file is request
 
 ## Planner installation and identity
 
-`planner_setup.copy_llm_config` preserves each source routing document and adds
-`legacy-9b78d505cb11-v1` only in the fresh user copy when no strategy is selected.
-This provider matches the prior tutorial pin349b6cd6's planner source SHA-256
-9b78d505cb11786319aca45e763f48d73d235e0f7e9de6fb3a62ffc774d237bd.
-It is not the separate paper-v4 replay provider. Historical experiment assets
-are not rewritten. Exp installs the package as a non-editable uv dependency;
-infra installs the same exp-owned package normally after its own frozen sync.
+`tutorials.shared.llm_setup.write_test_llm_config` validates and exclusively
+copies `tutorials/shared/openai_smoke_luna.json` into a fresh project. It does
+not read scientific experiment routing. All eleven configured workflow routes
+select OpenAI `gpt-6-luna`, reasoning `medium`; the planner explicitly selects
+`native-timing-v1`. The same helper serves TESS, TIDMAD, Project8, LIGO and Pet.
+The old paper-specific strategy-injection helper is removed. No historical
+experiment configuration or existing external project is rewritten. Native
+selection does not require installing the historical planner package.
+
+The [shared contract](../shared/llm-profile.md) owns route coverage, retry limits,
+validation scope and the distinction between workflow routing and an external
+orchestrator's model.
 
 All three `inspect` implementations call `verify_planner_setup` before native
 execution. It parses the selected routing and resolves the public provider in

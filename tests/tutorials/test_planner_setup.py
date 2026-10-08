@@ -6,17 +6,24 @@ from pathlib import Path
 
 import pytest
 from agent.planner_strategy import resolve_planner_strategy
+from workflows.llm_config import WorkflowLLMConfig
 
-from tutorials.paper import planner_setup
+from tutorials.shared import planner_setup
+from tutorials.shared.llm_setup import TEST_LLM_CONFIG, write_test_llm_config
 
 
-@pytest.mark.parametrize("task", ["tess", "tidmad", "project8", "ligo"])
-def test_initialized_projects_keep_previous_planner(tmp_path, task):
-    """Fails if any initializer bypasses the shared configuration copy."""
+@pytest.mark.parametrize("task", ["tess", "tidmad", "project8", "ligo", "pet"])
+def test_initialized_projects_use_independent_test_routing(tmp_path, task):
+    """Every initializer uses native Luna routing and refuses existing projects."""
     if task == "tess":
         from tutorials.paper.project import create_project
     elif task == "tidmad":
         from tutorials.paper.tidmad.project import create_project
+    elif task == "pet":
+        from tutorials.supplementary.pet.project import create_project as pet
+
+        def create_project(project, infra):
+            pet(project, infra, tmp_path / "images")
     else:
         from tutorials.paper.prepared.project import create_project as prepared
 
@@ -25,28 +32,55 @@ def test_initialized_projects_keep_previous_planner(tmp_path, task):
 
     project = tmp_path / "user project"
     create_project(project, tmp_path / "infra")
-    data = json.loads((project / "llm/agents.json").read_text())
-    assert data["tune"]["planner_strategy"] == "legacy-9b78d505cb11-v1"
+    saved = project / "llm/agents.json"
+    assert saved.read_bytes() == TEST_LLM_CONFIG.read_bytes()
+    data = json.loads(saved.read_text())
+    assert data["tune"]["planner_strategy"] == "native-timing-v1"
+    saved.write_text('{"user-owned": true}\n')
+    with pytest.raises(ValueError, match="(new|existing|fresh)"):
+        create_project(project, tmp_path / "infra")
+    assert saved.read_text() == '{"user-owned": true}\n'
 
 
-def test_copy_preserves_explicit_strategy_and_never_overwrites(tmp_path):
-    """Detects lossy schema reserialization or replacement of an explicit choice."""
-    source = tmp_path / "source.json"
-    content = {
-        "tune": {
-            "planner_strategy": "native-timing-v1",
-            "planner": {"provider": "openai", "model": "example-model"},
-        },
-        "description": "Preserve experiment metadata too",
-    }
-    source.write_text(json.dumps(content))
-    before = source.read_bytes()
+def test_test_config_writer_never_overwrites(tmp_path):
     destination = tmp_path / "agents.json"
-    planner_setup.copy_llm_config(source, destination)
-    assert json.loads(destination.read_text()) == content
-    assert source.read_bytes() == before
+    write_test_llm_config(destination)
+    destination.write_text('{"user-owned": true}\n')
     with pytest.raises(FileExistsError):
-        planner_setup.copy_llm_config(source, destination)
+        write_test_llm_config(destination)
+    assert destination.read_text() == '{"user-owned": true}\n'
+
+
+@pytest.mark.parametrize(
+    "role, prefix",
+    [(name, "") for name in ("interpret", "data_analysis", "implement", "validate")]
+    + [("propose", stage + "_") for stage in ("comparison", "reasoning", "proposing")]
+    + [("tune", ""), ("tune", "reflect_")]
+    + [("lit_review", "llm_"), ("lit_review", "search_llm_")],
+)
+def test_all_eleven_resolved_routes_select_luna(role, prefix):
+    routing = WorkflowLLMConfig.from_json(str(TEST_LLM_CONFIG))
+    projected = routing.get(role)
+    assert projected[prefix + "provider"] == "openai"
+    assert projected[prefix + "model_id"] == "gpt-6-luna"
+    assert projected[prefix + "reasoning_effort"] == "medium"
+    assert routing.tune.planner_strategy == "native-timing-v1"
+
+
+def test_profile_does_not_claim_unsupported_literature_retry_controls():
+    data = json.loads(TEST_LLM_CONFIG.read_text())
+    assert "max_retries" not in data["lit_review"]["main"]
+    assert "max_retries" not in data["lit_review"]["search"]
+    routing = WorkflowLLMConfig.model_validate(data)
+    for role in (
+        "interpret",
+        "data_analysis",
+        "implement",
+        "validate",
+        "propose",
+        "tune",
+    ):
+        assert routing.get(role)["max_retries"] == 1
 
 
 @pytest.mark.parametrize("mode", ["match", "missing", "different"])
@@ -88,7 +122,8 @@ def test_preflight_compares_actual_child_identity_without_echoing_errors(
             )
         message = str(error.value)
         assert "private-test-key" not in message
-        assert "uv pip install --python" in message
+        assert "native-timing-v1 is built into infra" in message
+        assert "uv pip install" not in message
         assert "tune.planner_strategy" in message
 
 

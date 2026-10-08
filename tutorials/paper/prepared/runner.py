@@ -21,7 +21,6 @@ from experiments.shared.framework_pin import (
 from experiments.shared.prepared_unit_preflight import verify_prepared_arrays
 from experiments.shared.workflow_credentials import required_workflow_api_keys
 from tasks.shared.prepared_regression import PreparedDeclaration
-from tutorials.paper.planner_setup import verify_planner_setup
 from tutorials.paper.runner import (
     ROOT,
     TutorialExperiment,
@@ -31,6 +30,7 @@ from tutorials.paper.runner import (
     verify_gpu,
 )
 from tutorials.paper.runner import build_command as shared_command
+from tutorials.shared.planner_setup import verify_planner_setup
 
 
 class PreparedExperiment(TutorialExperiment):

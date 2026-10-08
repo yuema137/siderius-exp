@@ -1,5 +1,9 @@
 # Project8 and LIGO: run a small workflow demo
 
+New projects use the [shared GPT-6 Luna test configuration](../../shared/README.md) for all
+workflow LLM stages. It is independent of paper routing. Recorded figures below
+come from earlier runs and do not establish live Luna compatibility.
+
 These notebooks teach the same three steps as TESS and TIDMAD: **save and inspect
 inputs, run the saved script, then plot real scores**. They use 512 training and
 1,000 validation events for three iterations. This is a workflow demo, **not a

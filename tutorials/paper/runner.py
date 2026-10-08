@@ -24,8 +24,8 @@ from experiments.shared.framework_pin import (
 )
 from experiments.shared.information_treatment import resolve_information_treatment
 from experiments.shared.workflow_credentials import required_workflow_api_keys
-from tutorials.paper.planner_setup import verify_planner_setup
 from tutorials.shared.gpu_check import ExpectedGpu, VramBudget
+from tutorials.shared.planner_setup import verify_planner_setup
 from tutorials.shared.runtime import (
     ROOT,
     child_environment,
