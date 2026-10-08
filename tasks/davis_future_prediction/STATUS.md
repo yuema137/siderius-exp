@@ -1,9 +1,19 @@
-# STATUS — `davis_future_prediction` (honest maturity; MIRROR of roadmap §15.1 / §22.12)
+# davis_future_prediction capability and historical evidence
 
-The roadmap (`docs/design/siderius_generic_framework_upgrade.md`) is the ONE
-status authority; this file mirrors it for a reader of the pack.
+The active task is declared by its [composition](compositions/) and implemented
+by its task-owned runtime/plugins. See the [task guide](README.md) for current
+entrypoints. The ledger below preserves pre-separation source revisions, paths
+and observations; its roadmap was an implementation plan, not today's capability
+authority. Old references to framework `examples/` paths name that historical
+checkout, not paths in this repository.
 
-## Maturity: **L4** (Step 12 / PR-12d D-FINAL, on `G-12d` evidence) — the composed production loop has now executed this task end to end
+The [consumer qualification wrapper](../../experiments/davis_future_prediction/two_iteration_qualification/README.md)
+is a current route for a selected pair. Its presence does not establish a new
+run on the root dependency pin.
+
+## Historical maturity ledger
+
+### Recorded maturity: **L4** (Step 12 / PR-12d D-FINAL, on `G-12d` evidence) — the composed production loop has now executed this task end to end
 
 **Promoted, and only now.** Until D-FINAL this heading read *"L4 DECLARATIONS COMPLETE / L4 EXECUTION PENDING … the real composed run has NOT happened yet"*, and the pack was deliberately not labelled L4 because declaring is not executing. `G-12d` executed it.
 

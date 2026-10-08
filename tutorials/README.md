@@ -25,7 +25,9 @@ API keys, data preparation, supported hardware, and what the demos can establish
 | LIGO: chirp mass from two detector channels | Prepare a tiny real-data subset, run three iterations and inspect R² | [LIGO notebook](paper/notebooks/04_ligo_tutorial.ipynb) · [setup](paper/prepared/README.md) |
 
 The `paper/` directory groups teaching examples based on the paper's tasks.
-**These four tutorials are workflow demos, not reproductions of paper artifacts.** New LLM searches are not guaranteed to recover the paper's models or
+**These four tutorials are workflow demos, not reproductions of paper artifacts.** The
+[paper artifact reference](../experiments/paper-artifacts.md) points to frozen
+settings, recorded source pairs and missing-evidence limits. New LLM searches are not guaranteed to recover the paper's models or
 scores, and very small training budgets can yield unusable models.
 
 Read notebooks here to browse, but execute only the copies initialized in your

@@ -45,7 +45,9 @@ reproduction. All four tasks have notebooks. Fresh LLM
 searches may produce different models and scores. The demos do not reproduce
 the paper's coding-agent/orchestration comparisons or retrospective reviews.
 Archived-checkpoint replay and the original campaign launchers are separate
-routes. Changing a split defines a new scientific protocol.
+routes. The [paper artifact reference](../../experiments/paper-artifacts.md)
+connects frozen configurations, original source pairs and archived evidence;
+it also records missing provenance. Changing a split defines a new scientific protocol.
 
 The TESS and TIDMAD three-iteration notebooks have been run end to end on an RTX 5090: about
 24 minutes for TESS and 35 minutes for TIDMAD. These times include LLM work,

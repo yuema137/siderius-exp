@@ -28,7 +28,7 @@ selection or ordering.
 | `MetricSpec` (golden metric) | `resolved/metric_spec.json` — GENERATED | task-owned `runtime/scoring.py`; `id == tidmad_denoising_score`, `direction == higher` pinned as literals |
 | identity (file indices + file families) | `resolved/identity.json` — GENERATED | deep-compare |
 | task description / forward contract | package-owned composition and resolved declarations | [`README.md`](README.md) and `compositions/bounded_qualification.yaml` |
-| health policy | task/campaign-owned declarations; framework policy is selected by the pinned checkout | [`README.md`](README.md#declared-health-roles-and-historical-inputs) |
+| health policy | task/campaign-owned declarations; framework policy is selected by the pinned checkout | [`README.md`](README.md#which-file-owns-which-decision) |
 | data root | explicit caller-owned `--data_dir` argument | `data/README.md` |
 | run entrypoint | experiment-owned `experiments/tidmad/two_iteration_qualification/launch.sh`, which delegates to the selected pinned checkout | experiment README and launcher dry-run |
 

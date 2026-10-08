@@ -14,9 +14,13 @@ workspace; use `--dry-run` where the launcher supports it.
 | Oxford-IIIT Pet | [`two_iteration_qualification/`](oxford_iiit_pet/two_iteration_qualification/) | consumer-pair qualification |
 | DAVIS | [`two_iteration_qualification/`](davis_future_prediction/two_iteration_qualification/) | consumer-pair qualification |
 | Cancer MTG | [`p0_final_pair_qualification/`](cancer_gene_identification/p0_final_pair_qualification/) | consumer-pair qualification |
-| PhyTS TESS | [`main_fixed_workflow/`](phyts_tess/main_fixed_workflow/) | no-prior arm only; never run |
-| PhyTS LIGO | [`main_fixed_workflow/`](phyts_ligo/main_fixed_workflow/) | NoPrior; deployment qualification in progress |
-| PhyTS Project 8 | [`main_fixed_workflow/`](phyts_project8/main_fixed_workflow/) | NoPrior; deployment qualification in progress |
+| PhyTS TESS | [`main_fixed_workflow/`](phyts_tess/main_fixed_workflow/) | historical NoPrior execution recorded; current-pair qualification is separate |
+| PhyTS LIGO | [`main_fixed_workflow/`](phyts_ligo/main_fixed_workflow/) | NoPrior; archived launch/startup evidence is indexed separately |
+| PhyTS Project 8 | [`main_fixed_workflow/`](phyts_project8/main_fixed_workflow/) and [dual representation](phyts_project8/main_fixed_workflow_dual_representation/README.md) | distinct input contracts; keep their evidence separate |
+
+For the paper's recorded source/configuration pairs and their limits, use the
+[paper artifact reference](paper-artifacts.md). Compatibility adapters and shared
+launch responsibilities are grouped under [shared support](shared/README.md).
 
 Archived experiments are retained as dated evidence and are not current launch
 routes. Campaign coordination belongs under [`campaigns/`](../campaigns/README.md).

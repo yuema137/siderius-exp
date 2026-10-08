@@ -26,10 +26,10 @@ target here**. Its targets are not committed anywhere in this repository.
 ## Staging a run data root
 
 ```bash
-uv run --no-project --with pyarrow --with numpy \
-    python tasks/phyts_tess/tools/stage_data.py \
-        --source /path/to/PhyTS/TESS/split \
-        --data_dir /path/to/run-data
+uv sync --group dev --group tutorial --frozen
+.venv/bin/python tasks/phyts_tess/tools/stage_data.py \
+    --source /path/to/PhyTS/TESS/split \
+    --data_dir /path/to/run-data
 ```
 
 `--source` is the directory holding the released
@@ -38,9 +38,10 @@ files by name — never a glob — converts them to `tess_rotation_{split}.npz`,
 and verifies that the resulting population matches the committed manifest
 exactly, refusing on any mismatch.
 
-pyarrow is supplied only for the conversion. It is not a repository
-dependency and the run itself does not need it; everything after staging uses
-the checkout's own `.venv/bin/python`.
+Run these commands from this exp checkout. The frozen `tutorial` dependency
+group supplies pyarrow for Parquet conversion; the staged NPZ run inputs do not
+require Parquet decoding. Staging and later commands use this checkout's own
+`.venv/bin/python`.
 
 Expected output: roughly 15 MiB for train and 2 MiB for val.
 

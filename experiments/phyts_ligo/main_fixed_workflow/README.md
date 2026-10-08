@@ -1,8 +1,10 @@
 # PhyTS ligo: NoPrior fixed workflow
 
 This experiment binds [the prepared task](../../../tasks/phyts_ligo/README.md)
-to the native fixed workflow. It is in deployment qualification; no formal
-campaign has started and the production launcher is being qualified.
+to the native fixed workflow. The paper archive records the historical
+`ligo-no-prior-run2` launch and planner startup. See the
+[paper artifact reference](../../paper-artifacts.md) for its exact source pair
+and evidence limits; those records do not qualify a new deployment.
 
 - [workflow.json](workflow.json): one Trial followed by one Formal per proposal,
   agent-controlled training fractions, fixed 10% epoch-loss validation, full

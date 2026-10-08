@@ -8,11 +8,11 @@ The collector accepts one or more `NAME=/absolute/workspace` arguments. The
 renderer can combine receipts collected on different machines:
 
 ```bash
-python reporting/metric_dashboard.py collect \
+.venv/bin/python reporting/metric_dashboard.py collect \
   --task 'Task A=/runtime/task-a' \
   --output /runtime/task-a-receipt.json
 
-python reporting/metric_dashboard.py render \
+.venv/bin/python reporting/metric_dashboard.py render \
   --receipt /runtime/task-a-receipt.json \
   --receipt /runtime/task-b-receipt.json \
   --y-axis 'Task A=0.60:0.80:0.05' \
