@@ -1,0 +1,22 @@
+{
+  "record": 20698789,
+  "doi": "10.5281/zenodo.20698789",
+  "files": {
+    "data_Bi214_merged.h5": {
+      "bytes": 5847162948,
+      "md5": "2e93e8b928ce5a074ee62d4754c564de"
+    },
+    "data_2nubb_merged.h5": {
+      "bytes": 7121195308,
+      "md5": "f15e7cba4e0562d3e2644d1e571c180a"
+    },
+    "data_0nubb_merged.h5": {
+      "bytes": 4573397944,
+      "md5": "8109782ce2a90b5246a8fca9ed097bf8"
+    },
+    "data_Tl208_merged.h5": {
+      "bytes": 5514190096,
+      "md5": "3a67f2d346f01d886e3c6707ef226658"
+    }
+  }
+}

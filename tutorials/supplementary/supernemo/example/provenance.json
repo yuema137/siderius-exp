@@ -1,0 +1,148 @@
+{
+  "kind": "supernemo-process-demo-evidence",
+  "paper_artifact": false,
+  "executed_exp_revision": "f3ebf1d9e4015e915740c9a2285897b66583bdb4",
+  "infra_revision": "52373be9a52bead36fd1f15d706385967e0a129d",
+  "composition_fingerprint": "05aa752603b24ae7c01195f4d7b15964a3c3ec2d6c50ad80bc661687857bbebc",
+  "planner_strategy_identity": {
+    "name": "native-timing-v1",
+    "version": "1",
+    "content_sha256": "41d4a916d489cbf1ba073c2961bb2adc8e368fdfd636d13b56adea9cafd3fe17",
+    "assembly_sha256": "d1321a044c946859faa180a21c4eda21ca8fe79ff838a0c816bc68e5ba265b3b"
+  },
+  "llm": {
+    "model": "gpt-6-luna",
+    "reasoning_effort": "medium",
+    "provider": "openai",
+    "purpose": "test routing"
+  },
+  "hardware": "NVIDIA GeForce RTX 5090",
+  "settings": {
+    "version": "supernemo-tutorial-v1",
+    "run_name": "supernemo_demo_001",
+    "gpu": null,
+    "iterations": 3,
+    "rounds": 2,
+    "epochs": 1,
+    "trial_train_fraction": 0.01,
+    "trial_eval_fraction": 0.01,
+    "formal_train_fraction": 0.01,
+    "formal_eval_fraction": 0.01,
+    "trial_minutes": 2.0,
+    "formal_minutes": 5.0,
+    "vram_gib": 10.0,
+    "trial_vram_gib": null,
+    "formal_vram_gib": null,
+    "train_portion": 1.0,
+    "advice_file": null
+  },
+  "data": {
+    "release": "https://zenodo.org/records/20698789",
+    "files": 4,
+    "bytes": 23055946296,
+    "launch_verification": "official_raw_md5_and_prepared_index_hashes",
+    "official_manifest_sha256": "03f03b684d3674bf9120129e38426629d6238d57737540baea3388dd50600e88",
+    "profiler_sha256": "78e09efc0010d238510d1206c465aba88a53329a7da35febc4d498a5cca02fd0",
+    "prepared_file_sha256": {
+      "event_indexes/0nubb_event_index.npz": "d69e4b7b42b3fa18d7a792620742287ea98f2a9c0d3f1a204a1059b256a02b05",
+      "event_indexes/2nubb_event_index.npz": "ab434eb9a6c6d44d18ed3db04dd08c539f9c3847844fd9aab767d121c72c3918",
+      "event_indexes/Bi214_event_index.npz": "bdc2fe4bcc15dff16909b7d182708cfef16982ee8ae5d149cce3cf11a296495b",
+      "event_indexes/Tl208_event_index.npz": "e7bb751e438d1b55c365ced1818fa9fabf9c6f0360ae7c97f1cefc8ffa89c85a",
+      "event_indexes/dataset_profile.json": "528b2c0793309a74bf6f7e1e2da4591d3be08a82d540045800c2fa0112b03915"
+    },
+    "evaluation_role": "Validation supplies search feedback; reserved test partition is unused"
+  },
+  "illustrative_scope_counts": {
+    "seed": 42,
+    "training_samples": 7344,
+    "training_per_class": 3672,
+    "validation_samples": 970,
+    "validation_per_class": 485,
+    "qualification": "CPU scope preview; actual attempt sampling can differ"
+  },
+  "native_output_sha256": {
+    "runs/supernemo_demo_001/iter_001/iteration_001/compact_event_dilated_cnn/run_output_iter_001.json": "a801495aff7c01396fca3e629cd742e5ae3a98418faa0f1bdaaf8eef9c0b2a40",
+    "runs/supernemo_demo_001/iter_002/iteration_002/compact_event_dilated_cnn_v2/run_output_iter_002.json": "89b68464b5d3bbe68c47e2def469d9a627aec74bb916238bc7bcc76e050a3934",
+    "runs/supernemo_demo_001/iter_003/iteration_003/compact_event_transformer_v1/run_output_iter_003.json": "df343423a02d2344e1ea19b727b41867cddb8891fb3d45724df60ed016e6ea5f"
+  },
+  "records": [
+    {
+      "exp_id": "compact_event_dilated_cnn_iter_001_001",
+      "role": "trial",
+      "score": 0.6384312891912,
+      "metric": "energy_matched_roc_auc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "compact_event_dilated_cnn_iter_001_002",
+      "role": "formal",
+      "score": 0.613158503801029,
+      "metric": "energy_matched_roc_auc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "compact_event_dilated_cnn_v2_iter_002_001",
+      "role": "trial",
+      "score": 0.6106935299650631,
+      "metric": "energy_matched_roc_auc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "compact_event_dilated_cnn_v2_iter_002_002",
+      "role": "formal",
+      "score": 0.6088598337950138,
+      "metric": "energy_matched_roc_auc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "compact_event_transformer_v1_iter_003_001",
+      "role": "trial",
+      "score": 0.5696053786952704,
+      "metric": "energy_matched_roc_auc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    },
+    {
+      "exp_id": "compact_event_transformer_v1_iter_003_002",
+      "role": "formal",
+      "score": 0.6212538451620033,
+      "metric": "energy_matched_roc_auc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none"
+    }
+  ],
+  "qualification": {
+    "status": "completed",
+    "request_count": 39,
+    "conservative_accounted_usd": "0.064367000",
+    "unknown_requests": 0,
+    "cumulative_command_seconds_upper_bound": 933.9528948999941,
+    "campaign_wall_seconds": 988.0036133332178,
+    "full_notebook_command_elapsed_seconds": 923.3298013526946,
+    "cached_notebook_command_elapsed_seconds": 10.623093547299504,
+    "notebook_saved_script_elapsed_seconds": 906.9918123446405,
+    "automatic_retries": "Native proposer recovered from a duplicate existing model name in iteration 3; iteration 2 also had a structural retry. No manual source or model intervention, no score-driven rerun.",
+    "all_three_iterations_completed": true,
+    "result_reuse": "Repeated Run All made no new API requests and preserved the completion receipt.",
+    "command_time_includes_api_wait": true,
+    "limits": "Observed validation accounting, not limits automatically imposed by the public notebook; command time is not measured GPU utilization."
+  },
+  "cpu_preparation": {
+    "wall_seconds": 195.7,
+    "maximum_resident_kib": 9076488,
+    "index_size_approx_mib": 204,
+    "scope": "Separate one-time CPU preparation, not included in the live API/GPU campaign timing"
+  },
+  "display_paths": "CSV source paths are project-relative; score/status values and PNG/SVG bytes are unchanged. Notebook publishes image outputs only, not console, prompts or machine-path output.",
+  "source_csv_sha256": "3f9acbb130a16dce44e509bf33a37c60e459f3890dd624b3328304b97f6f22ee",
+  "asset_sha256": {
+    "event.png": "0417d396f89f50231f5102ce945620da17af1ba262934d84cf31bf253d94a236",
+    "score-versus-iteration.csv": "6a2414952faf076ab8673c8e05fe4b429a5923914d72b97f949eae17c3f8f887",
+    "score-versus-iteration.png": "45c5b5fef78c2cfd381c8eb5ad01598eb8add1547d405581d6e944ef82c0eebb",
+    "score-versus-iteration.svg": "ddbbfb4ef9730afaa387546c785ec5bee34aeee88ef9f15666242bd744eb6b4c"
+  }
+}

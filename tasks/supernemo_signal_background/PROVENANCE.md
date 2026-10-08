@@ -9,6 +9,10 @@
 - Creator: Miroslav Macko, on behalf of the SuperNEMO Collaboration
 - License: CC BY 4.0
 
+The current machine-readable download authority is
+[`declared/source_files.json`](declared/source_files.json). The dated acquisition
+evidence below remains historical provenance.
+
 ## Data artifacts
 
 | File | Bytes | Zenodo MD5 | Process | Documentation count |

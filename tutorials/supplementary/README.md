@@ -18,16 +18,23 @@ data; the [recorded three-iteration demo](mjd/example/README.md) includes actual
 waveforms, scores and provenance. Official Test feeds search evaluation, not a
 blind final test.
 
+## SuperNEMO event tutorial
+
+[SuperNEMO setup](supernemo/README.md) and its [notebook](supernemo/supernemo_tutorial.ipynb)
+explain whole-event inputs, separate raw/prepared/project directories and the
+saved-script workflow. The [recorded three-iteration demo](supernemo/example/README.md)
+includes a real Train event, measured scores and provenance. Reserved test
+events remain unused.
+
 ## Tasks awaiting a notebook
 
-SuperNEMO, Cancer and DAVIS already have task packages and experiment code.
+Cancer and DAVIS already have task packages and experiment code.
 Their notebook-plus-script tutorials are **not yet available**. The references
 below are for inspecting existing work; they are not interchangeable with the
 Pet walkthrough or evidence of a newly qualified three-iteration demo.
 
 | Task | Existing references |
 |---|---|
-| SuperNEMO event classification | [Task](../../tasks/supernemo_signal_background/README.md) · [Experiment profiles](../../experiments/supernemo_signal_background/README.md) |
 | Cancer-gene identification | [Task and current entrypoints](../../tasks/cancer_gene_identification/README.md) · [Two-network qualification reference](../../experiments/cancer_gene_identification/two_network_qualification/README.md) |
 | DAVIS future-frame prediction | [Task](../../tasks/davis_future_prediction/README.md) · [Bounded qualification reference](../../experiments/davis_future_prediction/two_iteration_qualification/README.md) |
 
