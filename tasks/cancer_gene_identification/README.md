@@ -71,7 +71,7 @@ experiments/cancer_gene_identification/mtg_size_qualification/
 experiments/cancer_gene_identification/eight_network_comparison/
 ```
 
-Both are ordinary experiments selecting the same Trial/Formal workflow. Their
+These are ordinary experiments selecting the same Trial/Formal workflow. Their
 scope size does not make either one a campaign.
 
 Sources:
@@ -79,3 +79,13 @@ Sources:
 - <https://huggingface.co/datasets/FrontisAI/NatureBench/tree/main/tasks/s41551-024-01312-5>
 - <https://github.com/aibuildai/AI-Build-AI/tree/main/tasks/cancer-gene-identification>
 - <https://github.com/Blair1213/TREE>
+
+## CPDB teaching tutorial
+
+The [notebook and saved-script tutorial](../../tutorials/supplementary/cancer/README.md)
+uses a new `compositions/cpdb_tutorial.yaml` variant with only CPDB and its original
+masks. It shares the existing graph, loss, metric and forward contracts; the task
+description explicitly names the teaching population. `declared/tutorial_source_files.json`
+owns its pinned single-file identity. The [recorded example](../../tutorials/supplementary/cancer/example/README.md)
+shows a completed three-iteration CPDB workflow with diagnostic scores.
+Original multi-network experiments and historical evidence remain separate.

@@ -1,0 +1,9 @@
+{
+  "version": "cancer-cpdb-source-v1",
+  "dataset": "FrontisAI/NatureBench",
+  "revision": "9e6a69f10865dd56f4991b49d1c974e2006b6b18",
+  "source_path": "tasks/s41551-024-01312-5/problem/data/cpdb/data.h5",
+  "relative_path": "cpdb/data.h5",
+  "bytes": 1500816975,
+  "sha256": "9b94630a4a3fbdad208fe2c2ae558dd98b482e3b3bd61341b09fe2d991a6db2d"
+}

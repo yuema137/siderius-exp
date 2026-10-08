@@ -1,0 +1,163 @@
+{
+  "kind": "cancer-cpdb-process-demo-evidence",
+  "paper_artifact": false,
+  "executed_exp_revision": "9e5b4c166dc0a58271c251e93e6f3f453c8310bd",
+  "infra_revision": "52373be9a52bead36fd1f15d706385967e0a129d",
+  "composition_fingerprint": "3187c98335555a435357e8f57366592fc825a7479d7f60f79584512556b5e675",
+  "llm": {
+    "model": "gpt-6-luna",
+    "reasoning_effort": "medium",
+    "provider": "openai",
+    "purpose": "test routing"
+  },
+  "hardware": "NVIDIA GeForce RTX 5090",
+  "settings": {
+    "version": "cancer-tutorial-v1",
+    "run_name": "cancer_demo_001",
+    "gpu": null,
+    "iterations": 3,
+    "rounds": 2,
+    "epochs": 1,
+    "trial_train_label_fraction": 1.0,
+    "trial_eval_label_fraction": 1.0,
+    "formal_train_label_fraction": 1.0,
+    "formal_eval_label_fraction": 1.0,
+    "trial_minutes": 2.0,
+    "formal_minutes": 5.0,
+    "vram_gib": 10.0,
+    "trial_vram_gib": null,
+    "formal_vram_gib": null,
+    "advice_file": null
+  },
+  "data": {
+    "repository": "https://huggingface.co/datasets/FrontisAI/NatureBench",
+    "revision": "9e6a69f10865dd56f4991b49d1c974e2006b6b18",
+    "path": "tasks/s41551-024-01312-5/problem/data/cpdb/data.h5",
+    "bytes": 1500816975,
+    "sha256": "9b94630a4a3fbdad208fe2c2ae558dd98b482e3b3bd61341b09fe2d991a6db2d",
+    "launch_verification": "complete official SHA-256",
+    "nodes": 13627,
+    "features": 64,
+    "packed_records": 518005,
+    "train_labels": 2013,
+    "validation_labels": 224,
+    "reserved_test_labels": 746,
+    "evaluation_role": "Original Validation labels supply search feedback; reserved Test labels are not loaded or scored"
+  },
+  "native_output_sha256": {
+    "runs/cancer_demo_001/iter_001/iteration_001/packed_transductive_gcn/run_output_iter_001.json": "172e9c7c1cc962b70e3a035f8d49a45352979b98d4805b618c93fd6da0e5d73c",
+    "runs/cancer_demo_001/iter_002/iteration_002/residual_skip_gcn/run_output_iter_002.json": "58e8ec81a1fed017efb52f41f463cc81c0f267a735115e8ecc772273b53917cb",
+    "runs/cancer_demo_001/iter_003/iteration_003/replicated_sparse_gcn/run_output_iter_003.json": "becca83426fa6c889ce7201d85da6cb9e40092fc845e8adc729c50024ccdcab6"
+  },
+  "records": [
+    {
+      "exp_id": "packed_transductive_gcn_iter_001_001",
+      "role": "trial",
+      "score": 0.5334328167995573,
+      "metric": "mean_auprc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none",
+      "native_timing_seconds": {
+        "train_time_s": 10.8,
+        "validation_time_s": 3.4,
+        "inference_time_s": 4.6,
+        "scoring_time_s": 1.4
+      }
+    },
+    {
+      "exp_id": "packed_transductive_gcn_iter_001_002",
+      "role": "formal",
+      "score": 0.1847977751619175,
+      "metric": "mean_auprc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none",
+      "native_timing_seconds": {
+        "train_time_s": 10.3,
+        "validation_time_s": 3.5,
+        "inference_time_s": 4.6,
+        "scoring_time_s": 1.4
+      }
+    },
+    {
+      "exp_id": "residual_skip_gcn_iter_002_001",
+      "role": "trial",
+      "score": 0.3091263718946179,
+      "metric": "mean_auprc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none",
+      "native_timing_seconds": {
+        "train_time_s": 10.9,
+        "validation_time_s": 3.7,
+        "inference_time_s": 5.1,
+        "scoring_time_s": 1.4
+      }
+    },
+    {
+      "exp_id": "residual_skip_gcn_iter_002_002",
+      "role": "formal",
+      "score": 0.24494385928046952,
+      "metric": "mean_auprc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none",
+      "native_timing_seconds": {
+        "train_time_s": 10.4,
+        "validation_time_s": 3.6,
+        "inference_time_s": 4.7,
+        "scoring_time_s": 1.4
+      }
+    },
+    {
+      "exp_id": "replicated_sparse_gcn_iter_003_001",
+      "role": "trial",
+      "score": 0.5732607266992731,
+      "metric": "mean_auprc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none",
+      "native_timing_seconds": {
+        "train_time_s": 10.0,
+        "validation_time_s": 2.8,
+        "inference_time_s": 4.9,
+        "scoring_time_s": 1.4
+      }
+    },
+    {
+      "exp_id": "replicated_sparse_gcn_iter_003_002",
+      "role": "formal",
+      "score": 0.17785397173886575,
+      "metric": "mean_auprc",
+      "status": "success",
+      "health": "not_applicable_task_declares_none",
+      "native_timing_seconds": {
+        "train_time_s": 10.4,
+        "validation_time_s": 3.6,
+        "inference_time_s": 5.0,
+        "scoring_time_s": 1.5
+      }
+    }
+  ],
+  "qualification": {
+    "status": "completed",
+    "request_count": 42,
+    "accounted_usd": "0.067196000",
+    "unknown_requests": 0,
+    "cumulative_command_seconds_upper_bound": 1063.115221986547,
+    "campaign_wall_seconds_at_closure_check": 1288.1897589685395,
+    "full_notebook_command_elapsed_seconds": 1044.8051977846771,
+    "cached_notebook_command_elapsed_seconds": 18.310024201869965,
+    "notebook_saved_script_elapsed_seconds": 1017.8837596746162,
+    "automatic_retries": "All three initially generated models narrowed symbolic forward batch B to 1; native B=2 shape test rejected them and automatic implementation retries repaired them. No manual repair or score pursuit.",
+    "all_three_iterations_completed": true,
+    "result_authority": "diagnostic",
+    "result_reuse": "Repeated Run All made no new API requests and preserved the completion receipt.",
+    "command_time_includes_api_wait": true,
+    "limits": "Observed validation accounting, not limits automatically imposed by the public notebook; command time is not measured GPU utilization."
+  },
+  "display_paths": "CSV source paths are project-relative; score/status values and PNG/SVG bytes are unchanged. Notebook publishes image outputs only, not console, prompts or machine-path output.",
+  "source_csv_sha256": "c4606030c03fb58f1bfad2ff3636557acd00b26ba894e559b2389ad3e8ca8c7f",
+  "asset_sha256": {
+    "graph.png": "ca00746077dab5bbcaea04398bfe27865321e9ee3e4bf11b5ad166e8c5250054",
+    "score-versus-iteration.csv": "98d7edba671ea66bb77833404f109c278013f10e76a8102f16e58e558a9b781a",
+    "score-versus-iteration.png": "73f328c1df6cc56ca72803b4143fa26d11c175cb2c2b58b81d327a2082785cc2",
+    "score-versus-iteration.svg": "515e46596efdb02b1b329c2bb5789b48c063c3d593c77d606f82e574f46a1321"
+  }
+}

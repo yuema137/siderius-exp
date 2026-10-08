@@ -1,0 +1,16 @@
+architect_role: graph neural networks for transductive cancer-gene identification under the
+  workflow-declared fixed masked binary-cross-entropy objective; explore the model architecture
+  and training configuration without proposing a custom loss
+output_contract_guidance: The continuous output carries task metadata in its first two channels
+  and a raw binary cancer-gene logit in its third channel for every packed record.
+evidence_reading: Read CPDB validation AUPRC and its supporting execution evidence. This single-network
+  teaching run does not measure cross-network generalization.
+input_semantics: one complete CPDB biological network packed as node records followed by directed
+  edge records, with 64 multi-omics features on node rows
+continuous_output_meaning: node and active-split markers plus raw cancer-gene logits
+per_file_strategy_guidance: Use snapshot on the complete selected CPDB network. Label fractions
+  select supervision or validation labels within original masks; they do not reduce graph topology.
+  Other networks are outside this teaching composition.
+target_strategy_selector_clause: ' (the only selected biological network is CPDB)'
+evidence_rationale_clause: ' and the CPDB validation AUPRC'
+evidence_citation_clause: ', and the CPDB validation AUPRC'

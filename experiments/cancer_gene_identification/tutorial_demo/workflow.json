@@ -1,0 +1,11 @@
+{
+  "version": "siderius-exp-fixed-workflow-v1",
+  "task_composition": "tasks/cancer/compositions/cpdb_tutorial.yaml",
+  "agent_parameters": "llm/agents.json",
+  "agent_parameters_owner": "experiment",
+  "parameters": {
+    "--allowed_output_types": "regressor",
+    "--formal_training_scope_source": "operator",
+    "--min_formal_batch_size": 1
+  }
+}

@@ -26,16 +26,22 @@ saved-script workflow. The [recorded three-iteration demo](supernemo/example/REA
 includes a real Train event, measured scores and provenance. Reserved test
 events remain unused.
 
+## Cancer graph tutorial
+
+[Cancer setup](cancer/README.md) and its [notebook](cancer/cancer_tutorial.ipynb)
+explain one complete CPDB graph, original label masks and editable active-label
+fractions. The [recorded example](cancer/example/README.md) shows a real graph
+preview and three completed iterations; original Test labels remain unused.
+
 ## Tasks awaiting a notebook
 
-Cancer and DAVIS already have task packages and experiment code.
-Their notebook-plus-script tutorials are **not yet available**. The references
+DAVIS already has a task package and experiment code.
+Its notebook-plus-script tutorial is **not yet available**. The references
 below are for inspecting existing work; they are not interchangeable with the
 Pet walkthrough or evidence of a newly qualified three-iteration demo.
 
 | Task | Existing references |
 |---|---|
-| Cancer-gene identification | [Task and current entrypoints](../../tasks/cancer_gene_identification/README.md) · [Two-network qualification reference](../../experiments/cancer_gene_identification/two_network_qualification/README.md) |
 | DAVIS future-frame prediction | [Task](../../tasks/davis_future_prediction/README.md) · [Bounded qualification reference](../../experiments/davis_future_prediction/two_iteration_qualification/README.md) |
 
 In particular, an older experiment profile called `demo` may run many iterations

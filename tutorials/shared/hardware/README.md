@@ -49,7 +49,7 @@ cd "$EXP_CHECKOUT"
 
 For the four paper-task notebooks, **Quick A must first save its JSON**. Check
 that Quick A file, not the initial example if you have since changed settings.
-For Pet, MJD and SuperNEMO, initialization already creates the default JSON.
+For Pet, MJD, SuperNEMO and Cancer, initialization already creates the default JSON.
 After saving a variant, use the new JSON path printed by the notebook.
 
 This command needs no API key, makes no LLM call, starts no training and creates
@@ -85,6 +85,7 @@ every GPU.
 | [Pet](../../supplementary/pet/README.md) | 8 GiB | Account for downloaded archives, extracted images, manifests and checkpoints. Fewer training images do not remove the original dataset or extraction space. |
 | [MJD](../../supplementary/mjd/README.md) | 10 GiB | The 22 original supervised files total about 43.5 GB; reuse them in place. Runtime-selected waveforms and generated models need additional RAM/storage. |
 | [SuperNEMO](../../supplementary/supernemo/README.md) | 10 GiB | Raw files total about 23.1 GB. One-time index preparation produced about 204 MiB and peaked at 8.7 GiB host RAM in the recorded run; an 8 GiB host is unsuitable for that demonstrated preparation. Leave headroom for the OS and other programs. |
+| [Cancer](../../supplementary/cancer/README.md) | 10 GiB | The single CPDB source file is about 1.50 GB. Four CPU graph-loader previews peaked near 980 MiB host RAM in one audit; this is not a training minimum or upper bound. The complete graph stays in every sample, so smaller active-label fractions do not reduce topology or message-passing memory. |
 
 The current MJD and SuperNEMO examples completed on an RTX 5090; their example
 receipts record the exact run. The earlier tutorials likewise link their own
