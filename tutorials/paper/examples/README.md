@@ -14,7 +14,7 @@ They are clearly labeled **archived examples**, separate from your own run.
 
 These examples come from real RTX 5090 runs on September 29–30, 2026. The JSON
 files record their source revisions, numerical settings, elapsed time, launcher
-exit code and source-record hashes. CSV source paths are relative to the original
+exit code and verification records for the original results. CSV source paths are relative to the original
 run workspace; the original model checkpoints and full run directories are not
 included. No API keys, machine-local paths or raw datasets are published here.
 The data figures show the first training observation/window, not a selected

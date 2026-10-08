@@ -42,7 +42,7 @@ export TIDMAD_SOURCE="/absolute/path/to/TIDMAD"
   --project "$TUTORIAL_HOME" --source "$TIDMAD_SOURCE"
 ```
 
-This verifies the eight source hashes and creates only symbolic links in
+This verifies the eight original files and creates only symbolic links in
 `data/band-0-3/`. The small scoring anchor is local. Keep the shared source
 paths available; tutorial execution reads them and writes outputs elsewhere.
 
@@ -197,7 +197,7 @@ demo. To follow them, save and run that optional example in notebook sections
 
 Workflow validation influences the agent and training/model selection. Final
 test happens only after selection: stop search, declare the selected native
-model, seal its hashes, then run the separate test script. The notebook shows
+model, record that selection, then run the separate test script. The notebook shows
 how to select a saved successful attempt and generate `final-test/candidate.json`
 from its recorded artifact paths. Search scripts retain the training checkpoint
 for this step. Its report uses the selected task's

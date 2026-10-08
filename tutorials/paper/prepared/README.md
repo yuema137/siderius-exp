@@ -110,10 +110,11 @@ No test file is requested. Data are from the pinned
 [PhyTS release](https://huggingface.co/datasets/PhyTS-team/PhyTS-bench/tree/9f203f4c338645a1e4b2c9dc7d6f820269ca5114).
 
 The helper checks the source manifest and array metadata when reusing local
-prepared data; it does not rehash the entire large source. Partial downloads
-cannot verify a whole-file hash. Both routes hash every small output array;
-the launcher verifies those hashes before execution. The manifest states this
-integrity boundary and preserves source row identities.
+prepared data; it does not verify every byte of the large source arrays.
+Partial downloads cannot verify the complete source files either. Both routes
+create verification records for every small output array; the launcher checks
+each array before execution. The manifest records this coverage limit and the
+selected source rows.
 
 Do not repeat data preparation for every run. Reuse the prepared task/data pair.
 To choose different row counts, pass `--train-rows` (20–2000) and
@@ -165,7 +166,7 @@ $TUTORIAL_HOME/
   tasks/project8-demo-001/compositions/regression.yaml
   tasks/project8-demo-001/declared/prepared.json
   tasks/shared/                             # copied task adapter/metric code
-  data/demo-001/manifest.json                # row identities, source and hashes
+  data/demo-001/manifest.json                # row membership, source and integrity record
   data/demo-001/training/{inputs,targets}.npy
   data/demo-001/evaluator/validation/{inputs,targets,loss_indices}.npy
   experiments/project8_quick-demo-001.json    # Quick A's saved settings

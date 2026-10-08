@@ -85,7 +85,7 @@ cd "$EXP_CHECKOUT"
   --project "$TUTORIAL_HOME" --source "$TESS_SOURCE"
 ```
 
-The helper verifies source hashes and stages only the two required NPZ archives.
+The helper verifies the declared source files and stages only the two required NPZ archives.
 It does not copy or download the raw Parquet. If verified run-input NPZ files
 already exist, point the initial `experiments/tess-experiment.json` `data_dir`
 to their absolute directory before Quick A; no staging is needed.
@@ -101,7 +101,7 @@ cd "$EXP_CHECKOUT"
 
 This downloads about 31 MB from the pinned
 [PhyTS release](https://huggingface.co/datasets/PhyTS-team/PhyTS-bench/tree/9f203f4c338645a1e4b2c9dc7d6f820269ca5114/TESS/split),
-checks [declared source hashes](../configs/tess_source.json), then stages 3,338
+verifies the files against the [source declaration](../configs/tess_source.json), then stages 3,338
 training and 442 validation curves. The 403 held-out test curves are not
 downloaded or used. No Hugging Face token is needed for these public files.
 
