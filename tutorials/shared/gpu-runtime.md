@@ -29,19 +29,22 @@ The child obtains fresh typed framework facts, then requires:
 3. Effective Trial/Formal budgets strictly below the selected physical capacity.
 4. An implemented required accounting adapter and the framework's actual stable
    device identity. No index/name-based or synthetic UUID fallback is allowed.
-5. One zero-initialized tensor, one addition and synchronization on `cuda:0`.
+5. One call to existing `gpu_accounting.sample_device_baseline(identity)` must
+   return available telemetry. This owner performs the UUID-matched device and
+   compute-app queries; exceptions or unavailable results refuse before the kernel.
+6. One zero-initialized tensor, one addition and synchronization on `cuda:0`.
    PyTorch uses this namespace on both CUDA and ROCm; no vendor check is copied
    into the adapter. Missing capabilities refuse before this kernel witness.
 
-Accounting implementation and identity do not prove live samples are available,
-coherent or sufficient. Actual framework measurement/admission/protection must
+Successful baseline queries show driver-query availability at setup, not
+coherent/sufficient admission evidence or continuing availability. Actual framework measurement/admission/protection must
 still validate those facts. A tiny kernel cannot prove model fit or peak safety.
 
 ## Outputs, failures and effects
 
 The child returns one discriminated, extra-forbid JSON response: `GpuCheckReport`
 contains backend/runtime, name, logical index, capacity, real UUID, limitations
-and successful kernel witness; `GpuCheckFailure` contains an actionable message.
+and successful driver-query/kernel witnesses; `GpuCheckFailure` contains an actionable message.
 The parent validates this response and preserves the existing string receipt
 interface. Child failure, malformed JSON, missing interpreter or a 60-second
 setup timeout refuses launch. This timeout bounds this check only, not the

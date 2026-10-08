@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import core.hardware_context as hardware
+import core.runtime_control.gpu_accounting as accounting
 import pytest
 
 from tutorials.paper.runner import TutorialExperiment
@@ -47,6 +48,20 @@ def native(monkeypatch):
     )
     # The unchanged exp pin intentionally predates this additive API.
     monkeypatch.setattr(hardware, "inspect_gpu_runtime", lambda: facts, raising=False)
+    monkeypatch.setattr(
+        accounting,
+        "sample_device_baseline",
+        lambda device: accounting.DeviceBaselineSnapshot(
+            device=device,
+            telemetry_available=True,
+            sampled_at=0.0,
+            device_total_mib=192 * 1024,
+            device_used_mib=0,
+            device_free_mib=192 * 1024,
+            processes=(),
+            process_count=0,
+        ),
+    )
     calls = []
     monkeypatch.setattr(
         hardware.torch,
@@ -133,6 +148,31 @@ def test_explicit_saved_name_is_trimmed_and_preserved(native):
         gpu_check.check_gpu(request(expected_name=" NVIDIA ")).device_name
         == "Arbitrary NVIDIA device"
     )
+
+
+@pytest.mark.parametrize("failed_query", ["unavailable", "exception"])
+def test_implemented_adapter_and_uuid_require_real_queries_before_kernel(
+    native, monkeypatch, failed_query
+):
+    facts, calls = native
+    assert facts.implemented_accounting_adapter == "nvidia-smi"
+    assert facts.hardware.active_device_uuid == "GPU-example"
+
+    def query(device):
+        assert device.uuid == "GPU-example"
+        if failed_query == "exception":
+            raise OSError("private-driver-output")
+        return accounting.DeviceBaselineSnapshot(
+            device=device,
+            telemetry_available=False,
+            sampled_at=0.0,
+        )
+
+    monkeypatch.setattr(accounting, "sample_device_baseline", query)
+    with pytest.raises(ValueError, match="queries") as error:
+        gpu_check.check_gpu(request())
+    assert "private-driver-output" not in str(error.value)
+    assert calls == []
 
 
 def test_missing_new_api_is_named_pair_failure_without_old_probe(monkeypatch):

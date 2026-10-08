@@ -86,7 +86,7 @@ def verify_gpu(settings: RuntimeSettings) -> str:
     details = (
         f"{report.device_name}; logical device {report.logical_index}; "
         f"{report.capacity_gib:g} GiB; backend {report.installed_backend}; "
-        "kernel witness passed; live admission/accounting checks still required"
+        "driver queries and kernel witness passed; live admission/accounting checks still required"
     )
     return details + (
         "; " + "; ".join(report.limitations) if report.limitations else ""

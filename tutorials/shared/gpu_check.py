@@ -32,6 +32,7 @@ class GpuCheckReport(BaseModel):
     capacity_gib: VramBudget
     device_uuid: str
     limitations: tuple[str, ...]
+    driver_queries_passed: Literal[True] = True
     kernel_witness: Literal[True] = True
 
 
@@ -99,7 +100,10 @@ def check_gpu(request: GpuCheckRequest) -> GpuCheckReport:
             "this backend. AMD/ROCm compatibility is experimental and untested; "
             "do not disable required protection to proceed."
         )
-    from core.runtime_control.gpu_accounting import device_identity_from_hardware
+    from core.runtime_control.gpu_accounting import (
+        device_identity_from_hardware,
+        sample_device_baseline,
+    )
 
     identity = device_identity_from_hardware(hardware)
     if identity is None:
@@ -107,6 +111,19 @@ def check_gpu(request: GpuCheckRequest) -> GpuCheckReport:
             "Stable driver GPU identity is unavailable. Check the driver and device "
             "visibility in this job/container. Required accounting cannot use a "
             "model name or logical index as an identity."
+        )
+    try:
+        baseline = sample_device_baseline(identity)
+    except Exception as error:
+        raise ValueError(
+            f"GPU driver queries failed ({type(error).__name__}). Check driver tooling "
+            "and device/process query access inside this job/container before launch."
+        ) from error
+    if not baseline.telemetry_available:
+        raise ValueError(
+            "GPU driver device/process queries are unavailable. Check driver tooling "
+            "and permissions inside this job/container; required accounting must work "
+            "before allocation or provider calls. Do not disable resource protection."
         )
     try:
         import torch
