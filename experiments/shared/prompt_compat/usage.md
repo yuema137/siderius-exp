@@ -27,10 +27,19 @@ uv pip install --python "$INFRA_CHECKOUT/.venv/bin/python" \
 ```
 
 This installs the package versions declared by the selected exp checkout
-(currently planner compatibility 0.8.0 and prompt compatibility 0.6.0) as normal
+(currently planner compatibility 0.8.0 and prompt compatibility 0.7.0) as normal
 packages. Do not share another checkout's virtualenv or add its source through
 `PYTHONPATH`. Running `uv sync` again can remove these separately installed
 consumer packages; reinstall them before using a historical profile.
+
+Version 0.7.0 also supports the renderer assembly tested at infra
+`34660bed0960f3bcad60ba30aaedffaaf617ff8b`. Its
+[qualification report](release-renderer-qualification.md) records 47 matching
+offline message comparisons and the four paper proposer routes. This is a
+development candidate, not a new public installation pin or a completed
+onboarding release. Changing the package changes its recorded identity: use
+a new workspace and leave historical workspace locks intact. Retain the old
+package and infra revision when using an old workspace's recorded identities.
 
 ## 2. Configure copies in a new workspace
 
