@@ -179,7 +179,7 @@ Select one visible GPU with working kernels and required accounting, and keep
 resource budgets below its capacity. Names are not restricted to specific NVIDIA
 models; an explicit `gpu` value remains a name expectation. Follow the
 [shared hardware instructions](../README.md#6-change-settings-or-hardware-deliberately),
-including the pending paired-pin qualification. AMD/ROCm is experimental and
+including the source-pair qualification limits. AMD/ROCm is experimental and
 untested; missing driver accounting currently prevents this tutorial route.
 Intel GPU training is unsupported. Per-stage time allowances are not total campaign
 or cost caps. The fixed workflow has no separate security sandbox: raw files

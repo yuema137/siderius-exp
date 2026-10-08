@@ -27,7 +27,7 @@ infra revision. Each checkout must have its own frozen virtual environment.
 
 Use Linux, Python 3.12 and one visible GPU supported by the frozen installation
 and required accounting. Follow the [shared hardware instructions](../README.md#6-change-settings-or-hardware-deliberately)
-for optional name expectations, capacity checks and pending paired qualification.
+for optional name expectations, capacity checks and source-pair qualification limits.
 AMD/ROCm is experimental and untested; its missing driver accounting currently
 prevents these tutorial launches. Intel GPU training is unsupported. This fixed workflow has no separate coding-agent
 filesystem sandbox; generated models execute under your user account.

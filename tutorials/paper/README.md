@@ -145,9 +145,12 @@ launcher checks that combination before starting the run. The historical TESS
 deployment used RTX 5090 with an 8 GiB model budget. That record does not qualify
 a new device or backend.
 
-This portability update still awaits final paired qualification and promotion
-of the framework pin. Until then, launch refuses a framework lacking the new
-discovery API; do not bypass the pin check or substitute another environment.
+The pinned source pair passed offline installation, historical prompt checks
+and fresh-project command previews. Those checks do not establish that a real
+run will succeed on your GPU. Public-source installation is verified separately
+after release synchronization; do not bypass a missing revision or the pin check.
+See the [qualification record](../../provenance/validation/2026-10-08_final_source_pair.md)
+for the tested scope.
 
 Choose a new location for the public exp checkout:
 
