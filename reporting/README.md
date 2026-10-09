@@ -4,8 +4,14 @@
 experiment records. Generated receipts and HTML files are runtime artifacts;
 keep them beside the workspaces rather than committing them to this repository.
 
-The collector accepts one or more `NAME=/absolute/workspace` arguments. The
-renderer can combine receipts collected on different machines:
+Run from this checkout with its own environment. Replace `/runtime/task-a`
+with your completed run workspace and choose your output paths:
+
+```bash
+uv sync --group dev --frozen
+```
+
+Collect one run, then render the receipt just created:
 
 ```bash
 .venv/bin/python reporting/metric_dashboard.py collect \
@@ -14,10 +20,15 @@ renderer can combine receipts collected on different machines:
 
 .venv/bin/python reporting/metric_dashboard.py render \
   --receipt /runtime/task-a-receipt.json \
-  --receipt /runtime/task-b-receipt.json \
   --y-axis 'Task A=0.60:0.80:0.05' \
   --output /runtime/metric-dashboard.html
 ```
+
+Open `/runtime/metric-dashboard.html` in a browser. The collector also accepts
+multiple `NAME=/absolute/workspace` arguments. To combine separately collected
+receipts, including ones from different machines, add another `--receipt` to
+`render`; for example, `--receipt /runtime/task-b-receipt.json` only after that
+file has been collected.
 
 `--y-axis NAME=MIN:MAX:STEP` is optional and repeatable. It fixes a panel's
 display range and tick spacing without embedding task-specific presentation
