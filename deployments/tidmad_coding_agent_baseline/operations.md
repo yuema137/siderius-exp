@@ -61,45 +61,26 @@ reasons without explicit operator approval.
 
 ## Before renting GPUs
 
-1. Review the tracked [`task.md`](task.md); changing it creates a new frozen
+1. Review the main package's [`task-main-band.md`](task-main-band.md); changing it creates a new frozen
    experiment package and run identity.
 2. Choose and review one treatment from
    [`experiments/tidmad/information_treatments`](../../experiments/tidmad/information_treatments/).
-3. Build one archive and copy those exact bytes to both machines.
+3. For each band and condition, build one archive and give Codex and Claude
+   identical bytes. Different bands require distinct archives.
 4. Prepare a distinct agent API credential and append-only backup credential
    for each machine.
 5. Create isolated Nebius VMs only after the archive is ready: two for the
    historical four-band pilot, or one per independent band/agent main unit.
 
-From this checkout, using its own environment and the exact pinned SIDERIUS
-checkout:
+Build from this checkout using its own environment and the exact pinned SIDERIUS
+checkout. The builder refuses a dirty TIDMAD task tree or a SIDERIUS checkout
+that differs from [`SIDERIUS_REVISION`](../../SIDERIUS_REVISION).
 
-```bash
-.venv/bin/python -m \
-  deployments.tidmad_coding_agent_baseline.tools.build_bundle \
-  --task-md deployments/tidmad_coding_agent_baseline/task.md \
-  --information-treatment \
-    experiments/tidmad/information_treatments/prerelease-without-advice.yaml \
-  --siderius-checkout /path/to/exact-pinned-SIDERIUS \
-  --output /safe/bundles/tidmad-coding-agent-baseline.tar.gz
-sha256sum /safe/bundles/tidmad-coding-agent-baseline.tar.gz
-```
+### Single-band main package
 
-Use the same reported archive hash on both machines. The builder refuses a
-dirty TIDMAD task tree or a SIDERIUS checkout that differs from
-[`SIDERIUS_REVISION`](../../SIDERIUS_REVISION).
-
-The command above builds the explicit advice-off condition. To build the
-otherwise identical advice-on condition, change only the treatment path to
-`experiments/tidmad/information_treatments/prerelease-with-advice.yaml`.
-The resulting `treatment.json` records the selected arm and advice identity;
-the public task-view hash remains the same. Codex and Claude must receive the
-same archive bytes when they belong to the same arm.
-
-The command above is for the four-band diagnostic pilot. For a **single-band
-main-experiment package**, select one band explicitly, use
-`task-main-band.md` and `main-cli-no-advice.yaml`, and build the same archive
-bytes for Codex and Claude in that band:
+Select one band explicitly, use `task-main-band.md` and
+`main-cli-no-advice.yaml`, and give both agents the same archive for that band
+and condition:
 
 ```bash
 .venv/bin/python -m \
@@ -116,6 +97,31 @@ Replace `4-9` with the selected band and use a distinct run/workspace for
 each band. This package carries only that band's training/validation checksum
 entries and evaluator scopes. It does not by itself authorize a main run:
 freeze the remaining launch inputs and complete the H100 drill first.
+
+### Historical four-band diagnostic pilot
+
+This separate recipe uses the historical four-band `task.md`. It is not the
+single-band main package above:
+
+```bash
+.venv/bin/python -m \
+  deployments.tidmad_coding_agent_baseline.tools.build_bundle \
+  --task-md deployments/tidmad_coding_agent_baseline/task.md \
+  --information-treatment \
+    experiments/tidmad/information_treatments/prerelease-without-advice.yaml \
+  --siderius-checkout /path/to/exact-pinned-SIDERIUS \
+  --output /safe/bundles/tidmad-coding-agent-baseline.tar.gz
+sha256sum /safe/bundles/tidmad-coding-agent-baseline.tar.gz
+```
+
+Use the same reported archive hash on both machines for the selected pilot arm.
+
+The command above builds the explicit advice-off condition. To build the
+otherwise identical advice-on condition, change only the treatment path to
+`experiments/tidmad/information_treatments/prerelease-with-advice.yaml`.
+The resulting `treatment.json` records the selected arm and advice identity;
+the public task-view hash remains the same. Codex and Claude must receive the
+same archive bytes when they belong to the same arm.
 
 ## VM contract
 
