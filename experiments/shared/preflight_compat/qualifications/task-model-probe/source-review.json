@@ -1,0 +1,13 @@
+{
+  "infra_revision": "769bba4539cc9bef0189427d7da278da1012daac",
+  "reference_revision": "b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
+  "assembly_sha256": "a42ade482e55d198c94c9a8656a37cfd506521ea0fab8c416e2fe99e1eda92e8",
+  "assembly_members": 78,
+  "changed_assembly_sources": [
+    "src/agent/schemas/hyperparam_tuning.py",
+    "src/workflows/model_exploration.py",
+    "src/workflows/task_composition.py"
+  ],
+  "static_arithmetic_search_and_observation_sources": "byte-identical",
+  "scope": "Task probe transport only; no change to preflight arithmetic or search. New workspace required; no live or full conversation replay claim."
+}

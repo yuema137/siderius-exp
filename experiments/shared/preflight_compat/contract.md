@@ -111,3 +111,11 @@ projection of newly measured/protected execution evidence. Correct `drop_last=Fa
 producer behavior can differ from the old full-batch-only probe; one archived
 Project8 configuration still lacks recovered geometry. The [execution receipt](qualifications/final-pair/report.md)
 distinguishes source review from checks actually run.
+
+## Task-model-probe framework pairing
+
+The [task-model-probe qualification](qualifications/task-model-probe/report.md)
+extends the same historical static scope to the current root framework pin.
+Package 0.2.1 adds the reviewed source assembly without changing historical
+arithmetic or weakening unknown-source refusal. Its new identity requires a new
+workspace; prior qualifications and archived pins remain intact.
