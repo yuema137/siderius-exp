@@ -72,25 +72,27 @@ For a variant, use its own saved JSON. This hardware-only check creates no run
 workspace and does not validate every task setting. Fresh launches repeat the
 GPU check; later native measurement still decides whether a generated model fits.
 
-## 2. Reuse images, or download once
+## 2. Download the images
 
-If the dataset is already available, pass its **images directory**, containing
-files such as `Abyssinian_100.jpg`, directly to project initialization. Supply
-your own absolute external path with `--images`; no machine-specific data
-location is assumed.
-No JPEGs are copied or downloaded by initialization.
-
-For another machine, the repository provides an explicit acquisition tool:
+Use the task-owned helper to download and verify the official image and
+annotation archives, then extract them outside the repositories:
 
 ```bash
+export PET_DATA="/absolute/path/data/OXFORD_IIIT_PET"
 cd /absolute/path/siderius-exp
 .venv/bin/python -m tasks.oxford_iiit_pet.tools.fetch_oxford_iiit_pet \
-  --dest /absolute/path/data/OXFORD_IIIT_PET --extract
+  --dest "$PET_DATA" --extract
 ```
 
-This verifies pinned archives. Do not download another copy if you already have
-the images. The demo checks all declared image filenames and decodes search
-images before launching; it never uses final-set pixels for search.
+The input directory is `$PET_DATA/images/`, containing files such as
+`Abyssinian_100.jpg`. Pass that directory to `--images` below; the initializer
+saves it as experiment `data_dir` without copying or downloading JPEGs. See the
+[shared directory guide](../../README.md#source-project-data-and-run-directories)
+for the distinction from your project and run outputs.
+
+Keep this completed download for later runs. The demo checks every declared
+image filename and decodes search images before launch; final-set pixels never
+enter search. Fix missing files before running the notebook's image preview.
 
 ## 3. Initialize your project and export keys
 
@@ -99,7 +101,7 @@ cd /absolute/path/siderius-exp
 .venv/bin/python -m tutorials.supplementary.pet.project \
   --project /absolute/path/my-pet-project \
   --infra-checkout /absolute/path/SIDERIUS \
-  --images /absolute/path/data/OXFORD_IIIT_PET/images
+  --images "$PET_DATA/images"
 ```
 
 Choose a new project outside both repositories and the dataset. Initialization

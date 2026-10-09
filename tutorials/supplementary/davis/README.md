@@ -43,25 +43,24 @@ been qualified. The [hardware guide](../../shared/hardware/README.md) explains
 how to check GPU readiness and inspect available RAM/disk before spending API
 credit. Smaller clip fractions reduce work, not the size of each video tensor.
 
-## 2. Reuse existing data or fetch it once
+## 2. Download the archive and extract the frames
 
-Your data directory must contain both the pinned archive and the extracted
-`DAVIS/JPEGImages/480p/` tree. Reuse an existing copy directly:
+Use the task-owned helper to fetch and verify the official archive, extract it
+and check the sequence layout:
 
 ```bash
-export DAVIS_DATA="/absolute/path/DAVIS_2017"
+export DAVIS_DATA="/absolute/path/data/DAVIS_2017"
 cd "$EXP_CHECKOUT"
-.venv/bin/python -m tasks.davis_future_prediction.tools.fetch_davis \
-  --dest "$DAVIS_DATA" --no-download --check-layout
-```
-
-For a new machine without the data, use the same task-owned helper to fetch,
-verify and extract the official archive:
-
-```bash
 .venv/bin/python -m tasks.davis_future_prediction.tools.fetch_davis \
   --dest "$DAVIS_DATA" --extract --check-layout
 ```
+
+Success prints `[layout] ... sequences present`. Keep both
+`DAVIS-2017-trainval-480p.zip` and the extracted `DAVIS/JPEGImages/480p/` tree
+under `DAVIS_DATA`. Pass this outer directory to `--data-dir` in the next step;
+do not pass `JPEGImages` itself. It becomes `data_dir` in `experiments/davis-demo.json`.
+The [shared directory guide](../../README.md#source-project-data-and-run-directories)
+explains how inputs differ from the project and run outputs.
 
 The helper reuses and verifies a present archive. Keep data outside
 both repositories. See the [data guide](../../../tasks/davis_future_prediction/data/README.md)
