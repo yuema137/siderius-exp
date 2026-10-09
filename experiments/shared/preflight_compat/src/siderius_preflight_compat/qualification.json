@@ -46,6 +46,11 @@
       "infra_revision": "769bba4539cc9bef0189427d7da278da1012daac",
       "assembly_sha256": "a42ade482e55d198c94c9a8656a37cfd506521ea0fab8c416e2fe99e1eda92e8",
       "scope": "Task-valid candidate probe interface; static arithmetic/search/observation sources unchanged from b13b9263. Frozen 45 phase estimates and 32 batch decisions; static_only with protected execution unselected. No live GPU, universal producer geometry or stochastic training parity claim."
+    },
+    {
+      "infra_revision": "fec37b60f5701db8993ac4d29539b2f1090e4c2b",
+      "assembly_sha256": "772589d71f3468c489808a6eb104f4c8a63af5fa7ebb444317e2bc56abda6f87",
+      "scope": "Removal of implicit epoch maximum; estimation closure changes only TrainConfig epoch maximum and cooperative allocation validation/description. Frozen static arithmetic and batch decisions; explicit historical 100 caps. No live GPU, stochastic training or formerly invalid >100 trajectory parity claim."
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"

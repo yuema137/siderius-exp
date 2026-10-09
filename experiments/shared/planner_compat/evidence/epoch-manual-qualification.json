@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "infra_revision": "fec37b60f5701db8993ac4d29539b2f1090e4c2b",
+  "exp_base_revision": "27ff63784fb9cb32b3f149c8e035781806f3976c",
+  "scope": "Offline exact manual and recorded startup qualification; not full historical conversations, stochastic responses, scores or training replay",
+  "source_closures": [
+    {
+      "closure": "estimation_assembly_digest",
+      "baseline_revision": "769bba4539cc9bef0189427d7da278da1012daac",
+      "files": 78,
+      "changed_paths": [
+        "src/agent/schemas/hyperparam_tuning.py",
+        "src/ml_models/models_format_sandbox.py"
+      ],
+      "candidate_assembly": "772589d71f3468c489808a6eb104f4c8a63af5fa7ebb444317e2bc56abda6f87"
+    },
+    {
+      "closure": "verifier_assembly_digest",
+      "baseline_revision": "b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
+      "files": 18,
+      "changed_paths": [],
+      "candidate_assembly": "57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da"
+    },
+    {
+      "closure": "rendering_assembly_digest",
+      "baseline_revision": "830d819f3233cad23ac613c1ba1c50f82b8efa88",
+      "files": 160,
+      "changed_paths": [
+        "src/agent/schemas/hyperparam_tuning.py"
+      ],
+      "candidate_assembly": "1541a79216be560ec70ed489dd6d90bb93401a6ef883920cd185d3418f16367d"
+    }
+  ],
+  "validation_sources_sha256": {
+    "planner_compat/src/siderius_planner_compat/startup_check.py": "b6fb07c26d45a38e4ef7a6d204cec55ef9559472e1ccab2fdc88305769237fae",
+    "planner_compat/src/siderius_planner_compat/self_check.py": "0a98b251be3669f42458f9b9f14c3080541a02cc51e6f3e6ffcc5cc67ce5ba38",
+    "prompt_compat/compare.py": "a3acbe2a5a1bd0c6cc6e842fee3acd61e9aedb82358faaad8f2ea54fcc9ad321",
+    "prompt_compat/capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42",
+    "prompt_compat/check_installation.py": "3dabba5d3948aacd0c74a63dd4e0feabddfa30488de046df672e01b3b5a2095e",
+    "preflight_compat/check_installation.py": "587740010827b58d478928bf846c849d609bde3d33d7c46ed0e86e2f64dece6e"
+  },
+  "planner_installation": {
+    "installed_source_files": 25,
+    "installed_sources_match": true,
+    "profiles": [
+      {
+        "name": "legacy-9b78d505cb11-paper-epochs-v9",
+        "version": "9",
+        "content_sha256": "87f8d3292e6d26b41fbd0f2e67d79ea17094c4b5c63e88cc79edb986e230a098",
+        "assembly_sha256": "d1321a044c946859faa180a21c4eda21ca8fe79ff838a0c816bc68e5ba265b3b"
+      },
+      {
+        "name": "legacy-9b78d505cb11-paper-late-epochs-v9",
+        "version": "9",
+        "content_sha256": "02cfc124cdcdb38e8b233213fc61cf86fd9a3741ca798df8c18171e5272f986b",
+        "assembly_sha256": "d1321a044c946859faa180a21c4eda21ca8fe79ff838a0c816bc68e5ba265b3b"
+      }
+    ]
+  },
+  "preflight_installation": {
+    "infra_revision": "fec37b60f5701db8993ac4d29539b2f1090e4c2b",
+    "qualified_reference_revisions": [
+      "fec37b60f5701db8993ac4d29539b2f1090e4c2b"
+    ],
+    "selected_checkout_assembly_match": true,
+    "installed_source_files": 5,
+    "packages": {
+      "siderius-preflight-compat": "0.2.2",
+      "siderius-planner-compat": "0.10.0"
+    },
+    "identity": {
+      "name": "legacy-078b23ca-preflight-v1",
+      "version": "1",
+      "content_sha256": "f4c43c524bc5edcec4bcac885e140a198727c92046166ae7f017a3141d157385",
+      "assembly_sha256": "772589d71f3468c489808a6eb104f4c8a63af5fa7ebb444317e2bc56abda6f87"
+    },
+    "child_identity_match": true,
+    "unknown_assembly_refused": true,
+    "api_calls": 0,
+    "gpu_calls": 0,
+    "training_calls": 0,
+    "scope": "Normal installed sources, profile discovery and subprocess identity; no data or training execution"
+  },
+  "prompt_installation": {
+    "installed_source_files": 15,
+    "frozen_source_entries": 11,
+    "profiles": [
+      {
+        "name": "paper-early-v2",
+        "version": "2",
+        "content_sha256": "c76d682d4c929273df2a5c840ad13e8a8eaeb95c215b2d99a0876f64fec57390",
+        "assembly_sha256": "1541a79216be560ec70ed489dd6d90bb93401a6ef883920cd185d3418f16367d"
+      },
+      {
+        "name": "paper-late-v2",
+        "version": "2",
+        "content_sha256": "5dcea2f3836ffa7754861b3a58b1e512b35f5400f6582c18920c9a1c01842be2",
+        "assembly_sha256": "1541a79216be560ec70ed489dd6d90bb93401a6ef883920cd185d3418f16367d"
+      },
+      {
+        "name": "paper-tidmad-noprior-v2",
+        "version": "2",
+        "content_sha256": "bbc62fd5a1eedbc71b561bfe90e8f9f02c0e9c1d01406394924b99124fc8b03f",
+        "assembly_sha256": "1541a79216be560ec70ed489dd6d90bb93401a6ef883920cd185d3418f16367d"
+      },
+      {
+        "name": "paper-analysis-c0467447-v2",
+        "version": "2",
+        "content_sha256": "ed209f7a99d4a2da10aedea93b4268c9aeddd8e9535770825b3c4ea305597503",
+        "assembly_sha256": "1541a79216be560ec70ed489dd6d90bb93401a6ef883920cd185d3418f16367d"
+      }
+    ],
+    "unqualified_assembly_refusals": 4,
+    "api_calls": 0,
+    "training_calls": 0
+  },
+  "actual_task_startups": [
+    {
+      "case": "tess",
+      "planner_strategy": "legacy-9b78d505cb11-paper-epochs-v9",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "4bd6119c979afcd470013e6c3fc2db5a25d5b7bfeeffb0891b9907a48b14ced0",
+        "user": "39ca1c956e72fd37c433c5d88ad3df9d3c120f5ac5beeb7e5fb517ad47251625"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "ligo",
+      "planner_strategy": "legacy-9b78d505cb11-paper-epochs-v9",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+        "user": "337e6f7d697bfe0ff6803ce5144365563cde9da3c700079e573f070a2f84d646"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "project8",
+      "planner_strategy": "legacy-9b78d505cb11-paper-late-epochs-v9",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "b2abecd0315f2f3a0e3beebebfbb3431629123465418da550f69635910861aef",
+        "user": "516f520d1b2f181ef3e35478a91aa0e6748d5f5761416256f504840c3afbc9cd"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "tidmad",
+      "planner_strategy": "legacy-9b78d505cb11-paper-epochs-v9",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "d59f2d173ad44f205083d5414acbcb3ea1f0e29bbf1767b4ba24aa94f76c73fd",
+        "user": "3ed12413a37d9546ec36f13ce198bc22336dd54be6eac55f27d2e9b496603bbd"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    }
+  ],
+  "frozen_boundary_comparison": {
+    "cases": 47,
+    "matches": 47,
+    "comparison_sha256": "584b0c38a404eb4a7ca42eda6a4a9ac826982078bc8ff9c635369a6b40bd4659",
+    "capture_scope": "Existing mixed recovered/reconstructed boundary fixtures, including proposer system-only cases; not full historical conversations"
+  },
+  "focused_tests": {
+    "passed": 106,
+    "components": {
+      "epoch_manual_v9": 13,
+      "frozen_manual_v4": 1,
+      "runtime_verifier_v8": 13,
+      "historical_estimation": 79
+    },
+    "static_estimates": 45,
+    "static_batch_decisions": 32,
+    "runtime_finite_sessions": 23,
+    "scope": "Runtime sessions exercise frozen deterministic traces, not training"
+  },
+  "explicit_paper_caps": {
+    "selected_units": 11,
+    "global": 100,
+    "trial": 100,
+    "formal": 100
+  },
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "training_calls": 0,
+  "limitations": [
+    "Four actual startup pairs, not eleven captures",
+    "No parity claim for formerly invalid >100 proposal retry/rejection trajectories",
+    "Old workspaces require original installed package/framework identities; use new workspace with v9"
+  ]
+}

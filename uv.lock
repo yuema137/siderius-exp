@@ -3020,7 +3020,7 @@ tutorial = [
 
 [[package]]
 name = "siderius-planner-compat"
-version = "0.9.0"
+version = "0.10.0"
 source = { directory = "experiments/shared/planner_compat" }
 
 [package.metadata]
@@ -3029,7 +3029,7 @@ provides-extras = ["historical-runtime"]
 
 [[package]]
 name = "siderius-preflight-compat"
-version = "0.2.1"
+version = "0.2.2"
 source = { directory = "experiments/shared/preflight_compat" }
 
 [[package]]
