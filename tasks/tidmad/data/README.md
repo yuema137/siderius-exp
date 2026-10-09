@@ -1,7 +1,7 @@
 # `data/` — TIDMAD data root (nothing is stored here)
 
 No dataset lives in this directory. Prepare the official HDF5 files in an
-external data directory using the [one-band tutorial's reuse or download steps](../../../tutorials/paper/tidmad/README.md#choose-existing-data-or-a-download).
+external data directory using the [one-band tutorial's download and preparation steps](../../../tutorials/paper/tidmad/README.md#download-your-band-data).
 [Provenance](../PROVENANCE.md) identifies the official distribution. Each
 experiment or campaign selects its data root explicitly with `--data_dir`.
 

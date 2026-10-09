@@ -1,13 +1,13 @@
 # SuperNEMO data
 
-Keep the four official HDF5 files in your own data directory outside the source
-repositories. Reuse an existing download. The [source manifest](../declared/source_files.json)
-lists the required filenames, sizes and checksums from the
-[official release](https://zenodo.org/records/20698789).
+Download the four HDF5 files from the [official release](https://zenodo.org/records/20698789)
+into your own data directory outside the source repositories. The
+[source manifest](../declared/source_files.json) lists the required filenames,
+sizes and verification details. Keep the completed download for later runs.
 
 The model consumes events, while the raw files contain detector-hit rows.
 Execution therefore also needs event indexes. The
-[tutorial preparation guide](../../../tutorials/supplementary/supernemo/README.md#2-reuse-raw-data-and-prepare-event-indexes-once)
+[tutorial preparation guide](../../../tutorials/supplementary/supernemo/README.md#2-download-raw-data-and-prepare-event-indexes)
 shows how to generate those indexes in a separate directory, using symbolic
 links to the raw files rather than copying them. Point the tutorial's
 `data_dir` at that prepared directory.
