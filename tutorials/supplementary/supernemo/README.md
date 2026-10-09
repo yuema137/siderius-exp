@@ -71,11 +71,9 @@ For a variant, use its own saved JSON. This hardware-only check creates no run
 workspace and does not validate every task setting. Fresh launches repeat the
 GPU check; later native measurement still decides whether a generated model fits.
 
-## 2. Reuse raw data and prepare event indexes once
+## 2. Download raw data and prepare event indexes
 
-If the four official files already exist locally, set `RAW_DATA` to that
-directory. Do not download or copy another set. Otherwise obtain these files
-from the [official SuperNEMO release](https://zenodo.org/records/20698789):
+Download these files into the `RAW_DATA` directory selected above from the [official SuperNEMO release](https://zenodo.org/records/20698789):
 
 - `data_0nubb_merged.h5`
 - `data_2nubb_merged.h5`
@@ -86,7 +84,9 @@ Together they occupy about 23.1 GB. Small training fractions do not reduce this
 source download. The [task-owned manifest](../../../tasks/supernemo_signal_background/declared/source_files.json)
 records the required files and their verification details.
 
-Keep these three locations separate and outside the source checkouts:
+The [common directory guide](../../README.md#source-project-data-and-run-directories)
+explains project and run outputs. This task also needs a separate prepared-data
+directory; keep these locations outside the source checkouts:
 
 ```text
 supernemo-raw/                Original four HDF5 files; never modified
@@ -135,7 +135,9 @@ partition; it does not change partition membership.
 
 ## 3. Create your editable project
 
-Point `--data-dir` at the **prepared** directory, not the raw one:
+Complete preparation **before initialization**. Point `--data-dir` at the
+**prepared** directory, not the raw one; this path is saved in
+`experiments/supernemo-demo.json`:
 
 ```bash
 cd "$EXP_CHECKOUT"

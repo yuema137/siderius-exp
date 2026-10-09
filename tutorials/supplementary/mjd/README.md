@@ -76,22 +76,22 @@ For a variant, use its own saved JSON. This hardware-only check creates no run
 workspace and does not validate every task setting. Fresh launches repeat the
 GPU check; later native measurement still decides whether a generated model fits.
 
-## 2. Reuse data, or acquire the official files once
+## 2. Download and verify the supervised files
 
-Bind an existing external dataset directory directly. The initializer neither
-copies nor downloads data. On another machine, download the supervised files
-from the [official Majorana Zenodo release](https://zenodo.org/records/8257027):
+Download the supervised files from the [official Majorana Zenodo release](https://zenodo.org/records/8257027):
 `MJD_Train_0.hdf5` through `MJD_Train_15.hdf5` and `MJD_Test_0.hdf5` through
 `MJD_Test_5.hdf5`. Place all 22 files together. The three `MJD_NPML_*` files
 are unlabeled and are not needed. The supervised files total 43,535,055,168 bytes
-(about 43.5 GB / 40.5 GiB). Do not download a second copy if you already have them.
+(about 43.5 GB / 40.5 GiB). Keep the completed download for later runs.
 
-Verify the download explicitly with the task-owned checker:
+Set `MJD_DATA` to the directory containing those files, then verify the download
+with the task-owned checker:
 
 ```bash
+export MJD_DATA="/absolute/path/data/MAJORANA"
 cd /absolute/path/siderius-exp
 .venv/bin/python -B tasks/majorana_low_avse/tools/verify_dataset.py \
-  /absolute/path/data/MAJORANA \
+  "$MJD_DATA" \
   tasks/majorana_low_avse/declared/dataset_manifest.json --supervised-only
 ```
 
@@ -109,8 +109,12 @@ cd /absolute/path/siderius-exp
 .venv/bin/python -B -m tutorials.supplementary.mjd.project \
   --project /absolute/path/my-mjd-project \
   --infra-checkout /absolute/path/SIDERIUS \
-  --data-dir /absolute/path/data/MAJORANA
+  --data-dir "$MJD_DATA"
 ```
+
+`MJD_DATA` becomes `data_dir` in `experiments/mjd-demo.json`. The
+[common directory guide](../../README.md#source-project-data-and-run-directories)
+explains how it differs from your project and run outputs.
 
 Choose a new directory outside the repositories and raw data. The initializer
 refuses existing destinations. It creates these editable inputs:
