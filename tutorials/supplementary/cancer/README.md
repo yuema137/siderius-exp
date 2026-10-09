@@ -45,18 +45,15 @@ additional disk space for environments, checkpoints and results. A smaller
 label fraction does not make this graph smaller. See the
 [hardware guide](../../shared/hardware/README.md) before paid execution.
 
-## 2. Reuse or obtain the single CPDB file
+## 2. Download the CPDB file
 
-The data directory must contain `cpdb/data.h5`. If the dataset already exists
-on your machine or shared server, point directly to it; do not download another
-copy. The tutorial never modifies it.
+Download **only CPDB** (about 1.50 GB) from the pinned
+[FrontisAI/NatureBench source](https://huggingface.co/datasets/FrontisAI/NatureBench/tree/9e6a69f10865dd56f4991b49d1c974e2006b6b18/tasks/s41551-024-01312-5/problem/data/cpdb).
+Choose your own external data directory:
 
 ```bash
-export CANCER_DATA="/absolute/path/NatureBench/tasks/s41551-024-01312-5/problem/data"
+export CANCER_DATA="/absolute/path/data/cancer"
 ```
-
-If absent, download **only CPDB** from the pinned
-[FrontisAI/NatureBench source](https://huggingface.co/datasets/FrontisAI/NatureBench/tree/9e6a69f10865dd56f4991b49d1c974e2006b6b18/tasks/s41551-024-01312-5/problem/data/cpdb):
 
 ```bash
 mkdir -p "$CANCER_DATA/cpdb"
@@ -64,7 +61,11 @@ curl --fail --location --output "$CANCER_DATA/cpdb/data.h5" \
   'https://huggingface.co/datasets/FrontisAI/NatureBench/resolve/9e6a69f10865dd56f4991b49d1c974e2006b6b18/tasks/s41551-024-01312-5/problem/data/cpdb/data.h5?download=true'
 ```
 
-Use that command only when the file is missing. The copied task's
+The result must be `$CANCER_DATA/cpdb/data.h5`. Pass `CANCER_DATA`, not the
+`cpdb/` subdirectory, to `--data-dir` below; initialization saves it in
+`experiments/cancer-demo.json`. The [directory guide](../../README.md#source-project-data-and-run-directories)
+explains how this input root differs from run outputs. Keep a successful download
+for later runs instead of downloading again. The copied task's
 `declared/tutorial_source_files.json` records the required file and verification details. Preview
 checks size and mask structure; launch verifies the complete source file. No index-building
 or second prepared-data directory is needed.
