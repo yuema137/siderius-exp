@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import secrets
 from collections.abc import Sequence
 from pathlib import Path
@@ -17,9 +18,7 @@ from typing import Any, ClassVar, Literal
 import h5py
 import numpy as np
 import torch
-from pydantic import BaseModel, ConfigDict, Field
-from torch.utils.data import Dataset
-
+from agent.schemas.model_probe import ModelProbeRequest
 from execute_tools.task_data_path import (
     DeliverableWriteRequest,
     EpochSamplingParams,
@@ -29,6 +28,8 @@ from execute_tools.task_data_path import (
     TaskOutputArtifactInventory,
     ValidationScopeError,
 )
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 CANCER_GENE_TASK_ID = "naturebench_cancer_gene"
 INSTANCES = ("cpdb", "stringdb", "pcnet", "iref_v15", "iref_v9", "multinet", "mtg", "ltg")
@@ -154,6 +155,32 @@ class CancerGeneTaskDataPath:
 
     task_data_path_id: ClassVar[str] = CANCER_GENE_TASK_ID
     _SCOPE_KIND: ClassVar[str] = "naturebench_cancer_gene_scope_v1"
+
+    @staticmethod
+    def model_validation_input(request: ModelProbeRequest) -> torch.Tensor:
+        """Build a legal synthetic graph for CPU candidate checks, without data I/O."""
+        shape = request.input_shape
+        if len(shape) != 3 or shape[0] != 1 or shape[2] != RECORD_WIDTH:
+            raise ValueError("Cancer candidate probes require shape [1, R, 68]")
+        if request.dtype != "float32":
+            raise ValueError("Cancer candidate probes require float32 inputs")
+        records = shape[1]
+        # n*n >= R provides enough distinct non-self edges for R-n edge rows.
+        nodes = math.isqrt(records - 1) + 1
+        packed = torch.zeros(shape, dtype=torch.float32)
+        packed[0, :nodes, 0] = 1
+        packed[0, :nodes, 1] = torch.arange(nodes)
+        packed[0, :nodes, 3] = (torch.arange(nodes) % 2 == 0).float()
+        packed[0, :nodes, 4:] = torch.linspace(0, 1, RECORD_WIDTH - 4)
+        edges = records - nodes
+        if edges:
+            index = torch.arange(edges)
+            source = index // (nodes - 1)
+            destination = index % (nodes - 1)
+            destination = destination + (destination >= source).long()
+            packed[0, nodes:, 1] = source
+            packed[0, nodes:, 2] = destination
+        return packed
 
     @staticmethod
     def custom_loss_validation_pair() -> tuple[torch.Tensor, torch.Tensor]:

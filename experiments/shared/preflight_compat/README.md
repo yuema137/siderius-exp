@@ -17,7 +17,7 @@ weights, or score.
 ## Install in the environment that runs infra
 
 The current package targets the exact framework revision in the repository's
-`SIDERIUS_REVISION`. Its [final-pair report](qualifications/final-pair/report.md)
+`SIDERIUS_REVISION`. Its [qualification report](qualifications/task-model-probe/report.md)
 records the source review, executed checks and limits. Use `static_only` and leave
 `gpu_execution_policy` unselected for this historical view. Newly measured/protected
 execution evidence is outside that qualification.

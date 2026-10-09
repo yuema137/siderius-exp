@@ -5,9 +5,12 @@ The task-owned CPDB composition is a teaching variant: it selects only CPDB and
 the forward contract is identical to the original task declaration. The selected
 dataset profile declares one CPDB partition, and tutorial proposal blocks describe
 CPDB-only evidence and full-graph label sampling. Neither reuses an operational
-instruction to compare all eight networks. Original
-plugins, loss, metrics, three compositions, archived configurations and dated
-provenance remain unchanged. No framework policy or scientific loader is copied.
+instruction to compare all eight networks. The task's real data loading, loss,
+metrics and original splits are unchanged. Candidate checks use the task-owned
+[synthetic graph fixture](../../../tasks/cancer_gene_identification/plugins/model-probe.md)
+through the framework's optional input capability. Archived configurations and
+dated provenance retain their original source pins. No framework policy or
+scientific loader is copied.
 
 `settings.CancerExperiment` owns external paths, three-iteration defaults,
 positive time/VRAM allowances and native fraction range [0.01,1].
