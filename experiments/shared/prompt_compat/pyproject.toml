@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-prompt-compat"
-version = "0.9.0"
+version = "0.10.0"
 description = "Explicit experiment-owned historical prompt rendering profiles"
 requires-python = ">=3.12"
 license = "MIT"
@@ -15,9 +15,13 @@ paper-early-v1 = "siderius_prompt_compat:early"
 paper-late-v1 = "siderius_prompt_compat:late"
 paper-tidmad-noprior-v1 = "siderius_prompt_compat:tidmad_noprior"
 paper-analysis-c0467447-v1 = "siderius_prompt_compat:analysis"
+paper-early-v2 = "siderius_prompt_compat:early_v2"
+paper-late-v2 = "siderius_prompt_compat:late_v2"
+paper-tidmad-noprior-v2 = "siderius_prompt_compat:tidmad_noprior_v2"
+paper-analysis-c0467447-v2 = "siderius_prompt_compat:analysis_v2"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-siderius_prompt_compat = ["templates/*.md", "source-inventory.json", "qualification.json"]
+siderius_prompt_compat = ["templates/*.md", "source-inventory.json", "qualification*.json"]

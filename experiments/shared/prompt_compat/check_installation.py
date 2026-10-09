@@ -6,6 +6,7 @@ provenance and loader behavior without contacting providers or executing data.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import subprocess
@@ -13,10 +14,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-def check() -> dict:
-    import siderius_prompt_compat as installed
-
+def check(profile_version: int = 1) -> dict:
     import agent
+    import siderius_prompt_compat as installed
     from agent.prompt_rendering import resolve_prompt_profile
 
     source = Path(__file__).parent / "src/siderius_prompt_compat"
@@ -30,7 +30,9 @@ def check() -> dict:
         if p.suffix in {".py", ".md", ".json"}
     }
     if actual != expected:
-        raise AssertionError("Installed package differs from the reviewed source package")
+        raise AssertionError(
+            "Installed package differs from the reviewed source package"
+        )
     rows = json.loads((source / "source-inventory.json").read_text())
     for row in rows:
         original = subprocess.check_output(
@@ -38,15 +40,24 @@ def check() -> dict:
         )
         if hashlib.sha256(original).hexdigest() != row["source_sha256"]:
             raise AssertionError("Historical source inventory drift")
-        if hashlib.sha256(expected[row["packaged_file"]]).hexdigest() != row["packaged_sha256"]:
+        if (
+            hashlib.sha256(expected[row["packaged_file"]]).hexdigest()
+            != row["packaged_sha256"]
+        ):
             raise AssertionError("Frozen packaged renderer drift")
-    names = (
-        "paper-early-v1",
-        "paper-late-v1",
-        "paper-tidmad-noprior-v1",
-        "paper-analysis-c0467447-v1",
+    names = tuple(
+        f"{prefix}-v{profile_version}"
+        for prefix in (
+            "paper-early",
+            "paper-late",
+            "paper-tidmad-noprior",
+            "paper-analysis-c0467447",
+        )
     )
-    identities = [resolve_prompt_profile(name).identity().model_dump(mode="json") for name in names]
+    identities = [
+        resolve_prompt_profile(name).identity().model_dump(mode="json")
+        for name in names
+    ]
     with patch.object(installed, "rendering_assembly_digest", return_value="0" * 64):
         for name in names:
             try:
@@ -67,4 +78,6 @@ def check() -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(check(), indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile-version", type=int, choices=(1, 2), default=1)
+    print(json.dumps(check(parser.parse_args().profile_version), indent=2))

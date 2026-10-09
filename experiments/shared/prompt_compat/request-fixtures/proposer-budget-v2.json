@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+    "source_revision": "c7996a352d064229725ab1ebe886b9006bdbf36d",
+    "source_path": "tests/unit/agent/ml_model_proposal_agent/test_pipeline_runner.py",
+    "source_sha256": "ba7a78fdda131bd296a1915fc3da6cb2c2a5e53f83396420dca26b9376e4ca85",
+    "adjustments": "Grounded metric name and best valid score; distinct fractional budgets; deliberately invalid intermediate responses trigger native retry branches."
+  },
+  "interpretation": {
+    "model_types": [
+      "punet",
+      "wavenet",
+      "fcnet",
+      "gated_fno"
+    ],
+    "total_experiments": 20,
+    "metric_identity": {
+      "metric_id": "tidmad_denoising_score",
+      "direction": "higher"
+    },
+    "per_model_best": {
+      "punet": 1.8,
+      "wavenet": 5.5,
+      "fcnet": 0.9,
+      "gated_fno": 4.2
+    },
+    "per_model_best_valid": {
+      "punet": 1.8,
+      "wavenet": 5.5,
+      "fcnet": 0.9,
+      "gated_fno": 4.2
+    },
+    "per_model_worst": {
+      "punet": 1.2,
+      "wavenet": 3.1,
+      "fcnet": 0.7,
+      "gated_fno": 2.0
+    },
+    "best_denoising_score": 5.5,
+    "worst_denoising_score": 0.7,
+    "key_findings": [
+      "wavenet dominates"
+    ],
+    "bottlenecks": [
+      "low-freq gap"
+    ],
+    "take_home_message": "Wavenet wins but lacks low-freq coverage.",
+    "model_descriptions": {
+      "punet": "U-Net with positional encoding",
+      "wavenet": "Dilated causal convolutions with gating and dilated_causal_conv",
+      "fcnet": "Fully connected autoencoder",
+      "gated_fno": "Fourier neural operator with gating"
+    },
+    "model_knowledge_cache": {
+      "punet": {
+        "key_findings": [
+          "Skip connections help low-freq"
+        ],
+        "bottlenecks": [
+          "No temporal context"
+        ],
+        "score_trend": "Flat after round 3",
+        "strategy_assessment": "U-Net family exhausted",
+        "_stats": {
+          "best_denoising_score": 1.8
+        }
+      },
+      "wavenet": {
+        "key_findings": [
+          "Wide receptive field via dilation"
+        ],
+        "bottlenecks": [
+          "Misses very low frequencies"
+        ],
+        "score_trend": "Steady improvement to round 8",
+        "strategy_assessment": "Still room for spectral augmentation",
+        "_stats": {
+          "best_denoising_score": 5.5
+        }
+      },
+      "fcnet": {
+        "key_findings": [
+          "Global mixing collapses temporal structure"
+        ],
+        "bottlenecks": [
+          "No local feature extraction"
+        ],
+        "score_trend": "Peaked at round 1, flat thereafter",
+        "strategy_assessment": "FC architecture unsuitable for this task",
+        "_stats": {
+          "best_denoising_score": 0.9
+        }
+      },
+      "gated_fno": {
+        "key_findings": [
+          "Fourier modes capture periodic patterns well"
+        ],
+        "bottlenecks": [
+          "Gating adds instability at higher modes"
+        ],
+        "score_trend": "Improving but noisy",
+        "strategy_assessment": "Reduce active modes, add residual path",
+        "_stats": {
+          "best_denoising_score": 4.2
+        }
+      }
+    },
+    "best_valid_denoising_score": 5.5
+  },
+  "cases": [
+    {
+      "case_id": "explore",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_01",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "exploit",
+      "mode": "exploit",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_01",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "legacy",
+      "mode": "legacy",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.legacy_reasoning",
+        "proposer.legacy_commit"
+      ]
+    },
+    {
+      "case_id": "trial_only",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": null,
+      "responses": [
+        "reply_01",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "formal_only",
+      "mode": "explore",
+      "is_trial": false,
+      "trial": null,
+      "formal": 47.5,
+      "responses": [
+        "reply_01",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "unconfigured",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": null,
+      "formal": null,
+      "responses": [
+        "reply_01",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "comparison_retry",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_04",
+        "reply_01",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.comparison.correction",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "boldness_retry",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_01",
+        "reply_05",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "causal_retry",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_01",
+        "reply_06",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.causal_reasoning.correction",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "proposing_retry",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_01",
+        "reply_02",
+        "reply_07",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing",
+        "proposer.proposing"
+      ]
+    },
+    {
+      "case_id": "text_stages",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ],
+      "text_reasoning": true
+    },
+    {
+      "case_id": "clamped",
+      "mode": "explore",
+      "is_trial": true,
+      "trial": 13.25,
+      "formal": 47.5,
+      "responses": [
+        "reply_08",
+        "reply_02",
+        "reply_03"
+      ],
+      "expected_labels": [
+        "proposer.comparison",
+        "proposer.causal_reasoning",
+        "proposer.proposing"
+      ],
+      "prior_stage_max_chars": 64
+    }
+  ],
+  "replies": {
+    "reply_01": {
+      "comparisons": [
+        {
+          "model_type": "wavenet",
+          "source": "seed",
+          "best_score": 5.5,
+          "key_mechanism": "Dilated causal conv gives wide receptive field.",
+          "strengths": [
+            "Strong on high-freq files"
+          ],
+          "weaknesses": [
+            "Weak on low-freq files"
+          ],
+          "lesson_for_next_proposal": "Keep dilation, add spectral processing."
+        }
+      ],
+      "proposed_vocab_links": [],
+      "proposed_vocab_candidates": [],
+      "sota_model_type": "wavenet",
+      "sota_score": 5.5,
+      "sota_mechanism": "Dilated causal conv."
+    },
+    "reply_02": {
+      "proposed_change": "Add spectral_conv after the dilated conv stack.",
+      "causal_hypothesis": "WaveNet bottleneck is low-freq. Spectral conv addresses this.",
+      "falsifiable_prediction": {
+        "metric": "tidmad_denoising_score",
+        "current_value": 5.5,
+        "predicted_value": 6.5,
+        "threshold_for_refutation": 5.0,
+        "rationale": "Spectral processing should lift low-freq."
+      },
+      "predicted_failure_modes": [
+        "FNO layer may exceed VRAM."
+      ],
+      "inherited_components": []
+    },
+    "reply_03": {
+      "model_name": "spectral_wavenet",
+      "model_description": "WaveNet with spectral conv layer.",
+      "mathematical_definition": "Dilated conv stack + FFT spectral layer.",
+      "motivation": "Addresses low-freq bottleneck per DiscoveryMemo.",
+      "expert_advice": {
+        "focus_areas": [
+          "low-freq recovery"
+        ],
+        "constraints": [
+          "VRAM < 10 GB"
+        ],
+        "known_failures": [],
+        "suggested_directions": [
+          "start with depth=2"
+        ],
+        "rationale": "Conservative baseline."
+      },
+      "baseline_config": {
+        "model_config": {
+          "depth": 2
+        },
+        "train_config": {
+          "lr": 0.0001,
+          "epochs": 5
+        },
+        "loss_config": {
+          "loss_type": "focal"
+        }
+      },
+      "memo_consistency_notes": []
+    },
+    "reply_04": {
+      "comparisons": [
+        {
+          "model_type": "wavenet",
+          "source": "seed",
+          "best_score": 5.5,
+          "key_mechanism": "Dilated causal conv gives wide receptive field.",
+          "strengths": [
+            "Strong on high-freq files"
+          ],
+          "weaknesses": [
+            "Weak on low-freq files"
+          ],
+          "lesson_for_next_proposal": "Keep dilation, add spectral processing."
+        }
+      ],
+      "proposed_vocab_links": [
+        {
+          "feature": "missing-required-fields"
+        }
+      ],
+      "proposed_vocab_candidates": [],
+      "sota_model_type": "wavenet",
+      "sota_score": 5.5,
+      "sota_mechanism": "Dilated causal conv."
+    },
+    "reply_05": {
+      "proposed_change": "Add spectral_conv after the dilated conv stack.",
+      "causal_hypothesis": "WaveNet bottleneck is low-freq. Spectral conv addresses this.",
+      "falsifiable_prediction": {
+        "metric": "tidmad_denoising_score",
+        "current_value": 5.5,
+        "predicted_value": 5.51,
+        "threshold_for_refutation": 5.0,
+        "rationale": "Spectral processing should lift low-freq."
+      },
+      "predicted_failure_modes": [
+        "FNO layer may exceed VRAM."
+      ],
+      "inherited_components": []
+    },
+    "reply_06": {
+      "proposed_change": "Add spectral_conv after the dilated conv stack.",
+      "causal_hypothesis": "WaveNet bottleneck is low-freq. Spectral conv addresses this.",
+      "falsifiable_prediction": {
+        "metric": "tidmad_denoising_score",
+        "current_value": 5.5,
+        "predicted_value": 6.5,
+        "threshold_for_refutation": 5.0,
+        "rationale": "Spectral processing should lift low-freq."
+      },
+      "predicted_failure_modes": [
+        "FNO layer may exceed VRAM."
+      ],
+      "inherited_components": [
+        {
+          "component": "spectral",
+          "source_type": "external_agent",
+          "source_id": "iter_004",
+          "contribution_evidence": "Reuse spectral processing."
+        }
+      ]
+    },
+    "reply_07": {
+      "model_name": "wavenet",
+      "model_description": "WaveNet with spectral conv layer.",
+      "mathematical_definition": "Dilated conv stack + FFT spectral layer.",
+      "motivation": "Addresses low-freq bottleneck per DiscoveryMemo.",
+      "expert_advice": {
+        "focus_areas": [
+          "low-freq recovery"
+        ],
+        "constraints": [
+          "VRAM < 10 GB"
+        ],
+        "known_failures": [],
+        "suggested_directions": [
+          "start with depth=2"
+        ],
+        "rationale": "Conservative baseline."
+      },
+      "baseline_config": {
+        "model_config": {
+          "depth": 2
+        },
+        "train_config": {
+          "lr": 0.0001,
+          "epochs": 5
+        },
+        "loss_config": {
+          "loss_type": "focal"
+        }
+      },
+      "memo_consistency_notes": []
+    },
+    "reply_08": {
+      "comparisons": [
+        {
+          "model_type": "wavenet",
+          "source": "seed",
+          "best_score": 5.5,
+          "key_mechanism": "Dilated causal conv gives wide receptive field.",
+          "strengths": [
+            "Strong on high-freq files"
+          ],
+          "weaknesses": [
+            "Weak on low-freq files"
+          ],
+          "lesson_for_next_proposal": "Keep dilation, add spectral processing."
+        }
+      ],
+      "proposed_vocab_links": [],
+      "proposed_vocab_candidates": [],
+      "sota_model_type": "wavenet",
+      "sota_score": 5.5,
+      "sota_mechanism": "OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-OVERSIZED-STAGE-PROSE-"
+    }
+  }
+}

@@ -10,6 +10,11 @@ They do not call an LLM, train a model, download data, or reproduce a paper scor
 Some intermediate replies were not archived. The [coverage report](parity-report.md)
 separates recovered inputs from supplementary branch tests and missing evidence.
 
+For the framework's proposer time-budget delivery repair, use the explicit v2
+profiles and [migration contract](proposer-budget-v2.md). The v1 instructions
+below remain for their separately qualified older assemblies. Installing a new
+package does not make an old workspace resumable with changed renderer identity.
+
 ## 1. Install into the infra environment
 
 Set `INFRA_CHECKOUT` and `EXP_CHECKOUT` to your own absolute checkout paths.

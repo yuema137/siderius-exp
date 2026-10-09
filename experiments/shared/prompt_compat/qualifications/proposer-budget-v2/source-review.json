@@ -1,0 +1,60 @@
+{
+  "previous_qualified_revision": "46ee992043a1ccb0e2db57cac1afc8a73171e063",
+  "reference_revision": "c7996a352d064229725ab1ebe886b9006bdbf36d",
+  "candidate_revision": "830d819f3233cad23ac613c1ba1c50f82b8efa88",
+  "reference_assembly": "0de25c8610de268703cb3efd47614a161f09012d2548467f9d4897cbecb3c443",
+  "candidate_assembly": "b47d5246a59e9ce7fb2780066f8b65c3675ab6c792a19fb22fdf0349e2a68dc0",
+  "baseline_closure_changes": [
+    {
+      "path": "src/agent/schemas/hyperparam_tuning.py",
+      "before_sha256": "7999846b066cff0022a60127dc692cef83f76a0d94e8e198eb8e2a415ad09edd",
+      "after_sha256": "e751fe95d3ec37353f4cc5009a199c5c8ba9a69ff2cbcbaaf679ccbbcb06a27b"
+    },
+    {
+      "path": "src/agent/schemas/implementor.py",
+      "before_sha256": "4b4994db7d8c96115ca1b2772bbf01ea4a377ad3d4c8b9be7666cb673f98ba3f",
+      "after_sha256": "49db77a177e55f08ffb8bcaf68f11ae5c173c8e60f0b9ae075df4b45642f140c"
+    },
+    {
+      "path": "src/agent/schemas/model_probe.py",
+      "before_sha256": null,
+      "after_sha256": "4cb74aca9faaf565ff2572b72916a8b18581dfcbd302617536056afa412533c2"
+    },
+    {
+      "path": "src/agent/schemas/protocols/ml_model_impl_to_ml_model_valid.py",
+      "before_sha256": "ce6f0771207888e5134c19a0e32a8117db39be0764b6d51682f29d8e9e696d3f",
+      "after_sha256": "9241a9272f1045bffe5a3d6b7f8f5b65ca7ebc28f7a8a0affc14f4212cc3cf7a"
+    },
+    {
+      "path": "src/agent/schemas/validator.py",
+      "before_sha256": "d26df7a15888015537bf03574234ef3ed1a2db6e6a6e4116ebd38b2da457d698",
+      "after_sha256": "a68315abcd12cfe400de7f8b18cd382e3d324b9493b1607f1386abf70b5e62e9"
+    },
+    {
+      "path": "src/nodes/ml_code_validator_agent/ml_code_validator_agent.py",
+      "before_sha256": "2e63c36d36e29078e1426a6c3b11c682ee71faaa90c13224fae8ce6a4f2b44c2",
+      "after_sha256": "41f50e689785945413c83f03f53b4b74135811010c52be934331f439660f87d7"
+    },
+    {
+      "path": "src/nodes/ml_model_implementor/ml_model_implementor.py",
+      "before_sha256": "d95683ab3f596d88a443f48b78ed2e3a40bba009f3e0459360190e709c6430ea",
+      "after_sha256": "d900cd788f45b5947b221657a165dd894178807f562b8b4a8b0ec203fd39f8b9"
+    }
+  ],
+  "baseline_findings": [
+    "Optional model_probe_context fields default absent and exclude None serialization.",
+    "Changed implementor/validator code transports and executes optional model probes; selected pure prompt renderers unchanged.",
+    "No proposal template or proposer source changes between previous qualification and reference.",
+    "Original 47 frozen boundary comparisons executed to establish baseline compatibility; source similarity alone is not parity evidence."
+  ],
+  "candidate_findings": [
+    "New generic proposal.time_budget_context boundary is omitted only by explicit v2 profiles.",
+    "Native proposing template changes are isolated from frozen exp templates.",
+    "V1 qualifier admits pre-fix baseline only; candidate assembly refused under v1."
+  ],
+  "limitations": [
+    "Current native validators and correction rules remain active.",
+    "Synthetic requests share one classification-shaped fixture across four task-to-profile mappings; not reconstructed historical task conversations.",
+    "Provider identity changes with package closure; old workspace resume requires old installed package."
+  ]
+}

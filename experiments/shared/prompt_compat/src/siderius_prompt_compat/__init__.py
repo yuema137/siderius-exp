@@ -5,18 +5,28 @@ from functools import wraps
 from pathlib import Path
 
 from agent.prompt_rendering import PromptRenderingProfile, rendering_assembly_digest
+from agent.schemas.proposal import ProposalInput
 
 _ROOT = Path(__file__).parent
-_INTERPRETATION = frozenset({"interpretation.model_system", "interpretation.model_user"})
+_INTERPRETATION = frozenset(
+    {"interpretation.model_system", "interpretation.model_user"}
+)
 
 
 def _template(filename: str) -> str:
     if Path(filename).name != filename or not filename.endswith(".md"):
-        raise ValueError("Historical proposal template must be a declared Markdown basename")
+        raise ValueError(
+            "Historical proposal template must be a declared Markdown basename"
+        )
     return (_ROOT / "templates" / filename).read_text()
 
 
 def _without_appendix() -> str:
+    return ""
+
+
+def _without_time_budget_context(inp: ProposalInput) -> str:
+    """Preserve the historical absence of numeric proposer budget context."""
     return ""
 
 
@@ -27,7 +37,9 @@ def _analysis_view(renderer):
         # The renderer receives its own copy, and cannot mutate saved inputs.
         if "analysis_input" in kwargs:
             value = kwargs["analysis_input"]
-            kwargs["analysis_input"] = value.model_copy(update={"recovery_policy": None})
+            kwargs["analysis_input"] = value.model_copy(
+                update={"recovery_policy": None}
+            )
         return renderer(**kwargs)
 
     return render
@@ -39,16 +51,24 @@ def _profile(
     early_contract: bool,
     old_interpretation: bool = False,
     with_analysis: bool = False,
+    time_budget_compat: bool = False,
 ) -> PromptRenderingProfile:
-    qualification = json.loads((_ROOT / "qualification.json").read_text())
+    qualification_file = (
+        "qualification-v2.json" if time_budget_compat else "qualification.json"
+    )
+    qualification = json.loads((_ROOT / qualification_file).read_text())
     qualified = {qualification["assembly_sha256"]}
-    qualified.update(row["assembly_sha256"] for row in qualification.get("additional_assemblies", []))
+    qualified.update(
+        row["assembly_sha256"] for row in qualification.get("additional_assemblies", [])
+    )
     if rendering_assembly_digest() not in qualified:
         raise ValueError(
             "This historical profile has not been qualified for the installed infra "
             "renderers. Use the documented infra revision or rerun offline qualification."
         )
     renderers = {"proposal.template": _template}
+    if time_budget_compat:
+        renderers["proposal.time_budget_context"] = _without_time_budget_context
     native = set(_INTERPRETATION)
     if early_contract:
         renderers["native_training.appendix"] = _without_appendix
@@ -84,7 +104,8 @@ def _profile(
         for p in _ROOT.rglob("*")
         if p.is_file() and p.suffix in {".py", ".md", ".json"}
     }
-    return PromptRenderingProfile(name, "1", renderers, frozenset(native), sources)
+    version = "2" if time_budget_compat else "1"
+    return PromptRenderingProfile(name, version, renderers, frozenset(native), sources)
 
 
 def early() -> PromptRenderingProfile:
@@ -96,8 +117,38 @@ def late() -> PromptRenderingProfile:
 
 
 def tidmad_noprior() -> PromptRenderingProfile:
-    return _profile("paper-tidmad-noprior-v1", early_contract=True, old_interpretation=True)
+    return _profile(
+        "paper-tidmad-noprior-v1", early_contract=True, old_interpretation=True
+    )
 
 
 def analysis() -> PromptRenderingProfile:
-    return _profile("paper-analysis-c0467447-v1", early_contract=False, with_analysis=True)
+    return _profile(
+        "paper-analysis-c0467447-v1", early_contract=False, with_analysis=True
+    )
+
+
+def early_v2() -> PromptRenderingProfile:
+    return _profile("paper-early-v2", early_contract=True, time_budget_compat=True)
+
+
+def late_v2() -> PromptRenderingProfile:
+    return _profile("paper-late-v2", early_contract=False, time_budget_compat=True)
+
+
+def tidmad_noprior_v2() -> PromptRenderingProfile:
+    return _profile(
+        "paper-tidmad-noprior-v2",
+        early_contract=True,
+        old_interpretation=True,
+        time_budget_compat=True,
+    )
+
+
+def analysis_v2() -> PromptRenderingProfile:
+    return _profile(
+        "paper-analysis-c0467447-v2",
+        early_contract=False,
+        with_analysis=True,
+        time_budget_compat=True,
+    )

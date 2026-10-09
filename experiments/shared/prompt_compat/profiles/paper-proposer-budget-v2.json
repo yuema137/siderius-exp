@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "scope": "Explicit copied-task overlays for new historical-presentation workspaces; apply alongside the selected existing planner/runtime compatibility declarations, never rewrite archived runs.",
+  "required_packages": {"siderius-prompt-compat": "0.10.0"},
+  "cases": {
+    "tess": {
+      "source_task_composition": "tasks/phyts_tess/compositions/rotation_regression.yaml",
+      "task_composition_overlay": {"prompt_renderer": "paper-early-v2"}
+    },
+    "ligo": {
+      "source_task_composition": "tasks/phyts_ligo/compositions/regression.yaml",
+      "task_composition_overlay": {"prompt_renderer": "paper-early-v2"}
+    },
+    "project8": {
+      "source_task_composition": "tasks/phyts_project8/compositions/dual_representation.yaml",
+      "task_composition_overlay": {"prompt_renderer": "paper-late-v2"}
+    },
+    "tidmad": {
+      "source_task_composition": "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml",
+      "task_composition_overlay": {"prompt_renderer": "paper-tidmad-noprior-v2"}
+    },
+    "tidmad-analysis": {
+      "source_task_composition": "experiments/tidmad/data_analysis_pair/task_composition_on.yaml",
+      "task_composition_overlay": {"prompt_renderer": "paper-analysis-c0467447-v2"}
+    }
+  }
+}

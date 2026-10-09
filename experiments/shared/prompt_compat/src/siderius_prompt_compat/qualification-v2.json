@@ -1,0 +1,6 @@
+{
+  "infra_revision": "830d819f3233cad23ac613c1ba1c50f82b8efa88",
+  "assembly_sha256": "b47d5246a59e9ce7fb2780066f8b65c3675ab6c792a19fb22fdf0349e2a68dc0",
+  "scope": "Explicit historical omission of proposer numeric budget context; frozen system-template corpus and supplementary synthetic full-request branch witnesses, not recovered historical conversations",
+  "additional_assemblies": []
+}

@@ -17,11 +17,15 @@ PROFILES = {
 }
 
 
-def compare(candidate: Path, references: dict, output: Path) -> dict:
+def compare(
+    candidate: Path, references: dict, output: Path, profile_version: int = 1
+) -> dict:
     root = Path(__file__).parent
     requests = sorted((root / "fixtures").glob("*.json"))
     if not requests:
-        raise ValueError("No prompt fixtures found; an empty comparison is not qualification")
+        raise ValueError(
+            "No prompt fixtures found; an empty comparison is not qualification"
+        )
     output.mkdir(parents=True, exist_ok=False)
     candidate_revision = subprocess.check_output(
         ["git", "-C", str(candidate), "rev-parse", "HEAD"], text=True
@@ -49,8 +53,11 @@ def compare(candidate: Path, references: dict, output: Path) -> dict:
                 revision,
             ]
             if label == "candidate":
-                command += ["--profile", PROFILES[task]]
-            process = subprocess.run(command, cwd=checkout, capture_output=True, text=True)
+                profile = PROFILES[task].removesuffix("-v1") + f"-v{profile_version}"
+                command += ["--profile", profile]
+            process = subprocess.run(
+                command, cwd=checkout, capture_output=True, text=True, check=False
+            )
             if process.returncode:
                 return {
                     "case": request.stem,
@@ -85,9 +92,13 @@ if __name__ == "__main__":
     parser.add_argument("--candidate", required=True, type=Path)
     parser.add_argument("--references", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--profile-version", type=int, choices=(1, 2), default=1)
     args = parser.parse_args()
     report = compare(
-        args.candidate.resolve(), json.loads(args.references.read_text()), args.output.resolve()
+        args.candidate.resolve(),
+        json.loads(args.references.read_text()),
+        args.output.resolve(),
+        args.profile_version,
     )
     failures = [row for row in report["results"] if row["status"] != "MATCH"]
     print(json.dumps({"cases": len(report["results"]), "failures": failures}, indent=2))
