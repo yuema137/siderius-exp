@@ -17,6 +17,11 @@
       "infra_revision": "c6cfb842583da34afe6e5043406d538837da9361",
       "assembly_sha256": "0820d7b3fb97b158a51a53964e420cfe715396e1f352752fdea6590d428e130b",
       "scope": "Watchdog selection transported in schemas; frozen prompt boundaries and reflector checkpoint requests remain unchanged. Planner history uses separately selected v10 metadata projection; not historical conversation replay."
+    },
+    {
+      "infra_revision": "1e298540fdf85deea1bf676d3e64d3bd821eebff",
+      "assembly_sha256": "1a37457532d329cd5c5ddd351c5b2a5aa9527943b8a38f75031d102e36f9f4d4",
+      "scope": "TrialConfig persistence helper extraction without changes to serialization or provenance ordering; full historical planner and reflector requests compared with preserved reference bytes. No historical conversation or stochastic training replay claim."
     }
   ]
 }

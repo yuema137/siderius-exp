@@ -20,6 +20,11 @@
       "infra_revision": "597350da45b5559e7a32ed93be337cddc3d5a1f8",
       "assembly_sha256": "c001808beaaa310b84c4e95430e2c919449dca069ef31419dd2874bbf2ab1048",
       "scope": "Watchdog disabled for all archived paper units; unchanged historical verifier arithmetic and session admission, with v10 historical metadata presentation. Deadline execution is outside this timing-provider qualification."
+    },
+    {
+      "infra_revision": "1e298540fdf85deea1bf676d3e64d3bd821eebff",
+      "assembly_sha256": "8ea37190fe16e4298bab773b8dbb3709917fbcf03a381900479115ec3fa09d8f",
+      "scope": "Shared typed run-lock helper preserves disabled None and enabled deadline selection. Historical verifier arithmetic, admission and metadata presentation remain unchanged. Deadline algorithm qualification is separate; no live GPU or stochastic training replay claim."
     }
   ]
 }

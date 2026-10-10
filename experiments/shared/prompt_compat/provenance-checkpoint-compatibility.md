@@ -105,3 +105,26 @@ source/child/checkout identity check also passed.
 No real LLM response, GPU measurement or training was performed. This evidence
 qualifies deterministic presentation only; it does not claim that the old
 plan-only narrative was correct, or promise identical models, weights or scores.
+
+## Structural persistence and run-lock qualification
+
+The [structural qualification receipt](qualifications/planning-persistence/receipt.json)
+binds infra `1e298540` after two behavior-preserving extractions: TrialConfig
+JSON persistence and enabled-watchdog run-lock selection. Serialized bytes,
+operation order and lock values retain their previous contracts. The prompt
+source closure includes the persistence owner; estimator and runtime closures
+include the affected lock owners. Only their source qualifications and package
+identities change; frozen renderers, arithmetic and deadline algorithms do not.
+
+Install prompt 0.10.4, preflight 0.2.5 and runtime 0.1.2 in the selected framework's
+own environment. Planner 0.11.1 aligns its optional `historical-runtime` dependency
+with runtime 0.1.2 without changing its providers. Continue to use a new workspace
+for these changed identities. Existing qualifiers, archived evidence and the
+repository's public framework pin remain unchanged.
+
+Fresh candidate captures matched 12 complete planner requests, 20 complete
+reflector requests and four archived startup message identities. Original full
+reference bytes and their fixture/tool digests were verified and reused; original
+checkouts were not rerun for this follow-up. The 174 focused tests and installed
+source/child checks passed. This is offline compatibility evidence, not a claim
+of training replay or identical stochastic outputs.

@@ -1,0 +1,73 @@
+{
+  "infra_revision": "1e298540fdf85deea1bf676d3e64d3bd821eebff",
+  "infra_base_revision": "b9ae7f4069a63b49281300ca298c30ef558ddc0f",
+  "exp_base_revision": "4c142687a806da6e414f86ffcc11ab0980a43a57",
+  "package_versions": {
+    "planner": "0.11.1",
+    "preflight": "0.2.5",
+    "runtime": "0.1.2",
+    "prompt": "0.10.4"
+  },
+  "closures": [
+    {
+      "closure": "estimation_assembly_digest",
+      "files": 78,
+      "changed_paths_from_base": [
+        "src/nodes/ml_hyperparameter_tune_agent/ml_hyperparameter_tune_agent.py",
+        "src/workflows/model_exploration.py"
+      ],
+      "candidate_assembly": "40e50883cc335eb872cf0b4a10ddfb90c402f55f781ab0879fd4cf10e048d2a8"
+    },
+    {
+      "closure": "rendering_assembly_digest",
+      "files": 162,
+      "changed_paths_from_base": [
+        "src/nodes/ml_hyperparameter_tune_agent/planning.py"
+      ],
+      "candidate_assembly": "1a37457532d329cd5c5ddd351c5b2a5aa9527943b8a38f75031d102e36f9f4d4"
+    },
+    {
+      "closure": "verifier_assembly_digest",
+      "files": 18,
+      "changed_paths_from_base": [
+        "src/core/run_invariants.py"
+      ],
+      "candidate_assembly": "8ea37190fe16e4298bab773b8dbb3709917fbcf03a381900479115ec3fa09d8f"
+    }
+  ],
+  "validation": {
+    "focused_tests_passed": 174,
+    "planner_complete_request_pairs_matched": 12,
+    "reflector_complete_request_pairs_matched": 20,
+    "archived_startup_pairs_matched": 4,
+    "reference_execution": "Fresh candidate captures compared byte for byte with preserved full reference captures and verified fixture/tool digests; original reference checkouts not rerun in this follow-up",
+    "input_scope": "Archived task/model declarations with synthetic watchdog history and provenance witnesses; not recovered historical conversations",
+    "prompt_installed_source_files": 16,
+    "frozen_prompt_source_entries": 13,
+    "prompt_unknown_assembly_refusals": 4,
+    "preflight_installed_source_files": 5,
+    "preflight_child_identity_match": true,
+    "preflight_unknown_assembly_refused": true,
+    "runtime_scope": "Frozen source inventory/oracles, installed profiles, child identity, session replay and unknown-assembly refusal covered by focused tests"
+  },
+  "evidence_file_sha256": {
+    "complete_requests": "9e27b232156e6fead67aca32042e7113eeafbbf0db79a2ffe0d99587b38abfcd",
+    "source_closures": "c752347b0514840a98e39c12ad96e553e3c64b457c42820c8047f3a1c2dd565e",
+    "prompt_installation": "2527f97fdb1523da9c2e548937a672ea409743ed94f00d87cb7171ff78a35632",
+    "preflight_installation": "8b134c4da5bacf3d64b05107f35be78226910f085fa44dd876489cf11be16108",
+    "focused_tests": "04f165382ff566aa2e9b134296753bce98515a5f22ccdedfeadb2570e9cb465b"
+  },
+  "digest_construction": "SHA256 of literal evidence file bytes; no JSON canonicalization",
+  "preserved": {
+    "historical_qualifications": true,
+    "scientific_configs_and_archives": true,
+    "frozen_fixtures_and_algorithms": true,
+    "public_framework_pin": true,
+    "watchdog_deadline_source_qualification": true
+  },
+  "effects": {
+    "api_calls": 0,
+    "gpu_calls": 0,
+    "training_calls": 0
+  }
+}

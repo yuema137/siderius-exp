@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-planner-compat"
-version = "0.11.0"
+version = "0.11.1"
 description = "Experiment-owned historical SIDERIUS planner prompt providers"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
 
 [project.optional-dependencies]
-historical-runtime = ["siderius-runtime-compat==0.1.1"]
+historical-runtime = ["siderius-runtime-compat==0.1.2"]
 
 [project.entry-points."siderius.planner_strategies"]
 legacy-9b78d505cb11-paper-watchdog-v10 = "siderius_planner_compat.watchdog_policy_v10:historical_watchdog_v10"
