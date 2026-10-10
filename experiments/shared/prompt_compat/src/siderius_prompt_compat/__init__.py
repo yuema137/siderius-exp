@@ -66,7 +66,12 @@ def _profile(
             "This historical profile has not been qualified for the installed infra "
             "renderers. Use the documented infra revision or rerun offline qualification."
         )
-    renderers = {"proposal.template": _template}
+    from .provenance_0ab15736 import render_plan_resolution_checkpoint
+
+    renderers = {
+        "proposal.template": _template,
+        "tuner.execution_provenance": render_plan_resolution_checkpoint,
+    }
     if time_budget_compat:
         renderers["proposal.time_budget_context"] = _without_time_budget_context
     native = set(_INTERPRETATION)

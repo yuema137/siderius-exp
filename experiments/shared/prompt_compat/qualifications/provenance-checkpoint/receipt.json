@@ -1,0 +1,119 @@
+{
+  "infra_revision": "4d8165a614da410e4e90576fd5c2de026d2203ea",
+  "exp_base_revision": "19216d687baa2ee07fda240161763cc5a3f40d01",
+  "package_version": "0.10.2",
+  "closures": [
+    {
+      "closure": "estimation_assembly_digest",
+      "files": 78,
+      "changed_paths_from_689": [],
+      "candidate_assembly": "646a61fd53eea5c7e46fe8416b4dece44381dddacb521ae27be31f7a8b2b6502"
+    },
+    {
+      "closure": "rendering_assembly_digest",
+      "files": 162,
+      "changed_paths_from_689": [
+        "src/agent/prompt_rendering.py",
+        "src/agent/prompt_templates/tuner/rendering.py",
+        "src/agent/schemas/execution_provenance.py",
+        "src/nodes/ml_hyperparameter_tune_agent/planning.py",
+        "src/nodes/ml_hyperparameter_tune_agent/provenance.py"
+      ],
+      "candidate_assembly": "aa4221342560bfe3cb1a1fd8e67272a88211ae5a963de1253a7576e6da3373b8"
+    },
+    {
+      "closure": "verifier_assembly_digest",
+      "files": 18,
+      "changed_paths_from_689": [],
+      "candidate_assembly": "57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da"
+    }
+  ],
+  "reflector": {
+    "reference_execution": "All four original clean reference checkouts rerun in their own environments",
+    "input_scope": "Archived task/metric inputs with explicitly synthetic provenance and numeric results, not recovered historical conversations",
+    "cases": [
+      {
+        "case": "ligo",
+        "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+        "profile": "paper-early-v2",
+        "matching_complete_requests": 5,
+        "input_fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "capture_tool_sha256": "cd33b69c69132059d581125649c8267914ab98273c9a2a25a7c8e470626bd957",
+        "request_digest": "9b6b4599ce84cd957a6279ba371b30444c9be038deb2e779ce2f35771f21cb9d"
+      },
+      {
+        "case": "tess",
+        "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+        "profile": "paper-early-v2",
+        "matching_complete_requests": 5,
+        "input_fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "capture_tool_sha256": "cd33b69c69132059d581125649c8267914ab98273c9a2a25a7c8e470626bd957",
+        "request_digest": "9b6b4599ce84cd957a6279ba371b30444c9be038deb2e779ce2f35771f21cb9d"
+      },
+      {
+        "case": "project8",
+        "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+        "profile": "paper-late-v2",
+        "matching_complete_requests": 5,
+        "input_fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "capture_tool_sha256": "cd33b69c69132059d581125649c8267914ab98273c9a2a25a7c8e470626bd957",
+        "request_digest": "9b6b4599ce84cd957a6279ba371b30444c9be038deb2e779ce2f35771f21cb9d"
+      },
+      {
+        "case": "tidmad",
+        "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+        "profile": "paper-tidmad-noprior-v2",
+        "matching_complete_requests": 5,
+        "input_fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "capture_tool_sha256": "cd33b69c69132059d581125649c8267914ab98273c9a2a25a7c8e470626bd957",
+        "request_digest": "c02f1ac578e2f7775e096bd255440dc699e2094ee9d64091cfe07f0abc0f8c75"
+      }
+    ]
+  },
+  "tests": {
+    "focused_passed": 23,
+    "full_reflector_pairs_matched": 20,
+    "frozen_rendering_boundaries_matched": 47,
+    "archived_startup_pairs_matched": 4,
+    "paper_unit_mappings": 11
+  },
+  "installation": {
+    "installed_source_files": 16,
+    "frozen_source_entries": 13,
+    "profiles": [
+      {
+        "name": "paper-early-v2",
+        "version": "2",
+        "content_sha256": "e9e417a4608195651b827e91fc19ae5f031265252ec17c393a354b922d8a692c",
+        "assembly_sha256": "aa4221342560bfe3cb1a1fd8e67272a88211ae5a963de1253a7576e6da3373b8"
+      },
+      {
+        "name": "paper-late-v2",
+        "version": "2",
+        "content_sha256": "6438f11c69baf726275965db03a134fa19ef90bcae21b62b2f15bf7f76159e9e",
+        "assembly_sha256": "aa4221342560bfe3cb1a1fd8e67272a88211ae5a963de1253a7576e6da3373b8"
+      },
+      {
+        "name": "paper-tidmad-noprior-v2",
+        "version": "2",
+        "content_sha256": "59cb4ec82a5927c66aafa465a64b6c2e4b1f08897ec6b7d3499195a605ae05b3",
+        "assembly_sha256": "aa4221342560bfe3cb1a1fd8e67272a88211ae5a963de1253a7576e6da3373b8"
+      },
+      {
+        "name": "paper-analysis-c0467447-v2",
+        "version": "2",
+        "content_sha256": "1d6f0242b9b78662671eddd16cf109907f8131d457bcf635cdd725ee3e7ab750",
+        "assembly_sha256": "aa4221342560bfe3cb1a1fd8e67272a88211ae5a963de1253a7576e6da3373b8"
+      }
+    ],
+    "unqualified_assembly_refusals": 4,
+    "api_calls": 0,
+    "training_calls": 0
+  },
+  "preflight_installation_passed": true,
+  "effects": {
+    "api_calls": 0,
+    "gpu_calls": 0,
+    "training_calls": 0
+  }
+}

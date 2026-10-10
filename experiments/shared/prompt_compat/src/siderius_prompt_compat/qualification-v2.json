@@ -7,6 +7,11 @@
       "infra_revision": "fec37b60f5701db8993ac4d29539b2f1090e4c2b",
       "assembly_sha256": "1541a79216be560ec70ed489dd6d90bb93401a6ef883920cd185d3418f16367d",
       "scope": "Epoch maximum removal; rendering closure changes only cooperative allocation validation/description in hyperparam_tuning.py. Frozen historical boundary corpus; no new prompt renderer behavior or historical conversation reconstruction."
+    },
+    {
+      "infra_revision": "4d8165a614da410e4e90576fd5c2de026d2203ea",
+      "assembly_sha256": "aa4221342560bfe3cb1a1fd8e67272a88211ae5a963de1253a7576e6da3373b8",
+      "scope": "Execution provenance corrected against persisted TrialConfig; explicit historical renderer uses preserved plan_resolution_events only. Five synthetic full-reflector witnesses across four original paper revisions, existing frozen rendering corpus; not complete historical conversation replay or a claim that old execution narratives were correct."
     }
   ]
 }

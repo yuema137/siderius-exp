@@ -89,5 +89,21 @@
     "packaged_file": "templates/proposing_stage_explore.md",
     "selection": "complete template",
     "packaged_sha256": "7d6a53af9b44d0922bada12dec4f733741e180e43621965e824539ff59ca05a1"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/schemas/execution_provenance.py",
+    "source_sha256": "ca46193874c65278b04e94dc5f6eeae1fec0732af86ab8a67ad01dcf8aa94de6",
+    "packaged_file": "provenance_0ab15736.py",
+    "selection": "AUTHORITY_DESCRIPTIONS",
+    "packaged_sha256": "94f5f0e309ea2825d02c0065d91372ee166b4536509699fe5e325d85b43ccb3c"
+  },
+  {
+    "revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+    "source": "src/agent/prompt_templates/tuner/rendering.py",
+    "source_sha256": "db15f4d79710995fbb91f0d9c27d5b63729f0a17e1809557b20bedb9ecf1e947",
+    "packaged_file": "provenance_0ab15736.py",
+    "selection": "render_execution_provenance_block",
+    "packaged_sha256": "94f5f0e309ea2825d02c0065d91372ee166b4536509699fe5e325d85b43ccb3c"
   }
 ]
