@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-prompt-compat"
-version = "0.10.2"
+version = "0.10.3"
 description = "Explicit experiment-owned historical prompt rendering profiles"
 requires-python = ">=3.12"
 license = "MIT"

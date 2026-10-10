@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "scope": "Explicit v10 deadline metadata projection; runtime session and tuner production sources remain bound by the independent historical runtime verifier assembly.",
+  "assemblies": [
+    {
+      "infra_revision": "597350da45b5559e7a32ed93be337cddc3d5a1f8",
+      "source_sha256": "ead3b88421da52359d03461e060d2b6e2f2056b9a3d95bc31f350f41bd69beb1",
+      "scope": "Explicit forecast-tightening-v1 preserves the common four-reference deadline algorithm. Paper units disable watchdog; v10 removes only equivalent policy metadata from a rendering copy."
+    }
+  ]
+}

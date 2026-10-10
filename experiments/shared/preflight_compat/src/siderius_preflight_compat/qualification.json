@@ -56,6 +56,11 @@
       "infra_revision": "6675f8ec1ce5952a0b8732f382e847185759f3ae",
       "assembly_sha256": "646a61fd53eea5c7e46fe8416b4dece44381dddacb521ae27be31f7a8b2b6502",
       "scope": "Explicit historical batch-times-segmentation limit of 800000; native default has no such rule. Frozen 45 phase estimates and 32 batch decisions match unchanged fixtures. Static_only scope with protected GPU policy unselected; no arbitrary refusal-prompt, live GPU or stochastic training parity claim."
+    },
+    {
+      "infra_revision": "597350da45b5559e7a32ed93be337cddc3d5a1f8",
+      "assembly_sha256": "738bef5fffc6d2ce0ee1b5786f0b959abc5f850ea0275265852ea7534a4449d6",
+      "scope": "Explicit watchdog deadline selection and independent enabled-native budget transport. Frozen static estimates and batch decisions; unchanged paper-disabled execution. No live GPU or stochastic training replay claim."
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"

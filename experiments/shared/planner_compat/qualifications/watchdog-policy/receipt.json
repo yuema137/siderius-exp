@@ -1,0 +1,161 @@
+{
+  "infra_revision": "597350da45b5559e7a32ed93be337cddc3d5a1f8",
+  "exp_base_revision": "62be32e68ebc2f9f8de93188fcb8c29e55f637ff",
+  "package_versions": {
+    "planner": "0.11.0",
+    "runtime": "0.1.1",
+    "preflight": "0.2.4",
+    "prompt": "0.10.3"
+  },
+  "closures": [
+    {
+      "closure": "estimation_assembly_digest",
+      "files": 78,
+      "changed_paths_from_base": [
+        "src/agent/schemas/hyperparam_tuning.py",
+        "src/nodes/ml_hyperparameter_tune_agent/ml_hyperparameter_tune_agent.py",
+        "src/nodes/ml_hyperparameter_tune_agent/runtime.py",
+        "src/workflows/model_exploration.py"
+      ],
+      "candidate_assembly": "738bef5fffc6d2ce0ee1b5786f0b959abc5f850ea0275265852ea7534a4449d6"
+    },
+    {
+      "closure": "rendering_assembly_digest",
+      "files": 162,
+      "changed_paths_from_base": [
+        "src/agent/schemas/hyperparam_tuning.py",
+        "src/agent/schemas/protocols/ml_model_valid_to_ml_model_tune.py"
+      ],
+      "candidate_assembly": "0820d7b3fb97b158a51a53964e420cfe715396e1f352752fdea6590d428e130b"
+    },
+    {
+      "closure": "verifier_assembly_digest",
+      "files": 18,
+      "changed_paths_from_base": [
+        "src/core/run_invariants.py",
+        "src/core/runtime_control/session.py",
+        "src/nodes/ml_hyperparameter_tune_agent/runtime.py"
+      ],
+      "candidate_assembly": "c001808beaaa310b84c4e95430e2c919449dca069ef31419dd2874bbf2ab1048"
+    }
+  ],
+  "deadline_source_sha256": "ead3b88421da52359d03461e060d2b6e2f2056b9a3d95bc31f350f41bd69beb1",
+  "archive_audit_sha256": "3bad02de09088f14a2afb820b51224a110716ef2773b0592933a2e49094d2e4d",
+  "planner_history": {
+    "matching_complete_requests": 12,
+    "reference_execution": "All four original clean reference checkouts rerun with isolated source registries",
+    "scope": "Actual paper task/startup inputs plus synthetic watchdog history; not recovered historical conversations",
+    "cases": [
+      {
+        "case": "tess",
+        "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+        "profile": "legacy-9b78d505cb11-paper-watchdog-v10",
+        "matching_complete_requests": 3,
+        "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "appendix_fixture_sha256": "b64e428a36fad17d031822abb14dddd431e8447a3bcf5abce3cab7145efc0aa3",
+        "capture_tool_sha256": "9857d2bf8b3b64aef514423c4065e1257140403dd43c4869182ab6ba26fa2605",
+        "candidate_receipt_file_sha256": "10c3d46ac293ffde4effdf42257e73e996d3ab7d4d2bd8e6510f8d9e3e30ce36"
+      },
+      {
+        "case": "ligo",
+        "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+        "profile": "legacy-9b78d505cb11-paper-watchdog-v10",
+        "matching_complete_requests": 3,
+        "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "appendix_fixture_sha256": "b64e428a36fad17d031822abb14dddd431e8447a3bcf5abce3cab7145efc0aa3",
+        "capture_tool_sha256": "9857d2bf8b3b64aef514423c4065e1257140403dd43c4869182ab6ba26fa2605",
+        "candidate_receipt_file_sha256": "1ce194c5e2cffb529f1862e3a0e842028273fe221885c2d4532c76681f7e4cb3"
+      },
+      {
+        "case": "project8",
+        "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+        "profile": "legacy-9b78d505cb11-paper-late-watchdog-v10",
+        "matching_complete_requests": 3,
+        "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "appendix_fixture_sha256": "b64e428a36fad17d031822abb14dddd431e8447a3bcf5abce3cab7145efc0aa3",
+        "capture_tool_sha256": "9857d2bf8b3b64aef514423c4065e1257140403dd43c4869182ab6ba26fa2605",
+        "candidate_receipt_file_sha256": "8a9d84c07e8121aa702083121d71fb1cac84bb95d6087a17375127c09bed3413"
+      },
+      {
+        "case": "tidmad",
+        "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+        "profile": "legacy-9b78d505cb11-paper-watchdog-v10",
+        "matching_complete_requests": 3,
+        "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+        "appendix_fixture_sha256": "b64e428a36fad17d031822abb14dddd431e8447a3bcf5abce3cab7145efc0aa3",
+        "capture_tool_sha256": "9857d2bf8b3b64aef514423c4065e1257140403dd43c4869182ab6ba26fa2605",
+        "candidate_receipt_file_sha256": "9ed873285ae611088bb82f8ea087a8ac70596880fbb0a3d8a8ad2da941a04de2"
+      }
+    ]
+  },
+  "final_startup": {
+    "matching_complete_requests": 4,
+    "cases": [
+      {
+        "case": "tess",
+        "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+        "message_sha256": {
+          "system": "4bd6119c979afcd470013e6c3fc2db5a25d5b7bfeeffb0891b9907a48b14ced0",
+          "user": "39ca1c956e72fd37c433c5d88ad3df9d3c120f5ac5beeb7e5fb517ad47251625"
+        }
+      },
+      {
+        "case": "ligo",
+        "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+        "message_sha256": {
+          "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+          "user": "337e6f7d697bfe0ff6803ce5144365563cde9da3c700079e573f070a2f84d646"
+        }
+      },
+      {
+        "case": "project8",
+        "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+        "message_sha256": {
+          "system": "b2abecd0315f2f3a0e3beebebfbb3431629123465418da550f69635910861aef",
+          "user": "516f520d1b2f181ef3e35478a91aa0e6748d5f5761416256f504840c3afbc9cd"
+        }
+      },
+      {
+        "case": "tidmad",
+        "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+        "message_sha256": {
+          "system": "d59f2d173ad44f205083d5414acbcb3ea1f0e29bbf1767b4ba24aa94f76c73fd",
+          "user": "3ed12413a37d9546ec36f13ce198bc22336dd54be6eac55f27d2e9b496603bbd"
+        }
+      }
+    ]
+  },
+  "selected_tests": {
+    "passed": 186,
+    "failed": 0,
+    "seconds": 5.15,
+    "v10_cases": 25,
+    "session_cases_with_frozen_component_admission_and_policy_checks": 23
+  },
+  "rendering_regression": {
+    "executed_candidate_revision": "c6cfb842583da34afe6e5043406d538837da9361",
+    "final_source_binding": "The final typed RuntimeControlPolicy construction fix changes runtime.py, which is outside the rendering closure; all162 rendering source files and installed prompt profile identity remain unchanged. These captures were not relabeled as final-head execution.",
+    "rendering_assembly_sha256": "0820d7b3fb97b158a51a53964e420cfe715396e1f352752fdea6590d428e130b",
+    "boundary_corpus_matches": 47,
+    "boundary_reference_execution": "Original references and candidate both rerun",
+    "reflector_request_matches": 20,
+    "reflector_reference_execution": "Preserved original-reference full bytes from the previous qualification, not rerun here; fixture and capture-tool digests verified",
+    "boundary_comparison_file_sha256": "c2bc80ba80a05ddfec3306b8cfe888f049c061b400c3e055f9b4650e7c2f8192",
+    "reflector_comparison_file_sha256": "21c7268796b4efefedafe7872fc1be15dd1de97156a38809b1420b128e01c5fe"
+  },
+  "installed_checks": {
+    "preflight_source_files": 5,
+    "preflight_selected_checkout_assembly_match": true,
+    "prompt_source_files": 16,
+    "prompt_frozen_source_entries": 13,
+    "prompt_unknown_assembly_refusals": 4
+  },
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "training_calls": 0,
+  "scope_exclusions": [
+    "No full historical conversation or stochastic response replay",
+    "No enabled-watchdog paper execution claim",
+    "No archived workspace mutation or new scientific setup"
+  ]
+}

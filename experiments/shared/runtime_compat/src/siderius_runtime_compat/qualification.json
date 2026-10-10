@@ -15,6 +15,11 @@
       "infra_revision": "b13b9263c939c33b8d06361b1ae2fd0f99c3a900",
       "assembly_sha256": "57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da",
       "scope": "Shared phase launch selection with unchanged watchdog/plain keyword and result semantics; fresh standalone generic inference starts setup measurement before model construction and records it before generic inference. Resumed inference prediction and actual retain prepatch timing boundaries, including the existing child-preparation omission deferred to issue673. Historical verifier algorithms, finite-trace decisions, explicit verified-prediction-v1 selection and child identity are checked; no full historical training or conversation replay claim."
+    },
+    {
+      "infra_revision": "597350da45b5559e7a32ed93be337cddc3d5a1f8",
+      "assembly_sha256": "c001808beaaa310b84c4e95430e2c919449dca069ef31419dd2874bbf2ab1048",
+      "scope": "Watchdog disabled for all archived paper units; unchanged historical verifier arithmetic and session admission, with v10 historical metadata presentation. Deadline execution is outside this timing-provider qualification."
     }
   ]
 }

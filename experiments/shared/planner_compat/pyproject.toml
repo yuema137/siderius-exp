@@ -4,16 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-planner-compat"
-version = "0.10.0"
+version = "0.11.0"
 description = "Experiment-owned historical SIDERIUS planner prompt providers"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
 
 [project.optional-dependencies]
-historical-runtime = ["siderius-runtime-compat==0.1.0"]
+historical-runtime = ["siderius-runtime-compat==0.1.1"]
 
 [project.entry-points."siderius.planner_strategies"]
+legacy-9b78d505cb11-paper-watchdog-v10 = "siderius_planner_compat.watchdog_policy_v10:historical_watchdog_v10"
+legacy-9b78d505cb11-paper-late-watchdog-v10 = "siderius_planner_compat.watchdog_policy_v10:historical_watchdog_late_v10"
 legacy-9b78d505cb11-paper-epochs-v9 = "siderius_planner_compat.epoch_manual_v9:historical_epochs_v9"
 legacy-9b78d505cb11-paper-late-epochs-v9 = "siderius_planner_compat.epoch_manual_v9:historical_epochs_late_v9"
 legacy-9b78d505cb11-paper-verifier-v8 = "siderius_planner_compat.runtime_verifier_v8:historical_verifier_v8"
@@ -38,4 +40,4 @@ legacy-9b78d505cb11-v1 = "siderius_planner_compat:current_legacy"
 where = ["src"]
 
 [tool.setuptools.package-data]
-siderius_planner_compat = ["fixtures/*.json"]
+siderius_planner_compat = ["fixtures/*.json", "watchdog-qualification.json"]

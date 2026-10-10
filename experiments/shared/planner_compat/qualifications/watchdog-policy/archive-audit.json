@@ -1,0 +1,151 @@
+{
+  "scope": "Read-only audit of preserved paper launch declarations, runtime policies and workspace locks; no new training or historical workspace mutation",
+  "units": [
+    {
+      "task": "TESS",
+      "run_id": "nop_004",
+      "infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "launch_sha256": "6113995ba7a7f734f22f9511ac2506a1d397403165b52ff5ab180509790c9270",
+      "runtime_policy_count": 65,
+      "lock_count": 18,
+      "operator_budget_seconds_counts": {
+        "300.0": 46,
+        "900.0": 19
+      }
+    },
+    {
+      "task": "LIGO",
+      "run_id": "ligo-no-prior-run2",
+      "infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "launch_sha256": "ab7301ec45879af5ffa0841c90c7f5b1cf97da8dba523405cab1e6f3c23fc2ba",
+      "runtime_policy_count": 36,
+      "lock_count": 19,
+      "operator_budget_seconds_counts": {
+        "1800.0": 18,
+        "600.0": 18
+      }
+    },
+    {
+      "task": "Project 8",
+      "run_id": "project8-dual-no-prior-run5",
+      "infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "launch_sha256": "b01824e6b5b0e479e7dd0e47eb3b57b821f8bfefc867883dc29fa185d71a1ea5",
+      "runtime_policy_count": 26,
+      "lock_count": 14,
+      "operator_budget_seconds_counts": {
+        "1800.0": 14,
+        "7200.0": 12
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:0-3",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "5e30778d84ec2f949e54477bff249b922c3fb63674835a6452bf1c001c828c67",
+      "runtime_policy_count": 28,
+      "lock_count": 11,
+      "operator_budget_seconds_counts": {
+        "1800.0": 20,
+        "7200.0": 8
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:4-9",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "f7aaeac280bd262086ce3ea8bd8687027aa2b8fe40080f96e2e5b4c0184e26f8",
+      "runtime_policy_count": 27,
+      "lock_count": 10,
+      "operator_budget_seconds_counts": {
+        "1800.0": 18,
+        "7200.0": 9
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:10-14",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "9b24b5c82973723be3007656db78974aeaff2bf7f0c45a523b2c18cdfcc4212d",
+      "runtime_policy_count": 26,
+      "lock_count": 10,
+      "operator_budget_seconds_counts": {
+        "1800.0": 18,
+        "7200.0": 8
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_noprior:15-19",
+      "infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "launch_sha256": "58cd36d52452a304cdf9abd26d61dad2422526828db2c0b72a56944cfadb7dcf",
+      "runtime_policy_count": 24,
+      "lock_count": 9,
+      "operator_budget_seconds_counts": {
+        "1800.0": 16,
+        "7200.0": 8
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:0-3",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "e012bd15a73fc92c4649dbd7d8993f043a834106d2693461a46b9295e3b954e1",
+      "runtime_policy_count": 27,
+      "lock_count": 10,
+      "operator_budget_seconds_counts": {
+        "1800.0": 18,
+        "7200.0": 9
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:4-9",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "b547c9fa986c13d08fe3e7ad40942c4319fc8bdae3d071402d7b278e6e661d1c",
+      "runtime_policy_count": 24,
+      "lock_count": 9,
+      "operator_budget_seconds_counts": {
+        "1800.0": 16,
+        "7200.0": 8
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:10-14",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "35013fffb13a40434627fe62080d4b7ea302ea7993bf78ed52fa92e6a1a2bb6a",
+      "runtime_policy_count": 25,
+      "lock_count": 10,
+      "operator_budget_seconds_counts": {
+        "1800.0": 17,
+        "7200.0": 8
+      }
+    },
+    {
+      "task": "TIDMAD",
+      "run_id": "workflow_analysis_on:15-19",
+      "infra_revision": "c046744712fabfbd09c5c5a51a84fb30073d59e3",
+      "launch_sha256": "2b5fbb83eb3f0cdf7b15d4550065c4f50585553d01caf2222257aa3a657bb10f",
+      "runtime_policy_count": 25,
+      "lock_count": 10,
+      "operator_budget_seconds_counts": {
+        "1800.0": 17,
+        "7200.0": 8
+      }
+    }
+  ],
+  "runtime_policy_count": 333,
+  "lock_count": 130,
+  "watchdog": {
+    "enabled": false,
+    "floor_seconds": 60.0,
+    "grace_seconds": 10.0,
+    "max_phase_seconds": null,
+    "poll_seconds": 1.0,
+    "safety_factor": null
+  },
+  "all_launch_digests_match_declared_manifest": true,
+  "all_original_locks_lack_watchdog_specific_fields": true,
+  "shared_four_reference_deadline_source": "src/core/runtime_control/watchdog_deadline.py",
+  "shared_four_reference_deadline_source_sha256": "2d9c8a0571be7d312f76fcff9205939e175bc84b2c43d794f216e8f8f46998d6"
+}
