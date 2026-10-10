@@ -22,7 +22,7 @@ def source_files() -> dict[str, Path]:
 
 
 def historical_profile():
-    from core.preflight_estimation import PreflightEstimatorProfile
+    import core.preflight_estimation as registry
 
     from .arithmetic import estimate_historical_phase
 
@@ -30,12 +30,18 @@ def historical_profile():
     assemblies = frozenset(
         row["assembly_sha256"] for row in qualification["assemblies"]
     )
-    return PreflightEstimatorProfile(
+    # Qualified older frameworks enforce this rule internally and lack the field.
+    # New frameworks require the historical provider to declare it explicitly.
+    policy = {}
+    if "workload_rule" in registry.PreflightEstimatorProfile.__dataclass_fields__:
+        policy["workload_rule"] = registry.BatchSegmentationLimit(limit=800000)
+    return registry.PreflightEstimatorProfile(
         name=SELECTION,
         version="1",
         estimate=estimate_historical_phase,
         sources=source_files(),
         qualified_assemblies=assemblies,
+        **policy,
     )
 
 

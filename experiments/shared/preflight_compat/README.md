@@ -10,15 +10,22 @@ each recorded forward call. The native estimator counts its registered state.
 This package explicitly chooses the old arithmetic; the saved record identifies
 that choice. It does not rewrite native estimates or archived results.
 
+It also preserves the historical rule `batch_size × segmentation_size ≤ 800,000`
+when a segmentation size is declared. This is a historical workload restriction,
+not a GPU memory limit. Newer frameworks with explicit workload rules omit it
+from native runs; selecting this package restores it for that historical run.
+Older qualified frameworks, including this repository's pinned version, still
+enforce the same rule internally.
+
 The package does not launch training, call an LLM, or measure GPU peaks.
 Matching inputs and prompts does not guarantee the same generated model,
 weights, or score.
 
 ## Install in the environment that runs infra
 
-The current package targets the exact framework revision in the repository's
-`SIDERIUS_REVISION`. Its [qualification report](qualifications/task-model-probe/report.md)
-records the source review, executed checks and limits. Use `static_only` and leave
+The package supports the repository's pinned framework and the explicitly
+qualified newer framework versions listed in its [technical contract](contract.md).
+Its [workload-rule qualification](qualifications/workload-rule/report.md) records the source review, executed checks and limits. Use `static_only` and leave
 `gpu_execution_policy` unselected for this historical view. Newly measured/protected
 execution evidence is outside that qualification.
 

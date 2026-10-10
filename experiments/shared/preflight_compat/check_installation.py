@@ -73,9 +73,17 @@ def check(infra_checkout: Path) -> dict:
     )
     if not references:
         raise ValueError("Selected clean assembly is not explicitly qualified")
-    expected_hash = source_fingerprint(
-        {name: expected[name] for name in installed.source_files()}
-    )
+    identity_sources = {name: expected[name] for name in installed.source_files()}
+    if hasattr(profile, "workload_rule"):
+        identity_sources = {
+            **{f"source:{name}": content for name, content in identity_sources.items()},
+            "policy:workload_rule": (
+                profile.workload_rule.model_dump_json().encode()
+                if profile.workload_rule is not None
+                else b"null"
+            ),
+        }
+    expected_hash = source_fingerprint(identity_sources)
     if identity.content_sha256 != expected_hash:
         raise ValueError("Installed identity differs from reviewed package sources")
     child_code = (

@@ -51,6 +51,11 @@
       "infra_revision": "fec37b60f5701db8993ac4d29539b2f1090e4c2b",
       "assembly_sha256": "772589d71f3468c489808a6eb104f4c8a63af5fa7ebb444317e2bc56abda6f87",
       "scope": "Removal of implicit epoch maximum; estimation closure changes only TrainConfig epoch maximum and cooperative allocation validation/description. Frozen static arithmetic and batch decisions; explicit historical 100 caps. No live GPU, stochastic training or formerly invalid >100 trajectory parity claim."
+    },
+    {
+      "infra_revision": "6675f8ec1ce5952a0b8732f382e847185759f3ae",
+      "assembly_sha256": "646a61fd53eea5c7e46fe8416b4dece44381dddacb521ae27be31f7a8b2b6502",
+      "scope": "Explicit historical batch-times-segmentation limit of 800000; native default has no such rule. Frozen 45 phase estimates and 32 batch decisions match unchanged fixtures. Static_only scope with protected GPU policy unselected; no arbitrary refusal-prompt, live GPU or stochastic training parity claim."
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"

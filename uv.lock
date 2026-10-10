@@ -3029,7 +3029,7 @@ provides-extras = ["historical-runtime"]
 
 [[package]]
 name = "siderius-preflight-compat"
-version = "0.2.2"
+version = "0.2.3"
 source = { directory = "experiments/shared/preflight_compat" }
 
 [[package]]

@@ -2,11 +2,11 @@
 
 ## Owner and boundary
 
-Exp owns `siderius-preflight-compat` 0.2.0 and the explicit
+Exp owns `siderius-preflight-compat` 0.2.3 and the explicit
 `legacy-078b23ca-preflight-v1` entry point in `siderius.preflight_estimators`.
 There is no installed-default entry point. Infra owns typed observations,
 provider identity, composition binding, worker dispatch, probing, candidate
-order, caps, intensity checks, admission, and failure attribution.
+order, caps, typed workload-rule enforcement, admission, and failure attribution.
 
 The provider consumes `PhaseObservations` and returns `PhaseEstimate`. It does
 not receive a model or dataset and cannot return execution commands. It uses
@@ -33,7 +33,7 @@ and optimizer state multipliers (Adam/AdamW: 2; SGD: 0).
   An unknown historical identifier raises; no new fallback is invented.
 
 Diagnostic breakdown keys retain their old meanings. Infra still owns rounding,
-dominant phase, comparison operators, candidate order and compute-intensity
+dominant phase, comparison operators, candidate order and declared workload-rule
 checks. The package does not undo the truthful refusal attribution introduced
 in PR A. New refusal records remain outside planner v6's qualified projection.
 
@@ -119,3 +119,34 @@ extends the same historical static scope to the current root framework pin.
 Package 0.2.1 adds the reviewed source assembly without changing historical
 arithmetic or weakening unknown-source refusal. Its new identity requires a new
 workspace; prior qualifications and archived pins remain intact.
+
+## Explicit workload rule (#689)
+
+On frameworks exposing `PreflightEstimatorProfile.workload_rule`, this provider
+sets `BatchSegmentationLimit(kind="batch-times-segmentation-v1", limit=800000)`.
+The generic framework checks the declared product only when segmentation size
+is available; this is not a hardware-capacity measurement. Native profiles no
+longer declare this historical threshold. Frozen arithmetic and search fixtures
+remain unchanged, including threshold equality and intensity-only refusals.
+
+Qualified older framework APIs, including the unchanged root pin, lack that
+field and already enforce the same threshold internally. The factory checks
+the dataclass field explicitly and omits the keyword only on those APIs; the
+existing qualified-assembly gate still rejects unknown source. No exception
+fallback or new default estimator is introduced.
+
+New framework identities fingerprint `source:<filename>` entries and a
+`policy:workload_rule` entry containing the declared rule's `model_dump_json()`
+bytes (or `null` when absent). Older APIs retain their source-only identity
+format. The installation checker independently follows that format and requires
+exact installed sources, selected checkout assembly and child identity. Changing
+the rule or this package changes identity. Use a new workspace and retain original
+packages for existing locks; never relabel archived records.
+
+The appended qualification covers infra `6675f8ec` and tree-equivalent clean
+revisions. Previous qualification entries, dependency pins and scientific
+archives are unchanged. Existing v9 paper selectors and eleven-unit mappings
+remain applicable. New static refusal evidence is still outside the guarded
+planner projection: reproducing the workload decision does not imply arbitrary
+refusal-message replay. See [the scoped qualification](qualifications/workload-rule/report.md)
+for executed checks and limitations.

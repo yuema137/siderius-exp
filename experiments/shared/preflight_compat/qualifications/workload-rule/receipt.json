@@ -1,0 +1,144 @@
+{
+  "infra_revision": "6675f8ec1ce5952a0b8732f382e847185759f3ae",
+  "exp_base_revision": "1d02ca93fc5c34a84590051873deb728ea55e41b",
+  "package_version": "0.2.3",
+  "workload_rule": {
+    "kind": "batch-times-segmentation-v1",
+    "limit": 800000
+  },
+  "closures": [
+    {
+      "closure": "estimation_assembly_digest",
+      "baseline_revision": "218483c6049eef94060ee890e8dd388165547630",
+      "candidate_revision": "6675f8ec1ce5952a0b8732f382e847185759f3ae",
+      "files": 78,
+      "changed_paths": [
+        "src/agent/skills/evaluate_vram_skill/evidence.py",
+        "src/agent/skills/evaluate_vram_skill/batch_resolver.py",
+        "src/agent/skills/evaluate_vram_skill/killer_report.py",
+        "src/agent/skills/evaluate_vram_skill/wrapper.py",
+        "src/agent/skills/evaluate_vram_skill/compute_intensity.py",
+        "src/core/preflight_estimation.py"
+      ],
+      "candidate_assembly": "646a61fd53eea5c7e46fe8416b4dece44381dddacb521ae27be31f7a8b2b6502"
+    },
+    {
+      "closure": "rendering_assembly_digest",
+      "baseline_revision": "218483c6049eef94060ee890e8dd388165547630",
+      "candidate_revision": "6675f8ec1ce5952a0b8732f382e847185759f3ae",
+      "files": 160,
+      "changed_paths": [],
+      "candidate_assembly": "1541a79216be560ec70ed489dd6d90bb93401a6ef883920cd185d3418f16367d"
+    },
+    {
+      "closure": "verifier_assembly_digest",
+      "baseline_revision": "218483c6049eef94060ee890e8dd388165547630",
+      "candidate_revision": "6675f8ec1ce5952a0b8732f382e847185759f3ae",
+      "files": 18,
+      "changed_paths": [],
+      "candidate_assembly": "57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da"
+    }
+  ],
+  "installation": {
+    "infra_revision": "6675f8ec1ce5952a0b8732f382e847185759f3ae",
+    "qualified_reference_revisions": [
+      "6675f8ec1ce5952a0b8732f382e847185759f3ae"
+    ],
+    "selected_checkout_assembly_match": true,
+    "installed_source_files": 5,
+    "packages": {
+      "siderius-preflight-compat": "0.2.3",
+      "siderius-planner-compat": "0.10.0"
+    },
+    "identity": {
+      "name": "legacy-078b23ca-preflight-v1",
+      "version": "1",
+      "content_sha256": "3e9495af0d8a240d1e349c1d78565cf86bb57a95f5e9e781acd6a557055d2f31",
+      "assembly_sha256": "646a61fd53eea5c7e46fe8416b4dece44381dddacb521ae27be31f7a8b2b6502"
+    },
+    "child_identity_match": true,
+    "unknown_assembly_refused": true,
+    "api_calls": 0,
+    "gpu_calls": 0,
+    "training_calls": 0,
+    "scope": "Normal installed sources, profile discovery and subprocess identity; no data or training execution"
+  },
+  "tests": {
+    "candidate_passed": 132,
+    "candidate_known_baseline_deselected": 2,
+    "pinned_legacy_passed": 80,
+    "pinned_new_api_skipped": 3,
+    "frozen_phase_estimates": 45,
+    "frozen_search_decisions": 32,
+    "paper_unit_mappings": 11
+  },
+  "startup_requests": [
+    {
+      "case": "tess",
+      "planner_strategy": "legacy-9b78d505cb11-paper-epochs-v9",
+      "reference_infra_revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "4bd6119c979afcd470013e6c3fc2db5a25d5b7bfeeffb0891b9907a48b14ced0",
+        "user": "39ca1c956e72fd37c433c5d88ad3df9d3c120f5ac5beeb7e5fb517ad47251625"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "ligo",
+      "planner_strategy": "legacy-9b78d505cb11-paper-epochs-v9",
+      "reference_infra_revision": "0ab1573602c708ddd182432ad4d0e43ae4828c53",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "6f29f4d533ec5520a3e288a7020b6641a814d257d79c84ae4781d12f54298754",
+        "user": "337e6f7d697bfe0ff6803ce5144365563cde9da3c700079e573f070a2f84d646"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "project8",
+      "planner_strategy": "legacy-9b78d505cb11-paper-late-epochs-v9",
+      "reference_infra_revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "b2abecd0315f2f3a0e3beebebfbb3431629123465418da550f69635910861aef",
+        "user": "516f520d1b2f181ef3e35478a91aa0e6748d5f5761416256f504840c3afbc9cd"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    },
+    {
+      "case": "tidmad",
+      "planner_strategy": "legacy-9b78d505cb11-paper-epochs-v9",
+      "reference_infra_revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "fixture_sha256": "21e4606fcc593e14726942e37633b92ef14e5604ab910edd01ea21f6b2ee898a",
+      "message_sha256": {
+        "system": "d59f2d173ad44f205083d5414acbcb3ea1f0e29bbf1767b4ba24aa94f76c73fd",
+        "user": "3ed12413a37d9546ec36f13ce198bc22336dd54be6eac55f27d2e9b496603bbd"
+      },
+      "api_calls": 0,
+      "training_calls": 0,
+      "scope": "First tuner planner call with archived model, description and advice; no upstream-node or stochastic replay"
+    }
+  ],
+  "prompt_boundaries": {
+    "matched": 47,
+    "different": 0,
+    "reference_execution": "Preserved original full system/user bytes, not rerun",
+    "request_and_capture_tool_identities_verified": true,
+    "preserved_message_identities_verified": true,
+    "comparison_sha256": "ab981cc1f3c1798423f9314ca7f5dcadb32b7676c05005004b9da7883d49aa5f"
+  },
+  "frozen_fixture_sha256": "fbc00c647a6d406b12c80e782faca8f70d2912f54e857be7e7f0f455b1fe8db0",
+  "effects": {
+    "api_calls": 0,
+    "gpu_calls": 0,
+    "training_calls": 0
+  },
+  "scope": "Completed static decisions, four archived startup requests and 47 declared rendering boundaries; not arbitrary refusal-message or complete conversation replay"
+}
