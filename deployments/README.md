@@ -2,6 +2,10 @@
 
 Deployment configuration is explicit and portable. Machine-specific values arrive through configuration or environment variables and are never hidden in task or framework code.
 
+For a fixed workflow, reuse the experiment's launcher or the framework's standard
+chain entrypoint. The [operating contract](workflow-operations.md) explains who
+owns credentials, services and recovery, and how to switch deployments safely.
+
 ## Available packages
 
 - [TIDMAD coding-agent baseline](tidmad_coding_agent_baseline/README.md):
