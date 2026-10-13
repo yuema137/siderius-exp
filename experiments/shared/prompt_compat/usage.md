@@ -326,3 +326,12 @@ qualifies the v2 profiles without changing the four paper task declarations.
 See the [qualification scope, receipt and reproduction commands](qualifications/probe-contract/report.md).
 This changes profile content identity; use a new workspace and preserve old
 locks and records. It does not update the repository-wide infra dependency pin.
+
+## Central low-cost model defaults
+
+Prompt-compat 0.10.6 qualifies infra
+`141ce44787ba1cf3e210a583dc8991d21168f0ad` for the existing v2 historical profiles.
+The four paper configurations explicitly select their original models and do
+not inherit the new Luna defaults. See the [qualification report](qualifications/luna-defaults/report.md)
+for message, routing and installation checks. Preserve archived environments;
+use a new workspace when selecting this changed package identity.

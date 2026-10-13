@@ -27,6 +27,11 @@
       "infra_revision": "a50c578a9b975f301122e65dfee11101cd83ba72",
       "assembly_sha256": "d18fd2c0afbb608845b2d89f0d007355b87c67cfa02e5a81acd03aa53bde9c43",
       "scope": "Optional task-owned model probe contract. Four paper tasks do not declare this capability; 47 frozen rendering requests and eight supplementary undeclared repair requests retain message bytes. No historical conversation or stochastic training replay claim."
+    },
+    {
+      "infra_revision": "141ce44787ba1cf3e210a583dc8991d21168f0ad",
+      "assembly_sha256": "9084acbb05059dc025b0639bb0b2be0b40d819040574b3298f82955d73f4d956",
+      "scope": "Central low-cost model defaults. Explicit paper model routes and frozen message boundaries remain unchanged; no historical conversation or stochastic training replay claim."
     }
   ]
 }
