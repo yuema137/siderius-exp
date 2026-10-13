@@ -318,3 +318,11 @@ presentation for them. The [compatibility report](static-preflight-parity.md)
 separates archived-input equality, current producer checks, and execution-policy
 limits. Neither package changes the public infra pin or authorizes resuming an
 old workspace in place.
+
+## Optional model-probe contract qualification
+
+For infra `a50c578a9b975f301122e65dfee11101cd83ba72`, prompt-compat 0.10.5
+qualifies the v2 profiles without changing the four paper task declarations.
+See the [qualification scope, receipt and reproduction commands](qualifications/probe-contract/report.md).
+This changes profile content identity; use a new workspace and preserve old
+locks and records. It does not update the repository-wide infra dependency pin.

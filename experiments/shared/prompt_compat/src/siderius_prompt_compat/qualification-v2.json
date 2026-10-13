@@ -22,6 +22,11 @@
       "infra_revision": "1e298540fdf85deea1bf676d3e64d3bd821eebff",
       "assembly_sha256": "1a37457532d329cd5c5ddd351c5b2a5aa9527943b8a38f75031d102e36f9f4d4",
       "scope": "TrialConfig persistence helper extraction without changes to serialization or provenance ordering; full historical planner and reflector requests compared with preserved reference bytes. No historical conversation or stochastic training replay claim."
+    },
+    {
+      "infra_revision": "a50c578a9b975f301122e65dfee11101cd83ba72",
+      "assembly_sha256": "d18fd2c0afbb608845b2d89f0d007355b87c67cfa02e5a81acd03aa53bde9c43",
+      "scope": "Optional task-owned model probe contract. Four paper tasks do not declare this capability; 47 frozen rendering requests and eight supplementary undeclared repair requests retain message bytes. No historical conversation or stochastic training replay claim."
     }
   ]
 }
