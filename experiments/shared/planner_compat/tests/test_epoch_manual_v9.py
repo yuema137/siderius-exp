@@ -18,13 +18,21 @@ def _manuals():
     )["config_manuals"]
 
 
+def _qualified_v9_manual():
+    # This historical schema change belongs to v9, not to today's producer.
+    manual = _manuals()["pre_pr"]
+    assert (
+        manual["schemas"]["TrainConfig"]["properties"]["epochs"].pop("maximum") == 100
+    )
+    return manual
+
+
 @pytest.mark.parametrize("late", [False, True])
-def test_production_manual_restores_frozen_bytes_and_old_profile_refuses(late):
+def test_qualified_epoch_manual_restores_frozen_bytes_and_old_profile_refuses(late):
     from agent.planner_strategy import resolve_planner_strategy
-    from agent.skills.check_config_format_skill.wrapper import run_skill
 
     prefix = "legacy-9b78d505cb11-paper" + ("-late" if late else "")
-    current = run_skill(None)["data"]
+    current = _qualified_v9_manual()
     before = deepcopy(current)
     expected = json.dumps(_manuals()["pre_pr" if late else "historical"], indent=2)
     profile = resolve_planner_strategy(prefix + "-epochs-v9")
@@ -43,9 +51,8 @@ def test_production_manual_restores_frozen_bytes_and_old_profile_refuses(late):
 @pytest.mark.parametrize("defect", ["maximum", "default", "minimum", "extra", "old"])
 def test_unknown_manual_refuses_before_provider_request(defect):
     from agent.planner_strategy import resolve_planner_strategy
-    from agent.skills.check_config_format_skill.wrapper import run_skill
 
-    manual = run_skill(None)["data"]
+    manual = _qualified_v9_manual()
     epochs = manual["schemas"]["TrainConfig"]["properties"]["epochs"]
     if defect in {"maximum", "default", "minimum"}:
         epochs[defect] = 101
@@ -63,7 +70,8 @@ def test_unknown_manual_refuses_before_provider_request(defect):
 
 
 @pytest.mark.parametrize(
-    "version", ["v4", "runtime-v5", "preflight-v6", "storage-v7", "verifier-v8"]
+    "version",
+    ["v4", "runtime-v5", "preflight-v6", "storage-v7", "verifier-v8", "epochs-v9"],
 )
 def test_previous_manual_profiles_do_not_implicitly_accept_new_schema(version):
     from agent.planner_strategy import resolve_planner_strategy
@@ -72,7 +80,7 @@ def test_previous_manual_profiles_do_not_implicitly_accept_new_schema(version):
     current = run_skill(None)["data"]
     for era in ("", "-late"):
         previous = resolve_planner_strategy(f"legacy-9b78d505cb11-paper{era}-{version}")
-        with pytest.raises(ValueError, match="Unqualified paper configuration manual"):
+        with pytest.raises(ValueError, match="Unqualified .*configuration manual"):
             previous.render_config_manual(current)
 
 

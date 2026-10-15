@@ -61,7 +61,6 @@ def passing_record(status="success"):
 
 def planner_arguments():
     from agent.prompt_templates.tuner.rendering import TunerTaskRender
-    from agent.skills.check_config_format_skill.wrapper import run_skill
     from execute_tools.evaluation_metric import MetricSpec, PresenceScoreabilityContract
 
     fixture = json.loads(
@@ -70,7 +69,11 @@ def planner_arguments():
         .read_text()
     )
     return fixture["base_arguments"] | {
-        "config_manual": run_skill(None)["data"],
+        "config_manual": json.loads(
+            files("siderius_planner_compat")
+            .joinpath("fixtures/paper_ligo_boundary.json")
+            .read_text()
+        )["config_manuals"]["pre_pr"],
         "task_render": TunerTaskRender.model_validate(fixture["task_render"]),
         "metric_spec": MetricSpec.model_validate(
             fixture["metric_spec"]

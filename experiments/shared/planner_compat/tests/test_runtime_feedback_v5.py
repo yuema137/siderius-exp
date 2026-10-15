@@ -29,7 +29,6 @@ def raw_record():
 
 def base_arguments():
     from agent.prompt_templates.tuner.rendering import TunerTaskRender
-    from agent.skills.check_config_format_skill.wrapper import run_skill
     from execute_tools.evaluation_metric import MetricSpec, PresenceScoreabilityContract
 
     fixture = json.loads(
@@ -38,7 +37,11 @@ def base_arguments():
         .read_text()
     )
     return fixture["base_arguments"] | {
-        "config_manual": run_skill(None)["data"],
+        "config_manual": json.loads(
+            files("siderius_planner_compat")
+            .joinpath("fixtures/paper_ligo_boundary.json")
+            .read_text()
+        )["config_manuals"]["pre_pr"],
         "task_render": TunerTaskRender.model_validate(fixture["task_render"]),
         "metric_spec": MetricSpec.model_validate(
             fixture["metric_spec"]
@@ -91,7 +94,16 @@ def test_final_request_matches_v4_with_frozen_old_feedback(late):
 
 
 @pytest.mark.parametrize(
-    "change", ["version", "status", "stage", "admission", "within_budget", "record_only", "pre_launch"]
+    "change",
+    [
+        "version",
+        "status",
+        "stage",
+        "admission",
+        "within_budget",
+        "record_only",
+        "pre_launch",
+    ],
 )
 def test_unknown_or_inconsistent_producers_fail_instead_of_guessing(change):
     record = raw_record()
@@ -134,7 +146,10 @@ def test_supported_refusals_keep_final_historical_messages(stage, reason_code):
     ]:
         bridge = _CaptureBridge()
         bridge.plan(
-            **(base_arguments() | {"planner_strategy": strategy, "memory_history": [history]})
+            **(
+                base_arguments()
+                | {"planner_strategy": strategy, "memory_history": [history]}
+            )
         )
         captures.append(bridge.captures)
     assert captures[0] == captures[1]

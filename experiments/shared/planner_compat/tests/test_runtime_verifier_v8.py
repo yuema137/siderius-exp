@@ -36,7 +36,7 @@ def _record(session):
     }
 
 
-def _request(profile, record):
+def _request(profile, record, *, config_manual=None):
     from agent.prompt_templates.tuner.rendering import TunerTaskRender
     from execute_tools.evaluation_metric import MetricSpec, PresenceScoreabilityContract
 
@@ -48,7 +48,11 @@ def _request(profile, record):
         package.joinpath("fixtures/paper_ligo_boundary.json").read_text()
     )
     arguments = fixture["base_arguments"] | {
-        "config_manual": manual["config_manuals"]["historical"],
+        "config_manual": (
+            manual["config_manuals"]["historical"]
+            if config_manual is None
+            else config_manual
+        ),
         "task_render": TunerTaskRender.model_validate(fixture["task_render"]),
         "metric_spec": MetricSpec.model_validate(
             fixture["metric_spec"]
@@ -67,38 +71,87 @@ def _request(profile, record):
     return bridge.captures[0]
 
 
-def test_actual_sessions_preserve_original_policy_and_planner_requests(sessions):
-    """The enclosing record is a minimal boundary carrier, not a training replay."""
+def _historical_record(session):
+    original = next(
+        row for row in ORIGINAL["cases"] if row["case_id"] == session["case_id"]
+    )
+    record = deepcopy(_record(session))
+    record["runtime_verification"]["runtime_policy"] = deepcopy(
+        ORIGINAL["policies"][original["policy_index"]]
+    )
+    return record
+
+
+def _profile_prefix(session):
+    case = next(row for row in TRACES["cases"] if row["case_id"] == session["case_id"])
+    late = case["reference_infra_revision"].startswith("349b6cd6")
+    return "legacy-9b78d505cb11-paper" + ("-late" if late else "")
+
+
+def test_actual_sessions_preserve_original_components_and_admission(sessions):
     originals = {row["case_id"]: row for row in ORIGINAL["cases"]}
     cases = {row["case_id"]: row for row in TRACES["cases"]}
     assert len(sessions) == len(originals) == 23
     for session in sessions:
-        original = originals[session["case_id"]]
         component_bytes = json.dumps(
             session["component"], sort_keys=True, separators=(",", ":")
         ).encode()
         assert (
-            hashlib.sha256(component_bytes).hexdigest() == original["component_sha256"]
+            hashlib.sha256(component_bytes).hexdigest()
+            == originals[session["case_id"]]["component_sha256"]
         )
         assert (
             session["admission"]
             == cases[session["case_id"]]["expected_archived"]["admission"]
         )
+
+
+def test_v8_synthetic_era_policy_preserves_original_planner_requests(sessions):
+    """Frozen policy plus verifier provenance isolates the v8-owned change.
+
+    This synthetic carrier is not a current session or a recovered conversation.
+    The current session is checked separately through the complete v11 chain.
+    """
+    for session in sessions:
+        historical = _historical_record(session)
+        incoming = deepcopy(historical)
+        incoming["runtime_verification"]["runtime_policy"].update(
+            {
+                field: deepcopy(session["policy"][field])
+                for field in (
+                    "runtime_completion_policy",
+                    "runtime_verifier",
+                    "runtime_verifier_identity",
+                )
+            }
+        )
+        untouched = deepcopy(incoming)
+        prefix = _profile_prefix(session)
+        expected = _request(prefix + "-storage-v7", historical)
+        assert _request(prefix + "-verifier-v8", incoming) == expected
+        assert _request(prefix + "-storage-v7", incoming) != expected
+        assert project_record(incoming) == historical
+        assert incoming == untouched
+
+
+def test_current_sessions_match_frozen_requests_through_v11(sessions):
+    from agent.skills.check_config_format_skill.wrapper import run_skill
+
+    manual = run_skill(None)["data"]
+    before_manual = deepcopy(manual)
+    for session in sessions:
         current = _record(session)
         untouched = deepcopy(current)
-        historical = deepcopy(current)
-        historical["runtime_verification"]["runtime_policy"] = ORIGINAL["policies"][
-            original["policy_index"]
-        ]
-        late = cases[session["case_id"]]["reference_infra_revision"].startswith(
-            "349b6cd6"
+        prefix = _profile_prefix(session)
+        expected = _request(prefix + "-storage-v7", _historical_record(session))
+        assert (
+            _request(prefix + "-scheduler-off-v11", current, config_manual=manual)
+            == expected
         )
-        prefix = "legacy-9b78d505cb11-paper" + ("-late" if late else "")
-        expected = _request(prefix + "-storage-v7", historical)
-        assert _request(prefix + "-verifier-v8", current) == expected
-        assert _request(prefix + "-storage-v7", current) != expected
-        assert project_record(current) == historical
+        # v8 does not own the later watchdog projection: it must retain that evidence.
+        assert _request(prefix + "-verifier-v8", current) != expected
         assert current == untouched
+    assert manual == before_manual
 
 
 @pytest.mark.parametrize(
