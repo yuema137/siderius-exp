@@ -37,6 +37,11 @@
       "infra_revision": "35be68663787ddd03411651c36bee71c57a0043f",
       "assembly_sha256": "8617246d1c24dea37e610c97b1d6aa2beb6c466d0aa0314c89744f571dd8939a",
       "scope": "Upstream constraint disclosure with explicit historical workflow opt-out; frozen four-task rendering and synthetic analysis identity witnesses, not complete conversation or training replay."
+    },
+    {
+      "infra_revision": "3adaa9871b66382401a8cec8010f605fe950d275",
+      "assembly_sha256": "6c6516ba89c88f16c7a639a5c824c7a289d7d1302af46afab7501c3b739f0974",
+      "scope": "Downstream constraint disclosure with explicit historical workflow opt-out; frozen four-task messages and supplementary proposer, reflector and repair comparisons, not complete conversation or training replay."
     }
   ]
 }

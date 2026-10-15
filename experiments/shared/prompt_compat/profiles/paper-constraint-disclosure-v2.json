@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "scope": "Explicit selection for new historical-presentation workspaces on the qualified downstream constraint-disclosure infra revision. Preserve all existing scientific, planner and runtime configuration; never rewrite archives.",
+  "required_packages": {
+    "siderius-prompt-compat": "0.10.8"
+  },
+  "cases": {
+    "tess": {
+      "source_task_composition": "tasks/phyts_tess/compositions/rotation_regression.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-early-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false
+      }
+    },
+    "ligo": {
+      "source_task_composition": "tasks/phyts_ligo/compositions/regression.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-early-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false
+      }
+    },
+    "project8": {
+      "source_task_composition": "tasks/phyts_project8/compositions/dual_representation.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-late-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false
+      }
+    },
+    "tidmad": {
+      "source_task_composition": "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-tidmad-noprior-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false
+      }
+    },
+    "tidmad-analysis": {
+      "source_task_composition": "experiments/tidmad/data_analysis_pair/task_composition_on.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-analysis-c0467447-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false
+      }
+    }
+  }
+}

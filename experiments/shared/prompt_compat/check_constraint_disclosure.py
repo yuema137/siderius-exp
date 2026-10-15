@@ -14,7 +14,7 @@ from capture import CaptureRequest, render, validate_checkout
 _ROOT = Path(__file__).resolve().parent
 
 
-def check_selections() -> list[dict]:
+def check_selections(selection: Path | None = None) -> list[dict]:
     from agent.prompt_rendering import bind_prompt_profile, resolve_prompt_profile
     from agent.prompt_templates.constraints import append_constraint_disclosure
     from agent.schemas.parameter_rules import (
@@ -24,9 +24,8 @@ def check_selections() -> list[dict]:
     from workflows.constraint_disclosure import workflow_constraint_context
     from workflows.run_config import WorkflowLaunchConfig
 
-    overlay = json.loads(
-        (_ROOT / "profiles/paper-constraint-disclosure-v1.json").read_text()
-    )
+    selection = selection or _ROOT / "profiles/paper-constraint-disclosure-v1.json"
+    overlay = json.loads(selection.read_text())
     rules = ParameterRules.model_validate({"train_config.epochs": {"exact": 7}})
     rows = []
     for task, selection in overlay["cases"].items():
@@ -148,6 +147,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-revision", required=True)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument(
+        "--selection", type=Path, help="Explicit historical selection overlay"
+    )
     args = parser.parse_args()
     revision = validate_checkout(args.expected_revision)
 
@@ -160,7 +162,7 @@ def main() -> None:
     report = {
         "infra_revision": revision,
         "scope": "Explicit historical workflow selection and synthetic non-executing analysis plan identity; not conversation replay",
-        "selection_results": check_selections(),
+        "selection_results": check_selections(args.selection),
         "analysis_identity": check_analysis_identity(),
         "api_calls": 0,
         "training_calls": 0,

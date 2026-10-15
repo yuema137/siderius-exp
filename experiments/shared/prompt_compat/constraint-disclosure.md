@@ -3,8 +3,8 @@
 ## Scope and ownership
 
 New framework workflows disclose existing task and workflow restrictions to
-upstream agents. Normal runs retain this default. The explicit historical
-selection in [paper-constraint-disclosure-v1.json](profiles/paper-constraint-disclosure-v1.json)
+agents throughout the workflow. Normal runs retain this default. The explicit historical
+selection in [paper-constraint-disclosure-v2.json](profiles/paper-constraint-disclosure-v2.json)
 combines a paper prompt renderer with `disclose_execution_constraints: false`.
 It suppresses the newly added advisory context, not parameter-rule enforcement,
 objective selection, resource checks, or recorded execution provenance.
@@ -23,8 +23,9 @@ workspace and preserve old package installations, run locks, and archives.
 
 ## Apply to an external historical project
 
-Use framework `35be68663787ddd03411651c36bee71c57a0043f`, qualified in the
-[report](qualifications/constraint-disclosure/report.md);
+For the complete disclosure path, use package `0.10.8` and framework
+`3adaa9871b66382401a8cec8010f605fe950d275`, qualified in the
+[downstream report](qualifications/downstream-constraints/report.md);
 the repository root installation pin is unchanged and does not gain this option.
 Install this standalone package into that framework checkout's own frozen
 environment using the [existing installation procedure](usage.md#1-install-into-the-infra-environment).
@@ -71,9 +72,19 @@ revision and a new output file:
 ```bash
 "$INFRA_CHECKOUT/.venv/bin/python" \
   "$EXP_CHECKOUT/experiments/shared/prompt_compat/check_constraint_disclosure.py" \
-  --expected-revision "$INFRA_REVISION" --output "$NEW_RECEIPT_PATH"
+  --expected-revision "$INFRA_REVISION" \
+  --selection "$EXP_CHECKOUT/experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json" \
+  --output "$NEW_RECEIPT_PATH"
 ```
 
 The separate frozen-request comparisons establish equality only for their
 recorded boundaries and inputs. They do not establish complete conversation
 replay, identical future model responses, or equal retrained scientific scores.
+
+## Earlier upstream-only qualification
+
+Package `0.10.7`, framework `35be68663787ddd03411651c36bee71c57a0043f`, and
+[selection v1](profiles/paper-constraint-disclosure-v1.json) retain their separate
+[upstream report](qualifications/constraint-disclosure/report.md). That earlier
+pair does not include downstream disclosure. Its archived evidence remains
+unchanged; new complete-path selections use the qualified pair above.
