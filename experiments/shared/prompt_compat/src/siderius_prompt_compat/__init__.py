@@ -30,6 +30,17 @@ def _without_time_budget_context(inp: ProposalInput) -> str:
     return ""
 
 
+def _without_constraint_disclosure(context: object | None) -> str:
+    """Omit shared disclosure only after explicit historical workflow selection."""
+    if context is not None:
+        raise ValueError(
+            "Historical rendering requires disclose_execution_constraints=False "
+            "(--no-disclose_execution_constraints) in a new workspace; "
+            "deterministic parameter rules remain enforced."
+        )
+    return ""
+
+
 def _analysis_view(renderer):
     @wraps(renderer)
     def render(**kwargs):
@@ -37,6 +48,7 @@ def _analysis_view(renderer):
         # The renderer receives its own copy, and cannot mutate saved inputs.
         if "analysis_input" in kwargs:
             value = kwargs["analysis_input"]
+            _without_constraint_disclosure(getattr(value, "constraint_context", None))
             kwargs["analysis_input"] = value.model_copy(
                 update={"recovery_policy": None}
             )
@@ -70,6 +82,7 @@ def _profile(
 
     renderers = {
         "proposal.template": _template,
+        "constraints.disclosure": _without_constraint_disclosure,
         "tuner.execution_provenance": render_plan_resolution_checkpoint,
     }
     if time_budget_compat:

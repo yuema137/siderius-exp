@@ -32,6 +32,11 @@
       "infra_revision": "141ce44787ba1cf3e210a583dc8991d21168f0ad",
       "assembly_sha256": "9084acbb05059dc025b0639bb0b2be0b40d819040574b3298f82955d73f4d956",
       "scope": "Central low-cost model defaults. Explicit paper model routes and frozen message boundaries remain unchanged; no historical conversation or stochastic training replay claim."
+    },
+    {
+      "infra_revision": "35be68663787ddd03411651c36bee71c57a0043f",
+      "assembly_sha256": "8617246d1c24dea37e610c97b1d6aa2beb6c466d0aa0314c89744f571dd8939a",
+      "scope": "Upstream constraint disclosure with explicit historical workflow opt-out; frozen four-task rendering and synthetic analysis identity witnesses, not complete conversation or training replay."
     }
   ]
 }

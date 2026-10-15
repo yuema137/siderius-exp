@@ -15,6 +15,13 @@ profiles and [migration contract](proposer-budget-v2.md). The v1 instructions
 below remain for their separately qualified older assemblies. Installing a new
 package does not make an old workspace resumable with changed renderer identity.
 
+For the upstream constraint-disclosure change, version 0.10.7 additionally
+requires the [explicit historical workflow selection](constraint-disclosure.md)
+on its qualified new infra revision. Select the matching v2 renderer and pass
+`--no-disclose_execution_constraints` in a fresh workspace; deterministic
+constraints remain enforced. The root exp infra pin is unchanged and does not
+itself support the new option.
+
 ## 1. Install into the infra environment
 
 Set `INFRA_CHECKOUT` and `EXP_CHECKOUT` to your own absolute checkout paths.
