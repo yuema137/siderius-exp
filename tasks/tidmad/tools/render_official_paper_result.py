@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Render the official band-split TIDMAD paper-model results as Markdown.
 
 Reads the per-model summary JSONs produced by
@@ -117,13 +116,17 @@ def render_health_section(health: dict) -> list[str]:
             "records diversity/std and blocks only on amplitude collapse."
         ),
         "",
-        f"Thresholds: `unique_int8 > {t['min_unique_int8_values']}`, "
-        f"`std_mv >= {t['min_std_mv']}`, "
-        f"`mode_fraction < {t['collapse_threshold']}`.",
+        (
+            f"Thresholds: `unique_int8 > {t['min_unique_int8_values']}`, "
+            f"`std_mv >= {t['min_std_mv']}`, "
+            f"`mode_fraction < {t['collapse_threshold']}`."
+        ),
         "",
-        f"**Healthy on {s['all_three_pass']} of {n} files** "
-        f"(diversity {s['diversity_pass']}/{n}, std {s['std_pass']}/{n}, "
-        f"amplitude {s['amplitude_pass']}/{n}).",
+        (
+            f"**Healthy on {s['all_three_pass']} of {n} files** "
+            f"(diversity {s['diversity_pass']}/{n}, std {s['std_pass']}/{n}, "
+            f"amplitude {s['amplitude_pass']}/{n})."
+        ),
         "",
     ]
     if s["files_missing"]:
@@ -160,8 +163,10 @@ def render_health_section(health: dict) -> list[str]:
         )
     lines += [
         "",
-        "Verdict letters: upper case passed that check (D diversity, S std, "
-        "A amplitude), lower case failed.",
+        (
+            "Verdict letters: upper case passed that check (D diversity, S std, "
+            "A amplitude), lower case failed."
+        ),
         "",
         (
             "Re-scan existing outputs after checking their filename layout. The recipe "
@@ -206,10 +211,12 @@ def render_health_only(health: dict, out_path: Path) -> None:
         "",
         "## Headline",
         "",
-        "**Canonical `denoising_score` = _pending_** — the banded scoring run "
-        "has not produced a summary JSON for this model yet. The HealthGate "
-        "metrics below stand on their own: they describe the denoised outputs "
-        "that do exist, and they do not depend on the score.",
+        (
+            "**Canonical `denoising_score` = _pending_** — the banded scoring run "
+            "has not produced a summary JSON for this model yet. The HealthGate "
+            "metrics below stand on their own: they describe the denoised outputs "
+            "that do exist, and they do not depend on the score."
+        ),
     ]
     lines += render_health_section(health)
     out_path.write_text("\n".join(lines))

@@ -44,7 +44,6 @@ import sys
 from pathlib import Path
 
 import numpy as np
-
 from execute_tools.health_checks._peek import peek_int8_at_channel
 from execute_tools.health_checks.amplitude_collapse import AmplitudeCollapseCheck
 from execute_tools.health_checks.output_diversity import OutputDiversityCheck
@@ -253,21 +252,27 @@ def render_markdown(report: dict) -> str:
     lines = [
         f"### HealthGate per-file metrics — {report['model']}",
         "",
-        f"Peek window {report['peek_samples']:,} samples. Thresholds: "
-        f"`unique_int8 > {MIN_UNIQUE_INT8}`, `std_mv >= {MIN_STD_MV}`, "
-        f"`mode_fraction < {COLLAPSE_THRESHOLD}`.",
+        (
+            f"Peek window {report['peek_samples']:,} samples. Thresholds: "
+            f"`unique_int8 > {MIN_UNIQUE_INT8}`, `std_mv >= {MIN_STD_MV}`, "
+            f"`mode_fraction < {COLLAPSE_THRESHOLD}`."
+        ),
         "",
     ]
     if s["files_missing"]:
         lines += [
-            f"> **Partial scan — {n} of {NUM_FILES} files.** Missing: "
-            f"{', '.join(f'{i:04d}' for i in s['files_missing'])}. "
-            "Absent outputs are not scored and not inferred.",
+            (
+                f"> **Partial scan — {n} of {NUM_FILES} files.** Missing: "
+                f"{', '.join(f'{i:04d}' for i in s['files_missing'])}. "
+                "Absent outputs are not scored and not inferred."
+            ),
             "",
         ]
     lines += [
-        f"| Pass count | diversity {s['diversity_pass']}/{n} | std {s['std_pass']}/{n} | "
-        f"amplitude {s['amplitude_pass']}/{n} | **all three {s['all_three_pass']}/{n}** |",
+        (
+            f"| Pass count | diversity {s['diversity_pass']}/{n} | std {s['std_pass']}/{n} | "
+            f"amplitude {s['amplitude_pass']}/{n} | **all three {s['all_three_pass']}/{n}** |"
+        ),
         "|---|---|---|---|---|",
         "",
         "| file | ckpt | target std (mV) | unique_int8 | std (mV) | mode % | pearson | spectral | verdict |",
@@ -295,8 +300,10 @@ def render_markdown(report: dict) -> str:
         )
     lines += [
         "",
-        "Verdict letters: upper case = passed that check (D diversity, S std, "
-        "A amplitude), lower case = failed.",
+        (
+            "Verdict letters: upper case = passed that check (D diversity, S std, "
+            "A amplitude), lower case = failed."
+        ),
     ]
     return "\n".join(lines)
 
