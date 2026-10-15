@@ -30,6 +30,11 @@
       "infra_revision": "0d851a5f6d74f937444e601261ce6273aa31e1b2",
       "assembly_sha256": "4417a740d16e13c0ec74f67dc122077d4f62d1db0c851f3120451e57ceddba24",
       "scope": "Explicit scheduler-disabled historical workflow; exact-null execution lock, frozen manual and appendix, offline historical checks. No enabled scheduler or stochastic replay claim."
+    },
+    {
+      "infra_revision": "367df3d478da5c9342de3a3cb7a4975aa9f51095",
+      "assembly_sha256": "15fe99d712713943a3a5542579de80af9cb3419ad37901cd3d74c99ddfbec616",
+      "scope": "Custom-loss target resolution receives the task contract during training preparation and target-standardization checks. Built-in paper loss paths and historical verifier algorithms are unchanged; frozen finite-trace decisions, installed child identity and unknown-assembly refusal are checked. No training or stochastic artifact replay claim."
     }
   ]
 }
