@@ -4,9 +4,9 @@
 
 The current native framework supports explicit learning-rate schedules. Paper
 runs predate that feature. Select the experiment-owned
-[overlay](profiles/paper-scheduler-disabled-v1.json) in a **new workspace** to
+[overlay](profiles/paper-scheduler-disabled-v2.json) in a **new workspace** to
 retain the qualified historical training conditions and prompt presentation.
-The [qualification report](qualifications/native-scheduler/report.md) binds the
+The [qualification report](qualifications/analysis-receipt/report.md) binds the
 exact framework revision and offline evidence.
 The root repository dependency pin and original archived workspaces remain
 unchanged; this overlay requires the separately qualified framework and package

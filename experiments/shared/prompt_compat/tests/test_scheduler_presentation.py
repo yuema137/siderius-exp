@@ -5,7 +5,6 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
-
 from agent.prompt_rendering import bind_prompt_profile, resolve_prompt_profile
 from agent.schemas.parameter_rules import ParameterRules
 from nodes.ml_model_proposal_agent.parameter_rules import (
@@ -18,9 +17,12 @@ from workflows.run_config import WorkflowLaunchConfig
 ROOT = Path(__file__).parents[1]
 
 
-def test_all_overlay_choices_lock_an_enabled_proposal_off_and_preserve_other_rules():
+@pytest.mark.parametrize("version", [1, 2])
+def test_all_overlay_choices_lock_an_enabled_proposal_off_and_preserve_other_rules(
+    version,
+):
     overlay = json.loads(
-        (ROOT / "profiles/paper-scheduler-disabled-v1.json").read_text()
+        (ROOT / f"profiles/paper-scheduler-disabled-v{version}.json").read_text()
     )
     original = {
         "train_config": {
@@ -90,10 +92,16 @@ def test_previous_qualified_assemblies_keep_their_native_appendix(monkeypatch):
     qualification = json.loads(
         (Path(installed.__file__).parent / "qualification-v2.json").read_text()
     )
-    candidate = qualification["scheduler_disabled_assemblies"][0]
-    previous = qualification["additional_assemblies"][-2]["assembly_sha256"]
-    for digest, frozen in ((previous, False), (candidate, True)):
-        monkeypatch.setattr(installed, "rendering_assembly_digest", lambda: digest)
+    scheduler_disabled = set(qualification["scheduler_disabled_assemblies"])
+    qualified = {qualification["assembly_sha256"]} | {
+        row["assembly_sha256"] for row in qualification["additional_assemblies"]
+    }
+    assert scheduler_disabled and qualified - scheduler_disabled
+    for digest in sorted(qualified):
+        frozen = digest in scheduler_disabled
+        monkeypatch.setattr(
+            installed, "rendering_assembly_digest", lambda digest=digest: digest
+        )
         profile = installed.late_v2()
         assert ("native_training.appendix" in profile.renderers) == frozen
         assert ("native_training.appendix" in profile.native_boundaries) != frozen

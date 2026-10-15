@@ -47,9 +47,15 @@
       "infra_revision": "0d851a5f6d74f937444e601261ce6273aa31e1b2",
       "assembly_sha256": "44e40289389f8016c8b6c62211f91489eed6c1c478c55d5ff5f5d8f01fd5e4cd",
       "scope": "Explicit scheduler-disabled historical workflow; exact-null execution lock, frozen manual and appendix, offline historical checks. No enabled scheduler or stochastic replay claim."
+    },
+    {
+      "infra_revision": "e7549a3bfa98d3c5ec77ae0a39d1b99e3a82c400",
+      "assembly_sha256": "0bf0087a1e36976f86d0cf28c0aa5594ac0721b29fe6d72714590702fa36ed23",
+      "scope": "Optional analysis brief receipt uses the resolved execution model identity; prompt and explicit historical routing unchanged. Frozen boundary comparison and affected interpreter tests; no full conversation or stochastic replay claim."
     }
   ],
   "scheduler_disabled_assemblies": [
-    "44e40289389f8016c8b6c62211f91489eed6c1c478c55d5ff5f5d8f01fd5e4cd"
+    "44e40289389f8016c8b6c62211f91489eed6c1c478c55d5ff5f5d8f01fd5e4cd",
+    "0bf0087a1e36976f86d0cf28c0aa5594ac0721b29fe6d72714590702fa36ed23"
   ]
 }
