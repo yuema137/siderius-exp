@@ -1,0 +1,34 @@
+{
+  "reference_revision": "1e298540fdf85deea1bf676d3e64d3bd821eebff",
+  "candidate_revision": "3bf534433e2d2daa046e33ae3c326d68f77fdb80",
+  "assembly_sha256": "d2c7ca3d9c25bc9705335f71bf0b3235eb41547ce501ccf4d5f0d070810bb186",
+  "closure_file_count": 79,
+  "changed_or_added": [
+    {
+      "path": "src/core/runtime_control/gpu_measurement_phases.py",
+      "previous_sha256": "497111ce30c3267fef55f8e6e23f4a9eae260cf2fd34369ea27a878b2a1f359d",
+      "candidate_sha256": "852a7def51976e14b28a90a8ed28fba8dafa47441d33eaafb32ed7b54f56b4d1"
+    },
+    {
+      "path": "src/agent/schemas/hyperparam_tuning.py",
+      "previous_sha256": "29bf6d96168790b0414cd174c7d0dbeff749fe0a9ad3252b946e8a62b8a0ed19",
+      "candidate_sha256": "125dac344b7a97acc67855c0068bfa325d9b49b7b4018c642e6687ac2e9d0d16"
+    },
+    {
+      "path": "src/workflows/model_exploration.py",
+      "previous_sha256": "d83a632c48e68a61e4d87e299e496e5802bed7833c64e359f1e49d81ad4174dd",
+      "candidate_sha256": "208e6e20a23f34807728633792f4ddef3e32ee29b5722a75a40e711824056992"
+    },
+    {
+      "path": "src/workflows/termination.py",
+      "previous_sha256": null,
+      "candidate_sha256": "41b3ff6980a0f877ec5808e23b2228345cec632fbbcf89a6f27cd8f0254e276f"
+    },
+    {
+      "path": "src/core/preflight_estimation.py",
+      "previous_sha256": "16173c5abe8df41aa4305c2f50c63b35dc960bb73c10a3598039deb063d8d57e",
+      "candidate_sha256": "1dc4403ea14e330966ae42f0bd1ec1d748e3eae34e67b4cc199d20f7a8dfce3d"
+    }
+  ],
+  "arithmetic_search_observation_owners_unchanged": true
+}

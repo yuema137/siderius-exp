@@ -66,6 +66,11 @@
       "infra_revision": "1e298540fdf85deea1bf676d3e64d3bd821eebff",
       "assembly_sha256": "40e50883cc335eb872cf0b4a10ddfb90c402f55f781ab0879fd4cf10e048d2a8",
       "scope": "Lock owners delegate unchanged enabled-policy selection to a shared typed helper. Historical static arithmetic and batch selection remain unchanged; static_only scope with protected GPU policy unselected. No live GPU or stochastic training replay claim."
+    },
+    {
+      "infra_revision": "3bf534433e2d2daa046e33ae3c326d68f77fdb80",
+      "assembly_sha256": "d2c7ca3d9c25bc9705335f71bf0b3235eb41547ce501ccf4d5f0d070810bb186",
+      "scope": "Frozen static arithmetic/search and historical prompt projection; terminal infrastructure-abort propagation and CPU update diagnostics. static_only with protected GPU execution unselected. No measured GPU, stochastic training, or full conversation replay claim."
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"
