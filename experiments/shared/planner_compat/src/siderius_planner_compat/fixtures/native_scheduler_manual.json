@@ -1,0 +1,456 @@
+{
+  "schemas": {
+    "PUNetConfig": {
+      "properties": {
+        "model_type": {
+          "const": "punet",
+          "default": "punet",
+          "title": "Model Type",
+          "type": "string"
+        },
+        "segmentation_size": {
+          "default": 40000,
+          "description": "Input time series length",
+          "minimum": 1000,
+          "title": "Segmentation Size",
+          "type": "integer"
+        },
+        "batch_size": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Batch Size",
+          "type": "integer"
+        },
+        "num_classes": {
+          "default": 256,
+          "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+          "exclusiveMinimum": 0,
+          "title": "Num Classes",
+          "type": "integer"
+        },
+        "multi": {
+          "default": 40,
+          "description": "Base channel multiplier",
+          "maximum": 128,
+          "minimum": 8,
+          "title": "Multi",
+          "type": "integer"
+        },
+        "depth": {
+          "default": 4,
+          "description": "Number of downsampling steps",
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Depth",
+          "type": "integer"
+        },
+        "bilinear": {
+          "default": true,
+          "description": "Whether to use bilinear upsampling or conv transpose",
+          "title": "Bilinear",
+          "type": "boolean"
+        },
+        "pe_factor": {
+          "default": 1.0,
+          "description": "Positional encoding weight",
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Pe Factor",
+          "type": "number"
+        },
+        "kernel_size": {
+          "default": 9,
+          "description": "Convolutional kernel size",
+          "maximum": 15,
+          "minimum": 3,
+          "title": "Kernel Size",
+          "type": "integer"
+        },
+        "embedding_dim": {
+          "default": 32,
+          "description": "Latent space dimension for ADC values",
+          "maximum": 256,
+          "minimum": 8,
+          "title": "Embedding Dim",
+          "type": "integer"
+        }
+      },
+      "title": "PUNetConfig",
+      "type": "object"
+    },
+    "AEConfig": {
+      "description": "Configuration for Fully Connected AutoEncoder.\nDesigned for global feature compression and noise filtering.",
+      "properties": {
+        "model_type": {
+          "const": "fcnet",
+          "default": "fcnet",
+          "title": "Model Type",
+          "type": "string"
+        },
+        "segmentation_size": {
+          "default": 40000,
+          "description": "Input time series length",
+          "minimum": 1000,
+          "title": "Segmentation Size",
+          "type": "integer"
+        },
+        "batch_size": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Batch Size",
+          "type": "integer"
+        },
+        "num_classes": {
+          "default": 256,
+          "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+          "exclusiveMinimum": 0,
+          "title": "Num Classes",
+          "type": "integer"
+        },
+        "latent_dims": {
+          "default": [
+            4000,
+            400,
+            40
+          ],
+          "description": "List of hidden layer dimensions for the encoder",
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Latent Dims",
+          "type": "array"
+        },
+        "dropout": {
+          "default": 0.0,
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "title": "Dropout",
+          "type": "number"
+        }
+      },
+      "title": "AEConfig",
+      "type": "object"
+    },
+    "TransformerConfig": {
+      "properties": {
+        "model_type": {
+          "const": "transformer",
+          "default": "transformer",
+          "title": "Model Type",
+          "type": "string"
+        },
+        "segmentation_size": {
+          "default": 20000,
+          "maximum": 40000,
+          "minimum": 1000,
+          "title": "Segmentation Size",
+          "type": "integer"
+        },
+        "batch_size": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Batch Size",
+          "type": "integer"
+        },
+        "num_classes": {
+          "default": 256,
+          "description": "Size of the output class alphabet, used to build embedding tables and output heads. **DERIVED, not authored** \u2014 Step 03 injects it from the resolved Model-I/O contract, whose own class cardinality is cross-validated against the Dataset Profile's ValueEncoding.num_classes. The 256 default is the Regime-A compatibility value for a caller that predates the contract, in the same sense that an absent --dataset_profile_json resolves the shipped profile; a resolved path never reaches it. Setting it to contradict the contract fails closed rather than winning.",
+          "exclusiveMinimum": 0,
+          "title": "Num Classes",
+          "type": "integer"
+        },
+        "embedding_dim": {
+          "default": 32,
+          "maximum": 256,
+          "minimum": 8,
+          "title": "Embedding Dim",
+          "type": "integer"
+        },
+        "nhead": {
+          "default": 4,
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Nhead",
+          "type": "integer"
+        },
+        "num_layers": {
+          "default": 2,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Num Layers",
+          "type": "integer"
+        },
+        "dim_feedforward": {
+          "default": 128,
+          "maximum": 1024,
+          "minimum": 64,
+          "title": "Dim Feedforward",
+          "type": "integer"
+        },
+        "dropout": {
+          "default": 0.1,
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "title": "Dropout",
+          "type": "number"
+        },
+        "pe_factor": {
+          "default": 1.0,
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Pe Factor",
+          "type": "number"
+        }
+      },
+      "title": "TransformerConfig",
+      "type": "object"
+    },
+    "LossConfig": {
+      "description": "Configuration for the Denoising Scoring Functions (Loss).\nStrictly validates parameters based on the chosen loss_type.\n\nThe four built-in ``loss_type`` values (``focal``, ``focal_cw``, ``ce``,\n``smooth_l1``) use the ``alpha`` / ``gamma`` / ``beta`` fields below.\nThe ``custom`` value (L2 \u2014 see ``docs/design/enable_loss_inventory.md``)\nroutes to a plugin loss in ``agent_generated/losses/``; the plugin's own\n``PLUGIN_LOSS_CONFIG_CLASS`` carries any plugin-specific hyperparameters.\nLossConfig is purely the *router* in custom mode \u2014 ``alpha`` / ``gamma``\n/ ``beta`` are nullified by ``enforce_parameter_consistency`` so the\nagent can't accidentally pass them through.",
+      "properties": {
+        "loss_type": {
+          "default": "focal",
+          "enum": [
+            "focal",
+            "focal_cw",
+            "ce",
+            "smooth_l1",
+            "custom"
+          ],
+          "title": "Loss Type",
+          "type": "string"
+        },
+        "alpha": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 0.5,
+          "title": "Alpha"
+        },
+        "gamma": {
+          "anyOf": [
+            {
+              "maximum": 5.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 2.0,
+          "title": "Gamma"
+        },
+        "beta": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.1,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1.0,
+          "title": "Beta"
+        },
+        "reduction": {
+          "default": "mean",
+          "enum": [
+            "mean",
+            "sum"
+          ],
+          "title": "Reduction",
+          "type": "string"
+        },
+        "use_class_weights": {
+          "default": false,
+          "title": "Use Class Weights",
+          "type": "boolean"
+        },
+        "loss_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "PLUGIN_LOSS_TYPE key of the agent-generated loss to use. Required when loss_type='custom'. The loss plugin must exist in agent_generated/losses/ (or in a SIDERIUS_LOSS_DIRS-resolved per-run directory) before training begins.",
+          "title": "Loss Name"
+        }
+      },
+      "title": "LossConfig",
+      "type": "object"
+    },
+    "TrainConfig": {
+      "$defs": {
+        "CosineLearningRateSchedule": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "cosine",
+              "title": "Kind",
+              "type": "string"
+            },
+            "horizon_epochs": {
+              "exclusiveMinimum": 0,
+              "title": "Horizon Epochs",
+              "type": "integer"
+            },
+            "min_lr": {
+              "minimum": 0,
+              "title": "Min Lr",
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind",
+            "horizon_epochs",
+            "min_lr"
+          ],
+          "title": "CosineLearningRateSchedule",
+          "type": "object"
+        },
+        "StepLearningRateSchedule": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "step",
+              "title": "Kind",
+              "type": "string"
+            },
+            "step_size_epochs": {
+              "exclusiveMinimum": 0,
+              "title": "Step Size Epochs",
+              "type": "integer"
+            },
+            "gamma": {
+              "exclusiveMinimum": 0,
+              "maximum": 1,
+              "title": "Gamma",
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind",
+            "step_size_epochs",
+            "gamma"
+          ],
+          "title": "StepLearningRateSchedule",
+          "type": "object"
+        }
+      },
+      "description": "Configuration for the training execution.\nAgent can optimize learning rate, optimizer type, and epochs.",
+      "properties": {
+        "lr": {
+          "default": 0.0005,
+          "maximum": 0.1,
+          "minimum": 1e-06,
+          "title": "Lr",
+          "type": "number"
+        },
+        "epochs": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Epochs",
+          "type": "integer"
+        },
+        "batch_size": {
+          "default": 1,
+          "description": "Batch size for training",
+          "maximum": 1024,
+          "minimum": 1,
+          "title": "Batch Size",
+          "type": "integer"
+        },
+        "optimizer_type": {
+          "default": "adamw",
+          "enum": [
+            "adam",
+            "adamw",
+            "sgd"
+          ],
+          "title": "Optimizer Type",
+          "type": "string"
+        },
+        "weight_decay": {
+          "default": 1e-05,
+          "maximum": 0.1,
+          "minimum": 0,
+          "title": "Weight Decay",
+          "type": "number"
+        },
+        "device": {
+          "default": "cuda",
+          "title": "Device",
+          "type": "string"
+        },
+        "checkpoint_selection": {
+          "default": "last_completed_epoch",
+          "enum": [
+            "last_completed_epoch",
+            "best_validation_loss"
+          ],
+          "title": "Checkpoint Selection",
+          "type": "string"
+        },
+        "target_standardization": {
+          "default": "none",
+          "enum": [
+            "none",
+            "training_pool_global"
+          ],
+          "title": "Target Standardization",
+          "type": "string"
+        },
+        "drop_last": {
+          "default": true,
+          "title": "Drop Last",
+          "type": "boolean"
+        },
+        "lr_schedule": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "cosine": "#/$defs/CosineLearningRateSchedule",
+                  "step": "#/$defs/StepLearningRateSchedule"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CosineLearningRateSchedule"
+                },
+                {
+                  "$ref": "#/$defs/StepLearningRateSchedule"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lr Schedule"
+        }
+      },
+      "title": "TrainConfig",
+      "type": "object"
+    }
+  },
+  "quick_notes": "Returned schemas define configuration format only. For model/loss compatibility, output shape and class cardinality, segmentation legality, and resource limits, consult the resolved task contracts and execution validators; those authorities decide whether a proposal is valid."
+}

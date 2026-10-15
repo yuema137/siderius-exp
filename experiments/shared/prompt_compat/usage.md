@@ -1,5 +1,9 @@
 # Historical prompt compatibility
 
+For the scheduler-capable framework, use the newer explicit
+[scheduler-disabled selection](scheduler-disabled.md), which also retains the
+constraint-disclosure choices documented here.
+
 Use this package when you want current infra to assemble the historical prompt
 text for the paper experiments. It contains explicit rendering profiles, frozen
 inputs, and offline comparison tools. Infra keeps its current default behavior;

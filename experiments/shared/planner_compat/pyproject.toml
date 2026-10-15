@@ -4,16 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "siderius-planner-compat"
-version = "0.11.1"
+version = "0.12.0"
 description = "Experiment-owned historical SIDERIUS planner prompt providers"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
 
 [project.optional-dependencies]
-historical-runtime = ["siderius-runtime-compat==0.1.2"]
+historical-runtime = ["siderius-runtime-compat==0.1.3"]
 
 [project.entry-points."siderius.planner_strategies"]
+legacy-9b78d505cb11-paper-scheduler-off-v11 = "siderius_planner_compat.scheduler_manual_v11:historical_scheduler_off_v11"
+legacy-9b78d505cb11-paper-late-scheduler-off-v11 = "siderius_planner_compat.scheduler_manual_v11:historical_scheduler_off_late_v11"
 legacy-9b78d505cb11-paper-watchdog-v10 = "siderius_planner_compat.watchdog_policy_v10:historical_watchdog_v10"
 legacy-9b78d505cb11-paper-late-watchdog-v10 = "siderius_planner_compat.watchdog_policy_v10:historical_watchdog_late_v10"
 legacy-9b78d505cb11-paper-epochs-v9 = "siderius_planner_compat.epoch_manual_v9:historical_epochs_v9"

@@ -1,5 +1,9 @@
 # Historical constraint-disclosure selection
 
+For the scheduler-capable framework, use the newer explicit
+[scheduler-disabled selection](scheduler-disabled.md), which also retains the
+constraint-disclosure choices documented here.
+
 ## Scope and ownership
 
 New framework workflows disclose existing task and workflow restrictions to

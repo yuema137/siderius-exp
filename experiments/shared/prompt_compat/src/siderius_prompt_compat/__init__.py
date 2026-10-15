@@ -73,7 +73,11 @@ def _profile(
     qualified.update(
         row["assembly_sha256"] for row in qualification.get("additional_assemblies", [])
     )
-    if rendering_assembly_digest() not in qualified:
+    assembly = rendering_assembly_digest()
+    scheduler_disabled = set(qualification.get("scheduler_disabled_assemblies", []))
+    if not scheduler_disabled <= qualified:
+        raise ValueError("Scheduler-disabled assembly lacks prompt qualification")
+    if assembly not in qualified:
         raise ValueError(
             "This historical profile has not been qualified for the installed infra "
             "renderers. Use the documented infra revision or rerun offline qualification."
@@ -90,8 +94,16 @@ def _profile(
     native = set(_INTERPRETATION)
     if early_contract:
         renderers["native_training.appendix"] = _without_appendix
-    else:
+    elif assembly not in scheduler_disabled:
         native.add("native_training.appendix")
+    if assembly in scheduler_disabled:
+        from .scheduler_presentation import render_parameter_rules
+
+        renderers["proposer.parameter_rules"] = render_parameter_rules
+        if not early_contract:
+            renderers["native_training.appendix"] = lambda: _template(
+                "native_training_pre_scheduler.md"
+            )
     if old_interpretation:
         from . import interpretation_345c802d as old
 

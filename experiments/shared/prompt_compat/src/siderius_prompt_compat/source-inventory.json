@@ -105,5 +105,13 @@
     "packaged_file": "provenance_0ab15736.py",
     "selection": "render_execution_provenance_block",
     "packaged_sha256": "94f5f0e309ea2825d02c0065d91372ee166b4536509699fe5e325d85b43ccb3c"
+  },
+  {
+    "revision": "a72a5ef88225d6a5e5ee2d3a2f6d971c917a5e48",
+    "source": "src/agent/prompt_templates/native_training.py",
+    "source_sha256": "a4b2ac61841271e7e6415e12299acdb0a62d4021929b756a1b5fec7a151057c7",
+    "packaged_file": "templates/native_training_pre_scheduler.md",
+    "selection": "render_native_training_appendix() exact output",
+    "packaged_sha256": "0777b2913b321fa81bd695ed79a413e40804496df5dc4770e0058075160ca8f1"
   }
 ]

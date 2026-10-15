@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "scope": "Explicit new historical workspace selection for qualified native scheduler infra; scheduling is deterministically locked off. Merge overlays with existing rules, never replace or rewrite archived configurations.",
+  "required_packages": {
+    "siderius-prompt-compat": "0.10.9",
+    "siderius-planner-compat": "0.12.0",
+    "siderius-preflight-compat": "0.2.6",
+    "siderius-runtime-compat": "0.1.3"
+  },
+  "cases": {
+    "tess": {
+      "source_task_composition": "tasks/phyts_tess/compositions/rotation_regression.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-early-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false,
+        "workflow_parameter_rules": {
+          "train_config.lr_schedule": {
+            "exact": null
+          }
+        }
+      },
+      "planner_strategy": "legacy-9b78d505cb11-paper-scheduler-off-v11"
+    },
+    "ligo": {
+      "source_task_composition": "tasks/phyts_ligo/compositions/regression.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-early-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false,
+        "workflow_parameter_rules": {
+          "train_config.lr_schedule": {
+            "exact": null
+          }
+        }
+      },
+      "planner_strategy": "legacy-9b78d505cb11-paper-scheduler-off-v11"
+    },
+    "project8": {
+      "source_task_composition": "tasks/phyts_project8/compositions/dual_representation.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-late-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false,
+        "workflow_parameter_rules": {
+          "train_config.lr_schedule": {
+            "exact": null
+          }
+        }
+      },
+      "planner_strategy": "legacy-9b78d505cb11-paper-late-scheduler-off-v11"
+    },
+    "tidmad": {
+      "source_task_composition": "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-tidmad-noprior-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false,
+        "workflow_parameter_rules": {
+          "train_config.lr_schedule": {
+            "exact": null
+          }
+        }
+      },
+      "planner_strategy": "legacy-9b78d505cb11-paper-scheduler-off-v11"
+    },
+    "tidmad-analysis": {
+      "source_task_composition": "experiments/tidmad/data_analysis_pair/task_composition_on.yaml",
+      "task_composition_overlay": {
+        "prompt_renderer": "paper-analysis-c0467447-v2"
+      },
+      "workflow_launch_overlay": {
+        "disclose_execution_constraints": false,
+        "workflow_parameter_rules": {
+          "train_config.lr_schedule": {
+            "exact": null
+          }
+        }
+      },
+      "planner_strategy": "legacy-9b78d505cb11-paper-late-scheduler-off-v11"
+    }
+  }
+}
