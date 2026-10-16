@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scope": "Explicit new historical workspace selection for qualified native scheduler infra; scheduling is deterministically locked off. Merge overlays with existing rules, never replace or rewrite archived configurations.",
   "required_packages": {
-    "siderius-prompt-compat": "0.10.12",
+    "siderius-prompt-compat": "0.10.13",
     "siderius-planner-compat": "0.12.0",
     "siderius-preflight-compat": "0.2.6",
     "siderius-runtime-compat": "0.1.4"
