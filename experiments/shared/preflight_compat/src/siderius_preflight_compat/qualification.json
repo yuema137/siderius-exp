@@ -76,6 +76,11 @@
       "infra_revision": "0d851a5f6d74f937444e601261ce6273aa31e1b2",
       "assembly_sha256": "bee8510ac5b2198dfccf7d0fe17e983bf900ba2ba4ddd444f906773c67f7ec03",
       "scope": "Explicit scheduler-disabled historical workflow; exact-null execution lock, frozen manual and appendix, offline historical checks. No enabled scheduler or stochastic replay claim."
+    },
+    {
+      "infra_revision": "e8a1a8f540d65a0df8f7504cbf6e908bb861a025",
+      "assembly_sha256": "719fe1479c463e2cd0228eae3366016170087a41e7bf9226c3828128aacc5fd1",
+      "scope": "Historical static_only phase arithmetic and batch decisions after custom-loss target admission, reduction metadata replacement and rejected legacy-module rollback fixes. Paper retained objectives are built-in smooth_l1; no historical invalid-plugin policy. Protected GPU execution unselected; no live GPU or stochastic artifact replay claim."
     }
   ],
   "scope": "Completed static estimation and batch decisions; no stochastic training or complete conversation replay claim"

@@ -1,0 +1,67 @@
+{
+  "infra_revision": "e8a1a8f540d65a0df8f7504cbf6e908bb861a025",
+  "preflight_package": "0.2.7",
+  "reference_fixture_sha256": "fbc00c647a6d406b12c80e782faca8f70d2912f54e857be7e7f0f455b1fe8db0",
+  "phase_estimates": {
+    "cases": 45,
+    "matched": 45
+  },
+  "batch_searches": {
+    "cases": 32,
+    "matched": 32
+  },
+  "actual_cpu_forward_selection": "PASS: historical batch4, native batch7",
+  "tests": {
+    "command": "SIDERIUS_CHECKOUT=\"$INFRA_CHECKOUT\" \"$INFRA_CHECKOUT/.venv/bin/python\" -m pytest experiments/shared/preflight_compat/tests experiments/shared/planner_compat/tests/test_scheduler_manual_v11.py -q",
+    "passed": 113,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baseline_tests": {
+    "package": "0.2.6",
+    "passed": 100,
+    "failed": 8,
+    "after_admission_before_test_update": {
+      "passed": 106,
+      "failed": 2
+    }
+  },
+  "installation": {
+    "infra_revision": "e8a1a8f540d65a0df8f7504cbf6e908bb861a025",
+    "qualified_reference_revisions": [
+      "e8a1a8f540d65a0df8f7504cbf6e908bb861a025"
+    ],
+    "selected_checkout_assembly_match": true,
+    "installed_source_files": 5,
+    "packages": {
+      "siderius-preflight-compat": "0.2.7",
+      "siderius-planner-compat": "0.12.0"
+    },
+    "identity": {
+      "name": "legacy-078b23ca-preflight-v1",
+      "version": "1",
+      "content_sha256": "19e176ddcc3800c98530fe1b9badaafa1b5f9d4d52f0d9d17e01a5db62aae25a",
+      "assembly_sha256": "719fe1479c463e2cd0228eae3366016170087a41e7bf9226c3828128aacc5fd1"
+    },
+    "child_identity_match": true,
+    "unknown_assembly_refused": true,
+    "api_calls": 0,
+    "gpu_calls": 0,
+    "training_calls": 0,
+    "scope": "Normal installed sources, profile discovery and subprocess identity; no data or training execution"
+  },
+  "planner_self_check": {
+    "current_legacy_prompt_pairs": 12,
+    "early_legacy_prompt_pairs": 6,
+    "composed_loss_prompt_pairs": 10,
+    "early_empty_registry_boundary_cases": 2,
+    "early_uncertain_registry_refusal": true,
+    "reference_infra_revision": "a2eb55dfb2853870a8294eb675a8060043d9c68b",
+    "historical_scientific_replay": "not established",
+    "api_calls": 0
+  },
+  "api_calls": 0,
+  "gpu_calls": 0,
+  "training_calls": 0,
+  "scope": "Frozen static arithmetic/search, actual CPU probe and full synthetic planner projections; not complete historical conversation or stochastic replay"
+}
