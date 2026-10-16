@@ -2,9 +2,10 @@
 
 ## Scope and identity
 
-Infra `3863dcc02cfe6c9fe06b8e991442d248ade3866e` extracts request construction
-and response parsing from the large planning function into a helper in the same
-module. The producer remains included in the rendering assembly fingerprint.
+Infra `3863dcc02cfe6c9fe06b8e991442d248ade3866e` extracts history observation, request
+construction and planner invocation into a helper in the same module. Response
+parsing remains in `prepare_attempt`. The producer remains included in the
+rendering assembly fingerprint.
 Request arguments and post-parse record construction retain their source
 semantics. This qualification admits that exact assembly; it introduces no
 historical renderer, execution algorithm or scientific configuration.

@@ -577,25 +577,25 @@
       {
         "name": "paper-early-v2",
         "version": "2",
-        "content_sha256": "aea3e25be0f4f5d2e3933ec3413807b5d17f68495e6cb0c8ee9f257edc637066",
+        "content_sha256": "44eca7c4e50fa1038d2593fd1691d403238e79b9a8fee8747d2f92bbd66e33f4",
         "assembly_sha256": "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332"
       },
       {
         "name": "paper-late-v2",
         "version": "2",
-        "content_sha256": "aea3e25be0f4f5d2e3933ec3413807b5d17f68495e6cb0c8ee9f257edc637066",
+        "content_sha256": "44eca7c4e50fa1038d2593fd1691d403238e79b9a8fee8747d2f92bbd66e33f4",
         "assembly_sha256": "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332"
       },
       {
         "name": "paper-tidmad-noprior-v2",
         "version": "2",
-        "content_sha256": "9cc8b28891f8980896b60a52f797e685e2e272f9445ca9a9836ff9692112dd77",
+        "content_sha256": "ed2f7f9af2b64c0a523458a495af13594651ad13eabda617198d0e4e857c8f52",
         "assembly_sha256": "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332"
       },
       {
         "name": "paper-analysis-c0467447-v2",
         "version": "2",
-        "content_sha256": "70c4feb2bc2f9db03672bbe13abe323b08191f7b657fe8cf8e0233e5821b86b9",
+        "content_sha256": "0a5ffa48715d75dc1074048bacd745fe20b10c87a479b95df7e871292edef67b",
         "assembly_sha256": "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332"
       }
     ],

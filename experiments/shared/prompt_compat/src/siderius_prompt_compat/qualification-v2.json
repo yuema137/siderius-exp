@@ -76,7 +76,7 @@
     {
       "infra_revision": "3863dcc02cfe6c9fe06b8e991442d248ade3866e",
       "assembly_sha256": "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332",
-      "scope": "Same-module planner request/parse extraction preserves source request block and post-parse record assembly. Existing historical renderers unchanged; recovered message-boundary and synthetic planner checks, not complete conversation or stochastic artifact replay."
+      "scope": "Same-module history observation, request construction and planner invocation extraction preserves the request block. Response parsing and post-parse record assembly remain in prepare_attempt. Existing historical renderers unchanged; recovered message-boundary and synthetic planner checks, not complete conversation or stochastic artifact replay."
     }
   ],
   "scheduler_disabled_assemblies": [
