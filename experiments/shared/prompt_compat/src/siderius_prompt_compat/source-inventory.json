@@ -113,5 +113,13 @@
     "packaged_file": "templates/native_training_pre_scheduler.md",
     "selection": "render_native_training_appendix() exact output",
     "packaged_sha256": "0777b2913b321fa81bd695ed79a413e40804496df5dc4770e0058075160ca8f1"
+  },
+  {
+    "revision": "00dd22d044a6337051f6e90811a1516c6835a32a",
+    "source": "src/agent/prompt_templates/tuner/rendering.py",
+    "source_sha256": "d694a2b5d64b171c79d38c76dbb50cd1f3abd029c155ecfe0534f0bf005d6820",
+    "packaged_file": "dynamics_00dd22d0.py",
+    "selection": "_fmt and render_training_dynamics_line",
+    "packaged_sha256": "2135c9e6554b1f14491607d24b83db3d497703d52814baaec58d8affde716692"
   }
 ]
