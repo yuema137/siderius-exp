@@ -62,12 +62,18 @@
       "infra_revision": "7e83451ff7632d5c4ee2e338c8847cd3321c3bc4",
       "assembly_sha256": "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209",
       "scope": "Six-significant-digit native training diagnostics; explicit historical tuner.training_dynamics renderer retains two-decimal text. Frozen four-task request boundaries and shared planner/reflector/interpreter callers; no arithmetic, conversation replay or stochastic artifact claim."
+    },
+    {
+      "infra_revision": "55c7c1aed512887a9c7a0c85d42453f0e402a2dd",
+      "assembly_sha256": "155c09ada496126251892b1e16c6ecffe4afa911404f05f6d1b2d0d377c05193",
+      "scope": "Generic native Trial semantics and separate configured budgets/prior-attempt evidence. Historical planner owns frozen system and user renderers; unchanged historical request boundaries. Bridge documentation changes rendering assembly; no execution or scientific policy change."
     }
   ],
   "scheduler_disabled_assemblies": [
     "44e40289389f8016c8b6c62211f91489eed6c1c478c55d5ff5f5d8f01fd5e4cd",
     "0bf0087a1e36976f86d0cf28c0aa5594ac0721b29fe6d72714590702fa36ed23",
     "92bca0f3d9916508d8278e11ede0282cf56547768ad53f507db2a84a96c28a57",
-    "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209"
+    "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209",
+    "155c09ada496126251892b1e16c6ecffe4afa911404f05f6d1b2d0d377c05193"
   ]
 }
