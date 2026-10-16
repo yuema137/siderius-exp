@@ -121,5 +121,13 @@
     "packaged_file": "dynamics_00dd22d0.py",
     "selection": "_fmt and render_training_dynamics_line",
     "packaged_sha256": "2135c9e6554b1f14491607d24b83db3d497703d52814baaec58d8affde716692"
+  },
+  {
+    "revision": "284213c234af4188df5d2f10471c13f05b94f603",
+    "source": "src/agent/prompt_templates/interpretation/rendering.py",
+    "source_sha256": "1d74c90dcc10b1d1b9adfa9a41d6fdc353b3f7ae38b4a9804aa9e252ad2e2b6a",
+    "packaged_file": "score_284213c2.py",
+    "selection": "Score Trajectory score_str expression extracted into a pure function",
+    "packaged_sha256": "6636b96184a699cf79cab5c483f7efbedd666d7fba5e348601fde8cb031eef0d"
   }
 ]

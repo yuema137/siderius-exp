@@ -67,6 +67,11 @@
       "infra_revision": "55c7c1aed512887a9c7a0c85d42453f0e402a2dd",
       "assembly_sha256": "155c09ada496126251892b1e16c6ecffe4afa911404f05f6d1b2d0d377c05193",
       "scope": "Generic native Trial semantics and separate configured budgets/prior-attempt evidence. Historical planner owns frozen system and user renderers; unchanged historical request boundaries. Bridge documentation changes rendering assembly; no execution or scientific policy change."
+    },
+    {
+      "infra_revision": "23533342ce4257797fa5bdb915f4c303c6ca9ff0",
+      "assembly_sha256": "cea16b02f4dc19ca16d22d15ce9b9ee5e9b5769868514c0bdb2f784cebe08657",
+      "scope": "Shortest round-trip native diagnostic, trajectory and resource values. Explicit historical score_value restores four-decimal trajectory while existing dynamics renderer preserves its two-decimal presentation. Frozen message boundaries, not execution or stochastic artifact replay."
     }
   ],
   "scheduler_disabled_assemblies": [
@@ -74,6 +79,7 @@
     "0bf0087a1e36976f86d0cf28c0aa5594ac0721b29fe6d72714590702fa36ed23",
     "92bca0f3d9916508d8278e11ede0282cf56547768ad53f507db2a84a96c28a57",
     "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209",
-    "155c09ada496126251892b1e16c6ecffe4afa911404f05f6d1b2d0d377c05193"
+    "155c09ada496126251892b1e16c6ecffe4afa911404f05f6d1b2d0d377c05193",
+    "cea16b02f4dc19ca16d22d15ce9b9ee5e9b5769868514c0bdb2f784cebe08657"
   ]
 }

@@ -84,12 +84,14 @@ def _profile(
         )
     from .dynamics_00dd22d0 import render_training_dynamics_line
     from .provenance_0ab15736 import render_plan_resolution_checkpoint
+    from .score_284213c2 import format_interpretation_score
 
     renderers = {
         "proposal.template": _template,
         "constraints.disclosure": _without_constraint_disclosure,
         "tuner.execution_provenance": render_plan_resolution_checkpoint,
         "tuner.training_dynamics": render_training_dynamics_line,
+        "interpretation.score_value": format_interpretation_score,
     }
     if time_budget_compat:
         renderers["proposal.time_budget_context"] = _without_time_budget_context
