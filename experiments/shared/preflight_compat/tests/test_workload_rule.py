@@ -41,9 +41,10 @@ def test_new_api_profile_commits_explicit_policy_and_detects_policy_change():
 @pytest.mark.parametrize("late", [False, True])
 def test_current_paper_profile_preserves_full_requests_with_historical_rule(late):
     if not hasattr(registry, "BatchSegmentationLimit"):
-        pytest.skip("Current paper v9 requires the newer framework manual")
+        pytest.skip("Current paper v11 requires the newer framework manual")
     from copy import deepcopy
 
+    from agent.skills.check_config_format_skill.wrapper import run_skill
     from siderius_planner_compat.self_check import _CaptureBridge
 
     from experiments.shared.planner_compat.tests.test_static_preflight_v6 import (
@@ -59,14 +60,24 @@ def test_current_paper_profile_preserves_full_requests_with_historical_rule(late
     archived = deepcopy(current)
     archived["memory"].pop("static_preflight_evidence")
     archived["memory"].pop("preflight_outcome")
-    strategy = "legacy-9b78d505cb11-paper-" + ("late-" if late else "") + "epochs-v9"
+    strategy = (
+        "legacy-9b78d505cb11-paper-" + ("late-" if late else "") + "scheduler-off-v11"
+    )
+    # The shared synthetic arguments intentionally carry an old manual for v6.
+    # Current v11 must receive the actual native scheduler-bearing manual.
+    manual_result = run_skill(None)
+    assert manual_result["status"] == "success"
     requests = []
     for record in (archived, current):
         bridge = _CaptureBridge()
         bridge.plan(
             **(
                 planner_arguments()
-                | {"memory_history": [record], "planner_strategy": strategy}
+                | {
+                    "memory_history": [record],
+                    "planner_strategy": strategy,
+                    "config_manual": manual_result["data"],
+                }
             )
         )
         assert len(bridge.captures) == 1

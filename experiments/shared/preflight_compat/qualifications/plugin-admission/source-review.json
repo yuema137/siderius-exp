@@ -1,0 +1,43 @@
+{
+  "reference_revision": "0d851a5f6d74f937444e601261ce6273aa31e1b2",
+  "candidate_revision": "e8a1a8f540d65a0df8f7504cbf6e908bb861a025",
+  "closure_source_files": 80,
+  "changed_closure_files": [
+    {
+      "path": "src/core/runtime_control/gpu_training_components.py",
+      "reference_sha256": "933463a70032f7bd1df97e728dc8c6d28783d4e988a242035dc67f5cd8fda88f",
+      "candidate_sha256": "3d9dc358d080dae2196fda479b8e6ba44f7a36a8df36f0a993687c96f29705ae",
+      "review": "Pass task custom-loss contract into target dtype resolution; historical built-in objective path unchanged."
+    },
+    {
+      "path": "src/execute_tools/train_engine_sandbox.py",
+      "reference_sha256": "d10bb55109d366bb54c9cae8e974e579e71a59f90a7fd2c9463378010b2907fc",
+      "candidate_sha256": "090ef8710a51c4d36623659b1932c6c72f60f8c6e27d72afb1d342899b6f8dad",
+      "review": "Pass expected custom-loss contract to optional standardization target validation; built-in objective unaffected."
+    },
+    {
+      "path": "src/ml_models/loss_models_sandbox.py",
+      "reference_sha256": "3146c4ed307f277b3ad35ad9615475b6d9f2f785cc26c0e0a98d3b79cc34a3b7",
+      "candidate_sha256": "99de25337a2f8dab7a8fd8bd9ac8d6f9b1557720a7898879edae27b9b2fc69e3",
+      "review": "Validate custom target declarations; clear stale custom reduction metadata only after successful admission."
+    },
+    {
+      "path": "src/ml_models/loss_plugin_loader.py",
+      "reference_sha256": "56dac45f1a429c3f5374587b67313be9a030417aa9a5a0e8448c7143b52d12b3",
+      "candidate_sha256": "71ee66c8edf050534532a2ebd582dc91b10284341fdd07f9cabab8351eb2c3da",
+      "review": "Fail closed on invalid custom metadata, preserve validated target contract, clear absent reduction, roll back rejected legacy modules."
+    },
+    {
+      "path": "src/ml_models/plugin_loader.py",
+      "reference_sha256": "bddf07baac3b524507639ee645fe3cec454224f912dfc5f0d7270acce954fdec",
+      "candidate_sha256": "c78ce89e50fb30a3fd25b9c2e74e45f16a002a29d7eea9f08584225a76e7cb91",
+      "review": "Restore prior legacy module binding on rejected import or metadata; successful registration unchanged."
+    }
+  ],
+  "unchanged_authorities": [
+    "src/core/preflight_estimation.py",
+    "src/core/preflight_observations.py",
+    "src/agent/skills/evaluate_vram_skill/"
+  ],
+  "scope": "Existing static arithmetic/search and built-in paper objectives; no equivalence claim for rejected custom plugins."
+}
