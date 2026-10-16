@@ -1,0 +1,612 @@
+{
+  "candidate_infra_revision": "7e83451ff7632d5c4ee2e338c8847cd3321c3bc4",
+  "prompt_package": "0.10.12",
+  "scope": "Frozen request boundaries, not conversation replay or training artifact equality",
+  "api_calls": 0,
+  "training_calls": 0,
+  "frozen_rendering_results": [
+    {
+      "case": "analysis-plan",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "8ac787d62285bbabcb79571b475cf5b832de3ebc2009cffb96fcfa58d29e0f40",
+        "user": "be4e6be4a3ff5faeaf7043bcc5c07d424d2282d602479467b936040cd9a74f12"
+      },
+      "candidate_messages": {
+        "system": "8ac787d62285bbabcb79571b475cf5b832de3ebc2009cffb96fcfa58d29e0f40",
+        "user": "be4e6be4a3ff5faeaf7043bcc5c07d424d2282d602479467b936040cd9a74f12"
+      }
+    },
+    {
+      "case": "analysis-selection",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4afca03908af1467d3fde189f7b85b3231dd0ec64e534ef7e7d4fca16b416b6c",
+        "user": "ca4544c05047c2fb7c548319849a5efffea5475dd411f7def3d410bd9f6cf357"
+      },
+      "candidate_messages": {
+        "system": "4afca03908af1467d3fde189f7b85b3231dd0ec64e534ef7e7d4fca16b416b6c",
+        "user": "ca4544c05047c2fb7c548319849a5efffea5475dd411f7def3d410bd9f6cf357"
+      }
+    },
+    {
+      "case": "analysis-synthesis",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "d336ac508e1b89b70c7bd7c7fd102c0340051a21b0624efc249ccea8082021e7",
+        "user": "62e34de3de5792f7152f30681bdd682966f790d6565b07b9b4738cefb7fa0a3c"
+      },
+      "candidate_messages": {
+        "system": "d336ac508e1b89b70c7bd7c7fd102c0340051a21b0624efc249ccea8082021e7",
+        "user": "62e34de3de5792f7152f30681bdd682966f790d6565b07b9b4738cefb7fa0a3c"
+      }
+    },
+    {
+      "case": "ligo-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "5be1aee9aff52c0a161651057547a40dfadd6fa93fc0434fed960ec4ef346883"
+      },
+      "candidate_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "5be1aee9aff52c0a161651057547a40dfadd6fa93fc0434fed960ec4ef346883"
+      }
+    },
+    {
+      "case": "ligo-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7c8f77dc8d19d521150994cfe9238dcff9358a248776d7769b316879a75d2ede",
+        "user": "95c0b5bc19d8ba0d289c207d04ec23991154f81973caa4722a89c11401cf05be"
+      },
+      "candidate_messages": {
+        "system": "7c8f77dc8d19d521150994cfe9238dcff9358a248776d7769b316879a75d2ede",
+        "user": "95c0b5bc19d8ba0d289c207d04ec23991154f81973caa4722a89c11401cf05be"
+      }
+    },
+    {
+      "case": "ligo-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ae38d41a1a65068e189027584cc522c8ee4d35d8f9adabcfa78fa8759accc19f",
+        "user": "60ac960b42c941a64d9e9250158c3166438b4c55ddb46b940b6033efa8b8cef6"
+      },
+      "candidate_messages": {
+        "system": "ae38d41a1a65068e189027584cc522c8ee4d35d8f9adabcfa78fa8759accc19f",
+        "user": "60ac960b42c941a64d9e9250158c3166438b4c55ddb46b940b6033efa8b8cef6"
+      }
+    },
+    {
+      "case": "ligo-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "2db21abf58daa1ec58184768b848836e352bbd0865f0938862677501cea67319",
+        "user": "058c699ccbb91de689d88f718d0db98c1b01aed5cd684e61b4b39e99e6d5120d"
+      },
+      "candidate_messages": {
+        "system": "2db21abf58daa1ec58184768b848836e352bbd0865f0938862677501cea67319",
+        "user": "058c699ccbb91de689d88f718d0db98c1b01aed5cd684e61b4b39e99e6d5120d"
+      }
+    },
+    {
+      "case": "ligo-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "ligo-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "ligo-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "ligo-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "ligo-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "ligo-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "ligo-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "project8-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "e9b3dea28efa9d7c14580e3708cdbf994b2ed1586b41a1def3ca3f71db9449c8",
+        "user": "781a112b043197a073f7adfe8a3cf989bc78beb46d88b71b8534b54155d0f34a"
+      },
+      "candidate_messages": {
+        "system": "e9b3dea28efa9d7c14580e3708cdbf994b2ed1586b41a1def3ca3f71db9449c8",
+        "user": "781a112b043197a073f7adfe8a3cf989bc78beb46d88b71b8534b54155d0f34a"
+      }
+    },
+    {
+      "case": "project8-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "28ba8c052032c7ff35577116ca1072543620b07e145efc53738f196c030b7d0a",
+        "user": "44a594b7e36f26d4c5d7b0bb25a57d291e3c76242c69e7dbfd72b8e9899e6303"
+      },
+      "candidate_messages": {
+        "system": "28ba8c052032c7ff35577116ca1072543620b07e145efc53738f196c030b7d0a",
+        "user": "44a594b7e36f26d4c5d7b0bb25a57d291e3c76242c69e7dbfd72b8e9899e6303"
+      }
+    },
+    {
+      "case": "project8-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ac87c12a9432ea537a52768ecdedada3766b4eb90b445de088e6043f0f23a136",
+        "user": "649c414e9df2c2bd83e5a01c4e68d38206b7c0823aca2cd083c49e3950fbf5d2"
+      },
+      "candidate_messages": {
+        "system": "ac87c12a9432ea537a52768ecdedada3766b4eb90b445de088e6043f0f23a136",
+        "user": "649c414e9df2c2bd83e5a01c4e68d38206b7c0823aca2cd083c49e3950fbf5d2"
+      }
+    },
+    {
+      "case": "project8-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1a9b369cba5e99b5961bd756a1236da3704a0b48b2b0e3eb5e5113cbd2e37251",
+        "user": "a4578e328fc3848da0f1ee822444dd9be9109fec428c104fd80cc61c15fc660a"
+      },
+      "candidate_messages": {
+        "system": "1a9b369cba5e99b5961bd756a1236da3704a0b48b2b0e3eb5e5113cbd2e37251",
+        "user": "a4578e328fc3848da0f1ee822444dd9be9109fec428c104fd80cc61c15fc660a"
+      }
+    },
+    {
+      "case": "project8-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "9ba90811bfeeb6ef688f0a314192f81c21c1b05479b33d0c5de40a30f313ffdf",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "9ba90811bfeeb6ef688f0a314192f81c21c1b05479b33d0c5de40a30f313ffdf",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "project8-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "0bfc050f1dcd20889023acdcafef8b44a77ba1a86bb032c6485e99b866c24a80",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "0bfc050f1dcd20889023acdcafef8b44a77ba1a86bb032c6485e99b866c24a80",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "project8-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1b206529f52b6d8daacf2a3efddb6eab36ad9e07d5d1d477ce095ab284f02f6a",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1b206529f52b6d8daacf2a3efddb6eab36ad9e07d5d1d477ce095ab284f02f6a",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "project8-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "b88a89a57e48ba777ec6b88ade93b80237900d3cc99c34bd588404896173ef96",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "b88a89a57e48ba777ec6b88ade93b80237900d3cc99c34bd588404896173ef96",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "project8-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "f5417d430eab2bbad1f0c94b12c8e5a190d96191570906cf5d8690c405f3ced8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "f5417d430eab2bbad1f0c94b12c8e5a190d96191570906cf5d8690c405f3ced8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "project8-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "b81d4ab38463cfc9d8ff675223829311b03081e1930d43b84470c9a8695dc957",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "b81d4ab38463cfc9d8ff675223829311b03081e1930d43b84470c9a8695dc957",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "project8-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "2e96db47126d24f9fe8e1df4698b29fd7c022723502cb876eec3d7ac88ffbd52",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "2e96db47126d24f9fe8e1df4698b29fd7c022723502cb876eec3d7ac88ffbd52",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tess-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "366eab1fad07bf5f9981c2908dcced8c33ceb24a01c2fac422b4ab7115fa2e02"
+      },
+      "candidate_messages": {
+        "system": "4876dae8374c6a393ed78c28685be4e3764582771f60e15ef40c216709aebf17",
+        "user": "366eab1fad07bf5f9981c2908dcced8c33ceb24a01c2fac422b4ab7115fa2e02"
+      }
+    },
+    {
+      "case": "tess-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "5bc325ed430b5ff1e9e9441da1c1a06a0a70a45251b2f434f5eb68c2abf742be",
+        "user": "fc06d762857ae21e037198d54f65ed8e992a19ab9b391071b37d641ac3d7c695"
+      },
+      "candidate_messages": {
+        "system": "5bc325ed430b5ff1e9e9441da1c1a06a0a70a45251b2f434f5eb68c2abf742be",
+        "user": "fc06d762857ae21e037198d54f65ed8e992a19ab9b391071b37d641ac3d7c695"
+      }
+    },
+    {
+      "case": "tess-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "991999b7e426b570e6d4ae716b56b7132c7fab55b8d88dd29445ce3305860566",
+        "user": "2cd37bd873e577b69cf439cb3d2e52407b3553c342e2c21bb7105dea6cc3b513"
+      },
+      "candidate_messages": {
+        "system": "991999b7e426b570e6d4ae716b56b7132c7fab55b8d88dd29445ce3305860566",
+        "user": "2cd37bd873e577b69cf439cb3d2e52407b3553c342e2c21bb7105dea6cc3b513"
+      }
+    },
+    {
+      "case": "tess-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "4aed3e6b47268d057a03d8bd38937de8c0b3e971992c5c8179f12f2a2cb0648c",
+        "user": "ec271fa01b304ee9fe376339aa57c11a4808be4b4b685a222a84f1bb0a914d89"
+      },
+      "candidate_messages": {
+        "system": "4aed3e6b47268d057a03d8bd38937de8c0b3e971992c5c8179f12f2a2cb0648c",
+        "user": "ec271fa01b304ee9fe376339aa57c11a4808be4b4b685a222a84f1bb0a914d89"
+      }
+    },
+    {
+      "case": "tess-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tess-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tess-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tess-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tess-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tess-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tess-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tidmad-implementor-code",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "9b002b60413691adeceb9dcd228c447f8e9c1106e31dcab19345917ea63b496f",
+        "user": "1b93c7d5d9137ad6f32fa6adcd6edeae8e8679a8378ef340fceae0f7051c2a0b"
+      },
+      "candidate_messages": {
+        "system": "9b002b60413691adeceb9dcd228c447f8e9c1106e31dcab19345917ea63b496f",
+        "user": "1b93c7d5d9137ad6f32fa6adcd6edeae8e8679a8378ef340fceae0f7051c2a0b"
+      }
+    },
+    {
+      "case": "tidmad-implementor-reasoning",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "737311dbbffcb024cd77ed3368904094b2cfb86dc1b41bed394bc26c6cc26c1e",
+        "user": "163bff71db83231cc2055903994bdb258cbddb7fdd33ae969acba9e82d5b9aec"
+      },
+      "candidate_messages": {
+        "system": "737311dbbffcb024cd77ed3368904094b2cfb86dc1b41bed394bc26c6cc26c1e",
+        "user": "163bff71db83231cc2055903994bdb258cbddb7fdd33ae969acba9e82d5b9aec"
+      }
+    },
+    {
+      "case": "tidmad-interpretation-structured-health",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "116becfdd7ee4ce84e8afaed00d33e944b045727fff11017a510d917f32dcfa8",
+        "user": "7c2f982dd69985986e10036693f1ac059ddb477b58e63715a93a6d1f5b0f675a"
+      },
+      "candidate_messages": {
+        "system": "116becfdd7ee4ce84e8afaed00d33e944b045727fff11017a510d917f32dcfa8",
+        "user": "7c2f982dd69985986e10036693f1ac059ddb477b58e63715a93a6d1f5b0f675a"
+      }
+    },
+    {
+      "case": "tidmad-interpretation",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "c9bf80efbbf4524ac60fc3970e041a8ad32f7ec95c0aba6b2a67f4d1733c61cb",
+        "user": "d93ed26b10bb91c80e96a65733fc13ff54eaae86cb28183f1e28842f5275801a"
+      },
+      "candidate_messages": {
+        "system": "c9bf80efbbf4524ac60fc3970e041a8ad32f7ec95c0aba6b2a67f4d1733c61cb",
+        "user": "d93ed26b10bb91c80e96a65733fc13ff54eaae86cb28183f1e28842f5275801a"
+      }
+    },
+    {
+      "case": "tidmad-proposal-causal_reasoning_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "82af7e2154956a81ca693dae78199226fc1af1d07414f15d6aaca1f7130acca2",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tidmad-proposal-causal_reasoning_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "81d823ad82361042b8070bf4afcc155a75ba411533701efc9036bbabef748428",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tidmad-proposal-comparison_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "1dd376c33019006a6f0f5153b98f531a95574691005b25cbd049d38fd9c4ced0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tidmad-proposal-comparison_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "ed6a53c33ed069e0154eaf860391037ca79974f6e51e756b4b70561473f29ad0",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tidmad-proposal-proposing_stage-exploit",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "936e39b40fc19738fd9ff1166f2f2fd6deba62409723bbea99d8c9bfd7258aa9",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tidmad-proposal-proposing_stage-explore",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "3a70d2f36ce9c4558ca4c667ef75e00ee5d4ee977f29abb2f3c9adf1b5d9b4f8",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "case": "tidmad-validator-system",
+      "status": "MATCH",
+      "reference_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate_messages": {
+        "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+        "user": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "installation": {
+    "installed_source_files": 19,
+    "frozen_source_entries": 15,
+    "profiles": [
+      {
+        "name": "paper-early-v2",
+        "version": "2",
+        "content_sha256": "48ec77b607a37ba65380909e46fab422e4669abedc3c7d9ff9a4e1a027b92921",
+        "assembly_sha256": "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209"
+      },
+      {
+        "name": "paper-late-v2",
+        "version": "2",
+        "content_sha256": "48ec77b607a37ba65380909e46fab422e4669abedc3c7d9ff9a4e1a027b92921",
+        "assembly_sha256": "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209"
+      },
+      {
+        "name": "paper-tidmad-noprior-v2",
+        "version": "2",
+        "content_sha256": "645ab506a939fb192eb428423edb3fcb36c09e5abd016fe947e9eaa04c557eaf",
+        "assembly_sha256": "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209"
+      },
+      {
+        "name": "paper-analysis-c0467447-v2",
+        "version": "2",
+        "content_sha256": "88375523293746a6d1027a2be9ecf946b842ac5f5f35340dfcf7a2c9c6fc7337",
+        "assembly_sha256": "e37de8488a5320cd776f36db99e86be75d3ede9aecce5e8f9aa9f6ad94d49209"
+      }
+    ],
+    "unqualified_assembly_refusals": 4,
+    "api_calls": 0,
+    "training_calls": 0
+  },
+  "tests": {
+    "command": "SIDERIUS_CHECKOUT=\"$INFRA_CHECKOUT\" \"$INFRA_CHECKOUT/.venv/bin/python\" -m pytest experiments/shared/prompt_compat/tests experiments/shared/planner_compat/tests/test_scheduler_manual_v11.py -q",
+    "passed": 50,
+    "skipped": 0,
+    "failed": 0
+  }
+}
