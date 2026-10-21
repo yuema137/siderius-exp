@@ -4,12 +4,12 @@ Use this package when you want a **new external workspace** to apply a paper
 experiment's original timing rules. Ordinary tutorials use the framework's
 corrected default and do not need this package. Installing it changes no default.
 
-Use the framework version named by the [repository version file](../../../SIDERIUS_REVISION).
-The [qualification receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
-records the checked version and offline timing, prompt and installation results.
-Those checks used the development repository; they do not establish a later
-public-source installation check. The optional historical packages need the
-installation steps below even after normal exp setup.
+Use the **standalone pair qualified for this package**: runtime package 0.1.5
+and infra revision `a366edba08b0b8a89bd30137f7535e81f4a11da9`. The exp root
+version file remains the ordinary tutorial dependency; it does not select this
+newer historical compatibility environment. The [current qualification](qualifications/observation-time/report.md)
+explains the offline checks. The [earlier receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+is historical evidence for its own source versions.
 
 The paper runs estimated training time from observed steps. Their rules could
 reject a short phase even after every requested step had finished, because too
@@ -24,9 +24,13 @@ then present those decisions to the agents in the original format.
    Copy its launch configuration and complete task package to your own project.
    Remap data paths and select a new output workspace. Keep its other historical
    profiles, model routing, budgets and task settings.
-2. Install the package in the Python environment that launches infra **and** the
-   environment that executes training, if they are different. From your exp
-   checkout, after the normal environment setup, run:
+2. Prepare a separate infra checkout at the qualified revision above, then run
+   `uv sync --group dev --frozen` inside that checkout. Do this for each
+   environment that launches infra or executes training. Do not use the exp
+   root environment's older framework for this package.
+
+   From your exp checkout, install the standalone package into those exact
+   environments:
 
    ```bash
    uv pip install --python /path/to/launch/.venv/bin/python ./experiments/shared/runtime_compat
@@ -50,19 +54,32 @@ then present those decisions to the agents in the original format.
    These are additional arguments, not a standalone launch command. Keep the
    copied command's other required arguments and replace conflicting flags
    instead of appending duplicates. Installing exp does not apply the overlay.
-4. In your copied `llm/agents.json`, set `tune.planner_strategy` to the value in
-   that unit's `llm_configuration` section of the same overlay. Install the
-   [planner compatibility package](../planner_compat/usage.md#install-into-the-environment-that-will-run-infra)
-   in the launch environment. For TESS `nop_004`, the setting is:
+4. Install planner package 0.12.1 from this exp checkout into the launch
+   environment already prepared in step 2:
+
+   ```bash
+   uv pip install --python /path/to/launch/.venv/bin/python ./experiments/shared/planner_compat
+   ```
+
+   Keep the qualified infra revision from step 2. The general
+   [planner installation guide](../planner_compat/usage.md#install-into-the-environment-that-will-run-infra)
+   also describes older root-pinned setups; that version instruction does not
+   apply to this standalone pair.
+
+   In your copied `llm/agents.json`, use
+   `legacy-9b78d505cb11-paper-scheduler-off-v11` for TESS, LIGO and TIDMAD, or
+   `legacy-9b78d505cb11-paper-late-scheduler-off-v11` for Project8. Keep the
+   historical training scheduler disabled (`train_config.lr_schedule: null`). For example:
 
    ```json
-   {"tune": {"planner_strategy": "legacy-9b78d505cb11-paper-verifier-v8"}}
+   {"tune": {"planner_strategy": "legacy-9b78d505cb11-paper-scheduler-off-v11"}}
    ```
 
    Merge this field into your existing configuration; keep its model, credentials
-   and other routes. This explicit planner profile presents the old timing
-   format to the agent while saved results retain the new verifier identity.
-   Selecting only the timing algorithm does not restore the old prompt format.
+   and other routes. The immutable overlay still records its earlier v8 planner
+   selection. Use the v11 mapping above for the currently qualified policy and
+   training-manual presentation; v8 alone does not restore all of those fields.
+   Saved results retain the actual verifier identity.
 
 The overlay covers eleven native paper units: TESS, LIGO, Project8 dual
 representation, four TIDMAD NoPrior bands and four TIDMAD analysis-on bands.
@@ -85,11 +102,13 @@ historical arguments or bypass the check.
 
 Use a fresh workspace. Do not edit old locks, overwrite archived evidence or
 import old timing-calibration entries as though the new profile had produced
-them. New measurements record the selected profile's identity.
+them. New measurements record the selected profile's identity. Match the original
+host timezone when reproducing historical timestamp decisions: the old rule
+interpreted recorded times using that timezone.
 
 This package restores the tested timing decisions; it does not restore deleted
 artifacts or guarantee identical new LLM responses, trained weights or scores.
-The [technical contract](contract.md) and [current qualification results](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+The [technical contract](contract.md) and [current qualification results](qualifications/observation-time/report.md)
 list the original sources, test boundaries and remaining qualification.
 [Prompt adapters](../prompt_compat/README.md) and
 the [static estimator adapter](../preflight_compat/README.md) remain separate

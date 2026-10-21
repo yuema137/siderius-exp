@@ -54,15 +54,13 @@ current configuration schema and prevents assuming that future defaults match.
 Each profile declares the package factory, adapter, all imported frozen modules,
 source inventory and qualification file as source identity inputs. Its identity
 also binds the infra runtime verifier assembly. `qualification.json` is an
-allowlist of qualified assemblies. The current pair pins infra
-`52373be9a52bead36fd1f15d706385967e0a129d` (runtime assembly
-`57ef1a1509b9fb25f1fb810a1b65e94ae0720dda2775ebb3256d76c4ec0317da`).
-The [version and source receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
-links the final source qualification and records normal installations in both
-environments. The original [qualification report](qualification-report.json)
-remains historical evidence for its recorded revision, not the current pair.
-The receipt does not establish a later public-host installation check;
-synchronizing source alone does not add that evidence.
+allowlist of qualified assemblies. The current standalone pair pins infra
+`a366edba08b0b8a89bd30137f7535e81f4a11da9`; its exact assembly and test results
+are recorded in the [observation timestamp receipt](qualifications/observation-time/receipt.json).
+The [earlier version receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
+and original [qualification report](qualification-report.json) remain evidence
+for their recorded source versions, not the current standalone pair. The root
+exp dependency pin and lock are unchanged; they do not install this newer pair.
 Unknown assemblies fail closed. Profiles have explicit version `1`; no implicit
 historical default or automatic fallback is installed.
 
@@ -80,6 +78,12 @@ are not a replay requirement: any necessary historical prompt presentation is
 an explicit exp projection, never mutation of the raw record.
 
 ## Explicit historical presentation
+
+The immutable overlay below records the original v8 integration. For the current
+standalone pair, use planner package 0.12.1 and the early/late
+`paper-scheduler-off-v11` profiles listed in README.md, retaining
+`train_config.lr_schedule=null`. These compose the later policy and training
+manual projections; v8 alone does not claim the complete current presentation.
 
 `siderius-planner-compat` 0.9 provides two new explicit profiles,
 `legacy-9b78d505cb11-paper-verifier-v8` and its `paper-late-verifier-v8` counterpart.
@@ -167,3 +171,31 @@ Infra owns generic native completion and boundary tests;
 exp owns historical selection and comparisons. Prompt equality is not proof of
 live control-flow parity. No complete conversation, training, score reproduction,
 API call, GPU execution or dataset download is claimed by these offline checks.
+
+## Observation timestamp compatibility
+
+Package 0.1.5 additionally selects `historical_timestamp_seconds` through the
+framework's optional `observation_timestamp_parser` interface. The function
+preserves the original `mktime(strptime(...))` interpretation, including its
+host-local timezone and DST dependence and its disregard for explicit offsets.
+Native runs use the corrected framework parser. This selection changes neither
+observation ordering nor aggregation, eligibility or expiry thresholds.
+
+`observation-time-source.json` records the three original source revisions and
+extraction boundary. `fixtures/observation-timestamps.json` contains results
+executed from each original `_age_seconds` function in UTC, America/Los_Angeles
+and Asia/Shanghai. The tests compare these independent outputs and exercise
+populated-store expiry and production session lookup around the 90-day boundary.
+A matching host timezone remains an explicit historical replay requirement;
+selecting the profile does not make the old algorithm timezone-independent.
+
+The changed package sources change provider identity. Use a new external
+workspace; do not rewrite old observations or resume with a changed provider.
+The forecast preflight wrapper still requests bare calibration keys and cannot
+reuse rows labelled with these profiles. The supported clean historical workspace
+contains only its selected-profile rows. This qualification does not authorize
+importing unrelated native rows, introduce a new preflight reuse mechanism or
+claim complete stochastic artifact reproduction. The paper overlay continues to
+select measured admission. Package 0.1.5 requires the timestamp-parser interface;
+previous receipts and assembly entries remain historical evidence, not proof of
+new-package compatibility with earlier frameworks lacking that interface.

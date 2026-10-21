@@ -1,0 +1,128 @@
+{
+  "timestamps": [
+    "2026-07-23T12:00:00+0000",
+    "2026-07-23T05:00:00-0700",
+    "2026-07-23T20:00:00+0800",
+    "2026-07-23T12:00:00",
+    "invalid"
+  ],
+  "references": [
+    {
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "source": "src/core/runtime_control/observation_store.py",
+      "source_sha256": "db1f137e7d2e49dfdbb69baff44c3135a06d96ef7040355e729c02aa20e5d6dd",
+      "function_source": "def _age_seconds(timestamp: str, *, now: float | None = None) -> float | None:\n    \"\"\"Age of an observation timestamp (``%Y-%m-%dT%H:%M:%S%z``); None if unparseable.\"\"\"\n    for fmt in (\"%Y-%m-%dT%H:%M:%S%z\", \"%Y-%m-%dT%H:%M:%S\"):\n        try:\n            then = time.mktime(time.strptime(timestamp, fmt))\n            return (now if now is not None else time.time()) - then\n        except ValueError:\n            continue\n    return None",
+      "function_sha256": "196f77abfb5ee4d5b62837be44e4d81d889bae3b737e2b46b7ac3c9975d6f22e",
+      "cases": [
+        {
+          "timezone": "UTC",
+          "epoch_seconds": [
+            1784808000.0,
+            1784782800.0,
+            1784836800.0,
+            1784808000.0,
+            null
+          ]
+        },
+        {
+          "timezone": "America/Los_Angeles",
+          "epoch_seconds": [
+            1784833200.0,
+            1784808000.0,
+            1784862000.0,
+            1784833200.0,
+            null
+          ]
+        },
+        {
+          "timezone": "Asia/Shanghai",
+          "epoch_seconds": [
+            1784779200.0,
+            1784754000.0,
+            1784808000.0,
+            1784779200.0,
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "source": "src/core/runtime_control/observation_store.py",
+      "source_sha256": "db1f137e7d2e49dfdbb69baff44c3135a06d96ef7040355e729c02aa20e5d6dd",
+      "function_source": "def _age_seconds(timestamp: str, *, now: float | None = None) -> float | None:\n    \"\"\"Age of an observation timestamp (``%Y-%m-%dT%H:%M:%S%z``); None if unparseable.\"\"\"\n    for fmt in (\"%Y-%m-%dT%H:%M:%S%z\", \"%Y-%m-%dT%H:%M:%S\"):\n        try:\n            then = time.mktime(time.strptime(timestamp, fmt))\n            return (now if now is not None else time.time()) - then\n        except ValueError:\n            continue\n    return None",
+      "function_sha256": "196f77abfb5ee4d5b62837be44e4d81d889bae3b737e2b46b7ac3c9975d6f22e",
+      "cases": [
+        {
+          "timezone": "UTC",
+          "epoch_seconds": [
+            1784808000.0,
+            1784782800.0,
+            1784836800.0,
+            1784808000.0,
+            null
+          ]
+        },
+        {
+          "timezone": "America/Los_Angeles",
+          "epoch_seconds": [
+            1784833200.0,
+            1784808000.0,
+            1784862000.0,
+            1784833200.0,
+            null
+          ]
+        },
+        {
+          "timezone": "Asia/Shanghai",
+          "epoch_seconds": [
+            1784779200.0,
+            1784754000.0,
+            1784808000.0,
+            1784779200.0,
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "source": "src/core/runtime_control/observation_store.py",
+      "source_sha256": "db1f137e7d2e49dfdbb69baff44c3135a06d96ef7040355e729c02aa20e5d6dd",
+      "function_source": "def _age_seconds(timestamp: str, *, now: float | None = None) -> float | None:\n    \"\"\"Age of an observation timestamp (``%Y-%m-%dT%H:%M:%S%z``); None if unparseable.\"\"\"\n    for fmt in (\"%Y-%m-%dT%H:%M:%S%z\", \"%Y-%m-%dT%H:%M:%S\"):\n        try:\n            then = time.mktime(time.strptime(timestamp, fmt))\n            return (now if now is not None else time.time()) - then\n        except ValueError:\n            continue\n    return None",
+      "function_sha256": "196f77abfb5ee4d5b62837be44e4d81d889bae3b737e2b46b7ac3c9975d6f22e",
+      "cases": [
+        {
+          "timezone": "UTC",
+          "epoch_seconds": [
+            1784808000.0,
+            1784782800.0,
+            1784836800.0,
+            1784808000.0,
+            null
+          ]
+        },
+        {
+          "timezone": "America/Los_Angeles",
+          "epoch_seconds": [
+            1784833200.0,
+            1784808000.0,
+            1784862000.0,
+            1784833200.0,
+            null
+          ]
+        },
+        {
+          "timezone": "Asia/Shanghai",
+          "epoch_seconds": [
+            1784779200.0,
+            1784754000.0,
+            1784808000.0,
+            1784779200.0,
+            null
+          ]
+        }
+      ]
+    }
+  ]
+}
