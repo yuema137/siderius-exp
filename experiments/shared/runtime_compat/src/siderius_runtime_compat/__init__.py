@@ -29,7 +29,10 @@ def _historical_profile(family):
     from core.runtime_control.verifier_provider import RuntimeVerifierProfile
 
     from .adapter import create_historical_verifier
-    from .observation_time import historical_timestamp_seconds
+    from .observation_time import (
+        historical_timestamp_order_key,
+        historical_timestamp_seconds,
+    )
 
     qualification = json.loads((_ROOT / "qualification.json").read_text())
     sources = {
@@ -53,6 +56,7 @@ def _historical_profile(family):
         create=partial(create_historical_verifier, family),
         sources=sources,
         observation_timestamp_parser=historical_timestamp_seconds,
+        observation_timestamp_order_key=historical_timestamp_order_key,
         qualified_assemblies=frozenset(
             row["assembly_sha256"] for row in qualification["assemblies"]
         ),

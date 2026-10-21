@@ -40,6 +40,11 @@
       "infra_revision": "a366edba08b0b8a89bd30137f7535e81f4a11da9",
       "assembly_sha256": "cd9289fcc3185ced22046d7ca895c9783222a593eccd1a705f254ab04a75c2d9",
       "scope": "Explicit historical timestamp parser preserves original local-clock expiry in populated provider stores; clean historical workspaces retain bare-key preflight absence. Original frozen verifier and session outcomes remain required. No training or stochastic artifact replay claim."
+    },
+    {
+      "infra_revision": "7b0ab06f0a4d2e205725a7d778443202280ac02b",
+      "assembly_sha256": "b4febcdd02e8a24e78363779e44d447c5b16cfceedc707c8bb498a4230a948c8",
+      "scope": "Explicit historical timestamp parser and lexical ordering preserve original whole-prior lookup, including malformed timestamps and drift precedence. Populated current stores, production session consumption and frozen verifiers are compared with original-source outputs. No training or stochastic artifact replay claim."
     }
   ]
 }

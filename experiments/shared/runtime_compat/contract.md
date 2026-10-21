@@ -55,8 +55,8 @@ Each profile declares the package factory, adapter, all imported frozen modules,
 source inventory and qualification file as source identity inputs. Its identity
 also binds the infra runtime verifier assembly. `qualification.json` is an
 allowlist of qualified assemblies. The current standalone pair pins infra
-`a366edba08b0b8a89bd30137f7535e81f4a11da9`; its exact assembly and test results
-are recorded in the [observation timestamp receipt](qualifications/observation-time/receipt.json).
+`7b0ab06f0a4d2e205725a7d778443202280ac02b`; its exact assembly and test results
+are recorded in the [observation timestamp receipt](qualifications/observation-order/receipt.json).
 The [earlier version receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
 and original [qualification report](qualification-report.json) remain evidence
 for their recorded source versions, not the current standalone pair. The root
@@ -80,7 +80,7 @@ an explicit exp projection, never mutation of the raw record.
 ## Explicit historical presentation
 
 The immutable overlay below records the original v8 integration. For the current
-standalone pair, use planner package 0.12.1 and the early/late
+standalone pair, use planner package 0.12.2 and the early/late
 `paper-scheduler-off-v11` profiles listed in README.md, retaining
 `train_config.lr_schedule=null`. These compose the later policy and training
 manual projections; v8 alone does not claim the complete current presentation.
@@ -199,3 +199,36 @@ claim complete stochastic artifact reproduction. The paper overlay continues to
 select measured admission. Package 0.1.5 requires the timestamp-parser interface;
 previous receipts and assembly entries remain historical evidence, not proof of
 new-package compatibility with earlier frameworks lacking that interface.
+
+
+## Observation chronology compatibility
+
+Package 0.1.6 additionally supplies `historical_timestamp_order_key` through
+`RuntimeVerifierProfile.observation_timestamp_order_key`. The callback returns
+`(0.0, timestamp)` for every string, including malformed timestamps. This retains
+the original stable lexical sorting, newest-record selection, drift window and
+drift-before-age precedence. The previous historical parser is unchanged.
+Native infra instead orders known instants chronologically and refuses to claim
+a valid prior when an eligible timestamp cannot be ordered. These policies are
+explicitly different; historical selection is never an implicit default.
+
+The callback implementation is in the source-qualified `observation_time.py`.
+Its addition changes provider identity and therefore requires a new workspace.
+A selected session resolves both parser and ordering under the launch-pinned
+identity before reading the store. No archived observations are modified.
+
+`capture_observation_order.py` extracts and executes the original `lookup_prior`
+and `_age_seconds` from the three source revisions without modifying them.
+Synthetic eligible records isolate temporal decisions; unrelated eligibility
+and calibration-key functions are supplied as explicit test doubles. The fixture
+retains extracted source, source identities and complete return arguments.
+Current typed stores must match those outcomes, and production sessions pass
+the resulting prior to the selected frozen verifier. Comparisons cover malformed
+records, mixed offsets, equal instants, drift, expiry, fractional offsets, naive
+records and normalized leap seconds in three host timezones.
+
+This new qualification supplements, rather than rewrites, the 0.1.5
+[observation-time receipt](qualifications/observation-time/receipt.json). Earlier
+assembly entries are historical evidence only; the new callback requires the
+current framework interface. No old-framework install compatibility, new
+training result, or complete stochastic replay is claimed.

@@ -16,3 +16,8 @@ def historical_timestamp_seconds(timestamp: str) -> float | None:
         except ValueError:
             continue
     return None
+
+
+def historical_timestamp_order_key(timestamp: str) -> tuple[float, str]:
+    """Retain original lexical ordering, including malformed timestamp strings."""
+    return (0.0, timestamp)

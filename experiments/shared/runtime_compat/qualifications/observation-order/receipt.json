@@ -1,0 +1,32 @@
+{
+  "infra_revision": "7b0ab06f0a4d2e205725a7d778443202280ac02b",
+  "infra_assembly_sha256": "b4febcdd02e8a24e78363779e44d447c5b16cfceedc707c8bb498a4230a948c8",
+  "exp_base_revision": "69a43d38fc637f1b8f02268af426d63bd8f79b89",
+  "runtime_package_version": "0.1.6",
+  "planner_package_version": "0.12.2",
+  "tests": {
+    "passed": 202,
+    "failed": 0,
+    "exit_status": 0,
+    "seconds": 9.45
+  },
+  "static_checks": {
+    "ruff_check": 0,
+    "ruff_format_check": 0,
+    "git_diff_check": 0
+  },
+  "original_source_lookup_outcomes": 243,
+  "source_sha256": {
+    "fixtures/observation-order.json": "64fbd3e8fd3a44411b77764c5f8c55644d264c18279bb9a74a878366705fcd12",
+    "fixtures/observation-timestamps.json": "02e0811e5dc1e4710177d06b52cec86f269aa710caf1d29e6fa59b6899cbea0d",
+    "capture_observation_order.py": "5d5f24512267ef4c6b32d75ca3c45a79d79cecd1713f4eeb15aa27ecedcd4cb5",
+    "src/siderius_runtime_compat/__init__.py": "bcff2f95f1b2aa027044b5eb1aa66411decd804ff3c118f884b74c89d4f72c9b",
+    "src/siderius_runtime_compat/observation_time.py": "9968ada95d60d5617f77130eb57ae9e214ca14dfaa2d1c611007e86becc11fa4",
+    "src/siderius_runtime_compat/observation-time-source.json": "986cbbc72b60e7c1d34d5bcc7c8379b1861a303eba30548071cb363a689c7f23",
+    "src/siderius_runtime_compat/qualification.json": "be11db6db4d76aa2ae5dffd543db2548102d233a02f9e0acd266cb4eeec9d864",
+    "tests/test_observation_timestamps.py": "b8425b35313cca577d627878964a49b2beee881dbdacf1ac0a4b183adea87bad"
+  },
+  "live_api_calls": 0,
+  "gpu_work": false,
+  "qualification_scope": "Original-source whole observation lookup outputs, typed populated stores, current session consumption and frozen verifier comparisons; existing historical planner and current v11 manual tests. No full stochastic replay claim."
+}

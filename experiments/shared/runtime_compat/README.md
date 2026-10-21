@@ -4,10 +4,10 @@ Use this package when you want a **new external workspace** to apply a paper
 experiment's original timing rules. Ordinary tutorials use the framework's
 corrected default and do not need this package. Installing it changes no default.
 
-Use the **standalone pair qualified for this package**: runtime package 0.1.5
-and infra revision `a366edba08b0b8a89bd30137f7535e81f4a11da9`. The exp root
+Use the **standalone pair qualified for this package**: runtime package 0.1.6
+and infra revision `7b0ab06f0a4d2e205725a7d778443202280ac02b`. The exp root
 version file remains the ordinary tutorial dependency; it does not select this
-newer historical compatibility environment. The [current qualification](qualifications/observation-time/report.md)
+newer historical compatibility environment. The [current qualification](qualifications/observation-order/report.md)
 explains the offline checks. The [earlier receipt](../../../provenance/validation/2026-10-08_v1_metadata/receipt.json)
 is historical evidence for its own source versions.
 
@@ -15,7 +15,9 @@ The paper runs estimated training time from observed steps. Their rules could
 reject a short phase even after every requested step had finished, because too
 few observations were stable. New infra can use the actual time of completed
 work. This package preserves the original timing algorithms and selects the
-original admission rule explicitly. The separate historical prompt adapters can
+original admission rule explicitly. It also keeps the old way of reading and
+sorting saved timing records; ordinary runs use corrected timezone handling.
+The separate historical prompt adapters can
 then present those decisions to the agents in the original format.
 
 ## Prepare your own launch
@@ -54,7 +56,7 @@ then present those decisions to the agents in the original format.
    These are additional arguments, not a standalone launch command. Keep the
    copied command's other required arguments and replace conflicting flags
    instead of appending duplicates. Installing exp does not apply the overlay.
-4. Install planner package 0.12.1 from this exp checkout into the launch
+4. Install planner package 0.12.2 from this exp checkout into the launch
    environment already prepared in step 2:
 
    ```bash
@@ -108,7 +110,7 @@ interpreted recorded times using that timezone.
 
 This package restores the tested timing decisions; it does not restore deleted
 artifacts or guarantee identical new LLM responses, trained weights or scores.
-The [technical contract](contract.md) and [current qualification results](qualifications/observation-time/report.md)
+The [technical contract](contract.md) and [current qualification results](qualifications/observation-order/report.md)
 list the original sources, test boundaries and remaining qualification.
 [Prompt adapters](../prompt_compat/README.md) and
 the [static estimator adapter](../preflight_compat/README.md) remain separate

@@ -7,6 +7,8 @@
   "source": "src/core/runtime_control/observation_store.py::_age_seconds",
   "source_function_sha256": "196f77abfb5ee4d5b62837be44e4d81d889bae3b737e2b46b7ac3c9975d6f22e",
   "packaged_file": "observation_time.py",
-  "packaged_sha256": "0aecebe1c2525aeef2f69d9df4ca0df45fa8f456826d81c1378cfa768d2520e6",
-  "only_change": "Extract the original parsed epoch; framework computes now minus epoch. Original-source outputs are frozen in fixtures/observation-timestamps.json."
+  "packaged_sha256": "9968ada95d60d5617f77130eb57ae9e214ca14dfaa2d1c611007e86becc11fa4",
+  "only_change": "Extract the original parsed epoch; framework computes now minus epoch. The explicit order-key callback preserves the original timestamp-string ordering. Original-source parser and whole-lookup outputs are preserved in separate timestamp and order fixtures.",
+  "ordering_source": "src/core/runtime_control/observation_store.py::ObservationStore.lookup_prior",
+  "ordering_fixture": "fixtures/observation-order.json"
 }
