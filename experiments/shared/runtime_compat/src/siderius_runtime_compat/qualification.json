@@ -35,6 +35,11 @@
       "infra_revision": "367df3d478da5c9342de3a3cb7a4975aa9f51095",
       "assembly_sha256": "15fe99d712713943a3a5542579de80af9cb3419ad37901cd3d74c99ddfbec616",
       "scope": "Custom-loss target resolution receives the task contract during training preparation and target-standardization checks. Built-in paper loss paths and historical verifier algorithms are unchanged; frozen finite-trace decisions, installed child identity and unknown-assembly refusal are checked. No training or stochastic artifact replay claim."
+    },
+    {
+      "infra_revision": "a366edba08b0b8a89bd30137f7535e81f4a11da9",
+      "assembly_sha256": "cd9289fcc3185ced22046d7ca895c9783222a593eccd1a705f254ab04a75c2d9",
+      "scope": "Explicit historical timestamp parser preserves original local-clock expiry in populated provider stores; clean historical workspaces retain bare-key preflight absence. Original frozen verifier and session outcomes remain required. No training or stochastic artifact replay claim."
     }
   ]
 }

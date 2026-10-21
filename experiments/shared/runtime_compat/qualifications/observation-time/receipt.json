@@ -1,0 +1,26 @@
+{
+  "infra_revision": "a366edba08b0b8a89bd30137f7535e81f4a11da9",
+  "infra_assembly_sha256": "cd9289fcc3185ced22046d7ca895c9783222a593eccd1a705f254ab04a75c2d9",
+  "exp_base_revision": "c7da8ebb43e6e31ed99071f56bf6b3501dc68775",
+  "runtime_package_version": "0.1.5",
+  "tests": {
+    "passed": 116,
+    "failed": 0,
+    "exit_status": 0
+  },
+  "static_checks": {
+    "ruff_check": 0,
+    "ruff_format_check": 0,
+    "git_diff_check": 0
+  },
+  "source_sha256": {
+    "fixtures/observation-timestamps.json": "02e0811e5dc1e4710177d06b52cec86f269aa710caf1d29e6fa59b6899cbea0d",
+    "src/siderius_runtime_compat/observation_time.py": "0aecebe1c2525aeef2f69d9df4ca0df45fa8f456826d81c1378cfa768d2520e6",
+    "src/siderius_runtime_compat/observation-time-source.json": "edcd4807d6b750a551d9b00b63e47c0e4a21220b5cd326507ad783d178458427",
+    "tests/test_observation_timestamps.py": "a2b2ddc3a964d6845fc36cca91c4789bd144e67c2b79e2f2c0436d775c18707d"
+  },
+  "live_api_calls": 0,
+  "gpu_work": false,
+  "qualification_scope": "Original-source timestamp oracle, populated historical prior consumption, unchanged finite-trace sessions and existing historical prompt projection; no full stochastic replay claim.",
+  "planner_package_version": "0.12.1"
+}
