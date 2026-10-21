@@ -2,6 +2,7 @@
 
 import importlib
 import json
+import math
 import time
 from datetime import datetime
 from pathlib import Path
@@ -9,6 +10,7 @@ from pathlib import Path
 import pytest
 from core.runtime_control.observation_store import (
     ObservationStore,
+    PriorLookup,
     calibration_key,
     observation_calibration_key,
 )
@@ -16,6 +18,7 @@ from core.runtime_control.records import (
     PhaseComponentRecord,
     PhaseMeasurement,
     RuntimeObservation,
+    RuntimePrediction,
 )
 from core.runtime_control.session import (
     RuntimeControlPolicy,
@@ -64,8 +67,8 @@ def test_historical_parser_matches_original_source(reference, timezone):
     ]
 
 
-def observation(identity, timestamp):
-    return RuntimeObservation(
+def observation(identity, timestamp, *, unit_ms=40.0, log_error=None):
+    stored = RuntimeObservation(
         timestamp=timestamp,
         hardware={"gpu_name": "synthetic"},
         software={"torch_version": "2.6.0"},
@@ -80,7 +83,7 @@ def observation(identity, timestamp):
                     unit="optimizer_step",
                     n_measured_units=10,
                     n_stabilization_units=0,
-                    unit_time_ms_median=40,
+                    unit_time_ms_median=unit_ms,
                     steady_state_reached=True,
                     total_measurement_seconds=0.4,
                 ),
@@ -88,6 +91,31 @@ def observation(identity, timestamp):
         },
         final_status="completed",
     )
+    if log_error is not None:
+        actual = unit_ms * 10 / 1000
+        predicted = actual / math.exp(log_error)
+        component = (
+            stored.components["training"]
+            .model_copy(
+                update={
+                    "prediction": RuntimePrediction(
+                        predicted_seconds=predicted,
+                        source="real_training_verification",
+                        formal_execution_eligible=True,
+                        steady_state=True,
+                        verification="passed",
+                        confidence="high",
+                        ms_per_unit=predicted * 100,
+                        n_steady_units=10,
+                        unit_count=10,
+                        safety_factor=1.0,
+                    ),
+                }
+            )
+            .with_actual(actual)
+        )
+        stored = stored.model_copy(update={"components": {"training": component}})
+    return stored
 
 
 @pytest.mark.parametrize(
@@ -179,3 +207,73 @@ def assert_frozen_verifier_flow(session, reference, prior, expected_prior, monke
     ) == oracle.prediction(workload, "real_training_verification").model_dump(
         mode="json"
     )
+
+
+ORDER_FIXTURE = json.loads(
+    (
+        Path(__file__).resolve().parents[1] / "fixtures/observation-order.json"
+    ).read_text()
+)
+
+
+@pytest.mark.parametrize(
+    "reference", ORDER_FIXTURE["references"], ids=lambda r: r["revision"][:8]
+)
+@pytest.mark.parametrize("case", ORDER_FIXTURE["cases"], ids=lambda c: c["name"])
+def test_original_ordering_through_store_and_session(
+    reference, case, timezone, tmp_path, monkeypatch
+):
+    """Changing lexical history order must change the frozen lookup witness."""
+    selection = "legacy-" + reference["revision"][:8] + "-verifier-v1"
+    profile = resolve_runtime_verifier(selection)
+    identity = profile.identity()
+    store = ObservationStore(str(tmp_path / "store"))
+    for index, (timestamp, error) in enumerate(
+        zip(case["timestamps"], case["errors"], strict=True)
+    ):
+        stored = observation(identity, timestamp, unit_ms=40 + index, log_error=error)
+        store.append(stored, writer_id="reference")
+    key = observation_calibration_key(stored, "training")
+    outcomes = next(
+        row["outcomes"] for row in reference["zones"] if row["timezone"] == timezone
+    )
+    import core.runtime_control.session as session_owner
+
+    monkeypatch.setattr(
+        session_owner,
+        "capture_environment_provenance",
+        lambda: {
+            "gpu_name": "synthetic",
+            "torch_version": "2.6.0",
+        },
+    )
+    session = RuntimeVerificationSession(
+        str(tmp_path / "runtime.json"),
+        policy=RuntimeControlPolicy(
+            runtime_verifier=selection,
+            runtime_completion_policy="verified-prediction-v1",
+            observation_store_root=str(tmp_path / "store"),
+        ),
+    )
+    session.set_calibration_context(CONTEXT)
+    for outcome in outcomes:
+        if outcome["case"] != case["name"]:
+            continue
+        expected = PriorLookup.model_validate(outcome["result"])
+        if expected.provenance:
+            expected.provenance["key"] = key
+        actual = store.lookup_prior(
+            key,
+            "training",
+            now=outcome["now"],
+            timestamp_parser=profile.observation_timestamp_parser,
+            timestamp_order_key=profile.observation_timestamp_order_key,
+        )
+        assert actual.model_dump() == expected.model_dump()
+        monkeypatch.setattr(time, "time", lambda now=outcome["now"]: now)
+        prior = session.lookup_phase_prior("training")
+        expected_prior = expected.prior_unit_ms if expected.status == "valid" else None
+        assert prior == expected_prior
+        assert_frozen_verifier_flow(
+            session, reference, prior, expected_prior, monkeypatch
+        )

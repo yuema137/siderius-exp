@@ -1,0 +1,3448 @@
+{
+  "source": "src/core/runtime_control/observation_store.py",
+  "cases": [
+    {
+      "name": "offset_latest",
+      "timestamps": [
+        "2026-07-23T12:00:00+1400",
+        "2026-07-23T11:00:00-1200"
+      ],
+      "errors": [
+        null,
+        null
+      ]
+    },
+    {
+      "name": "offset_drift",
+      "timestamps": [
+        "2026-07-23T12:00:00+1400",
+        "2026-07-23T12:01:00+1400",
+        "2026-07-23T12:02:00+1400",
+        "2026-07-23T11:00:00-1200"
+      ],
+      "errors": [
+        1.0,
+        1.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "name": "equal_instants",
+      "timestamps": [
+        "2026-07-23T12:00:00+0200",
+        "2026-07-23T10:00:00Z"
+      ],
+      "errors": [
+        null,
+        null
+      ]
+    },
+    {
+      "name": "malformed_before",
+      "timestamps": [
+        "!malformed",
+        "2026-07-23T12:00:00+0000"
+      ],
+      "errors": [
+        null,
+        null
+      ]
+    },
+    {
+      "name": "malformed_after",
+      "timestamps": [
+        "2026-07-23T12:00:00+0000",
+        "malformed"
+      ],
+      "errors": [
+        null,
+        null
+      ]
+    },
+    {
+      "name": "malformed_drift",
+      "timestamps": [
+        "malformed-a",
+        "malformed-b",
+        "malformed-c"
+      ],
+      "errors": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fractional_offsets",
+      "timestamps": [
+        "2026-07-23T12:00:00+00:00:00.5",
+        "2026-07-23T12:00:00-00:00:00.5"
+      ],
+      "errors": [
+        null,
+        null
+      ]
+    },
+    {
+      "name": "leap_seconds",
+      "timestamps": [
+        "2026-07-23T11:59:60+0000",
+        "2026-07-23T11:59:61+0000"
+      ],
+      "errors": [
+        null,
+        null
+      ]
+    },
+    {
+      "name": "naive",
+      "timestamps": [
+        "2026-07-23T11:00:00",
+        "2026-07-23T12:00:00"
+      ],
+      "errors": [
+        null,
+        null
+      ]
+    }
+  ],
+  "references": [
+    {
+      "revision": "345c802d82c71f72e1b73a90d2bf702d09d1865d",
+      "source_sha256": "db1f137e7d2e49dfdbb69baff44c3135a06d96ef7040355e729c02aa20e5d6dd",
+      "extracted_source": "def lookup_prior(\n        self,\n        key: str,\n        phase: RuntimePhase,\n        *,\n        policy: PriorPolicy | None = None,\n        current_gpu_name: str | None = None,\n        current_torch_version: str | None = None,\n        now: float | None = None,\n    ) -> PriorLookup:\n        \"\"\"Derive the historical prior for ``key`` with \u00a76b invalidation.\n\n        Environment mismatch is structurally impossible for gpu/torch\n        (they are part of the key), but the CALLER's current environment\n        is still checked against the key so a stale key from another\n        host is never cross-applied (\u00a76b rules 1-2).\n\n        Args:\n            key:    ``calibration_key(...)`` string.\n            phase:  Phase whose unit time is being derived.\n            policy: \u00a76b parameters.\n            current_gpu_name / current_torch_version: the environment\n                    about to CONSUME the prior.\n            now:    Override for age computation (tests).\n        \"\"\"\n        policy = policy or PriorPolicy()\n        if current_gpu_name is not None and f\"gpu={current_gpu_name}|\" not in key + \"|\":\n            return PriorLookup(status=\"env_mismatch\")\n        if current_torch_version is not None:\n            major = current_torch_version.split(\".\")[0]\n            if f\"|torch{major}|\" not in f\"|{key}|\":\n                return PriorLookup(status=\"env_mismatch\")\n\n        matching: list[tuple[str, float, float | None]] = []\n        for obs in self.read_all():\n            if observation_calibration_key(obs, phase) != key:\n                continue\n            if not component_calibration_eligible(obs, phase):\n                continue\n            unit_ms = realized_unit_ms(obs, phase)\n            if unit_ms is None or unit_ms <= 0:\n                continue\n            component = obs.components.get(phase)\n            log_error = (\n                component.prediction_error.log_error\n                if component is not None and component.prediction_error is not None\n                else None\n            )\n            matching.append((obs.timestamp, unit_ms, log_error))\n        if not matching:\n            return PriorLookup(status=\"absent\")\n\n        matching.sort(key=lambda t: t[0])  # ISO timestamps sort lexically\n\n        # \u00a76b rule 4 \u2014 drift eviction: N consecutive newest observations\n        # violating the \u00a72.10 contract evict the prior entirely.\n        recent_errors = [e for _, _, e in matching if e is not None][-policy.drift_consecutive :]\n        if len(recent_errors) >= policy.drift_consecutive and all(\n            e > math.log(policy.contract_factor) for e in recent_errors\n        ):\n            return PriorLookup(status=\"evicted_drift\", n_observations=len(matching))\n\n        values = sorted(v for _, v, _ in matching)\n        median = values[len(values) // 2]\n        newest_ts = matching[-1][0]\n        status: Literal[\"valid\", \"stale\"] = \"valid\"\n        age_seconds = _age_seconds(newest_ts, now=now)\n        if age_seconds is None or age_seconds > policy.max_age_days * 86400.0:\n            status = \"stale\"  # \u00a76b rule 5 \u2014 elevated safety factor until refreshed\n        return PriorLookup(\n            status=status,\n            prior_unit_ms=median,\n            n_observations=len(matching),\n            newest_timestamp=newest_ts,\n            provenance={\n                \"key\": key,\n                \"aggregation\": \"median_of_realized_unit_ms\",\n                \"observation_count\": len(matching),\n            },\n        )\n\ndef _age_seconds(timestamp: str, *, now: float | None = None) -> float | None:\n    \"\"\"Age of an observation timestamp (``%Y-%m-%dT%H:%M:%S%z``); None if unparseable.\"\"\"\n    for fmt in (\"%Y-%m-%dT%H:%M:%S%z\", \"%Y-%m-%dT%H:%M:%S\"):\n        try:\n            then = time.mktime(time.strptime(timestamp, fmt))\n            return (now if now is not None else time.time()) - then\n        except ValueError:\n            continue\n    return None",
+      "extracted_sha256": "2aa5261559e86d3a2414643e738c0512c5a0a52304098fe9e0d466187ad38712",
+      "zones": [
+        {
+          "timezone": "UTC",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "timezone": "America/Los_Angeles",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "timezone": "Asia/Shanghai",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "revision": "7689fd58b91d410788e953b51ea69a9dbc528a7d",
+      "source_sha256": "db1f137e7d2e49dfdbb69baff44c3135a06d96ef7040355e729c02aa20e5d6dd",
+      "extracted_source": "def lookup_prior(\n        self,\n        key: str,\n        phase: RuntimePhase,\n        *,\n        policy: PriorPolicy | None = None,\n        current_gpu_name: str | None = None,\n        current_torch_version: str | None = None,\n        now: float | None = None,\n    ) -> PriorLookup:\n        \"\"\"Derive the historical prior for ``key`` with \u00a76b invalidation.\n\n        Environment mismatch is structurally impossible for gpu/torch\n        (they are part of the key), but the CALLER's current environment\n        is still checked against the key so a stale key from another\n        host is never cross-applied (\u00a76b rules 1-2).\n\n        Args:\n            key:    ``calibration_key(...)`` string.\n            phase:  Phase whose unit time is being derived.\n            policy: \u00a76b parameters.\n            current_gpu_name / current_torch_version: the environment\n                    about to CONSUME the prior.\n            now:    Override for age computation (tests).\n        \"\"\"\n        policy = policy or PriorPolicy()\n        if current_gpu_name is not None and f\"gpu={current_gpu_name}|\" not in key + \"|\":\n            return PriorLookup(status=\"env_mismatch\")\n        if current_torch_version is not None:\n            major = current_torch_version.split(\".\")[0]\n            if f\"|torch{major}|\" not in f\"|{key}|\":\n                return PriorLookup(status=\"env_mismatch\")\n\n        matching: list[tuple[str, float, float | None]] = []\n        for obs in self.read_all():\n            if observation_calibration_key(obs, phase) != key:\n                continue\n            if not component_calibration_eligible(obs, phase):\n                continue\n            unit_ms = realized_unit_ms(obs, phase)\n            if unit_ms is None or unit_ms <= 0:\n                continue\n            component = obs.components.get(phase)\n            log_error = (\n                component.prediction_error.log_error\n                if component is not None and component.prediction_error is not None\n                else None\n            )\n            matching.append((obs.timestamp, unit_ms, log_error))\n        if not matching:\n            return PriorLookup(status=\"absent\")\n\n        matching.sort(key=lambda t: t[0])  # ISO timestamps sort lexically\n\n        # \u00a76b rule 4 \u2014 drift eviction: N consecutive newest observations\n        # violating the \u00a72.10 contract evict the prior entirely.\n        recent_errors = [e for _, _, e in matching if e is not None][-policy.drift_consecutive :]\n        if len(recent_errors) >= policy.drift_consecutive and all(\n            e > math.log(policy.contract_factor) for e in recent_errors\n        ):\n            return PriorLookup(status=\"evicted_drift\", n_observations=len(matching))\n\n        values = sorted(v for _, v, _ in matching)\n        median = values[len(values) // 2]\n        newest_ts = matching[-1][0]\n        status: Literal[\"valid\", \"stale\"] = \"valid\"\n        age_seconds = _age_seconds(newest_ts, now=now)\n        if age_seconds is None or age_seconds > policy.max_age_days * 86400.0:\n            status = \"stale\"  # \u00a76b rule 5 \u2014 elevated safety factor until refreshed\n        return PriorLookup(\n            status=status,\n            prior_unit_ms=median,\n            n_observations=len(matching),\n            newest_timestamp=newest_ts,\n            provenance={\n                \"key\": key,\n                \"aggregation\": \"median_of_realized_unit_ms\",\n                \"observation_count\": len(matching),\n            },\n        )\n\ndef _age_seconds(timestamp: str, *, now: float | None = None) -> float | None:\n    \"\"\"Age of an observation timestamp (``%Y-%m-%dT%H:%M:%S%z``); None if unparseable.\"\"\"\n    for fmt in (\"%Y-%m-%dT%H:%M:%S%z\", \"%Y-%m-%dT%H:%M:%S\"):\n        try:\n            then = time.mktime(time.strptime(timestamp, fmt))\n            return (now if now is not None else time.time()) - then\n        except ValueError:\n            continue\n    return None",
+      "extracted_sha256": "2aa5261559e86d3a2414643e738c0512c5a0a52304098fe9e0d466187ad38712",
+      "zones": [
+        {
+          "timezone": "UTC",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "timezone": "America/Los_Angeles",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "timezone": "Asia/Shanghai",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "revision": "349b6cd6d9766abbf3d87515b22e1005599a694b",
+      "source_sha256": "db1f137e7d2e49dfdbb69baff44c3135a06d96ef7040355e729c02aa20e5d6dd",
+      "extracted_source": "def lookup_prior(\n        self,\n        key: str,\n        phase: RuntimePhase,\n        *,\n        policy: PriorPolicy | None = None,\n        current_gpu_name: str | None = None,\n        current_torch_version: str | None = None,\n        now: float | None = None,\n    ) -> PriorLookup:\n        \"\"\"Derive the historical prior for ``key`` with \u00a76b invalidation.\n\n        Environment mismatch is structurally impossible for gpu/torch\n        (they are part of the key), but the CALLER's current environment\n        is still checked against the key so a stale key from another\n        host is never cross-applied (\u00a76b rules 1-2).\n\n        Args:\n            key:    ``calibration_key(...)`` string.\n            phase:  Phase whose unit time is being derived.\n            policy: \u00a76b parameters.\n            current_gpu_name / current_torch_version: the environment\n                    about to CONSUME the prior.\n            now:    Override for age computation (tests).\n        \"\"\"\n        policy = policy or PriorPolicy()\n        if current_gpu_name is not None and f\"gpu={current_gpu_name}|\" not in key + \"|\":\n            return PriorLookup(status=\"env_mismatch\")\n        if current_torch_version is not None:\n            major = current_torch_version.split(\".\")[0]\n            if f\"|torch{major}|\" not in f\"|{key}|\":\n                return PriorLookup(status=\"env_mismatch\")\n\n        matching: list[tuple[str, float, float | None]] = []\n        for obs in self.read_all():\n            if observation_calibration_key(obs, phase) != key:\n                continue\n            if not component_calibration_eligible(obs, phase):\n                continue\n            unit_ms = realized_unit_ms(obs, phase)\n            if unit_ms is None or unit_ms <= 0:\n                continue\n            component = obs.components.get(phase)\n            log_error = (\n                component.prediction_error.log_error\n                if component is not None and component.prediction_error is not None\n                else None\n            )\n            matching.append((obs.timestamp, unit_ms, log_error))\n        if not matching:\n            return PriorLookup(status=\"absent\")\n\n        matching.sort(key=lambda t: t[0])  # ISO timestamps sort lexically\n\n        # \u00a76b rule 4 \u2014 drift eviction: N consecutive newest observations\n        # violating the \u00a72.10 contract evict the prior entirely.\n        recent_errors = [e for _, _, e in matching if e is not None][-policy.drift_consecutive :]\n        if len(recent_errors) >= policy.drift_consecutive and all(\n            e > math.log(policy.contract_factor) for e in recent_errors\n        ):\n            return PriorLookup(status=\"evicted_drift\", n_observations=len(matching))\n\n        values = sorted(v for _, v, _ in matching)\n        median = values[len(values) // 2]\n        newest_ts = matching[-1][0]\n        status: Literal[\"valid\", \"stale\"] = \"valid\"\n        age_seconds = _age_seconds(newest_ts, now=now)\n        if age_seconds is None or age_seconds > policy.max_age_days * 86400.0:\n            status = \"stale\"  # \u00a76b rule 5 \u2014 elevated safety factor until refreshed\n        return PriorLookup(\n            status=status,\n            prior_unit_ms=median,\n            n_observations=len(matching),\n            newest_timestamp=newest_ts,\n            provenance={\n                \"key\": key,\n                \"aggregation\": \"median_of_realized_unit_ms\",\n                \"observation_count\": len(matching),\n            },\n        )\n\ndef _age_seconds(timestamp: str, *, now: float | None = None) -> float | None:\n    \"\"\"Age of an observation timestamp (``%Y-%m-%dT%H:%M:%S%z``); None if unparseable.\"\"\"\n    for fmt in (\"%Y-%m-%dT%H:%M:%S%z\", \"%Y-%m-%dT%H:%M:%S\"):\n        try:\n            then = time.mktime(time.strptime(timestamp, fmt))\n            return (now if now is not None else time.time()) - then\n        except ValueError:\n            continue\n    return None",
+      "extracted_sha256": "2aa5261559e86d3a2414643e738c0512c5a0a52304098fe9e0d466187ad38712",
+      "zones": [
+        {
+          "timezone": "UTC",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "timezone": "America/Los_Angeles",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "timezone": "Asia/Shanghai",
+          "outcomes": [
+            {
+              "case": "offset_latest",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_latest",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+1400",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "offset_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 4
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "equal_instants",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0200",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_before",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1784808000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_after",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "malformed",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1784808000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792584000.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "malformed_drift",
+              "now": 1792587600.0,
+              "result": {
+                "status": "evicted_drift",
+                "n_observations": 3
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "fractional_offsets",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00-00:00:00.5",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "leap_seconds",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T11:59:61+0000",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1784808000.0,
+              "result": {
+                "status": "valid",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792584000.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            },
+            {
+              "case": "naive",
+              "now": 1792587600.0,
+              "result": {
+                "status": "stale",
+                "prior_unit_ms": 41.0,
+                "n_observations": 2,
+                "newest_timestamp": "2026-07-23T12:00:00",
+                "provenance": {
+                  "key": "synthetic",
+                  "aggregation": "median_of_realized_unit_ms",
+                  "observation_count": 2
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
