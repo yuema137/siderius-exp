@@ -82,6 +82,11 @@
       "infra_revision": "13e3b980177ab97e5da2e3a98a543588acd7ebb7",
       "assembly_sha256": "a0fa4718d66213c7c6056aee3c1800c4f1a3c13de4da20c1e85018f7b35db308",
       "scope": "Generated-model defaults checked before implementation; explicit historical proposer parameter-rule renderer preserves frozen boundaries and complete scripted requests. Includes preceding retry documentation identity changes. No historical invalid execution, full conversation or training replay claim."
+    },
+    {
+      "infra_revision": "4ec6c6968da61dc13a0d6d9acfa13fa56b53305b",
+      "assembly_sha256": "838a86cd2ae38e03caa6d7db9688b29f30247a6c0f5cd1e5db35d2a1a8d02b02",
+      "scope": "Live name collision validation permits verified same-name registered reuse. Frozen rendering boundaries and existing scripted requests unchanged; rejected historical control flow and arbitrary parameter rules are not replayed."
     }
   ],
   "scheduler_disabled_assemblies": [
@@ -92,6 +97,7 @@
     "155c09ada496126251892b1e16c6ecffe4afa911404f05f6d1b2d0d377c05193",
     "cea16b02f4dc19ca16d22d15ce9b9ee5e9b5769868514c0bdb2f784cebe08657",
     "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332",
-    "a0fa4718d66213c7c6056aee3c1800c4f1a3c13de4da20c1e85018f7b35db308"
+    "a0fa4718d66213c7c6056aee3c1800c4f1a3c13de4da20c1e85018f7b35db308",
+    "838a86cd2ae38e03caa6d7db9688b29f30247a6c0f5cd1e5db35d2a1a8d02b02"
   ]
 }
