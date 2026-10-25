@@ -3,8 +3,10 @@
 import json
 from functools import wraps
 from pathlib import Path
+from typing import Literal
 
 from agent.prompt_rendering import PromptRenderingProfile, rendering_assembly_digest
+from agent.schemas.model_io_contract import ModelIOContract
 from agent.schemas.proposal import ProposalInput
 
 _ROOT = Path(__file__).parent
@@ -27,6 +29,14 @@ def _without_appendix() -> str:
 
 def _without_time_budget_context(inp: ProposalInput) -> str:
     """Preserve the historical absence of numeric proposer budget context."""
+    return ""
+
+
+def _without_validator_input(
+    model_io_contract: ModelIOContract | None,
+    segmentation_applicability: Literal["temporal", "not_applicable"] | None = None,
+) -> str:
+    """Preserve historical review text without changing typed input/probe semantics."""
     return ""
 
 
@@ -95,6 +105,7 @@ def _profile(
     }
     if time_budget_compat:
         renderers["proposal.time_budget_context"] = _without_time_budget_context
+        renderers["validator.input_contract"] = _without_validator_input
     native = set(_INTERPRETATION)
     if early_contract:
         renderers["native_training.appendix"] = _without_appendix

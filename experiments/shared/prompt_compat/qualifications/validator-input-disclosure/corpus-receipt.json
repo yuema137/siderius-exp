@@ -1,0 +1,275 @@
+{
+  "infra_revision": "f2e8d140dea2ba910a3845181c42d58f3bec79fc",
+  "exp_source_revision": "a3b013f41241d9b8f9cfa1f3c7588adb7e128832",
+  "original_receipt_sha256": "1c2e9edeff6b29201d3fdb5970799f93b5bdc8d4f533b312a4d9b5f08a5329c5",
+  "cases": 47,
+  "matching_messages": "frozen-messages.json",
+  "profiles": {
+    "paper-analysis-c0467447-v2": {
+      "name": "paper-analysis-c0467447-v2",
+      "version": "2",
+      "content_sha256": "1c7099682357a293a8069fc42c2464cd8fea125596415131f822aea0b4a47f4a",
+      "assembly_sha256": "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b"
+    },
+    "paper-early-v2": {
+      "name": "paper-early-v2",
+      "version": "2",
+      "content_sha256": "71bdd906e12f507125821129d83f0f7263a7e8e14ebefac64a488a0d7a2e021a",
+      "assembly_sha256": "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b"
+    },
+    "paper-late-v2": {
+      "name": "paper-late-v2",
+      "version": "2",
+      "content_sha256": "71bdd906e12f507125821129d83f0f7263a7e8e14ebefac64a488a0d7a2e021a",
+      "assembly_sha256": "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b"
+    },
+    "paper-tidmad-noprior-v2": {
+      "name": "paper-tidmad-noprior-v2",
+      "version": "2",
+      "content_sha256": "3d1d7081bee2989e336f911e149386a38dd38a672bcf0250cf73c715fa8fa9ab",
+      "assembly_sha256": "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b"
+    }
+  },
+  "capture_sources": {
+    "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+  },
+  "requests": {
+    "analysis-plan": {
+      "boundary": "analysis.plan",
+      "request_sha256": "87eeb39f2f3a2751343325362afc7860a272aea985e3b16328e5929e8ee51eb9",
+      "profile": "paper-analysis-c0467447-v2"
+    },
+    "analysis-selection": {
+      "boundary": "analysis.selection",
+      "request_sha256": "bd19d574edb0357252fbd886a2237dbce968805ad66e962e418b8807573ff4fc",
+      "profile": "paper-analysis-c0467447-v2"
+    },
+    "analysis-synthesis": {
+      "boundary": "analysis.synthesis",
+      "request_sha256": "2e3ebb9289ed3bddffac6963df44362116b0cfa08540845312b8fb93ab279845",
+      "profile": "paper-analysis-c0467447-v2"
+    },
+    "ligo-implementor-code": {
+      "boundary": "implementor.code",
+      "request_sha256": "73e3286823ac90624ae888d94432f87eea3b6bc963641b1f69236f4f9000d219",
+      "profile": "paper-early-v2"
+    },
+    "ligo-implementor-reasoning": {
+      "boundary": "implementor.reasoning",
+      "request_sha256": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+      "profile": "paper-early-v2"
+    },
+    "ligo-interpretation-structured-health": {
+      "boundary": "interpretation.model",
+      "request_sha256": "7de9e56f7b84c1560946afba6af77f949a09c6dfcfc9ea60baeca5db1a9b364a",
+      "profile": "paper-early-v2"
+    },
+    "ligo-interpretation": {
+      "boundary": "interpretation.model",
+      "request_sha256": "660d971cce88d06a709a0397b90ff0946727ed98fe1fba258e631117f0a56ce6",
+      "profile": "paper-early-v2"
+    },
+    "ligo-proposal-causal_reasoning_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "6be87e4a4d3a91303bf9398f9b026746d5833f50f68e8ef3e2f05806a246bff1",
+      "profile": "paper-early-v2"
+    },
+    "ligo-proposal-causal_reasoning_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "4d06f2bf66cc7929b27180f25605686321cfec299e8c924c11b06bdd11b5e77f",
+      "profile": "paper-early-v2"
+    },
+    "ligo-proposal-comparison_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "b6d74b2218eeeb56f0800c120c018a763713907ef51317c42a46d86199824781",
+      "profile": "paper-early-v2"
+    },
+    "ligo-proposal-comparison_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "14d517a284356566a80ed5e19137a898214b2051c7ab9bdd7ad12d22a1bc33a8",
+      "profile": "paper-early-v2"
+    },
+    "ligo-proposal-proposing_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "202162ca80c8dbaf1267bb82b7746dc527e686360ed1d112266cb31b9a369990",
+      "profile": "paper-early-v2"
+    },
+    "ligo-proposal-proposing_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "f838356da16da7f8fcf046c3340b20093afb418f10dcab7e9dc3d73961005bd8",
+      "profile": "paper-early-v2"
+    },
+    "ligo-validator-system": {
+      "boundary": "validator.system",
+      "request_sha256": "8e22c04466d84e9092143c51ba1b9c52c15bdd9d60c0db5670a496fdb9e6dc1d",
+      "profile": "paper-early-v2"
+    },
+    "project8-implementor-code": {
+      "boundary": "implementor.code",
+      "request_sha256": "3f54dd37ad8785432f906dcd81c447a3a5dcbc5e2e024fcb6c0035c55b1b411d",
+      "profile": "paper-late-v2"
+    },
+    "project8-implementor-reasoning": {
+      "boundary": "implementor.reasoning",
+      "request_sha256": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+      "profile": "paper-late-v2"
+    },
+    "project8-interpretation-structured-health": {
+      "boundary": "interpretation.model",
+      "request_sha256": "3e84a71a01235ab26f9b01478d6060e77a2bfbb1f7951205b1fa5afd47483ae4",
+      "profile": "paper-late-v2"
+    },
+    "project8-interpretation": {
+      "boundary": "interpretation.model",
+      "request_sha256": "9512d0943ee5d35af9df987a017d1ef3b19ab79fb1670f1933628293dfac76d2",
+      "profile": "paper-late-v2"
+    },
+    "project8-proposal-causal_reasoning_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "d6f0bb33f70e61f866489dd137f1d2d6e060918d806cb09257e35f92528f4dfb",
+      "profile": "paper-late-v2"
+    },
+    "project8-proposal-causal_reasoning_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "7ff60fd7d03d583f7da9a260283230942f83f59da626583ceb68ba718e29c3dd",
+      "profile": "paper-late-v2"
+    },
+    "project8-proposal-comparison_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "031692b2e0891dc71bd88a0f5f7a72fe7be82d1bb2d6d93f76fdda10ceb9fa62",
+      "profile": "paper-late-v2"
+    },
+    "project8-proposal-comparison_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "d841b8019b49ce969a0fc5e58d421bc1a984391d8d4e4d37d764f447efc9af86",
+      "profile": "paper-late-v2"
+    },
+    "project8-proposal-proposing_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "777f554a8818b682f81a23f716e11003837cb17fb317064fbfab9ab29e9b583e",
+      "profile": "paper-late-v2"
+    },
+    "project8-proposal-proposing_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "cf44aa521ccedbac0acb0c0e6a9b6d915555b832df36832f548d91ebd2636ea9",
+      "profile": "paper-late-v2"
+    },
+    "project8-validator-system": {
+      "boundary": "validator.system",
+      "request_sha256": "6b4219a237cd02e975a128cb0a80301b2fd1f74b8ae52116d9ce6fa2c3194def",
+      "profile": "paper-late-v2"
+    },
+    "tess-implementor-code": {
+      "boundary": "implementor.code",
+      "request_sha256": "d870fbe83e53443fb85fe258e371de147431440206eacee55f5bdced5007ab1d",
+      "profile": "paper-early-v2"
+    },
+    "tess-implementor-reasoning": {
+      "boundary": "implementor.reasoning",
+      "request_sha256": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+      "profile": "paper-early-v2"
+    },
+    "tess-interpretation-structured-health": {
+      "boundary": "interpretation.model",
+      "request_sha256": "95b2c66e7c0c86ed2c63e5b448c68f02991f28ee7b7f0f5e34ef3cc3d8c1a990",
+      "profile": "paper-early-v2"
+    },
+    "tess-interpretation": {
+      "boundary": "interpretation.model",
+      "request_sha256": "3dc1d29c698591e7336f64a374638a2c3561587deee914d3e9358199a504dd35",
+      "profile": "paper-early-v2"
+    },
+    "tess-proposal-causal_reasoning_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "7e48d10e6ccbe4fca33566332e711b404852f64f7a0659aab0134098a5ebf31b",
+      "profile": "paper-early-v2"
+    },
+    "tess-proposal-causal_reasoning_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "26a9e42bca59c5cc6c8c590dcb2a46ead42225e00cb0d994d84d405fc851e5a3",
+      "profile": "paper-early-v2"
+    },
+    "tess-proposal-comparison_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "c5db70e288b6a55cf3d73755e3e9583f54d3b7c717601c1a3471f33b27eea3c8",
+      "profile": "paper-early-v2"
+    },
+    "tess-proposal-comparison_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "129d44ff8bdebe52396f065f999c1701e97820e012436a9c501e803d50b926fb",
+      "profile": "paper-early-v2"
+    },
+    "tess-proposal-proposing_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "2dd400ed1c4062bda953e11c89f1c22dc5f868a96ac0c72eb85649eed5acc8ab",
+      "profile": "paper-early-v2"
+    },
+    "tess-proposal-proposing_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "5b624272bf8ae7de0b39c28361c781ffd7c11c7094ee81332492b008e2cecaf4",
+      "profile": "paper-early-v2"
+    },
+    "tess-validator-system": {
+      "boundary": "validator.system",
+      "request_sha256": "690d7f27dab42870d2100560622b0ea03833d16a7bd430c52d7f1b26405db951",
+      "profile": "paper-early-v2"
+    },
+    "tidmad-implementor-code": {
+      "boundary": "implementor.code",
+      "request_sha256": "4664428659bb6c327687e24fa3ce2f145f5d0e3d3608ae3e3bec640cef5ff21e",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-implementor-reasoning": {
+      "boundary": "implementor.reasoning",
+      "request_sha256": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-interpretation-structured-health": {
+      "boundary": "interpretation.model",
+      "request_sha256": "bddbe47593195f08a471ef4b5cf0cb0a6c4365d952bf355ccacb1f705eb53ec4",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-interpretation": {
+      "boundary": "interpretation.model",
+      "request_sha256": "d6851e1cb7c6caa80a138f2d5dbb74cfbc27bdcaac611c0f78dd8e59e290265e",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-proposal-causal_reasoning_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "56da615f3a4f9467387bc94a626d752a36340e712c28003f8a22a3c846b36d3a",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-proposal-causal_reasoning_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "3bc3c9294420dee3e841a49825b4ab81da172b532e2c42a1119bd1c48876ab75",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-proposal-comparison_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "bc4429af454fcecb771e5f31fb348ede8aeab0b0da2ea20089af782ef1cd2ff2",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-proposal-comparison_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "89635a2b38782235a21a2be0ca136b504a0a2dbe4acfb14056ce12d368109a4f",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-proposal-proposing_stage-exploit": {
+      "boundary": "proposal.system",
+      "request_sha256": "ab48b63a76083f71aa33f2116c6e061a5ed068dec5dc0bad8740172c49e31281",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-proposal-proposing_stage-explore": {
+      "boundary": "proposal.system",
+      "request_sha256": "748af5ff998cf875714f94e48652804b24a8af5deaf7330a4b61a1e706e597fd",
+      "profile": "paper-tidmad-noprior-v2"
+    },
+    "tidmad-validator-system": {
+      "boundary": "validator.system",
+      "request_sha256": "acd8f142afae5410412257e967aaf2b6f4a42329c167607a24a1066d7f88878f",
+      "profile": "paper-tidmad-noprior-v2"
+    }
+  },
+  "api_calls": 0,
+  "training_calls": 0
+}

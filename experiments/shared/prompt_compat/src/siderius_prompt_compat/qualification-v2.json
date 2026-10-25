@@ -92,6 +92,11 @@
       "infra_revision": "1f15ba6d470c64ec55ad8c0029cf7c1398db0cef",
       "assembly_sha256": "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f",
       "scope": "Pre-disclosure baseline qualification: 47 preserved historical boundary pairs and 16 reconstructed complete validator requests match accepted4ec6c696; native boundary/request comparisons also match. Installation and unknown-assembly refusals checked. Existing scheduler-disabled rendering retained explicitly. No #848 disclosure admission, execution/conversation replay or stochastic artifact equivalence."
+    },
+    {
+      "infra_revision": "f2e8d140dea2ba910a3845181c42d58f3bec79fc",
+      "assembly_sha256": "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b",
+      "scope": "Declared validator input disclosure with explicit v2 historical omission. Preserved47 historical boundary pairs and16 reconstructed full validator requests match pre-disclosure baseline; native12 declared requests change and4 absent-input requests remain identical. Live typed transport, probes and gates remain unchanged. Prompt rendering only; runtime verifier/preflight qualification and whole historical execution remain separate."
     }
   ],
   "scheduler_disabled_assemblies": [
@@ -104,6 +109,7 @@
     "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332",
     "a0fa4718d66213c7c6056aee3c1800c4f1a3c13de4da20c1e85018f7b35db308",
     "838a86cd2ae38e03caa6d7db9688b29f30247a6c0f5cd1e5db35d2a1a8d02b02",
-    "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f"
+    "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f",
+    "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b"
   ]
 }
