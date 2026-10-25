@@ -1,0 +1,33 @@
+{
+  "installed_source_files": 20,
+  "frozen_source_entries": 16,
+  "profiles": [
+    {
+      "name": "paper-early-v2",
+      "version": "2",
+      "content_sha256": "7321de0d6671e0775a3ebf207b596714377a37c241a3e9ed910db179e714a4df",
+      "assembly_sha256": "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f"
+    },
+    {
+      "name": "paper-late-v2",
+      "version": "2",
+      "content_sha256": "7321de0d6671e0775a3ebf207b596714377a37c241a3e9ed910db179e714a4df",
+      "assembly_sha256": "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f"
+    },
+    {
+      "name": "paper-tidmad-noprior-v2",
+      "version": "2",
+      "content_sha256": "98dcb46d99efe4221db2a82f2464813bb1401af8e47e1a7cdb62c02e3c159ba8",
+      "assembly_sha256": "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f"
+    },
+    {
+      "name": "paper-analysis-c0467447-v2",
+      "version": "2",
+      "content_sha256": "37c1590f3c785bc85b04ca5a3d02e351d296f38524b16b0a1d4ba7bb1d61cf7b",
+      "assembly_sha256": "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f"
+    }
+  ],
+  "unqualified_assembly_refusals": 4,
+  "api_calls": 0,
+  "training_calls": 0
+}

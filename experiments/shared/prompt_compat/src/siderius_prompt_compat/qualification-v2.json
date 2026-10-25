@@ -87,6 +87,11 @@
       "infra_revision": "4ec6c6968da61dc13a0d6d9acfa13fa56b53305b",
       "assembly_sha256": "838a86cd2ae38e03caa6d7db9688b29f30247a6c0f5cd1e5db35d2a1a8d02b02",
       "scope": "Live name collision validation permits verified same-name registered reuse. Frozen rendering boundaries and existing scripted requests unchanged; rejected historical control flow and arbitrary parameter rules are not replayed."
+    },
+    {
+      "infra_revision": "1f15ba6d470c64ec55ad8c0029cf7c1398db0cef",
+      "assembly_sha256": "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f",
+      "scope": "Pre-disclosure baseline qualification: 47 preserved historical boundary pairs and 16 reconstructed complete validator requests match accepted4ec6c696; native boundary/request comparisons also match. Installation and unknown-assembly refusals checked. Existing scheduler-disabled rendering retained explicitly. No #848 disclosure admission, execution/conversation replay or stochastic artifact equivalence."
     }
   ],
   "scheduler_disabled_assemblies": [
@@ -98,6 +103,7 @@
     "cea16b02f4dc19ca16d22d15ce9b9ee5e9b5769868514c0bdb2f784cebe08657",
     "8d758977a8f4bfe1f87b2fa86c7208bf3c7433199cd6141cb735e3f89db0a332",
     "a0fa4718d66213c7c6056aee3c1800c4f1a3c13de4da20c1e85018f7b35db308",
-    "838a86cd2ae38e03caa6d7db9688b29f30247a6c0f5cd1e5db35d2a1a8d02b02"
+    "838a86cd2ae38e03caa6d7db9688b29f30247a6c0f5cd1e5db35d2a1a8d02b02",
+    "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f"
   ]
 }

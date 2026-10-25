@@ -1,0 +1,513 @@
+{
+  "native": {
+    "reference": {
+      "infra_revision": "4ec6c6968da61dc13a0d6d9acfa13fa56b53305b",
+      "exp_revision": "701bb642d906b148022d1e5ba109909117bdcd17",
+      "exp_worktree_status": [
+        " M experiments/shared/prompt_compat/qualifications/validator-baseline/capture_requests.py",
+        "?? experiments/shared/prompt_compat/qualifications/validator-baseline/compare_requests.py"
+      ],
+      "source_closure": {
+        "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json": "a95d09e9fffe12d03a999bac9e5b964121a22b3e18a0c1df128dd990027aae8a",
+        "tasks/phyts_tess/compositions/rotation_regression.yaml": "3d3ace7150a1e9df59e5db7c0a81aa720543ad194e23610aec279e10390aa1cd",
+        "tasks/phyts_tess/declared/task_config.yaml": "074900ea2b73abba7ca0f01a654cf3d0bda4de6ef272b932a116b68f197f6fdf",
+        "experiments/shared/prompt_compat/fixtures/tess-implementor-reasoning.json": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+        "tasks/phyts_ligo/compositions/regression.yaml": "996ce947903a84d6c4f73b9882467f8a1fe17ae15a49f12640279b2d0ff0ed31",
+        "tasks/phyts_ligo/declared/task_config.yaml": "53387c2cc649ce8b47442b87aa2d3e0b8431bb188f20cb63949f0ec7993bcc8f",
+        "experiments/shared/prompt_compat/fixtures/ligo-implementor-reasoning.json": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+        "tasks/phyts_project8/compositions/dual_representation.yaml": "c2d63f9d16cd38b8df394d4599fa80978c5ddc8c7008f7bab8e5d9a29f08425b",
+        "tasks/phyts_project8/declared/dual_representation/task_config.yaml": "6cd8e10d8f494706e1f4152dbd455ef574190f0a44eb5a3f2c89e996278d114d",
+        "experiments/shared/prompt_compat/fixtures/project8-implementor-reasoning.json": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+        "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml": "1361d0a7da37ef0fad6b9b4691e40d4f4ac0c2c2735bd0018bbd5dc997f8e29c",
+        "tasks/tidmad/declared/task_config_regression.yaml": "3a3127278e5fff60853f38c5a478ebfb9214f657ac327374d0a69e4417c819b0",
+        "experiments/shared/prompt_compat/fixtures/tidmad-implementor-reasoning.json": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5"
+      },
+      "includes_segmentation": false,
+      "tool_sha256": "cca31c43e1969021544d91f8c40f31f440498e9b3521bf3f32b67f82aeae19a2",
+      "scope": "Source-reconstructed final requests through real _llm_review, synthetic plugin/errors/advice; not archived wire or model-execution equivalence",
+      "api_calls": 0,
+      "training_calls": 0
+    },
+    "candidate": {
+      "infra_revision": "1f15ba6d470c64ec55ad8c0029cf7c1398db0cef",
+      "exp_revision": "701bb642d906b148022d1e5ba109909117bdcd17",
+      "exp_worktree_status": [
+        " M experiments/shared/prompt_compat/qualifications/validator-baseline/capture_requests.py",
+        "?? experiments/shared/prompt_compat/qualifications/validator-baseline/compare_requests.py"
+      ],
+      "source_closure": {
+        "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json": "a95d09e9fffe12d03a999bac9e5b964121a22b3e18a0c1df128dd990027aae8a",
+        "tasks/phyts_tess/compositions/rotation_regression.yaml": "3d3ace7150a1e9df59e5db7c0a81aa720543ad194e23610aec279e10390aa1cd",
+        "tasks/phyts_tess/declared/task_config.yaml": "074900ea2b73abba7ca0f01a654cf3d0bda4de6ef272b932a116b68f197f6fdf",
+        "experiments/shared/prompt_compat/fixtures/tess-implementor-reasoning.json": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+        "tasks/phyts_ligo/compositions/regression.yaml": "996ce947903a84d6c4f73b9882467f8a1fe17ae15a49f12640279b2d0ff0ed31",
+        "tasks/phyts_ligo/declared/task_config.yaml": "53387c2cc649ce8b47442b87aa2d3e0b8431bb188f20cb63949f0ec7993bcc8f",
+        "experiments/shared/prompt_compat/fixtures/ligo-implementor-reasoning.json": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+        "tasks/phyts_project8/compositions/dual_representation.yaml": "c2d63f9d16cd38b8df394d4599fa80978c5ddc8c7008f7bab8e5d9a29f08425b",
+        "tasks/phyts_project8/declared/dual_representation/task_config.yaml": "6cd8e10d8f494706e1f4152dbd455ef574190f0a44eb5a3f2c89e996278d114d",
+        "experiments/shared/prompt_compat/fixtures/project8-implementor-reasoning.json": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+        "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml": "1361d0a7da37ef0fad6b9b4691e40d4f4ac0c2c2735bd0018bbd5dc997f8e29c",
+        "tasks/tidmad/declared/task_config_regression.yaml": "3a3127278e5fff60853f38c5a478ebfb9214f657ac327374d0a69e4417c819b0",
+        "experiments/shared/prompt_compat/fixtures/tidmad-implementor-reasoning.json": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5"
+      },
+      "includes_segmentation": false,
+      "tool_sha256": "cca31c43e1969021544d91f8c40f31f440498e9b3521bf3f32b67f82aeae19a2",
+      "scope": "Source-reconstructed final requests through real _llm_review, synthetic plugin/errors/advice; not archived wire or model-execution equivalence",
+      "api_calls": 0,
+      "training_calls": 0
+    },
+    "results": [
+      {
+        "case": "ligo-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "49df4d9db62537d04e20e0df04f9a7b172aee997cd74cebd8155ae6c4a982201"
+        },
+        "candidate": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "49df4d9db62537d04e20e0df04f9a7b172aee997cd74cebd8155ae6c4a982201"
+        }
+      },
+      {
+        "case": "ligo-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "49df4d9db62537d04e20e0df04f9a7b172aee997cd74cebd8155ae6c4a982201"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "49df4d9db62537d04e20e0df04f9a7b172aee997cd74cebd8155ae6c4a982201"
+        }
+      },
+      {
+        "case": "ligo-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "d2ea298cf21a0f941f604e7b836bd47d2c3814c4d16da82e8d7edb800a223e46"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "d2ea298cf21a0f941f604e7b836bd47d2c3814c4d16da82e8d7edb800a223e46"
+        }
+      },
+      {
+        "case": "ligo-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "7d231dd55ec4deb3a4ffc6d524874b40e997b0a6efd091a9d59b67615dc43ca0"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "7d231dd55ec4deb3a4ffc6d524874b40e997b0a6efd091a9d59b67615dc43ca0"
+        }
+      },
+      {
+        "case": "project8-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "91de2af10aac309aab12c2a664d8ccc0fb760a59fe3ae005b511d1c347eef5af"
+        },
+        "candidate": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "91de2af10aac309aab12c2a664d8ccc0fb760a59fe3ae005b511d1c347eef5af"
+        }
+      },
+      {
+        "case": "project8-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "91de2af10aac309aab12c2a664d8ccc0fb760a59fe3ae005b511d1c347eef5af"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "91de2af10aac309aab12c2a664d8ccc0fb760a59fe3ae005b511d1c347eef5af"
+        }
+      },
+      {
+        "case": "project8-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "b35e6ef31e339514b0f732663558f75787132d1562ecc33b661d6c4f99624027"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "b35e6ef31e339514b0f732663558f75787132d1562ecc33b661d6c4f99624027"
+        }
+      },
+      {
+        "case": "project8-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "d2917e8f1ec794db480fb0cac29e06c917752afb2191b9193ceff472fdde78e7"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "d2917e8f1ec794db480fb0cac29e06c917752afb2191b9193ceff472fdde78e7"
+        }
+      },
+      {
+        "case": "tess-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "783e0867d68d43750d13a34ccd1f3e287fa08919d92646c46c7e24d1a603a0cd"
+        },
+        "candidate": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "783e0867d68d43750d13a34ccd1f3e287fa08919d92646c46c7e24d1a603a0cd"
+        }
+      },
+      {
+        "case": "tess-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "783e0867d68d43750d13a34ccd1f3e287fa08919d92646c46c7e24d1a603a0cd"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "783e0867d68d43750d13a34ccd1f3e287fa08919d92646c46c7e24d1a603a0cd"
+        }
+      },
+      {
+        "case": "tess-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "feb258daed2633b0dec94df178987c64ed350ac1acb0b36a62442d4fbf9a87ea"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "feb258daed2633b0dec94df178987c64ed350ac1acb0b36a62442d4fbf9a87ea"
+        }
+      },
+      {
+        "case": "tess-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "f3f0c6035fdefc2d1c977dbe6b915b206590d866ac11f119ee7b1370fa48bae6"
+        },
+        "candidate": {
+          "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+          "user": "f3f0c6035fdefc2d1c977dbe6b915b206590d866ac11f119ee7b1370fa48bae6"
+        }
+      },
+      {
+        "case": "tidmad-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "35d1acba25a2b169f0feb9465e5ad0084eef675deebbc67e11686713b86c8a58"
+        },
+        "candidate": {
+          "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+          "user": "35d1acba25a2b169f0feb9465e5ad0084eef675deebbc67e11686713b86c8a58"
+        }
+      },
+      {
+        "case": "tidmad-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+          "user": "35d1acba25a2b169f0feb9465e5ad0084eef675deebbc67e11686713b86c8a58"
+        },
+        "candidate": {
+          "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+          "user": "35d1acba25a2b169f0feb9465e5ad0084eef675deebbc67e11686713b86c8a58"
+        }
+      },
+      {
+        "case": "tidmad-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+          "user": "9597e4fca3ff5c0b8493f655c5fa3a78c58f844099ebb4cbfeedc2689b8ddbd6"
+        },
+        "candidate": {
+          "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+          "user": "9597e4fca3ff5c0b8493f655c5fa3a78c58f844099ebb4cbfeedc2689b8ddbd6"
+        }
+      },
+      {
+        "case": "tidmad-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+          "user": "eb311518b8c76af0306135b9c9bb21b2a940ddfed7f9003639ec16e628776bdb"
+        },
+        "candidate": {
+          "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+          "user": "eb311518b8c76af0306135b9c9bb21b2a940ddfed7f9003639ec16e628776bdb"
+        }
+      }
+    ]
+  },
+  "historical": {
+    "reference": {
+      "infra_revision": "4ec6c6968da61dc13a0d6d9acfa13fa56b53305b",
+      "exp_revision": "701bb642d906b148022d1e5ba109909117bdcd17",
+      "exp_worktree_status": [
+        " M experiments/shared/prompt_compat/qualifications/validator-baseline/capture_requests.py",
+        "?? experiments/shared/prompt_compat/qualifications/validator-baseline/compare_requests.py"
+      ],
+      "source_closure": {
+        "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json": "a95d09e9fffe12d03a999bac9e5b964121a22b3e18a0c1df128dd990027aae8a",
+        "tasks/phyts_tess/compositions/rotation_regression.yaml": "3d3ace7150a1e9df59e5db7c0a81aa720543ad194e23610aec279e10390aa1cd",
+        "tasks/phyts_tess/declared/task_config.yaml": "074900ea2b73abba7ca0f01a654cf3d0bda4de6ef272b932a116b68f197f6fdf",
+        "experiments/shared/prompt_compat/fixtures/tess-implementor-reasoning.json": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+        "tasks/phyts_ligo/compositions/regression.yaml": "996ce947903a84d6c4f73b9882467f8a1fe17ae15a49f12640279b2d0ff0ed31",
+        "tasks/phyts_ligo/declared/task_config.yaml": "53387c2cc649ce8b47442b87aa2d3e0b8431bb188f20cb63949f0ec7993bcc8f",
+        "experiments/shared/prompt_compat/fixtures/ligo-implementor-reasoning.json": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+        "tasks/phyts_project8/compositions/dual_representation.yaml": "c2d63f9d16cd38b8df394d4599fa80978c5ddc8c7008f7bab8e5d9a29f08425b",
+        "tasks/phyts_project8/declared/dual_representation/task_config.yaml": "6cd8e10d8f494706e1f4152dbd455ef574190f0a44eb5a3f2c89e996278d114d",
+        "experiments/shared/prompt_compat/fixtures/project8-implementor-reasoning.json": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+        "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml": "1361d0a7da37ef0fad6b9b4691e40d4f4ac0c2c2735bd0018bbd5dc997f8e29c",
+        "tasks/tidmad/declared/task_config_regression.yaml": "3a3127278e5fff60853f38c5a478ebfb9214f657ac327374d0a69e4417c819b0",
+        "experiments/shared/prompt_compat/fixtures/tidmad-implementor-reasoning.json": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5"
+      },
+      "includes_segmentation": false,
+      "tool_sha256": "cca31c43e1969021544d91f8c40f31f440498e9b3521bf3f32b67f82aeae19a2",
+      "scope": "Source-reconstructed final requests through real _llm_review, synthetic plugin/errors/advice; not archived wire or model-execution equivalence",
+      "api_calls": 0,
+      "training_calls": 0
+    },
+    "candidate": {
+      "infra_revision": "1f15ba6d470c64ec55ad8c0029cf7c1398db0cef",
+      "exp_revision": "701bb642d906b148022d1e5ba109909117bdcd17",
+      "exp_worktree_status": [
+        " M experiments/shared/prompt_compat/qualifications/validator-baseline/capture_requests.py",
+        "?? experiments/shared/prompt_compat/qualifications/validator-baseline/compare_requests.py"
+      ],
+      "source_closure": {
+        "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json": "a95d09e9fffe12d03a999bac9e5b964121a22b3e18a0c1df128dd990027aae8a",
+        "tasks/phyts_tess/compositions/rotation_regression.yaml": "3d3ace7150a1e9df59e5db7c0a81aa720543ad194e23610aec279e10390aa1cd",
+        "tasks/phyts_tess/declared/task_config.yaml": "074900ea2b73abba7ca0f01a654cf3d0bda4de6ef272b932a116b68f197f6fdf",
+        "experiments/shared/prompt_compat/fixtures/tess-implementor-reasoning.json": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+        "tasks/phyts_ligo/compositions/regression.yaml": "996ce947903a84d6c4f73b9882467f8a1fe17ae15a49f12640279b2d0ff0ed31",
+        "tasks/phyts_ligo/declared/task_config.yaml": "53387c2cc649ce8b47442b87aa2d3e0b8431bb188f20cb63949f0ec7993bcc8f",
+        "experiments/shared/prompt_compat/fixtures/ligo-implementor-reasoning.json": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+        "tasks/phyts_project8/compositions/dual_representation.yaml": "c2d63f9d16cd38b8df394d4599fa80978c5ddc8c7008f7bab8e5d9a29f08425b",
+        "tasks/phyts_project8/declared/dual_representation/task_config.yaml": "6cd8e10d8f494706e1f4152dbd455ef574190f0a44eb5a3f2c89e996278d114d",
+        "experiments/shared/prompt_compat/fixtures/project8-implementor-reasoning.json": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+        "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml": "1361d0a7da37ef0fad6b9b4691e40d4f4ac0c2c2735bd0018bbd5dc997f8e29c",
+        "tasks/tidmad/declared/task_config_regression.yaml": "3a3127278e5fff60853f38c5a478ebfb9214f657ac327374d0a69e4417c819b0",
+        "experiments/shared/prompt_compat/fixtures/tidmad-implementor-reasoning.json": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5"
+      },
+      "includes_segmentation": false,
+      "tool_sha256": "cca31c43e1969021544d91f8c40f31f440498e9b3521bf3f32b67f82aeae19a2",
+      "scope": "Source-reconstructed final requests through real _llm_review, synthetic plugin/errors/advice; not archived wire or model-execution equivalence",
+      "api_calls": 0,
+      "training_calls": 0
+    },
+    "results": [
+      {
+        "case": "ligo-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+          "user": "2272a123dd9d734527de48aa39a865decd4b9726d8c2d0d8b8b221c2ceb77298"
+        },
+        "candidate": {
+          "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+          "user": "2272a123dd9d734527de48aa39a865decd4b9726d8c2d0d8b8b221c2ceb77298"
+        }
+      },
+      {
+        "case": "ligo-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "2272a123dd9d734527de48aa39a865decd4b9726d8c2d0d8b8b221c2ceb77298"
+        },
+        "candidate": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "2272a123dd9d734527de48aa39a865decd4b9726d8c2d0d8b8b221c2ceb77298"
+        }
+      },
+      {
+        "case": "ligo-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "e43ec9a206f80da04713d7eb9e6ea8436f4c13dac1024a72b49f5719c9abc596"
+        },
+        "candidate": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "e43ec9a206f80da04713d7eb9e6ea8436f4c13dac1024a72b49f5719c9abc596"
+        }
+      },
+      {
+        "case": "ligo-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "9ce294b3d7166c401cc51f855d7633d19c96fa39dc7e6d6217654f6bd3fab785"
+        },
+        "candidate": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "9ce294b3d7166c401cc51f855d7633d19c96fa39dc7e6d6217654f6bd3fab785"
+        }
+      },
+      {
+        "case": "project8-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "2e96db47126d24f9fe8e1df4698b29fd7c022723502cb876eec3d7ac88ffbd52",
+          "user": "c48e25e91624fe3dd6ffbda995bf03c267ed72729449bc1f8fafaed546957c4d"
+        },
+        "candidate": {
+          "system": "2e96db47126d24f9fe8e1df4698b29fd7c022723502cb876eec3d7ac88ffbd52",
+          "user": "c48e25e91624fe3dd6ffbda995bf03c267ed72729449bc1f8fafaed546957c4d"
+        }
+      },
+      {
+        "case": "project8-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "c3ecb615029a41015696c60a64229a115b81324eeeefd1fc8ec36ac2ac7ff2a6",
+          "user": "c48e25e91624fe3dd6ffbda995bf03c267ed72729449bc1f8fafaed546957c4d"
+        },
+        "candidate": {
+          "system": "c3ecb615029a41015696c60a64229a115b81324eeeefd1fc8ec36ac2ac7ff2a6",
+          "user": "c48e25e91624fe3dd6ffbda995bf03c267ed72729449bc1f8fafaed546957c4d"
+        }
+      },
+      {
+        "case": "project8-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "c3ecb615029a41015696c60a64229a115b81324eeeefd1fc8ec36ac2ac7ff2a6",
+          "user": "7abbc6f11a9a0e5178d5a31e216012f17d20356e6e46a7247f1eb36d546238aa"
+        },
+        "candidate": {
+          "system": "c3ecb615029a41015696c60a64229a115b81324eeeefd1fc8ec36ac2ac7ff2a6",
+          "user": "7abbc6f11a9a0e5178d5a31e216012f17d20356e6e46a7247f1eb36d546238aa"
+        }
+      },
+      {
+        "case": "project8-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "c3ecb615029a41015696c60a64229a115b81324eeeefd1fc8ec36ac2ac7ff2a6",
+          "user": "098387e128ee65620f7da27f7bf7cc0c7797f7844a683e545752bc06b7dc9d36"
+        },
+        "candidate": {
+          "system": "c3ecb615029a41015696c60a64229a115b81324eeeefd1fc8ec36ac2ac7ff2a6",
+          "user": "098387e128ee65620f7da27f7bf7cc0c7797f7844a683e545752bc06b7dc9d36"
+        }
+      },
+      {
+        "case": "tess-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+          "user": "8458b4f9088dbe871c48b9da0dc3394209fe2d98343b60c62e63ad9644629269"
+        },
+        "candidate": {
+          "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+          "user": "8458b4f9088dbe871c48b9da0dc3394209fe2d98343b60c62e63ad9644629269"
+        }
+      },
+      {
+        "case": "tess-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "8458b4f9088dbe871c48b9da0dc3394209fe2d98343b60c62e63ad9644629269"
+        },
+        "candidate": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "8458b4f9088dbe871c48b9da0dc3394209fe2d98343b60c62e63ad9644629269"
+        }
+      },
+      {
+        "case": "tess-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "2298a4aba53e3ccec9497147de627b42ef43d86554c433d8f3247dea10f9b4a8"
+        },
+        "candidate": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "2298a4aba53e3ccec9497147de627b42ef43d86554c433d8f3247dea10f9b4a8"
+        }
+      },
+      {
+        "case": "tess-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "c43017e317d6aff96f8cb71a802abf39cbe0edcebd39f4d87ad82728074e7139"
+        },
+        "candidate": {
+          "system": "6e914d2d68175f82f42cef97ea31edb2daef36c99002053a787410614425322b",
+          "user": "c43017e317d6aff96f8cb71a802abf39cbe0edcebd39f4d87ad82728074e7139"
+        }
+      },
+      {
+        "case": "tidmad-absent",
+        "expected_change": false,
+        "reference": {
+          "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+          "user": "5f7f878a5d787422d8b63d51f0f4d7523fe413947e1013c3e1a57de054bb0c9b"
+        },
+        "candidate": {
+          "system": "7af32005aa7f3c721a8a4150f3f50a605b1e2c04b62f37eee303760d40292532",
+          "user": "5f7f878a5d787422d8b63d51f0f4d7523fe413947e1013c3e1a57de054bb0c9b"
+        }
+      },
+      {
+        "case": "tidmad-clean",
+        "expected_change": false,
+        "reference": {
+          "system": "b6d2b4d259ce5b031f0dd642f4c8b443aef3636672ce3af5323fc862325dd2e8",
+          "user": "5f7f878a5d787422d8b63d51f0f4d7523fe413947e1013c3e1a57de054bb0c9b"
+        },
+        "candidate": {
+          "system": "b6d2b4d259ce5b031f0dd642f4c8b443aef3636672ce3af5323fc862325dd2e8",
+          "user": "5f7f878a5d787422d8b63d51f0f4d7523fe413947e1013c3e1a57de054bb0c9b"
+        }
+      },
+      {
+        "case": "tidmad-gradient",
+        "expected_change": false,
+        "reference": {
+          "system": "b6d2b4d259ce5b031f0dd642f4c8b443aef3636672ce3af5323fc862325dd2e8",
+          "user": "92a105a847afe95cd2f1b7414fb483e3112616b67a57d9d85c7c06f077491469"
+        },
+        "candidate": {
+          "system": "b6d2b4d259ce5b031f0dd642f4c8b443aef3636672ce3af5323fc862325dd2e8",
+          "user": "92a105a847afe95cd2f1b7414fb483e3112616b67a57d9d85c7c06f077491469"
+        }
+      },
+      {
+        "case": "tidmad-pytest",
+        "expected_change": false,
+        "reference": {
+          "system": "b6d2b4d259ce5b031f0dd642f4c8b443aef3636672ce3af5323fc862325dd2e8",
+          "user": "5e68113a3f5e7d8ef524c6f6235c28ad63f08022b5a182be75e577bd3a865aff"
+        },
+        "candidate": {
+          "system": "b6d2b4d259ce5b031f0dd642f4c8b443aef3636672ce3af5323fc862325dd2e8",
+          "user": "5e68113a3f5e7d8ef524c6f6235c28ad63f08022b5a182be75e577bd3a865aff"
+        }
+      }
+    ]
+  },
+  "discrimination": [
+    "missing_case",
+    "different_system",
+    "different_user",
+    "different_contract",
+    "wrong_revision"
+  ]
+}
