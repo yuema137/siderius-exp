@@ -29,11 +29,9 @@
   },
   "candidate": {
     "infra_revision": "f2e8d140dea2ba910a3845181c42d58f3bec79fc",
-    "exp_revision": "56edc0974fbb83d6b10e7ea0586c19aad1d48a0f",
+    "exp_revision": "a3b013f41241d9b8f9cfa1f3c7588adb7e128832",
     "exp_worktree_status": [
-      " M experiments/shared/prompt_compat/pyproject.toml",
-      " M experiments/shared/prompt_compat/src/siderius_prompt_compat/__init__.py",
-      " M experiments/shared/prompt_compat/src/siderius_prompt_compat/qualification-v2.json"
+      "?? experiments/shared/prompt_compat/qualifications/validator-input-disclosure/installation.json"
     ],
     "source_closure": {
       "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json": "a95d09e9fffe12d03a999bac9e5b964121a22b3e18a0c1df128dd990027aae8a",

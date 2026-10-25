@@ -65,3 +65,15 @@ remains REQUIRED/PENDING under root's separate authorization. No paid/API/traini
 or GPU execution is part of these receipts. Whole historical paper-pair readiness
 also remains pending exp#276/#277; current runtime0.1.6 refuses the newer verifier
 assembly. This PR does not add a runtime/preflight qualification or waive that gap.
+
+## Final source and evidence binding
+
+Final package source was committed as expa3b013f. The final47 captures, complete16
+historical requests and73 package tests were rerun after final qualification scope
+wording, so profile content hashes agree with `installation.json`. The following
+commit only records these receipts; package source is unchanged. Capture metadata
+explicitly records the untracked installation receipt, rather than claiming a
+completely clean exp worktree. Framework source remained cleanf2e8d140 throughout.
+`corpus-receipt.json` links every request hash and capture source to the original
+frozen receipt hash and final installed identities. No new acceptance is inferred
+from package version or an assembly digest alone.
