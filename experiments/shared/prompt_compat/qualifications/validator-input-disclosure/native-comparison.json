@@ -1,0 +1,249 @@
+{
+  "reference": {
+    "infra_revision": "1f15ba6d470c64ec55ad8c0029cf7c1398db0cef",
+    "exp_revision": "701bb642d906b148022d1e5ba109909117bdcd17",
+    "exp_worktree_status": [
+      " M experiments/shared/prompt_compat/qualifications/validator-baseline/capture_requests.py",
+      "?? experiments/shared/prompt_compat/qualifications/validator-baseline/compare_requests.py"
+    ],
+    "source_closure": {
+      "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json": "a95d09e9fffe12d03a999bac9e5b964121a22b3e18a0c1df128dd990027aae8a",
+      "tasks/phyts_tess/compositions/rotation_regression.yaml": "3d3ace7150a1e9df59e5db7c0a81aa720543ad194e23610aec279e10390aa1cd",
+      "tasks/phyts_tess/declared/task_config.yaml": "074900ea2b73abba7ca0f01a654cf3d0bda4de6ef272b932a116b68f197f6fdf",
+      "experiments/shared/prompt_compat/fixtures/tess-implementor-reasoning.json": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+      "tasks/phyts_ligo/compositions/regression.yaml": "996ce947903a84d6c4f73b9882467f8a1fe17ae15a49f12640279b2d0ff0ed31",
+      "tasks/phyts_ligo/declared/task_config.yaml": "53387c2cc649ce8b47442b87aa2d3e0b8431bb188f20cb63949f0ec7993bcc8f",
+      "experiments/shared/prompt_compat/fixtures/ligo-implementor-reasoning.json": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+      "tasks/phyts_project8/compositions/dual_representation.yaml": "c2d63f9d16cd38b8df394d4599fa80978c5ddc8c7008f7bab8e5d9a29f08425b",
+      "tasks/phyts_project8/declared/dual_representation/task_config.yaml": "6cd8e10d8f494706e1f4152dbd455ef574190f0a44eb5a3f2c89e996278d114d",
+      "experiments/shared/prompt_compat/fixtures/project8-implementor-reasoning.json": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+      "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml": "1361d0a7da37ef0fad6b9b4691e40d4f4ac0c2c2735bd0018bbd5dc997f8e29c",
+      "tasks/tidmad/declared/task_config_regression.yaml": "3a3127278e5fff60853f38c5a478ebfb9214f657ac327374d0a69e4417c819b0",
+      "experiments/shared/prompt_compat/fixtures/tidmad-implementor-reasoning.json": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5"
+    },
+    "includes_segmentation": false,
+    "tool_sha256": "cca31c43e1969021544d91f8c40f31f440498e9b3521bf3f32b67f82aeae19a2",
+    "scope": "Source-reconstructed final requests through real _llm_review, synthetic plugin/errors/advice; not archived wire or model-execution equivalence",
+    "api_calls": 0,
+    "training_calls": 0
+  },
+  "candidate": {
+    "infra_revision": "f2e8d140dea2ba910a3845181c42d58f3bec79fc",
+    "exp_revision": "56edc0974fbb83d6b10e7ea0586c19aad1d48a0f",
+    "exp_worktree_status": [],
+    "source_closure": {
+      "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json": "a95d09e9fffe12d03a999bac9e5b964121a22b3e18a0c1df128dd990027aae8a",
+      "tasks/phyts_tess/compositions/rotation_regression.yaml": "3d3ace7150a1e9df59e5db7c0a81aa720543ad194e23610aec279e10390aa1cd",
+      "tasks/phyts_tess/declared/task_config.yaml": "074900ea2b73abba7ca0f01a654cf3d0bda4de6ef272b932a116b68f197f6fdf",
+      "experiments/shared/prompt_compat/fixtures/tess-implementor-reasoning.json": "9a8f1ac29c32ff187d1fcd47cf7609ccd6000710f7c9fd0c0461ff20b842b28d",
+      "tasks/phyts_ligo/compositions/regression.yaml": "996ce947903a84d6c4f73b9882467f8a1fe17ae15a49f12640279b2d0ff0ed31",
+      "tasks/phyts_ligo/declared/task_config.yaml": "53387c2cc649ce8b47442b87aa2d3e0b8431bb188f20cb63949f0ec7993bcc8f",
+      "experiments/shared/prompt_compat/fixtures/ligo-implementor-reasoning.json": "bd9712391d73d3fc092a6daa491da307d625f2034054e27e6873d5f1908fc17b",
+      "tasks/phyts_project8/compositions/dual_representation.yaml": "c2d63f9d16cd38b8df394d4599fa80978c5ddc8c7008f7bab8e5d9a29f08425b",
+      "tasks/phyts_project8/declared/dual_representation/task_config.yaml": "6cd8e10d8f494706e1f4152dbd455ef574190f0a44eb5a3f2c89e996278d114d",
+      "experiments/shared/prompt_compat/fixtures/project8-implementor-reasoning.json": "eab2adc876d23c618b8dcf9cc484766211de83e423c6c00965425e4b664c3e78",
+      "tasks/tidmad/compositions/continuous_regression_frozen_pool.yaml": "1361d0a7da37ef0fad6b9b4691e40d4f4ac0c2c2735bd0018bbd5dc997f8e29c",
+      "tasks/tidmad/declared/task_config_regression.yaml": "3a3127278e5fff60853f38c5a478ebfb9214f657ac327374d0a69e4417c819b0",
+      "experiments/shared/prompt_compat/fixtures/tidmad-implementor-reasoning.json": "f7b796331f977a57ffdbfc2eee32fbb2e8b2fbb62e67a6e1d4f39af6601a92b5"
+    },
+    "includes_segmentation": true,
+    "tool_sha256": "cca31c43e1969021544d91f8c40f31f440498e9b3521bf3f32b67f82aeae19a2",
+    "scope": "Source-reconstructed final requests through real _llm_review, synthetic plugin/errors/advice; not archived wire or model-execution equivalence",
+    "api_calls": 0,
+    "training_calls": 0
+  },
+  "results": [
+    {
+      "case": "ligo-absent",
+      "expected_change": false,
+      "reference": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "49df4d9db62537d04e20e0df04f9a7b172aee997cd74cebd8155ae6c4a982201"
+      },
+      "candidate": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "49df4d9db62537d04e20e0df04f9a7b172aee997cd74cebd8155ae6c4a982201"
+      }
+    },
+    {
+      "case": "ligo-clean",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "49df4d9db62537d04e20e0df04f9a7b172aee997cd74cebd8155ae6c4a982201"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "e1e0c5efe22910a08713bfa0a74860fc8c2587b64483b96e8c23712270e3caf3"
+      }
+    },
+    {
+      "case": "ligo-gradient",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "d2ea298cf21a0f941f604e7b836bd47d2c3814c4d16da82e8d7edb800a223e46"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "367063c8cd9a4f35737d773f76801a56023e04fa0c59e28cd173567878228db7"
+      }
+    },
+    {
+      "case": "ligo-pytest",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "7d231dd55ec4deb3a4ffc6d524874b40e997b0a6efd091a9d59b67615dc43ca0"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "d161991c17daa3578ef2cc8c5787b80516c7872342ded96255e8f1b656b68c6e"
+      }
+    },
+    {
+      "case": "project8-absent",
+      "expected_change": false,
+      "reference": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "91de2af10aac309aab12c2a664d8ccc0fb760a59fe3ae005b511d1c347eef5af"
+      },
+      "candidate": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "91de2af10aac309aab12c2a664d8ccc0fb760a59fe3ae005b511d1c347eef5af"
+      }
+    },
+    {
+      "case": "project8-clean",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "91de2af10aac309aab12c2a664d8ccc0fb760a59fe3ae005b511d1c347eef5af"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "bf7bba14c4de1a0a84e5dcda385b38445ddfbe73c259326c8d3492592d4a108e"
+      }
+    },
+    {
+      "case": "project8-gradient",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "b35e6ef31e339514b0f732663558f75787132d1562ecc33b661d6c4f99624027"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "d4aff336b2f6ac0050f2c5bf6ab263418b43bfe38e747c8eb4d7ee9ec6581814"
+      }
+    },
+    {
+      "case": "project8-pytest",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "d2917e8f1ec794db480fb0cac29e06c917752afb2191b9193ceff472fdde78e7"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "16c987f656c9caaa2ae3112c979b17e1ee88fdb67029cdec3dbead5bc8afe72d"
+      }
+    },
+    {
+      "case": "tess-absent",
+      "expected_change": false,
+      "reference": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "783e0867d68d43750d13a34ccd1f3e287fa08919d92646c46c7e24d1a603a0cd"
+      },
+      "candidate": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "783e0867d68d43750d13a34ccd1f3e287fa08919d92646c46c7e24d1a603a0cd"
+      }
+    },
+    {
+      "case": "tess-clean",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "783e0867d68d43750d13a34ccd1f3e287fa08919d92646c46c7e24d1a603a0cd"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "8b320053017b089687801de6b1fe10797c5fc910d1cd7246bfb3227cabcaf282"
+      }
+    },
+    {
+      "case": "tess-gradient",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "feb258daed2633b0dec94df178987c64ed350ac1acb0b36a62442d4fbf9a87ea"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "1309d510334ac85b936c2944e48b44a51bf6168b1ba4f4578dc5b3650402d336"
+      }
+    },
+    {
+      "case": "tess-pytest",
+      "expected_change": true,
+      "reference": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "f3f0c6035fdefc2d1c977dbe6b915b206590d866ac11f119ee7b1370fa48bae6"
+      },
+      "candidate": {
+        "system": "e56cf836429489d5f81a5c3e42cdba7b34a46f462217466cb013863e7fd2092d",
+        "user": "50f141ba22b365dcf2f97a7b8c68f40d426a40f8d6716573b6bcb8e099dfcdbd"
+      }
+    },
+    {
+      "case": "tidmad-absent",
+      "expected_change": false,
+      "reference": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "35d1acba25a2b169f0feb9465e5ad0084eef675deebbc67e11686713b86c8a58"
+      },
+      "candidate": {
+        "system": "4f1c0e838abaa2a086b91299ac252e6740f5e0998b20480f60de808d5c664f9e",
+        "user": "35d1acba25a2b169f0feb9465e5ad0084eef675deebbc67e11686713b86c8a58"
+      }
+    },
+    {
+      "case": "tidmad-clean",
+      "expected_change": true,
+      "reference": {
+        "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+        "user": "35d1acba25a2b169f0feb9465e5ad0084eef675deebbc67e11686713b86c8a58"
+      },
+      "candidate": {
+        "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+        "user": "048ff015226eefc47104c030c46bbaf8ad778ea63a77a1b591a68bdf5573841b"
+      }
+    },
+    {
+      "case": "tidmad-gradient",
+      "expected_change": true,
+      "reference": {
+        "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+        "user": "9597e4fca3ff5c0b8493f655c5fa3a78c58f844099ebb4cbfeedc2689b8ddbd6"
+      },
+      "candidate": {
+        "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+        "user": "12fd977fb4c4e0a4629df1df26395b928262bd6e1a0a921a408b0cfb0a06b501"
+      }
+    },
+    {
+      "case": "tidmad-pytest",
+      "expected_change": true,
+      "reference": {
+        "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+        "user": "eb311518b8c76af0306135b9c9bb21b2a940ddfed7f9003639ec16e628776bdb"
+      },
+      "candidate": {
+        "system": "29cb91c3e5f6326b8f804c71a9615a8eb38cd57703b7264c1c15b353a3e49acd",
+        "user": "31126a1c445a60b20702889ae3c3d4f1f857bf40acf081e928b6ccb98230f53c"
+      }
+    }
+  ]
+}
