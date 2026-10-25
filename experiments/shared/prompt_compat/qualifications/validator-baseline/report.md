@@ -75,7 +75,7 @@ checkout's `.venv/bin/python`, `--request`, a fresh `--output`, and the exact
 and then compare historical hashes to the unchanged registered-reuse receipt.
 No new corpus runner is introduced.
 
-Run `capture_requests.py --exp EXP --expected-revision REV --output FRESH.json`
+Run `capture_requests.py --exp EXP --expected-exp-revision EXP_REV --expected-revision REV --output FRESH.json`
 from this directory with each selected infra interpreter, once natively and once
 with `--historical`. Compare complete `rows` for equality before summarizing hashes;
 metadata revisions intentionally differ. This retained script contains all fixture
@@ -85,3 +85,14 @@ Run prompt-package tests with `SIDERIUS_CHECKOUT` explicitly selecting the candi
 and the candidate result-interpretation test directory. The separate runtime
 refusal can be reproduced with the ancillary planner tests and unchanged installed
 planner/runtime packages; it is expected to remain a blocker outside this PR.
+
+The retained full-request comparator is `compare_requests.py`. Supply both captures,
+expected infra revisions and a fresh output. It checks the exact16-case set,
+normalized inputs and complete system/user text before recording hashes. Missing
+cases, changed system/user text, changed contracts and wrong revisions were each
+rejected by a mutation witness. Capture receipts now retain hashes of the profile
+mapping, compositions, configs and original implementor fixtures, alongside the
+helper hash and explicit exp worktree status. The current captures were produced
+against701bb64 with only qualification-helper development changes recorded as
+dirty; scientific inputs and installed package source were unchanged. This is
+explicit candidate-tool provenance, not a clean-exp-head claim.

@@ -32,6 +32,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--exp", required=True, type=Path)
     parser.add_argument("--expected-revision", required=True)
+    parser.add_argument("--expected-exp-revision", required=True)
+    parser.add_argument("--include-segmentation", action="store_true")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--historical", action="store_true")
     a = parser.parse_args()
@@ -70,6 +72,15 @@ def main():
         / "experiments/shared/prompt_compat/profiles/paper-constraint-disclosure-v2.json"
     )
     selected = json.loads(profile_spec.read_text())["cases"]
+    exp_revision = subprocess.check_output(
+        ["git", "-C", str(a.exp), "rev-parse", "HEAD"], text=True
+    ).strip()
+    require(exp_revision == a.expected_exp_revision, "Experiment revision mismatch")
+    sources = {
+        str(profile_spec.relative_to(a.exp)): hashlib.sha256(
+            profile_spec.read_bytes()
+        ).hexdigest()
+    }
     rows = []
 
     class Recorder:
@@ -97,12 +108,16 @@ def main():
         contract = resolve_model_io_contract(
             ModelIOContract.model_validate(fc["model_io"]), preset=fc.get("preset")
         )
-        original = json.loads(
-            (
-                a.exp
-                / f"experiments/shared/prompt_compat/fixtures/{task}-implementor-reasoning.json"
-            ).read_text()
-        )["arguments"]["input"]
+        fixture = (
+            a.exp
+            / f"experiments/shared/prompt_compat/fixtures/{task}-implementor-reasoning.json"
+        )
+        original = json.loads(fixture.read_text())["arguments"]["input"]
+        for source in (composition, config_path, fixture):
+            sources[str(source.relative_to(a.exp))] = hashlib.sha256(
+                source.read_bytes()
+            ).hexdigest()
+
         profile_name = selection["task_composition_overlay"]["prompt_renderer"]
         profile = resolve_prompt_profile(profile_name) if a.historical else None
         for variant in ("clean", "pytest", "gradient", "absent"):
@@ -119,6 +134,16 @@ def main():
                 human_advice="Synthetic fixture: retain runtime failures.",
                 constraint_context=None,
             )
+            if a.include_segmentation:
+                require(
+                    "segmentation_applicability" in ValidatorInput.model_fields,
+                    "Candidate lacks segmentation transport",
+                )
+                inp.segmentation_applicability = (
+                    None
+                    if variant == "absent"
+                    else fc.get("segmentation_applicability")
+                )
             runner = MLCodeValidatorAgent(bridge_factory=Recorder)
             with bind_prompt_profile(profile) if profile else nullcontext():
                 verdict = runner._llm_review(
@@ -153,9 +178,12 @@ def main():
         json.dump(
             {
                 "infra_revision": a.expected_revision,
-                "exp_revision": subprocess.check_output(
-                    ["git", "-C", str(a.exp), "rev-parse", "HEAD"], text=True
-                ).strip(),
+                "exp_revision": exp_revision,
+                "exp_worktree_status": subprocess.check_output(
+                    ["git", "-C", str(a.exp), "status", "--porcelain"], text=True
+                ).splitlines(),
+                "source_closure": sources,
+                "includes_segmentation": a.include_segmentation,
                 "tool_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                 "scope": "Source-reconstructed final requests through real _llm_review, synthetic plugin/errors/advice; not archived wire or model-execution equivalence",
                 "api_calls": 0,
