@@ -35,10 +35,11 @@ Preparing does not launch a candidate or load light-curve samples.
 
 ## Inspect the prepared result
 
-**Open prepared run** identifies its `runs/<UUID>/inputs/` directory. Look for:
+**Open prepared run** identifies its inputs directory. Its parent,
+`runs/<UUID>/`, is the run envelope. Look for:
 
-- `proposal.json`: the single proposal input used by both branches.
-- `storage.build_left.json` and `storage.build_right.json`: separate attempt
+- `inputs/proposal.json`: the single proposal input used by both branches.
+- `inputs/storage.build_left.json` and `inputs/storage.build_right.json`: separate attempt
   destinations. Each validator shares only its own implementation's destination.
 - `workflow.py.snapshot`: the exact source prepared for this run.
 
