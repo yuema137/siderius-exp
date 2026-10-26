@@ -1,0 +1,98 @@
+{
+  "package_id": "oxford-iiit-pet-classification-example",
+  "revision": "checked-current-snapshot-001",
+  "framework_revision": "d1b63a8e8c2ca52e32aa59aceeff763f7dd3e278",
+  "asset_revision": "0ef535b31df1fa52c1ffb7cba169aff3b05d33c8",
+  "task_directory": "tasks/oxford_iiit_pet",
+  "label": "Oxford-IIIT Pet classification \u2014 checked current snapshot",
+  "example_id": "pet",
+  "run_name": "pet_candidate_001",
+  "workflow": {
+    "definition": {
+      "task": {
+        "manifest": "tasks/oxford_iiit_pet/compositions/bounded_qualification.yaml",
+        "data_root": "data"
+      },
+      "externals": [
+        {
+          "id": "seed",
+          "contract": "proposal.input",
+          "kind": "managed_candidate"
+        },
+        {
+          "id": "build_store",
+          "contract": "storage",
+          "kind": "managed_candidate"
+        },
+        {
+          "id": "check_store",
+          "contract": "storage",
+          "kind": "managed_candidate"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "proposal",
+          "capability": "proposal",
+          "request": {
+            "kind": "external",
+            "binding": "seed"
+          }
+        },
+        {
+          "id": "implementation",
+          "capability": "implementation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "proposal-to-implementation",
+            "arguments": [
+              {
+                "name": "output",
+                "source": {
+                  "kind": "result",
+                  "node": "proposal"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "build_store"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "validation",
+          "capability": "validation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "implementation-to-validation",
+            "arguments": [
+              {
+                "name": "output",
+                "source": {
+                  "kind": "result",
+                  "node": "implementation"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "check_store"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "preparation_options": {
+      "allowed_output_types": [
+        "classifier"
+      ]
+    }
+  }
+}

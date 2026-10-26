@@ -1,4 +1,4 @@
-/** Real exported TESS source -> GUI edit/accept/save -> native offline preparation.
+/** Real exported task source -> GUI edit/accept/save -> native offline preparation.
  * Requires EDITOR_PYTHON, CONSOLE_EXAMPLE_CONFIG, CONSOLE_PLAYWRIGHT_MODULE,
  * CONSOLE_BROWSER_EXECUTABLE, CONSOLE_EVIDENCE_DIR. Never presses candidate Launch.
  */
@@ -69,7 +69,7 @@ try {
   assert.deepEqual(roundtrip.task_binding, exported.task_binding);
   assert.deepEqual(roundtrip.definition.nodes, exported.definition.nodes);
   await page.locator('#new-run-task').selectOption(task.task_id);
-  await page.locator('#new-run-name').fill('tess_gui_candidate_001');
+  await page.locator('#new-run-name').fill(`${project.project_id}_gui_candidate_001`);
   const preparationReviewResponse = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/reusable-preparations/review'));
   await page.locator('#new-run-review').click();
   const preparationHttp = await preparationReviewResponse;
@@ -106,9 +106,9 @@ try {
   assert.equal(await page.evaluate(() => window.consoleSession.connected), true);
   assert.ok(calls.every(call => !call.path.endsWith('/launch')), 'Candidate launch is forbidden in this offline witness');
   assert.deepEqual(faults, []);
-  await page.screenshot({path: resolve(evidence, 'tess-candidate.png'), fullPage: true});
+  await page.screenshot({path: resolve(evidence, `${project.project_id}-candidate.png`), fullPage: true});
   await writeFile(resolve(evidence, 'receipt.json'), JSON.stringify({framework_python: python, framework_revision: execFileSync('git', ['-C', resolve(dirname(python), '../..'), 'rev-parse', 'HEAD'], {encoding: 'utf8'}).trim(), task_binding: task.task_revision, source_path: project.source_file, saved_source_sha256: saved.sha256, preparation: {operation_id: status.operation_id, state: status.state, native_status: status.native_status, source_path: preparation.source_path, inputs: preparation.inputs}, credential_readiness: capture.credential_readiness, connected: true, candidate_launched: false, calls, responses, faults}, null, 2));
-  console.log('PASS: exported TESS source -> actual GUI review/accept/save -> native offline preparation; no candidate launch.');
+  console.log('PASS: exported task source -> actual GUI review/accept/save -> native offline preparation; no candidate launch.');
 } catch (error) {
   if (page) await page.screenshot({path: resolve(evidence, 'failure.png'), fullPage: true});
   await writeFile(resolve(evidence, 'failure.json'), JSON.stringify({error: error.message, calls, responses, faults, server_error: stderr}, null, 2));
