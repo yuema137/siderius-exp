@@ -1,7 +1,7 @@
 {
   "package_id": "phyts-tess-rotation-example",
   "revision": "checked-current-snapshot-001",
-  "framework_revision": "cdf60abc112f489c2eaf0dfa442acd2a11e46129",
+  "framework_revision": "d1b63a8e8c2ca52e32aa59aceeff763f7dd3e278",
   "asset_revision": "693b85427f81226a51356d79a26b4f5556dbb0cd",
   "task_directory": "tasks/phyts_tess",
   "label": "TESS rotation regression \u2014 checked current snapshot",

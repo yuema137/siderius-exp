@@ -1,8 +1,8 @@
 # Native candidate example contract
 
 Scope: external asset materialization and checked-current-snapshot acceptance,
-then native three-stage reusable preparation/execution. First task is TESS.
-Training, scoring, iterative control examples and Pet/DAVIS additions remain
+then native three-stage reusable preparation/execution for TESS and Pet.
+Training, scoring, iterative control examples and DAVIS additions remain
 separately scoped work. No old tutorial generator or root pin is modified.
 
 ## Environment and provenance
@@ -15,9 +15,11 @@ into their own project and invoke that copied recipe with the selected framework
 checkout's own `uv sync --group dev --frozen` environment.
 
 Profile framework_revision currently selects
-cdf60abc112f489c2eaf0dfa442acd2a11e46129 (includes reviewed B GUI acceptance).
-asset_revision=693b85427f81226a51356d79a26b4f5556dbb0cd identifies the upstream
-exported scientific assets, not authenticated unchanged current user bytes.
+d1b63a8e8c2ca52e32aa59aceeff763f7dd3e278 (merged PR880, including B GUI acceptance
+and native reusable proposal families). This explicitly replaces the first TESS
+example framework pin; both profiles require new source/GUI/preparation qualification.
+Profile asset_revision identifies upstream exported scientific assets (TESS693b854,
+Pet0ef535b), not authenticated unchanged current user bytes.
 package_id/revision are explicit readable labels. Native composition supplies
 semantic_fingerprint/task_data_path_id. No new fingerprint, accepted-task record,
 immutable release registry or task-version lifecycle is introduced.
@@ -103,3 +105,21 @@ The real Chromium driver loads code-edited source, changes/reviews/acknowledges/
 saves it through B, then requests actual offline preparation of those saved bytes.
 It checks the captured source, final connected session, missing provider key and
 no candidate Launch request. No API/GPU/training/scientific success claim.
+
+
+## Task profile distinctions
+
+| Profile | Native task id | Input → output float32 dimensions after batch | Primary | Allowed output | Objective | Selected scope |
+| --- | --- | --- | --- | --- | --- | --- |
+| TESS | phyts_tess_rotation | [1,1024] → [1], unbounded | r2/higher | regressor | task does not select one | original train/validation stars |
+| Pet | oxford_iiit_pet | [3,144,144] → [37] logits | accuracy/higher | classifier | categorical CE | gate2_train370 / gate2_validation74; no final |
+
+Profiles are native typed declaration data consumed by the one unchanged recipe.
+Pet data root contains individual JPEGs; TESS root contains its prepared NPZ files.
+Both share external private credential-file checks and explicit current-snapshot
+acceptance. Tests preserve the existing five refusal/preparation cases for both
+profiles, assert independent expected native task/I/O/metric/output-type facts and
+resolve Pet's native objective and disjoint manifest-selected scopes without image
+loading. The browser witness derives project/task/run labels from console config;
+it must be executed separately for each qualified profile. No true-data or training
+qualification follows from these empty-data-directory fixtures.
