@@ -1,0 +1,161 @@
+{
+  "package_id": "phyts-tess-rotation-example",
+  "revision": "checked-current-snapshot-001",
+  "framework_revision": "4272979663eb42c1f51ee4b840f304d7a36c30ee",
+  "asset_revision": "693b85427f81226a51356d79a26b4f5556dbb0cd",
+  "task_directory": "tasks/phyts_tess",
+  "label": "TESS one proposal, two implementation branches \u2014 checked current snapshot",
+  "example_id": "tess_fanout",
+  "run_name": "tess_fanout_candidate_001",
+  "workflow": {
+    "definition": {
+      "task": {
+        "manifest": "tasks/phyts_tess/compositions/rotation_regression.yaml",
+        "data_root": "data"
+      },
+      "externals": [
+        {
+          "id": "seed",
+          "contract": "proposal.input",
+          "kind": "managed_candidate"
+        },
+        {
+          "id": "slot_left",
+          "contract": "storage",
+          "kind": "managed_candidate"
+        },
+        {
+          "id": "slot_right",
+          "contract": "storage",
+          "kind": "managed_candidate"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "proposal",
+          "capability": "proposal",
+          "request": {
+            "kind": "external",
+            "binding": "seed"
+          }
+        },
+        {
+          "id": "build_left",
+          "capability": "implementation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "proposal-to-implementation",
+            "arguments": [
+              {
+                "name": "output",
+                "source": {
+                  "kind": "result",
+                  "node": "proposal"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "slot_left"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "check_left",
+          "capability": "validation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "proposed-implementation-to-validation",
+            "arguments": [
+              {
+                "name": "proposal",
+                "source": {
+                  "kind": "result",
+                  "node": "proposal"
+                }
+              },
+              {
+                "name": "implementation",
+                "source": {
+                  "kind": "result",
+                  "node": "build_left"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "slot_left"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "build_right",
+          "capability": "implementation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "proposal-to-implementation",
+            "arguments": [
+              {
+                "name": "output",
+                "source": {
+                  "kind": "result",
+                  "node": "proposal"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "slot_right"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "check_right",
+          "capability": "validation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "proposed-implementation-to-validation",
+            "arguments": [
+              {
+                "name": "proposal",
+                "source": {
+                  "kind": "result",
+                  "node": "proposal"
+                }
+              },
+              {
+                "name": "implementation",
+                "source": {
+                  "kind": "result",
+                  "node": "build_right"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "slot_right"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "preparation_options": {
+      "allowed_output_types": [
+        "regressor"
+      ]
+    },
+    "execution_profile": "native-proposal-fanout/v1"
+  }
+}

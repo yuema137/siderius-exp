@@ -73,7 +73,7 @@ def recipe(project, *args):
     )
 
 
-def inspect(project):
+def inspect(project, profile_path=None):
     home, data, framework, _, _, example = project
     result = recipe(
         project,
@@ -85,7 +85,7 @@ def inspect(project):
         "--framework",
         framework,
         "--profile",
-        home / f"examples/native_candidate/{example}/profile.json",
+        home / (profile_path or f"examples/native_candidate/{example}/profile.json"),
         "--output",
         home / "inspections/task.json",
     )
@@ -338,3 +338,147 @@ def test_code_edit_invalidates_original_preparation_request(project):
     assert result.returncode != 0
     assert not (home / "runs" / request["run_id"] / "workspace").exists()
     assert not (home / "state/operations").exists()
+
+
+FANOUT_PROFILE = "examples/native_candidate/tess/fanout/profile.json"
+
+
+def fanout_source(project, mutate=None):
+    """Select copied declarative profile data, leaving the ordinary fixture unchanged."""
+    if mutate is not None:
+        path = project[0] / FANOUT_PROFILE
+        profile = json.loads(path.read_text())
+        mutate(profile["workflow"])
+        path.write_text(json.dumps(profile))
+    report = inspect(project, FANOUT_PROFILE)
+    result = accept(project, report, "--accept-task")
+    assert result.returncode == 0, result.stdout + result.stderr
+    return project[0] / "workflow.py"
+
+
+def prepare_source(project):
+    home, _, framework, python, _, _ = project
+    return subprocess.run(
+        [
+            str(python),
+            "-m",
+            "tools.candidate_prepare",
+            "--reusable-request",
+            str(home / "prepare-request.json"),
+        ],
+        cwd=framework,
+        text=True,
+        capture_output=True,
+        timeout=90,
+        check=False,
+    )
+
+
+@pytest.mark.parametrize("project", ["tess"], indirect=True)
+def test_fanout_prepares_one_seed_and_two_branch_owned_stores(project):
+    """A five-node picture must materialize the same native branch lineage and stores."""
+    source = fanout_source(project)
+    result = prepare_source(project)
+    assert result.returncode == 0, result.stdout + result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["status"] == "prepared"
+    envelope = Path(receipt["envelope"])
+    assert (envelope / "workflow.py.snapshot").read_bytes() == source.read_bytes()
+    inputs = Path(receipt["candidate_request_path"]).parent
+    candidate = json.loads((inputs / "candidate_request.json").read_text())
+    assert candidate["preview"]["execution_profile"] == "native-proposal-fanout/v1"
+    definition = candidate["preview"]["document"]["definition"]
+    assert [node["id"] for node in definition["nodes"]] == [
+        "proposal",
+        "build_left",
+        "check_left",
+        "build_right",
+        "check_right",
+    ]
+    index = json.loads((inputs / "preparation/child.json").read_text())
+    assert [
+        Path(item["path"]).relative_to(inputs).as_posix() for item in index["files"]
+    ] == [
+        "preparation/interpretation_input.json",
+        "interpretation.json",
+        "proposal.json",
+        "storage.build_left.json",
+        "storage.build_right.json",
+        "llm.json",
+        "workflow.json",
+        "workflow.resolved.py",
+    ]
+    seed = json.loads((inputs / "proposal.json").read_text())
+    assert seed["allowed_output_types"] == ["regressor"]
+    stores = {}
+    for side in ["left", "right"]:
+        store = json.loads((inputs / f"storage.build_{side}.json").read_text())
+        stores[side] = store["local"]["workspace"]
+        assert f"/graph_instances/build_{side}/" in stores[side]
+        validator = next(
+            node for node in definition["nodes"] if node["id"] == f"check_{side}"
+        )
+        refs = {arg["name"]: arg["source"] for arg in validator["request"]["arguments"]}
+        assert refs["proposal"]["node"] == "proposal"
+        assert refs["implementation"]["node"] == f"build_{side}"
+        assert refs["storage"]["binding"] == f"slot_{side}"
+    assert stores["left"] != stores["right"]
+    assert not (envelope / "workspace").exists()
+    assert not (project[0] / "state/operations").exists()
+
+
+@pytest.mark.parametrize("project", ["tess"], indirect=True)
+@pytest.mark.parametrize(
+    "malformation", ["cross_branch_storage", "missing_validator", "missing_profile"]
+)
+def test_fanout_native_admission_refuses_incomplete_or_shared_branch(
+    project, malformation
+):
+    """Neither node count nor a shared alias can authorize a graph without its native profile."""
+
+    def change(workflow):
+        if malformation == "missing_profile":
+            workflow.pop("execution_profile")
+        elif malformation == "missing_validator":
+            workflow["definition"]["nodes"] = [
+                node
+                for node in workflow["definition"]["nodes"]
+                if node["id"] != "check_right"
+            ]
+        else:
+            # Keep every binding used so the refusal specifically tests shared ownership.
+            workflow["definition"]["externals"] = [
+                item
+                for item in workflow["definition"]["externals"]
+                if item["id"] != "slot_right"
+            ]
+            for node in workflow["definition"]["nodes"]:
+                if node["id"] in {"build_right", "check_right"}:
+                    for argument in node["request"]["arguments"]:
+                        if argument["name"] == "storage":
+                            argument["source"]["binding"] = "slot_left"
+
+    fanout_source(project, change)
+    result = prepare_source(project)
+    assert result.returncode != 0
+    if malformation == "cross_branch_storage":
+        assert (
+            "Graph storage binding is shared across implementation owners"
+            in result.stdout + result.stderr
+        )
+    assert not (project[0] / "state/operations").exists()
+    assert not list((project[0] / "runs").glob("*/workspace"))
+
+
+@pytest.mark.parametrize("project", ["tess"], indirect=True)
+def test_fanout_edited_graph_cannot_use_old_preparation_request(project):
+    """The source identity includes explicit graph lineage, not just the accepted task."""
+    source = fanout_source(project)
+    before = source.read_text()
+    # Valid Python code edit changes the graph instance label, invalidating old request bytes.
+    assert "build_left" in before
+    source.write_text(before.replace("build_left", "build_edited"))
+    result = prepare_source(project)
+    assert result.returncode != 0
+    assert not (project[0] / "state/operations").exists()
+    assert not list((project[0] / "runs").glob("*/workspace"))

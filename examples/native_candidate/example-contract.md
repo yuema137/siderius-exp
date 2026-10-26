@@ -126,3 +126,34 @@ without image/frame loading. DAVIS checks sequence-level train/validation disjoi
 the actual selected custom-loss descriptor and MSE lower versus PSNR higher/MAE lower. The browser witness derives project/task/run labels from console config;
 it must be executed separately for each qualified profile. No true-data or training
 qualification follows from these empty-data-directory fixtures.
+
+
+## TESS one-proposal fanout lesson
+
+`tess/fanout/profile.json` selects the existing native-proposal-fanout/v1 grammar:
+proposal → build_left/check_left and build_right/check_right. Both validation
+requests use proposed-implementation-to-validation with exact proposal and
+implementation result arguments. Managed aliases slot_left/slot_right resolve
+through native layout to distinct storage.build_<side>.json files, each shared
+only by its implementation/validator pair. One seed proposal.json is reused.
+The exact native index has B+6=8 entries for B=2; unchanged native parent verification
+owns source-derived names, paths, bytes and branch lineage. A node-count heuristic
+cannot authorize the graph without the explicit execution profile.
+
+The profile uses the same TESS scientific task binding/export provenance and
+framework427 as the base lesson, plus distinct workflow example/run IDs. The common
+recipe/browser driver are unchanged. Common PROFILE_FILE selects declaration data,
+not a second engine. GUI source review/Save and native prepare preserve all five
+instances and exact edges. Branch runtime remains the existing serial executor;
+no shared-science diversity, aggregation/ranking/AND join, parallel execution or
+training_settings support is implied. This preparatory lesson does not satisfy
+TESS-D's aggregation/comparison requirement or A/B/C training/scoring packs.
+
+Focused tests reuse the existing TESS fixture with an optional selected profile
+path (default unchanged), assert the exact prepared seed/index/stores and validator
+lineage, and exercise real native refusal of cross-branch aliases, incomplete
+validation, missing explicit profile and stale edited graph source. No expanded
+fixture framework or production materializer change. One original fixed TESS
+native-prepare case protects the unchanged default selector. Actual browser source
+parity and offline preparation are separate required witnesses; no provider/API,
+GPU, data decoding or candidate launch occurs in qualification.

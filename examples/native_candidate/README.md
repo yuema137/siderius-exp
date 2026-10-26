@@ -29,6 +29,7 @@ export INFRA_CHECKOUT="/absolute/path/to/reviewed-SIDERIUS"
 export EXP_CHECKOUT="/absolute/path/to/siderius-exp-with-this-example"
 export EXAMPLE=tess
 export TASK_ASSETS=tasks/phyts_tess
+export PROFILE_FILE="examples/native_candidate/$EXAMPLE/profile.json"
 export PROJECT="/absolute/path/to/new-candidate-project"
 export TASK_DATA="/absolute/path/to/prepared-task-data"
 (cd "$INFRA_CHECKOUT" && uv sync --group dev --frozen)
@@ -40,6 +41,10 @@ git -C "$EXP_CHECKOUT" archive HEAD examples/native_candidate "$TASK_ASSETS" |
 cd "$PROJECT"
 ```
 
+For a second lesson, [TESS fanout](tess/fanout/README.md) prepares one proposal
+with two implementation/validation branches. After copying a fresh TESS project,
+select that lesson's `PROFILE_FILE` before inspection; the same steps apply.
+
 The project and data stay outside both repositories. Run the copied recipe with
 the framework's own Python; this route needs no exp environment or `PYTHONPATH`.
 
@@ -48,7 +53,7 @@ the framework's own Python; this route needs no exp environment or `PYTHONPATH`.
 ```bash
 "$INFRA_PYTHON" examples/native_candidate/materialize.py inspect \
   --project "$PROJECT" --data "$TASK_DATA" --framework "$INFRA_CHECKOUT" \
-  --profile "examples/native_candidate/$EXAMPLE/profile.json" \
+  --profile "$PROFILE_FILE" \
   --output "$PROJECT/inspections/task-001.json"
 ```
 
