@@ -202,9 +202,10 @@ def test_native_prepare_captures_same_source_without_candidate_or_training(proje
         node["capability"]
         for node in candidate["preview"]["document"]["definition"]["nodes"]
     ] == ["proposal", "implementation", "validation"]
-    assert candidate["preview"]["document"]["preparation_options"][
-        "allowed_output_types"
-    ] == [output_type]
+    proposal = json.loads(
+        (Path(receipt["candidate_request_path"]).parent / "proposal.json").read_text()
+    )
+    assert proposal["allowed_output_types"] == [output_type]
     if example == "pet":
         # Resolve the selected native task owner: no image decoding or training.
         probe = subprocess.run(
