@@ -36,7 +36,7 @@ Preparing does not launch a candidate or load light-curve samples.
 ## Inspect the prepared result
 
 **Open prepared run** identifies its inputs directory. Its parent,
-`runs/<UUID>/`, is the run envelope. Look for:
+`runs/<UUID>/`, is the run directory. Look for:
 
 - `inputs/proposal.json`: the single proposal input used by both branches.
 - `inputs/storage.build_left.json` and `inputs/storage.build_right.json`: separate attempt
@@ -46,8 +46,8 @@ Preparing does not launch a candidate or load light-curve samples.
 Change the copied `workflow.py` to edit branch names or supported advice, then
 review again and create a fresh preparation. Keep earlier captures; source edits
 do not rewrite them. Review the configured model routes, private credentials and
-paid API effects in the common guide before any explicit Launch. The checks for this example cover editing and preparation; they do not run
-the branches.
+paid API effects in the common guide before any explicit Launch. The checks for
+this example cover editing and preparation; they do not run the branches.
 
 This lesson does not supply AND aggregation or comparison. For training and
 scores, follow the [TESS training tutorial](../../../../tutorials/paper/tess/README.md)
