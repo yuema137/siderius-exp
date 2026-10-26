@@ -1,0 +1,98 @@
+{
+  "package_id": "davis-future-frame-example",
+  "revision": "checked-current-snapshot-001",
+  "framework_revision": "4272979663eb42c1f51ee4b840f304d7a36c30ee",
+  "asset_revision": "ac5572a8ca4d80b6005f4956c764928269b77d84",
+  "task_directory": "tasks/davis_future_prediction",
+  "label": "DAVIS future-frame regression \u2014 checked current snapshot",
+  "example_id": "davis",
+  "run_name": "davis_candidate_001",
+  "workflow": {
+    "definition": {
+      "task": {
+        "manifest": "tasks/davis_future_prediction/compositions/bounded_qualification.yaml",
+        "data_root": "data"
+      },
+      "externals": [
+        {
+          "id": "seed",
+          "contract": "proposal.input",
+          "kind": "managed_candidate"
+        },
+        {
+          "id": "build_store",
+          "contract": "storage",
+          "kind": "managed_candidate"
+        },
+        {
+          "id": "check_store",
+          "contract": "storage",
+          "kind": "managed_candidate"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "proposal",
+          "capability": "proposal",
+          "request": {
+            "kind": "external",
+            "binding": "seed"
+          }
+        },
+        {
+          "id": "implementation",
+          "capability": "implementation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "proposal-to-implementation",
+            "arguments": [
+              {
+                "name": "output",
+                "source": {
+                  "kind": "result",
+                  "node": "proposal"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "build_store"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "validation",
+          "capability": "validation",
+          "request": {
+            "kind": "protocol",
+            "protocol": "implementation-to-validation",
+            "arguments": [
+              {
+                "name": "output",
+                "source": {
+                  "kind": "result",
+                  "node": "implementation"
+                }
+              },
+              {
+                "name": "storage",
+                "source": {
+                  "kind": "external",
+                  "binding": "check_store"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "preparation_options": {
+      "allowed_output_types": [
+        "regressor"
+      ]
+    }
+  }
+}
