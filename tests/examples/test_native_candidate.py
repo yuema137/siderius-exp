@@ -214,12 +214,15 @@ def test_native_prepare_captures_same_source_without_candidate_or_training(proje
                 "-c",
                 """
 import json, sys
-from workflows.task_composition import compose_run_task_bindings
-from execute_tools.task_data_path import ScopeBuildRequest
-c = compose_run_task_bindings(sys.argv[1])
-r = ScopeBuildRequest(round_kind="formal", selection_strategy="snapshot", portion=1.0)
-train = c.task_data_path.build_training_scope(r)
-validation = c.task_data_path.build_eval_scope(r)
+from contextlib import redirect_stdout
+# Trusted task composition may print plugin diagnostics; keep JSON stdout distinct.
+with redirect_stdout(sys.stderr):
+    from workflows.task_composition import compose_run_task_bindings
+    from execute_tools.task_data_path import ScopeBuildRequest
+    c = compose_run_task_bindings(sys.argv[1])
+    r = ScopeBuildRequest(round_kind="formal", selection_strategy="snapshot", portion=1.0)
+    train = c.task_data_path.build_training_scope(r)
+    validation = c.task_data_path.build_eval_scope(r)
 print(json.dumps({"objective": c.objective.model_dump(mode="json"),
     "train": [row.image_id for row in train.rows],
     "validation": [row.image_id for row in validation.rows]}))
