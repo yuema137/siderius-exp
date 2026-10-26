@@ -18,10 +18,11 @@ Choose a task and prepare its data first:
 | --- | --- | --- | --- |
 | TESS rotation regression | [TESS guide](tess/README.md) | `tess` | `tasks/phyts_tess` |
 | Oxford-IIIT Pet classification | [Pet guide](pet/README.md) | `pet` | `tasks/oxford_iiit_pet` |
+| DAVIS future-frame prediction | [DAVIS guide](davis/README.md) | `davis` | `tasks/davis_future_prediction` |
 
 Select the reviewed example commit in your exp checkout. The commands below use
-TESS; for Pet set `EXAMPLE=pet`, `TASK_ASSETS=tasks/oxford_iiit_pet` and point
-`TASK_DATA` at its prepared images directory. Replace these paths with your own:
+TESS; for another task set `EXAMPLE` and `TASK_ASSETS` from its row, and point
+`TASK_DATA` at the directory described in its guide. Replace these paths with your own:
 
 ```bash
 export INFRA_CHECKOUT="/absolute/path/to/reviewed-SIDERIUS"
@@ -52,7 +53,7 @@ the framework's own Python; this route needs no exp environment or `PYTHONPATH`.
 ```
 
 Expect `Inspected, NOT accepted` and `r2 (higher is better)` for TESS or
-`accuracy (higher is better)` for Pet. This saves model
+`accuracy (higher is better)` for Pet or `mse (lower is better)` for DAVIS. This saves model
 routing, inspection scratch files and a report; it calls no provider. Read the
 report's task description, model I/O, metrics, split references and limitations.
 It checks composition, not dataset correctness. Failed checks need fresh report

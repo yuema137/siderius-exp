@@ -1,7 +1,7 @@
 {
   "package_id": "oxford-iiit-pet-classification-example",
   "revision": "checked-current-snapshot-001",
-  "framework_revision": "d1b63a8e8c2ca52e32aa59aceeff763f7dd3e278",
+  "framework_revision": "4272979663eb42c1f51ee4b840f304d7a36c30ee",
   "asset_revision": "0ef535b31df1fa52c1ffb7cba169aff3b05d33c8",
   "task_directory": "tasks/oxford_iiit_pet",
   "label": "Oxford-IIIT Pet classification \u2014 checked current snapshot",

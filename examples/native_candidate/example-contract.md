@@ -1,8 +1,8 @@
 # Native candidate example contract
 
 Scope: external asset materialization and checked-current-snapshot acceptance,
-then native three-stage reusable preparation/execution for TESS and Pet.
-Training, scoring, iterative control examples and DAVIS additions remain
+then native three-stage reusable preparation/execution for TESS, Pet and DAVIS.
+Training, scoring and iterative control examples remain
 separately scoped work. No old tutorial generator or root pin is modified.
 
 ## Environment and provenance
@@ -15,11 +15,12 @@ into their own project and invoke that copied recipe with the selected framework
 checkout's own `uv sync --group dev --frozen` environment.
 
 Profile framework_revision currently selects
-d1b63a8e8c2ca52e32aa59aceeff763f7dd3e278 (merged PR880, including B GUI acceptance
-and native reusable proposal families). This explicitly replaces the first TESS
-example framework pin; both profiles require new source/GUI/preparation qualification.
+4272979663eb42c1f51ee4b840f304d7a36c30ee (merged PR883, including B GUI acceptance,
+native reusable proposal families and checked task-reference updates). This explicitly
+replaces the TESS/Pet framework pin; all three profiles require new
+source/GUI/preparation qualification.
 Profile asset_revision identifies upstream exported scientific assets (TESS693b854,
-Pet0ef535b), not authenticated unchanged current user bytes.
+Pet0ef535b, DAVISac5572a), not authenticated unchanged current user bytes.
 package_id/revision are explicit readable labels. Native composition supplies
 semantic_fingerprint/task_data_path_id. No new fingerprint, accepted-task record,
 immutable release registry or task-version lifecycle is introduced.
@@ -113,13 +114,15 @@ no candidate Launch request. No API/GPU/training/scientific success claim.
 | --- | --- | --- | --- | --- | --- | --- |
 | TESS | phyts_tess_rotation | [1,1024] → [1], unbounded | r2/higher | regressor | task does not select one | original train/validation stars |
 | Pet | oxford_iiit_pet | [3,144,144] → [37] logits | accuracy/higher | classifier | categorical CE | gate2_train370 / gate2_validation74; no final |
+| DAVIS | davis_future_prediction | [3,8,128,224] → [3,4,128,224] | mse/lower | regressor | custom davis_exact_l1 | gate2_train60 / gate2_validation15; no final |
 
 Profiles are native typed declaration data consumed by the one unchanged recipe.
-Pet data root contains individual JPEGs; TESS root contains its prepared NPZ files.
-Both share external private credential-file checks and explicit current-snapshot
-acceptance. Tests preserve the existing five refusal/preparation cases for both
+Pet data root contains individual JPEGs; TESS root contains its prepared NPZ files;
+DAVIS root contains DAVIS/JPEGImages/480p. All share external private credential-file checks and explicit current-snapshot
+acceptance. Tests preserve the existing five refusal/preparation cases for all three
 profiles, assert independent expected native task/I/O/metric/output-type facts and
-resolve Pet's native objective and disjoint manifest-selected scopes without image
-loading. The browser witness derives project/task/run labels from console config;
+resolve Pet/DAVIS native objectives and exact original manifest-selected scopes
+without image/frame loading. DAVIS checks sequence-level train/validation disjointness,
+the actual selected custom-loss descriptor and MSE lower versus PSNR higher/MAE lower. The browser witness derives project/task/run labels from console config;
 it must be executed separately for each qualified profile. No true-data or training
 qualification follows from these empty-data-directory fixtures.

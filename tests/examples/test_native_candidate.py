@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import os
 import shutil
@@ -12,7 +13,11 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-EXAMPLES = {"tess": "tasks/phyts_tess", "pet": "tasks/oxford_iiit_pet"}
+EXAMPLES = {
+    "tess": "tasks/phyts_tess",
+    "pet": "tasks/oxford_iiit_pet",
+    "davis": "tasks/davis_future_prediction",
+}
 
 
 @pytest.fixture(params=EXAMPLES)
@@ -157,13 +162,33 @@ def test_native_prepare_captures_same_source_without_candidate_or_training(proje
     home, _, framework, python, credentials, example = project
     config = json.loads((home / "console.json").read_text())
     facts = json.loads(report.read_text())["observation"]["result"]["task"]
-    expected_id, metric, input_dims, output_dims, output_type = {
-        "tess": ("phyts_tess_rotation", "r2", [1, 1024], [1], "regressor"),
-        "pet": ("oxford_iiit_pet", "accuracy", [3, 144, 144], [37], "classifier"),
+    expected_id, metric, direction, input_dims, output_dims, output_type = {
+        "tess": ("phyts_tess_rotation", "r2", "higher", [1, 1024], [1], "regressor"),
+        "pet": (
+            "oxford_iiit_pet",
+            "accuracy",
+            "higher",
+            [3, 144, 144],
+            [37],
+            "classifier",
+        ),
+        "davis": (
+            "davis_future_prediction",
+            "mse",
+            "lower",
+            [3, 8, 128, 224],
+            [3, 4, 128, 224],
+            "regressor",
+        ),
     }[example]
     assert facts["task_data_path_id"] == expected_id
     assert facts["primary_metric"]["id"] == metric
-    assert facts["primary_metric"]["direction"] == "higher"
+    assert facts["primary_metric"]["direction"] == direction
+    if example == "davis":
+        assert [(m["id"], m["direction"]) for m in facts["secondary_metrics"]] == [
+            ("psnr", "higher"),
+            ("mae", "lower"),
+        ]
     io = facts["task_config"]["forward_contract"]["model_io"]
     for key, dimensions in [("input", input_dims), ("output", output_dims)]:
         assert [
@@ -206,8 +231,8 @@ def test_native_prepare_captures_same_source_without_candidate_or_training(proje
         (Path(receipt["candidate_request_path"]).parent / "proposal.json").read_text()
     )
     assert proposal["allowed_output_types"] == [output_type]
-    if example == "pet":
-        # Resolve the selected native task owner: no image decoding or training.
+    if example in {"pet", "davis"}:
+        # Resolve trusted task scope metadata only; no image/video loading or training.
         probe = subprocess.run(
             [
                 str(python),
@@ -223,13 +248,17 @@ with redirect_stdout(sys.stderr):
     r = ScopeBuildRequest(round_kind="formal", selection_strategy="snapshot", portion=1.0)
     train = c.task_data_path.build_training_scope(r)
     validation = c.task_data_path.build_eval_scope(r)
+def identity(row):
+    return row.image_id if sys.argv[2] == "pet" else [row.sequence_name, row.start_frame]
 print(json.dumps({"objective": c.objective.model_dump(mode="json"),
-    "train": [row.image_id for row in train.rows],
-    "validation": [row.image_id for row in validation.rows]}))
+    "custom_loss": c.task_owned_custom_loss.model_dump(mode="json") if c.task_owned_custom_loss else None,
+    "train": [identity(row) for row in train.rows],
+    "validation": [identity(row) for row in validation.rows]}))
 """,
                 str(
                     home / EXAMPLES[example] / "compositions/bounded_qualification.yaml"
                 ),
+                example,
             ],
             cwd=framework,
             text=True,
@@ -239,17 +268,42 @@ print(json.dumps({"objective": c.objective.model_dump(mode="json"),
         )
         assert probe.returncode == 0, probe.stdout + probe.stderr
         resolved = json.loads(probe.stdout)
-        assert resolved["objective"]["loss_type"] == "ce"
-        assert len(resolved["train"]) == 370 and len(resolved["validation"]) == 74
-        assert set(resolved["train"]).isdisjoint(resolved["validation"])
+        if example == "pet":
+            assert resolved["objective"]["loss_type"] == "ce"
+            assert resolved["custom_loss"] is None
+            assert len(resolved["train"]) == 370 and len(resolved["validation"]) == 74
+            assert set(resolved["train"]).isdisjoint(resolved["validation"])
+        else:
+            assert resolved["objective"]["loss_type"] == "custom"
+            assert resolved["objective"]["loss_name"] == "davis_exact_l1"
+            descriptor = resolved["custom_loss"]
+            loss_file = home / EXAMPLES[example] / "plugins/davis_exact_l1_loss.py"
+            assert descriptor["name"] == "davis_exact_l1"
+            prepared_loss = proposal["task_composition_ref"]["task_owned_custom_loss"]
+            assert prepared_loss["name"] == descriptor["name"]
+            assert prepared_loss["content_sha256"] == descriptor["content_sha256"]
+            assert descriptor["file_path"] == str(loss_file)
+            assert (
+                descriptor["content_sha256"]
+                == hashlib.sha256(loss_file.read_bytes()).hexdigest()
+            )
+            assert len(resolved["train"]) == 60 and len(resolved["validation"]) == 15
+            assert {row[0] for row in resolved["train"]}.isdisjoint(
+                row[0] for row in resolved["validation"]
+            )
         for role, filename in [
             ("train", "gate2_train.csv"),
             ("validation", "gate2_validation.csv"),
         ]:
             with (
-                ROOT / "tasks/oxford_iiit_pet/data/manifests" / filename
+                ROOT / EXAMPLES[example] / "data/manifests" / filename
             ).open() as stream:
-                expected = [row["image_id"] for row in csv.DictReader(stream)]
+                expected = [
+                    row["image_id"]
+                    if example == "pet"
+                    else [row["sequence_name"], int(row["start_frame"])]
+                    for row in csv.DictReader(stream)
+                ]
             assert resolved[role] == expected
     assert not (envelope / "workspace").exists()
     assert not (
