@@ -1,7 +1,7 @@
 # TESS candidate example
 
 First download and prepare the TESS training/validation data using the
-[existing TESS data instructions](https://github.com/Galileo-Sandbox/siderius-exp/blob/master/tutorials/paper/tess/README.md#3-download-and-prepare-data-once),
+[existing TESS data instructions](../../../tutorials/paper/tess/README.md#3-download-and-prepare-data-once),
 or locate the matching data you already prepared. Follow that tutorial's own
 pinned environment for its data tools. Then use the
 [common candidate project steps](../README.md) with your resulting data directory.
