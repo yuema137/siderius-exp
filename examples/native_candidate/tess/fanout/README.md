@@ -46,8 +46,9 @@ Preparing does not launch a candidate or load light-curve samples.
 Change the copied `workflow.py` to edit branch names or supported advice, then
 review again and create a fresh preparation. Keep earlier captures; source edits
 do not rewrite them. Review the configured model routes, private credentials and
-paid API effects in the common guide before any explicit Launch. The current
-qualification covers graph editing and offline preparation, not branch execution.
+paid API effects in the common guide before any explicit Launch. The checks for this example cover editing and preparation; they do not run
+the branches.
 
-This is an additional candidate lesson. It does not supply AND aggregation or
-comparison and does not replace the planned training/scoring examples.
+This lesson does not supply AND aggregation or comparison. For training and
+scores, follow the [TESS training tutorial](../../../../tutorials/paper/tess/README.md)
+with its matching pinned environment.
