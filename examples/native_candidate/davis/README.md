@@ -10,7 +10,8 @@ float32 [3,8,128,224] tensors per clip; outputs must be [3,4,128,224], with fram
 values normalized to [0,1]. Its primary metric is MSE, lower-is-better; PSNR is
 higher-is-better and MAE is lower-is-better. The task selects its exact mean-L1
 custom loss, rather than smooth-L1. The copied bounded composition selects
-60 training and 15 validation clips from disjoint sequences; final is unselected.
+60 training and 15 validation clips from disjoint sequences. The final-test split
+is not selected.
 
 Follow the [common project steps](../README.md), setting:
 
