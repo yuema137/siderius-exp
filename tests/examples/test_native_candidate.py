@@ -446,6 +446,12 @@ def test_fanout_native_admission_refuses_incomplete_or_shared_branch(
                 if node["id"] != "check_right"
             ]
         else:
+            # Keep every binding used so the refusal specifically tests shared ownership.
+            workflow["definition"]["externals"] = [
+                item
+                for item in workflow["definition"]["externals"]
+                if item["id"] != "slot_right"
+            ]
             for node in workflow["definition"]["nodes"]:
                 if node["id"] in {"build_right", "check_right"}:
                     for argument in node["request"]["arguments"]:
@@ -455,6 +461,11 @@ def test_fanout_native_admission_refuses_incomplete_or_shared_branch(
     fanout_source(project, change)
     result = prepare_source(project)
     assert result.returncode != 0
+    if malformation == "cross_branch_storage":
+        assert (
+            "Graph storage binding is shared across implementation owners"
+            in result.stdout + result.stderr
+        )
     assert not (project[0] / "state/operations").exists()
     assert not list((project[0] / "runs").glob("*/workspace"))
 
