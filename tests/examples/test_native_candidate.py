@@ -144,9 +144,11 @@ def test_task_change_after_inspection_cannot_inherit_acceptance(project):
     report = inspect(project)
     declaration = project[0] / EXAMPLES[project[5]] / "declared/task_config.yaml"
     before = declaration.read_text()
-    needle = (
-        "single TESS light curve." if project[5] == "tess" else "37-way fine-grained"
-    )
+    needle = {
+        "tess": "single TESS light curve.",
+        "pet": "37-way fine-grained",
+        "davis": "real-RGB future-frame prediction",
+    }[project[5]]
     assert needle in before
     declaration.write_text(before.replace(needle, "Deliberately changed " + needle))
     result = accept(project, report, "--accept-task")
