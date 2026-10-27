@@ -102,6 +102,11 @@
       "infra_revision": "536abcc5b4faac6a8a284811df1cc2617aa91504",
       "assembly_sha256": "b8e93c6b3580f91d4ac2de79f0b97050fd5a07d87cdc96a36ce2cda065991613",
       "scope": "Pre-L3 qualification of accumulated native rendering changes using the existing scheduler-disabled historical renderer, frozen 47 boundary cases and 48 complete synthetic proposer requests. No L3 collection change, recovered conversations, execution or stochastic artifact replay claim."
+    },
+    {
+      "infra_revision": "7a633910b06ce610b8fb9433bd35f012d7cc6e9d",
+      "assembly_sha256": "cfc7c822ad8ea8896a566e08df77a3f58f7ca1112401ce3b7bc4a2d1822d6993",
+      "scope": "Exact #908 candidate extending the separately qualified pre-L3 scheduler-disabled pair. Offline frozen 47 boundary cases and 48 synthetic complete proposer sequences cover the accumulated rendering closure; L3 contributes typed plural literature-review evidence. No recovered conversations, workflow execution, scientific training or stochastic artifact replay claim."
     }
   ],
   "scheduler_disabled_assemblies": [
@@ -116,6 +121,7 @@
     "838a86cd2ae38e03caa6d7db9688b29f30247a6c0f5cd1e5db35d2a1a8d02b02",
     "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f",
     "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b",
-    "b8e93c6b3580f91d4ac2de79f0b97050fd5a07d87cdc96a36ce2cda065991613"
+    "b8e93c6b3580f91d4ac2de79f0b97050fd5a07d87cdc96a36ce2cda065991613",
+    "cfc7c822ad8ea8896a566e08df77a3f58f7ca1112401ce3b7bc4a2d1822d6993"
   ]
 }
