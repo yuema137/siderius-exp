@@ -6,9 +6,11 @@ The current native framework supports explicit learning-rate schedules. Paper
 runs predate that feature. Select the experiment-owned
 [overlay](profiles/paper-scheduler-disabled-v2.json) in a **new workspace** to
 retain the qualified historical training conditions and prompt presentation.
-The [pre-L3 scheduler-disabled qualification report](qualifications/pre-l3-scheduler-disabled/report.md)
-binds the exact pre-L3 framework revision and offline evidence. Later framework
-revisions require their own exact qualification entries and receipts.
+The pre-L3 scheduler-disabled reference is documented in the
+[pre-L3 qualification report](qualifications/pre-l3-scheduler-disabled/report.md);
+the current L3 candidate has a separate [#908 qualification report](qualifications/l3-908/report.md).
+Each report binds one exact framework revision and offline evidence. Later
+framework revisions require their own exact qualification entries and receipts.
 The root repository dependency pin and original archived workspaces remain
 unchanged; this overlay requires the separately qualified framework and package
 versions in its `required_packages` mapping.
