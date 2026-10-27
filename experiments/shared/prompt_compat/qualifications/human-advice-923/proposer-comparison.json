@@ -1,0 +1,2216 @@
+{
+  "scope": "Supplementary synthetic branch witnesses; not recovered historical conversations",
+  "comparison_source_sha256": "8c6828100990274fa9df5ebeba476c7fbe181a3f7b3d016d07cff99af091930d",
+  "results": [
+    {
+      "task": "tess",
+      "status": "MATCH",
+      "reference": {
+        "infra_revision": "c7996a352d064229725ab1ebe886b9006bdbf36d",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-early-v1",
+          "version": "1",
+          "content_sha256": "cfee54ab3f730062425acf4903ab97700a5656bc54be66ea3c58115eed02298e",
+          "assembly_sha256": "0de25c8610de268703cb3efd47614a161f09012d2548467f9d4897cbecb3c443"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "24a0514a56ee5d92a00e9e9b21e3b08ddfbf6b3e889c1ab805a05a6967ee00dd",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "b2f556f678f151c4b345f121399cf9370e92e646fcf331877f7d1f7c40d33d45",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "66f85f12325b69223af579394cb6c7eb14e8a9df59ac9c17c8e25eba0b395851",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      },
+      "candidate": {
+        "infra_revision": "0c36aebc5d4359a872c61fc5f3cc099772dd2a43",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-early-v2",
+          "version": "2",
+          "content_sha256": "433058b937b2cd879683d7bf8af0df7e9045e18e25d16523074c03a79572834a",
+          "assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "24a0514a56ee5d92a00e9e9b21e3b08ddfbf6b3e889c1ab805a05a6967ee00dd",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "b2f556f678f151c4b345f121399cf9370e92e646fcf331877f7d1f7c40d33d45",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "66f85f12325b69223af579394cb6c7eb14e8a9df59ac9c17c8e25eba0b395851",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      }
+    },
+    {
+      "task": "ligo",
+      "status": "MATCH",
+      "reference": {
+        "infra_revision": "c7996a352d064229725ab1ebe886b9006bdbf36d",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-early-v1",
+          "version": "1",
+          "content_sha256": "cfee54ab3f730062425acf4903ab97700a5656bc54be66ea3c58115eed02298e",
+          "assembly_sha256": "0de25c8610de268703cb3efd47614a161f09012d2548467f9d4897cbecb3c443"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "24a0514a56ee5d92a00e9e9b21e3b08ddfbf6b3e889c1ab805a05a6967ee00dd",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "b2f556f678f151c4b345f121399cf9370e92e646fcf331877f7d1f7c40d33d45",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "66f85f12325b69223af579394cb6c7eb14e8a9df59ac9c17c8e25eba0b395851",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      },
+      "candidate": {
+        "infra_revision": "0c36aebc5d4359a872c61fc5f3cc099772dd2a43",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-early-v2",
+          "version": "2",
+          "content_sha256": "433058b937b2cd879683d7bf8af0df7e9045e18e25d16523074c03a79572834a",
+          "assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "24a0514a56ee5d92a00e9e9b21e3b08ddfbf6b3e889c1ab805a05a6967ee00dd",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "b2f556f678f151c4b345f121399cf9370e92e646fcf331877f7d1f7c40d33d45",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "66f85f12325b69223af579394cb6c7eb14e8a9df59ac9c17c8e25eba0b395851",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      }
+    },
+    {
+      "task": "project8",
+      "status": "MATCH",
+      "reference": {
+        "infra_revision": "c7996a352d064229725ab1ebe886b9006bdbf36d",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-late-v1",
+          "version": "1",
+          "content_sha256": "f30ba9d6793d4cb54afbbf88bd90e2a33cc971672a63a19e13f4fd13a9ee9469",
+          "assembly_sha256": "0de25c8610de268703cb3efd47614a161f09012d2548467f9d4897cbecb3c443"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "9c1ffa3af06822c0c0fad0247ad9e73c5e7992fd2eed0ba1de8912ba52f0b622",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "f7ffce27e264e4d9968409dd1c41dc907e08bf47a9cc0d230bfa22c8fcbabdab",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "fd03ee90a689aa7d9a73fe1bfada00527524e2f03fdfe34d549a55a4bbcc7aab",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      },
+      "candidate": {
+        "infra_revision": "0c36aebc5d4359a872c61fc5f3cc099772dd2a43",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-late-v2",
+          "version": "2",
+          "content_sha256": "433058b937b2cd879683d7bf8af0df7e9045e18e25d16523074c03a79572834a",
+          "assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "9c1ffa3af06822c0c0fad0247ad9e73c5e7992fd2eed0ba1de8912ba52f0b622",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "f7ffce27e264e4d9968409dd1c41dc907e08bf47a9cc0d230bfa22c8fcbabdab",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "fd03ee90a689aa7d9a73fe1bfada00527524e2f03fdfe34d549a55a4bbcc7aab",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "f9604618b753e21f9444597f7df95c5b5ea8f83341a09a92dc122c79a6609ee3",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "d2c7cfd7c2d47b52c75b22c4cdcd345c71e2b44469a858ac478c42337e82b8c5",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "38ccf9db6f3d517988bd0e303aedfd012840e6a4352c61266a824a3aa301c0ae",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      }
+    },
+    {
+      "task": "tidmad",
+      "status": "MATCH",
+      "reference": {
+        "infra_revision": "c7996a352d064229725ab1ebe886b9006bdbf36d",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-tidmad-noprior-v1",
+          "version": "1",
+          "content_sha256": "cda2397637938a5e662f620677d0ddb5df8b61143570486621e8057b4267a2e1",
+          "assembly_sha256": "0de25c8610de268703cb3efd47614a161f09012d2548467f9d4897cbecb3c443"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "24a0514a56ee5d92a00e9e9b21e3b08ddfbf6b3e889c1ab805a05a6967ee00dd",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "b2f556f678f151c4b345f121399cf9370e92e646fcf331877f7d1f7c40d33d45",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "66f85f12325b69223af579394cb6c7eb14e8a9df59ac9c17c8e25eba0b395851",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      },
+      "candidate": {
+        "infra_revision": "0c36aebc5d4359a872c61fc5f3cc099772dd2a43",
+        "fixture_sha256": "8dfa8c7620b6122758bd2345cb5ca7afd0422b8eb1cf23962e60313255044a38",
+        "capture_sources": {
+          "capture_proposer_requests.py": "1f025b1c0a2790feff6a756c4b1e3c4424da44c0ba394c6263eb7808e1b0756f",
+          "capture.py": "55e15e8ce7298b29819c86c46c4a7213fd34e02c2f861a8da9f59d741ed1aa42"
+        },
+        "profile": {
+          "name": "paper-tidmad-noprior-v2",
+          "version": "2",
+          "content_sha256": "fe54f086c7664722471f2be53e771b0034e4c11d0b2f7bca4cdd590880a76734",
+          "assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57"
+        },
+        "scope": "Supplementary synthetic branch witnesses, not reconstructed historical conversations",
+        "cases": [
+          {
+            "case": "explore",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "exploit",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "24a0514a56ee5d92a00e9e9b21e3b08ddfbf6b3e889c1ab805a05a6967ee00dd",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "b2f556f678f151c4b345f121399cf9370e92e646fcf331877f7d1f7c40d33d45",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "66f85f12325b69223af579394cb6c7eb14e8a9df59ac9c17c8e25eba0b395851",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "legacy",
+            "messages": [
+              {
+                "label": "proposer.legacy_reasoning",
+                "system_sha256": "19e51361e6b64b999061004c61b5f960425c1c4132bc8398d7009a9b03076e12",
+                "user_sha256": "28d48af8a6be1772de7ea44279aef026105c375f3095ecec637c3cd1ee4900e9"
+              },
+              {
+                "label": "proposer.legacy_commit",
+                "system_sha256": "a9fac89d89d1b5705187e7b195038b932f022ffdcaa3da29ecdbcf089723a5b5",
+                "user_sha256": "0a319fa044b42fec9ef225b7ad35db2d049862d0074646713dbbf2230da46598"
+              }
+            ]
+          },
+          {
+            "case": "trial_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "formal_only",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "unconfigured",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "comparison_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.comparison.correction",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "062a484983a052952c9abce968f4e45f7e5e9456933317c952d33c5e6e0f254a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "boldness_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "b1d0ee71b2242343ddd2e1d6145945967c0027e7b6ab56122b5c9a2ac904a6a8"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "e510ab12d3252a16f24ae4c3e5cd9fda0b2aa117d714a8c0ff1225f2ba2c01e9"
+              }
+            ]
+          },
+          {
+            "case": "causal_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.causal_reasoning.correction",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "1cb8f7fa5c46facff53aed66ba3b6532f127de1739535e6e449f4a813ba6f79a"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              }
+            ]
+          },
+          {
+            "case": "proposing_retry",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "8ecfa5a7fa9ac5a6b7284f3c561547d1ad66e580105442de1cca8cb57a083b01"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "5c9330811e569c2dc55938c5de19cf44bb62006e621abc4528fa4873f9dcefcc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "515c433e08f1f62d2dd8aaf570fb09c770bc3f10356dda25944f0810568e5c32"
+              }
+            ]
+          },
+          {
+            "case": "text_stages",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "72697ca2e050ff72e79f8d249ed32fbc3a4d0e295bf76383b62036d35779a452"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "90250f8ea02e9f12d166cb4cda5c0835f8a9cf7d63548547ec63c06cd3645d04"
+              }
+            ]
+          },
+          {
+            "case": "clamped",
+            "messages": [
+              {
+                "label": "proposer.comparison",
+                "system_sha256": "0039975863d71d1a581725409c748777cc82f5cdb91187e2c6e5572e1bb0ea83",
+                "user_sha256": "c325a3b95e2311f2dd0b5dcd57f3ca0bdc41f04d1693a25081e0ad61eb75216a"
+              },
+              {
+                "label": "proposer.causal_reasoning",
+                "system_sha256": "8fb163cff91f5fe3d9f7bd5f8148ee404c516883acbf09840e111c292b18074a",
+                "user_sha256": "23ee303435172b64b6c1a7a98913b05f4f02f7f907efdd88b2efe3fc3f13dbbc"
+              },
+              {
+                "label": "proposer.proposing",
+                "system_sha256": "895b071e86a2c2836ffde95bc8678affc9b28110ce76af1ac7f3f67382db248b",
+                "user_sha256": "2407de03a64add35e11bff47a16915a61aa2f20fe13556ca036451d41c4f039d"
+              }
+            ]
+          }
+        ],
+        "provider_calls": 0,
+        "training_calls": 0
+      }
+    }
+  ],
+  "provider_calls": 0,
+  "training_calls": 0
+}

@@ -107,6 +107,11 @@
       "infra_revision": "7a633910b06ce610b8fb9433bd35f012d7cc6e9d",
       "assembly_sha256": "cfc7c822ad8ea8896a566e08df77a3f58f7ca1112401ce3b7bc4a2d1822d6993",
       "scope": "Exact #908 candidate extending the separately qualified pre-L3 scheduler-disabled pair. Offline frozen 47 boundary cases and 48 synthetic complete proposer sequences cover the accumulated rendering closure; L3 contributes typed plural literature-review evidence. No recovered conversations, workflow execution, scientific training or stochastic artifact replay claim."
+    },
+    {
+      "infra_revision": "0c36aebc5d4359a872c61fc5f3cc099772dd2a43",
+      "assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57",
+      "scope": "Exact #923 human-advice prompt templates; the historical v2 renderer restores both archived template files byte-for-byte. Offline frozen 47 boundary cases and 48 synthetic complete proposer requests; no recovered conversations, workflow execution, scientific training or stochastic artifact replay claim."
     }
   ],
   "scheduler_disabled_assemblies": [
@@ -122,6 +127,7 @@
     "803e9ce34470b275329ca7bb9408945e98268d3303faabb607f0655d9d67bb0f",
     "cd48c044e7a8869686e597c123af5f0a9b148f32384ec4c02c4b5e52f8ade00b",
     "b8e93c6b3580f91d4ac2de79f0b97050fd5a07d87cdc96a36ce2cda065991613",
-    "cfc7c822ad8ea8896a566e08df77a3f58f7ca1112401ce3b7bc4a2d1822d6993"
+    "cfc7c822ad8ea8896a566e08df77a3f58f7ca1112401ce3b7bc4a2d1822d6993",
+    "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57"
   ]
 }

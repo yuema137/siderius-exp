@@ -1,0 +1,42 @@
+{
+  "infra_revision": "0c36aebc5d4359a872c61fc5f3cc099772dd2a43",
+  "assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57",
+  "exp_base": "416483b98f1dcc0860409b22c7fd894ef222cecf",
+  "prompt_package": "0.10.22",
+  "qualified_candidate": false,
+  "scheduler_disabled": true,
+  "frozen_boundaries": 47,
+  "boundary_matches": 47,
+  "proposer_sequences": 48,
+  "proposer_requests": 156,
+  "proposer_task_groups": 4,
+  "proposer_matches": 4,
+  "all_match": true,
+  "api_calls": 0,
+  "training_calls": 0,
+  "scope": "Exact #923 human-advice template assembly through existing scheduler-disabled v2 historical renderer; boundary and synthetic complete proposer-request evidence only, not recovered conversations, workflow execution, scientific training or stochastic artifact replay",
+  "installation": {
+    "installed_source_files": 20,
+    "frozen_source_entries": 16,
+    "unqualified_assembly_refusals": 4,
+    "profile_version": 2,
+    "profile_assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57"
+  },
+  "pre_admission_refusal": {
+    "package_version": "0.10.21",
+    "assembly_sha256": "61da42221d186bfff9efbb8c7343f7e20657c6c3cd39a6bfe6cfb0fa74895e57",
+    "result": "refused unqualified assembly",
+    "evidence": "Local-only execution log retained outside the repository; not included in this evidence export."
+  },
+  "evidence": {
+    "boundary_comparison": "boundary-comparison.json",
+    "proposer_comparison": "proposer-comparison.json",
+    "installation": "installation.json",
+    "environment": "Exact infra checkout own frozen Python 3.12 environment (local path omitted from evidence export)",
+    "commands": [
+      "<infra-python> <exp-checkout>/experiments/shared/prompt_compat/check_installation.py --profile-version 2",
+      "<infra-python> <exp-checkout>/experiments/shared/prompt_compat/compare.py --candidate <infra-checkout> --references <reference-map> --output <local-evidence>/compare47b --profile-version 2",
+      "<infra-python> <exp-checkout>/experiments/shared/prompt_compat/compare_proposer_requests.py --reference <proposer-reference>/prefx --candidate <infra-checkout> --output <local-evidence>/compare48b"
+    ]
+  }
+}
